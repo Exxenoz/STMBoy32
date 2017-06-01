@@ -1,0 +1,10 @@
+
+# uVision
+
+# Temp
+STM32F334x8/
+
+# Trash
+*.docx
+*.uvguix.*
+*.lst
