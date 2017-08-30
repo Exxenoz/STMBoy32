@@ -1,0 +1,15 @@
+
+# uVision
+
+# Temp
+DebugConfig/
+STM32F412xG/
+STM32F429_439xx/
+
+# User files
+*.uvguix.*
+
+# Trash
+*.docx
+*.uvguix.*
+*.lst
