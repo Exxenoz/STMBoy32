@@ -10,6 +10,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32f4xx_conf.h"
 
 /** @addtogroup STMBoy
   * @{
@@ -17,6 +18,14 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#ifndef USE_STDPERIPH_DRIVER
+	#define USE_STDPERIPH_DRIVER
+#endif
+
+#ifndef STM32F429_439xx
+	#define STM32F429_439xx
+#endif
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t uwTimingDelay;
@@ -61,7 +70,8 @@ int main(void)
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-    
+  
+	  
   /* HSE clock selected to output on MCO1 pin(PA8)*/
   RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);
   
@@ -75,7 +85,7 @@ int main(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
     
   /* SYSCLK/4 clock selected to output on MCO2 pin(PC9)*/
