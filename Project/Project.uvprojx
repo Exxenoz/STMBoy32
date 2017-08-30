@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;../../../Utilities/STM32_EVAL/Common;../../../Utilities/STM32_EVAL/STM324x9I_EVAL</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;../../../Utilities/STM32_EVAL/Common;../../../Utilities/STM32_EVAL/STM324x9I_EVAL;.\Common;.\Main;.\LCD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -391,7 +391,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -892,6 +892,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1285,7 +1320,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -1824,6 +1859,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2216,7 +2286,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -2755,6 +2825,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3145,7 +3250,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -3734,6 +3839,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4124,7 +4264,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -4663,6 +4803,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5053,7 +5228,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -5492,6 +5667,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5884,7 +6094,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -6323,6 +6533,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6713,7 +6958,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -7102,6 +7347,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7494,7 +7774,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -7833,6 +8113,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8226,7 +8541,7 @@
           <GroupName>Doc</GroupName>
         </Group>
         <Group>
-          <GroupName>User</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
@@ -8565,6 +8880,41 @@
               <FileName>stm32f4xx_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_regdef.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_regdef.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Common</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\common.h</FilePath>
             </File>
           </Files>
         </Group>
