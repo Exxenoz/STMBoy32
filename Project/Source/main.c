@@ -19,11 +19,11 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #ifndef USE_STDPERIPH_DRIVER
-	#define USE_STDPERIPH_DRIVER
+    #define USE_STDPERIPH_DRIVER
 #endif
 
 #ifndef STM32F429_439xx
-	#define STM32F429_439xx
+    #define STM32F429_439xx
 #endif
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,12 +70,10 @@ int main(void)
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-  
-	  
+
   /* HSE clock selected to output on MCO1 pin(PA8)*/
   RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);
-  
-  
+
   /* Output SYSCLK/4 clock on MCO2 pin(PC9) ***********************************/ 
   /* Enable the GPIOACperipheral */ 
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);

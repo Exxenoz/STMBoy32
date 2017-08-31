@@ -3,7 +3,7 @@
 
 enum LCD_RegisterAddress
 {
-	LCD_READ_DISPLAY_ID_INFO = 0x04	
+    LCD_READ_DISPLAY_ID_INFO = 0x04	
 };
 
 #endif //LCD_REGDEF_H
