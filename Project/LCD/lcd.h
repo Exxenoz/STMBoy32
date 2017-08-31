@@ -30,4 +30,14 @@ void LCD_Write(uint16_t addr, uint16_t data);
 uint16_t LCD_ReadData(void);
 uint16_t LCD_Read(uint16_t addr);
 
+typedef enum LCD_BusyFlag_e
+{
+    LCD_BUSYFLAG_NONE  = 0,
+    LCD_BUSYFLAG_WRITE = 1,
+    LCD_BUSYFLAG_READ  = 2,
+}
+LCD_BusyFlag;
+
+LCD_BusyFlag LCD_BusyFlags = 0;
+
 #endif //LCD_H
