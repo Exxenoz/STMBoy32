@@ -25,19 +25,15 @@ bool LCD_Initialize(void);
 
 void LCD_WriteAddr(uint16_t addr);
 void LCD_WriteData(uint16_t data);
+void LCD_WriteCommand(uint16_t addr);
 void LCD_Write(uint16_t addr, uint16_t data);
+void LCD_WriteBuffer(uint16_t addr, uint16_t buffer[], long length);
 
 uint16_t LCD_ReadData(void);
 uint16_t LCD_Read(uint16_t addr);
+void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length);
 
-typedef enum LCD_BusyFlag_e
-{
-    LCD_BUSYFLAG_NONE  = 0,
-    LCD_BUSYFLAG_WRITE = 1,
-    LCD_BUSYFLAG_READ  = 2,
-}
-LCD_BusyFlag;
-
-LCD_BusyFlag LCD_BusyFlags = 0;
+void LCD_SetColumnAddress(uint16_t startColumn, uint16_t endColumn);
+void LCD_SetRowAddress(uint16_t startRow, uint16_t endRow);
 
 #endif //LCD_H
