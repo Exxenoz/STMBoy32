@@ -30,19 +30,121 @@ bool LCD_Initialize(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
-    
-    LCD_Initialize_Pins();
-    
-    for (uint16_t i = 0; i < 50000; i++);
-    LCD_RST_RESET;
-    for (uint16_t i = 0; i < 50000; i++);
-    LCD_SET_RESET;
-    for (long i = 0; i < 50000; i++);
-    
-    uint16_t data[16] = {0};
-    data[0] = 0x00;
-    LCD_WriteBuffer(LCD_REG_WRITE_CTRL_DISPLAY, data, 1);
 
+    LCD_Initialize_Pins();
+
+    LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
+    // Wait ~120ms (ILI9341 Datasheet p. 90)
+    for (long i = 0; i < 500000; i++);
+
+    LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
+
+    uint16_t data[64];
+    data[0] = 0;
+    data[1] = 0x83;
+    data[2] = 0x30;
+    LCD_WriteBuffer(0xCF, data, 3);
+
+    data[0] = 0x64;
+    data[1] = 0x03;
+    data[2] = 0x12;
+    data[3] = 0x81;
+    LCD_WriteBuffer(0xED, data, 4);
+
+    data[0] = 0x85;
+    data[1] = 0x01;
+    data[2] = 0x79;
+    LCD_WriteBuffer(0xE8, data, 3);
+
+    data[0] = 0x39;
+    data[1] = 0x2C;
+    data[2] = 0x00;
+    data[3] = 0x34;
+    data[4] = 0x02;
+    LCD_WriteBuffer(0xCB, data, 5);
+
+    LCD_Write(0xF7, 0x20);
+
+    data[0] = 0x00;
+    data[1] = 0x00;
+    LCD_WriteBuffer(0xEA, data, 2);
+
+    LCD_Write(LCD_REG_POWER_CONTROL_1, 0x26);
+    LCD_Write(LCD_REG_POWER_CONTROL_2, 0x11);
+
+    data[0] = 0x35;
+    data[1] = 0x3E;
+    LCD_WriteBuffer(LCD_REG_VCOM_CONTROL_1, data, 2);
+    LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
+
+    LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, 0x48);
+    LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
+
+    data[0] = 0x00;
+    data[1] = 0x1B;
+    LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, data, 2);
+
+    LCD_Write(0xF2, 0x08); // Gamma Function Disable... probably?
+
+    LCD_Write(LCD_REG_GAMMA_SET, 0x01);
+
+    data[0]  = 0x1f;
+    data[1]  = 0x1a;
+    data[2]  = 0x18;
+    data[3]  = 0x0a;
+    data[4]  = 0x0f;
+    data[5]  = 0x06;
+    data[6]  = 0x45;
+    data[7]  = 0x87;
+    data[8]  = 0x32;
+    data[9]  = 0x0a;
+    data[10] = 0x07;
+    data[11] = 0x02;
+    data[12] = 0x07;
+    data[13] = 0x05;
+    data[14] = 0x00;
+    LCD_WriteBuffer(LCD_REG_POSITIVE_GAMMA_CORRECTION, data, 15);
+
+    data[0]  = 0x00;
+    data[1]  = 0x25;
+    data[2]  = 0x27;
+    data[3]  = 0x05;
+    data[4]  = 0x10;
+    data[5]  = 0x09;
+    data[6]  = 0x3A;
+    data[7]  = 0x78;
+    data[8]  = 0x4D;
+    data[9]  = 0x05;
+    data[10] = 0x18;
+    data[11] = 0x0D;
+    data[12] = 0x38;
+    data[13] = 0x3A;
+    data[14] = 0x1F;
+    LCD_WriteBuffer(LCD_REG_NEGATIVE_GAMMA_CORRECTION, data, 15);
+
+    data[0]  = 0x00;
+    data[1]  = 0x00;
+    data[2]  = 0x00;
+    data[3]  = 0xEF;
+    LCD_WriteBuffer(LCD_REG_SET_COLUMN_ADDRESS, data, 4);
+
+    data[0]  = 0x00;
+    data[1]  = 0x00;
+    data[2]  = 0x01;
+    data[3]  = 0x3F;
+    LCD_WriteBuffer(LCD_REG_SET_ROW_ADDRESS, data, 4);
+
+    LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
+
+    data[0]  = 0x0A;
+    data[1]  = 0x82;
+    data[2]  = 0x27;
+    data[3]  = 0x00;
+    LCD_WriteBuffer(LCD_REG_DISPLAY_FUNCTION_CONTROL, data, 4);
+
+    LCD_WriteCommand(LCD_REG_SLEEP_OUT);
+    LCD_WriteCommand(LCD_REG_DISPLAY_ON);
+    
     return false;
 }
 
@@ -51,21 +153,15 @@ void LCD_WriteAddr(uint16_t addr)
     LCD_DATA_PORT->ODR = addr;
     LCD_RST_RS; // Set to command
     LCD_RST_WR; // Set to write
-    NOP; NOP; NOP;
     LCD_SET_WR;
-    NOP; NOP; NOP;
     LCD_SET_RS; // Set to data
-    LCD_DATA_PORT->ODR = 0x00;
 }
 
 void LCD_WriteData(uint16_t data)
 {
     LCD_DATA_PORT->ODR = data;
     LCD_RST_WR; // Set to write
-    NOP; NOP; NOP;
     LCD_SET_WR;
-    NOP; NOP; NOP;
-    LCD_DATA_PORT->ODR = 0x00;
 }
 
 void LCD_WriteCommand(uint16_t addr)

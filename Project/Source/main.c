@@ -21,23 +21,8 @@ int main(void)
     
     LCD_Initialize();
     
-    LCD_SetColumnAddress(0, 239);
-    LCD_SetRowAddress(0, 319);
-    
-    LCD_WriteCommand(0x11);
-    LCD_WriteCommand(0x29);
-    
-    LCD_Write(0x3A, 0x05);
-    
-    
-    
-    LCD_Write(0x36, 0x10);
-    
-    LCD_SetColumnAddress(0, 239);
-    LCD_SetRowAddress(0, 319);
     LCD_RST_CS;
     LCD_WriteAddr(0x2C);
-    LCD_WriteData(0x00);
     for (long i = 0; i < 320*240; i++)
     {
         if (i < 320*120)
@@ -48,7 +33,6 @@ int main(void)
         {
             LCD_WriteData(0x0000);
         }
-        for (long i = 0; i < 400; i++);
     }
     LCD_SET_CS;
     
