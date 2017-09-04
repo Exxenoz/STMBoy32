@@ -27,7 +27,7 @@ enum LCD_RegisterAddress
     LCD_REG_NEGATIVE_GAMMA_CORRECTION = 0xE1,
 };
 
-typedef union
+typedef union // 0x36 - LCD_REG_MEMORY_ACCESS_CONTROL
 {
     struct
     {
@@ -44,5 +44,24 @@ typedef union
     uint16_t Data;
 }
 MemoryAccessControlData_t;
+
+typedef struct // 0xB6 - LCD_REG_DISPLAY_FUNCTION_CONTROL
+{
+    union
+    {
+        struct
+        {
+            unsigned int                   : 16; // LSB
+            unsigned int                   : 7;
+            unsigned int LiquidCrystalType : 1;
+            unsigned int                   : 8;
+            unsigned int                   : 16;
+            unsigned int                   : 16; // MSB
+        };
+
+        uint16_t Data[4];
+    };
+}
+DisplayFunctionControlData_t;
 
 #endif //LCD_REGDEF_H
