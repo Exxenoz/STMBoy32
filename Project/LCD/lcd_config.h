@@ -3,6 +3,11 @@
 
 #include "stm32f4xx_conf.h"
 
+#define LCD_DISPLAY_SIZE_X 320
+#define LCD_DISPLAY_SIZE_Y 240
+
+#define LCD_DISPLAY_PIXELS 76800 // LCD_DISPLAY_SIZE_X * LCD_DISPLAY_SIZE_Y
+
 #define LCD_RESET_PORT GPIOG
 #define LCD_RESET_PIN  GPIO_Pin_0
 

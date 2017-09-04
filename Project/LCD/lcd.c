@@ -52,6 +52,7 @@ bool LCD_Initialize(void)
     memoryAccessControlData.RowAddressOrder = 1;
     memoryAccessControlData.ColumnAddressOrder = 1;
     memoryAccessControlData.RowColumnExchange = 1;
+    memoryAccessControlData.RGBBGROrder = 1;
     LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
 
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
@@ -214,4 +215,15 @@ void LCD_SetRowAddress(uint16_t startRow, uint16_t endRow)
     data[2] = endRow >> 8;
     data[3] = endRow & 0xFF;
     LCD_WriteBuffer(LCD_REG_SET_ROW_ADDRESS, data, 4);
+}
+
+void LCD_ClearColor(uint16_t color)
+{
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
+    {
+        LCD_WriteData(color);
+    }
+    LCD_SET_CS;
 }

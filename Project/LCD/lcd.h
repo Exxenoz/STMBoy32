@@ -36,4 +36,6 @@ void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length);
 void LCD_SetColumnAddress(uint16_t startColumn, uint16_t endColumn);
 void LCD_SetRowAddress(uint16_t startRow, uint16_t endRow);
 
+void LCD_ClearColor(uint16_t color);
+
 #endif //LCD_H

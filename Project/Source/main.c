@@ -20,25 +20,8 @@ int main(void)
        refer to system_stm32f4xx.c file */
     
     LCD_Initialize();
+    LCD_ClearColor(0x001F);
 
-    LCD_RST_CS;
-    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (long i = 0, pixels = 320 * 240; i < pixels; i++)
-    {
-        if (i < 320*120)
-        {
-            LCD_WriteData(0x00FD);
-        }
-        else 
-        {
-            LCD_WriteData(0x07E0);
-        }
-    }
-    LCD_SET_CS;
-    
-    uint16_t madctl[2];
-    LCD_ReadBuffer(0x0B, madctl, 2);
-    
     /* Infinite loop */
     while (1)
     {
