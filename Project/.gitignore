@@ -13,3 +13,4 @@ STM32F429_439xx/
 *.docx
 *.uvguix.*
 *.lst
+*.TMP
