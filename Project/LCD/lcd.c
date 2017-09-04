@@ -39,52 +39,26 @@ bool LCD_Initialize(void)
 
     LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
 
-    uint16_t data[64];
-    data[0] = 0;
-    data[1] = 0x83;
-    data[2] = 0x30;
-    LCD_WriteBuffer(0xCF, data, 3);
+    LCD_Write(LCD_REG_POWER_CONTROL_1, 0x09);
+    LCD_Write(LCD_REG_POWER_CONTROL_2, 0x13);
 
-    data[0] = 0x64;
-    data[1] = 0x03;
-    data[2] = 0x12;
-    data[3] = 0x81;
-    LCD_WriteBuffer(0xED, data, 4);
-
-    data[0] = 0x85;
-    data[1] = 0x01;
-    data[2] = 0x79;
-    LCD_WriteBuffer(0xE8, data, 3);
-
-    data[0] = 0x39;
-    data[1] = 0x2C;
-    data[2] = 0x00;
-    data[3] = 0x34;
-    data[4] = 0x02;
-    LCD_WriteBuffer(0xCB, data, 5);
-
-    LCD_Write(0xF7, 0x20);
-
-    data[0] = 0x00;
-    data[1] = 0x00;
-    LCD_WriteBuffer(0xEA, data, 2);
-
-    LCD_Write(LCD_REG_POWER_CONTROL_1, 0x26);
-    LCD_Write(LCD_REG_POWER_CONTROL_2, 0x11);
-
-    data[0] = 0x35;
+    uint16_t data[16];
+    data[0] = 0x35; 
     data[1] = 0x3E;
     LCD_WriteBuffer(LCD_REG_VCOM_CONTROL_1, data, 2);
     LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
 
-    LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, 0x48);
+    MemoryAccessControlData_t memoryAccessControlData = {0};
+    memoryAccessControlData.RowAddressOrder = 1;
+    memoryAccessControlData.ColumnAddressOrder = 1;
+    memoryAccessControlData.RowColumnExchange = 1;
+    LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
+
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
 
     data[0] = 0x00;
     data[1] = 0x1B;
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, data, 2);
-
-    LCD_Write(0xF2, 0x08); // Gamma Function Disable... probably?
 
     LCD_Write(LCD_REG_GAMMA_SET, 0x01);
 
@@ -124,14 +98,14 @@ bool LCD_Initialize(void)
 
     data[0]  = 0x00;
     data[1]  = 0x00;
-    data[2]  = 0x00;
-    data[3]  = 0xEF;
+    data[2]  = 0x01;
+    data[3]  = 0x3F;
     LCD_WriteBuffer(LCD_REG_SET_COLUMN_ADDRESS, data, 4);
 
     data[0]  = 0x00;
     data[1]  = 0x00;
-    data[2]  = 0x01;
-    data[3]  = 0x3F;
+    data[2]  = 0x00;
+    data[3]  = 0xEF;
     LCD_WriteBuffer(LCD_REG_SET_ROW_ADDRESS, data, 4);
 
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);

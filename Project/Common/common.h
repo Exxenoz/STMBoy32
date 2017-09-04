@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#pragma anon_unions
+
 // Workaround for Keil syntax highlighting
 #ifndef USE_STDPERIPH_DRIVER
     #define USE_STDPERIPH_DRIVER

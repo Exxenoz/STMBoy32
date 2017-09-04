@@ -27,4 +27,22 @@ enum LCD_RegisterAddress
     LCD_REG_NEGATIVE_GAMMA_CORRECTION = 0xE1,
 };
 
+typedef union
+{
+    struct
+    {
+        unsigned int                        : 2; // LSB
+        unsigned int HorizontalRefreshOrder : 1;
+        unsigned int RGBBGROrder            : 1;
+        unsigned int VerticalRefreshOrder   : 1;
+        unsigned int RowColumnExchange      : 1;
+        unsigned int ColumnAddressOrder     : 1;
+        unsigned int RowAddressOrder        : 1;
+        unsigned int                        : 8; // MSB
+    };
+
+    uint16_t Data;
+}
+MemoryAccessControlData_t;
+
 #endif //LCD_REGDEF_H
