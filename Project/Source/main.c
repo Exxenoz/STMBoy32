@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "lcd.h"
+#include "input.h"
 
 int main(void)
 {
@@ -19,6 +20,8 @@ int main(void)
        To reconfigure the default setting of SystemInit() function, 
        refer to system_stm32f4xx.c file */
     
+    Input_Initialize();
+
     LCD_Initialize();
     LCD_ClearColor(0x001F);
 

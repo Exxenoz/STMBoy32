@@ -45,22 +45,19 @@ typedef union // 0x36 - LCD_REG_MEMORY_ACCESS_CONTROL
 }
 MemoryAccessControlData_t;
 
-typedef struct // 0xB6 - LCD_REG_DISPLAY_FUNCTION_CONTROL
+typedef union // 0xB6 - LCD_REG_DISPLAY_FUNCTION_CONTROL
 {
-    union
+    struct
     {
-        struct
-        {
-            unsigned int                   : 16; // LSB
-            unsigned int                   : 7;
-            unsigned int LiquidCrystalType : 1;
-            unsigned int                   : 8;
-            unsigned int                   : 16;
-            unsigned int                   : 16; // MSB
-        };
-
-        uint16_t Data[4];
+        unsigned int                   : 16; // LSB
+        unsigned int                   : 7;
+        unsigned int LiquidCrystalType : 1;
+        unsigned int                   : 8;
+        unsigned int                   : 16;
+        unsigned int                   : 16; // MSB
     };
+
+    uint16_t Data[4];
 }
 DisplayFunctionControlData_t;
 
