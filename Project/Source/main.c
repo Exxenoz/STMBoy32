@@ -22,11 +22,20 @@ int main(void)
     
     Input_Initialize();
 
-    LCD_Initialize();
-    LCD_ClearColor(0x001F);
+    LCD_Initialize();    
 
+    int i;
+    uint16_t red = 0xF000;
+    uint16_t green = 0x0F00;
+    uint16_t blue = 0x000F;
     /* Infinite loop */
     while (1)
     {
+        LCD_ClearColor(red);
+        for(i=0; i< 10000000; i++);
+        LCD_ClearColor(green);
+        for(i=0; i< 10000000; i++);
+        LCD_ClearColor(blue);
+        for(i=0; i< 10000000; i++);
     }
 }

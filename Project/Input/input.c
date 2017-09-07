@@ -91,7 +91,8 @@ void EXTI4_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
     {
-        /*if(GPIOB->ODR & GPIO_Pin_0)
+        /*if(INPUT_B_PORT->ODR & INPUT_B_PIN)
+
         {
             GPIO_SetBits(GPIOB, GPIO_Pin_0);
         }

@@ -223,7 +223,9 @@ void LCD_ClearColor(uint16_t color)
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
     {
-        LCD_WriteData(color);
+        LCD_DATA_PORT->ODR = color;
+        LCD_RST_WR; // Set to write
+        LCD_SET_WR;
     }
     LCD_SET_CS;
 }
