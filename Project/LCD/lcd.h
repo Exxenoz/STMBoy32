@@ -33,8 +33,9 @@ uint16_t LCD_ReadData(void);
 uint16_t LCD_Read(uint16_t addr);
 void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length);
 
-void LCD_SetColumnAddress(uint16_t startColumn, uint16_t endColumn);
-void LCD_SetRowAddress(uint16_t startRow, uint16_t endRow);
+void LCD_SetDrawAreaHorizontal(uint16_t startColumn, uint16_t endColumn);
+void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow);
+void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void LCD_ClearColor(uint16_t color);
 

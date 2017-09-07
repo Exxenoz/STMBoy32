@@ -58,7 +58,7 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
 
     data[0] = 0x00;
-    data[1] = 0x1B;
+    data[1] = 0x1B; // 70 Hz (Default)
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, data, 2);
 
     LCD_Write(LCD_REG_GAMMA_SET, 0x01);
@@ -97,17 +97,7 @@ bool LCD_Initialize(void)
     data[14] = 0x1F;
     LCD_WriteBuffer(LCD_REG_NEGATIVE_GAMMA_CORRECTION, data, 15);
 
-    data[0]  = 0x00;
-    data[1]  = 0x00;
-    data[2]  = 0x01;
-    data[3]  = 0x3F;
-    LCD_WriteBuffer(LCD_REG_SET_COLUMN_ADDRESS, data, 4);
-
-    data[0]  = 0x00;
-    data[1]  = 0x00;
-    data[2]  = 0x00;
-    data[3]  = 0xEF;
-    LCD_WriteBuffer(LCD_REG_SET_ROW_ADDRESS, data, 4);
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
 
@@ -119,7 +109,7 @@ bool LCD_Initialize(void)
 
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
-    
+
     return false;
 }
 
@@ -197,24 +187,30 @@ void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length)
     LCD_SET_CS;
 }
 
-void LCD_SetColumnAddress(uint16_t startColumn, uint16_t endColumn)
+void LCD_SetDrawAreaHorizontal(uint16_t startColumn, uint16_t endColumn)
 {
-    uint16_t data[4];
-    data[0] = startColumn >> 8;
-    data[1] = startColumn & 0xFF;
-    data[2] = endColumn >> 8;
-    data[3] = endColumn & 0xFF;
-    LCD_WriteBuffer(LCD_REG_SET_COLUMN_ADDRESS, data, 4);
+    ColumnAddressSetData_t columnAddressSetData = {0};
+    columnAddressSetData.StartColumnHigh = startColumn >> 8;
+    columnAddressSetData.StartColumnLow  = startColumn & 0xFF;
+    columnAddressSetData.EndColumnHigh   = endColumn >> 8;
+    columnAddressSetData.EndColumnLow    = endColumn & 0xFF;
+    LCD_WriteBuffer(LCD_REG_COLUMN_ADDRESS_SET, columnAddressSetData.Data, 4);
 }
 
-void LCD_SetRowAddress(uint16_t startRow, uint16_t endRow)
+void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow)
 {
-    uint16_t data[4];
-    data[0] = startRow >> 8;
-    data[1] = startRow & 0xFF;
-    data[2] = endRow >> 8;
-    data[3] = endRow & 0xFF;
-    LCD_WriteBuffer(LCD_REG_SET_ROW_ADDRESS, data, 4);
+    PageAddressSetData_t pageAddressSetData = {0};
+    pageAddressSetData.StartPageHigh = startRow >> 8;
+    pageAddressSetData.StartPageLow  = startRow & 0xFF;
+    pageAddressSetData.EndPageHigh   = endRow >> 8;
+    pageAddressSetData.EndPageLow    = endRow & 0xFF;
+    LCD_WriteBuffer(LCD_REG_PAGE_ADDRESS_SET, pageAddressSetData.Data, 4);
+}
+
+void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+{
+    LCD_SetDrawAreaHorizontal(x, x + width - 1);
+    LCD_SetDrawAreaVertical(y, y + height - 1);
 }
 
 void LCD_ClearColor(uint16_t color)
