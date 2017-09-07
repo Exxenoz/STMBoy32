@@ -22,7 +22,7 @@ int main(void)
     
     Input_Initialize();
 
-    LCD_Initialize();    
+    LCD_Initialize();
 
     int i;
     uint16_t red = 0xF000;

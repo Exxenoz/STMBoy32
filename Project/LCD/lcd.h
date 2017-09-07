@@ -5,20 +5,20 @@
 #include "lcd_config.h"
 #include "lcd_regdef.h"
 
-#define LCD_SET_RESET GPIO_SetBits(LCD_RESET_PORT, LCD_RESET_PIN)
-#define LCD_RST_RESET GPIO_ResetBits(LCD_RESET_PORT, LCD_RESET_PIN)
+#define LCD_SET_RESET   LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
+#define LCD_RST_RESET   LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
 
-#define LCD_SET_RS GPIO_SetBits(LCD_RS_PORT, LCD_RS_PIN)
-#define LCD_RST_RS GPIO_ResetBits(LCD_RS_PORT, LCD_RS_PIN)
+#define LCD_SET_RS      LCD_RS_PORT->BSRRL |= LCD_RS_PIN
+#define LCD_RST_RS      LCD_RS_PORT->BSRRH |= LCD_RS_PIN
 
-#define LCD_SET_CS GPIO_SetBits(LCD_CS_PORT, LCD_CS_PIN)
-#define LCD_RST_CS GPIO_ResetBits(LCD_CS_PORT, LCD_CS_PIN)
+#define LCD_SET_CS      LCD_CS_PORT->BSRRL |= LCD_CS_PIN
+#define LCD_RST_CS      LCD_CS_PORT->BSRRH |= LCD_CS_PIN
 
-#define LCD_SET_RD GPIO_SetBits(LCD_RD_PORT, LCD_RD_PIN)
-#define LCD_RST_RD GPIO_ResetBits(LCD_RD_PORT, LCD_RD_PIN)
+#define LCD_SET_RD      LCD_RD_PORT->BSRRL |= LCD_RD_PIN
+#define LCD_RST_RD      LCD_RD_PORT->BSRRH |= LCD_RD_PIN
 
-#define LCD_SET_WR GPIO_SetBits(LCD_WR_PORT, LCD_WR_PIN)
-#define LCD_RST_WR GPIO_ResetBits(LCD_WR_PORT, LCD_WR_PIN)
+#define LCD_SET_WR      LCD_WR_PORT->BSRRL |= LCD_WR_PIN
+#define LCD_RST_WR      LCD_WR_PORT->BSRRH |= LCD_WR_PIN
 
 void LCD_Initialize_Pins(void);
 bool LCD_Initialize(void);
