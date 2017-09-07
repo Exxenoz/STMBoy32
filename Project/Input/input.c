@@ -91,17 +91,19 @@ void EXTI4_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
     {
-        if(INPUT_B_PORT->ODR & INPUT_B_PIN)
+        /*if(GPIOB->ODR & GPIO_Pin_0)
         {
             GPIO_SetBits(GPIOB, GPIO_Pin_0);
         }
         else
         {
             GPIO_ResetBits(GPIOB, GPIO_Pin_0);
-        }
+        }*/
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+    }  
+    
 
-        EXTI_ClearITPendingBit(EXTI_Line4);
-    }
+    EXTI_ClearITPendingBit(EXTI_Line4);
 }
 
 void EXTI2_IRQHandler(void)

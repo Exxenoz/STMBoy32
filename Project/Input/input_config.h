@@ -15,7 +15,7 @@
 #define INPUT_B_EXTI_PORT                   EXTI_PortSourceGPIOA
 #define INPUT_B_EXTI_PIN                    EXTI_PinSource4
 #define INPUT_B_EXTI_LINE                   EXTI_Line4
-#define INPUT_B_NVIC_CHANNEL                EXTI1_IRQn
+#define INPUT_B_NVIC_CHANNEL                EXTI4_IRQn
 
 #define INPUT_START_PORT                    GPIOA
 #define INPUT_START_PIN                     GPIO_Pin_2
