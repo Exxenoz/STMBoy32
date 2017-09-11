@@ -35,7 +35,7 @@ bool LCD_Initialize(void)
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
     // Wait ~120ms (ILI9341 Datasheet p. 90)
-    for (long i = 0; i < 500000; i++);
+    for (long i = 0; i < 2000000; i++);
 
     LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
 
