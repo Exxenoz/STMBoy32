@@ -59,4 +59,11 @@
 #define INPUT_FADE_LEFT_EXTI_LINE           EXTI_Line8
 #define INPUT_FADE_LEFT_NVIC_CHANNEL        EXTI9_5_IRQn
 
+#define INPUT_FRAME_PORT                    GPIOA
+#define INPUT_FRAME_PIN                     GPIO_Pin_1
+#define INPUT_FRAME_EXTI_PORT               EXTI_PortSourceGPIOA
+#define INPUT_FRAME_EXTI_PIN                EXTI_PinSource1
+#define INPUT_FRAME_EXTI_LINE               EXTI_Line1
+#define INPUT_FRAME_NVIC_CHANNEL            EXTI1_IRQn
+
 #endif
