@@ -99,6 +99,13 @@ bool LCD_Initialize(void)
 
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 
+    LCD_WriteCommand(LCD_REG_TEARING_EFFECT_LINE_ON);
+
+    LCD_FrameRateControlData_t frameRateControlData = {0};
+    frameRateControlData.DivisionRatio = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
+    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
+    LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
+
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
 
     data[0]  = 0x0A;

@@ -9,6 +9,7 @@ enum LCD_RegisterAddress
     LCD_REG_GAMMA_SET                 = 0x26,
     LCD_REG_DISPLAY_OFF               = 0x28,
     LCD_REG_DISPLAY_ON                = 0x29,
+    LCD_REG_TEARING_EFFECT_LINE_ON    = 0x35,
     LCD_REG_MEMORY_ACCESS_CONTROL     = 0x36,
     LCD_REG_WRITE_CTRL_DISPLAY        = 0x53,
     LCD_REG_COLUMN_ADDRESS_SET        = 0x2A,
@@ -49,10 +50,10 @@ typedef union // 0x2A - LCD_REG_COLUMN_ADDRESS_SET
 {
     struct
     {
-        unsigned int StartColumnHigh : 16;
+        unsigned int StartColumnHigh : 16; // LSB
         unsigned int StartColumnLow  : 16;
         unsigned int EndColumnHigh   : 16;
-        unsigned int EndColumnLow    : 16;
+        unsigned int EndColumnLow    : 16; // MSB
     };
 
     uint16_t Data[4];
@@ -63,15 +64,35 @@ typedef union // 0x2B - LCD_REG_PAGE_ADDRESS_SET
 {
     struct
     {
-        unsigned int StartPageHigh : 16;
+        unsigned int StartPageHigh : 16; // LSB
         unsigned int StartPageLow  : 16;
         unsigned int EndPageHigh   : 16;
-        unsigned int EndPageLow    : 16;
+        unsigned int EndPageLow    : 16; // MSB
     };
 
     uint16_t Data[4];
 }
 PageAddressSetData_t;
+
+enum
+{
+    LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1 = 0x00,
+    LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ  = 0x1F,
+};
+
+typedef union // 0xB1 - LCD_REG_FRAME_RATE_CONTROL
+{
+    struct
+    {
+        unsigned int DivisionRatio :  2; // LSB
+        unsigned int               : 14;
+        unsigned int FrameRate     :  5;
+        unsigned int               : 11; // MSB
+    };
+
+    uint16_t Data[2];
+}
+LCD_FrameRateControlData_t;
 
 typedef union // 0xB6 - LCD_REG_DISPLAY_FUNCTION_CONTROL
 {
