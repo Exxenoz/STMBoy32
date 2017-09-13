@@ -102,16 +102,24 @@ bool LCD_Initialize(void)
 
     LCD_FrameRateControlData_t frameRateControlData = {0};
     frameRateControlData.DivisionRatio = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
-    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
+    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_83HZ;
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
 
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
 
-    data[0]  = 0x0A;
-    data[1]  = 0x82;
-    data[2]  = 0x27;
-    data[3]  = 0x00;
+    data[0] = 0x0A;
+    data[1] = 0x82;
+    data[2] = 0x27;
+    data[3] = 0x00;
     LCD_WriteBuffer(LCD_REG_DISPLAY_FUNCTION_CONTROL, data, 4);
+
+    // Setting of porching is needed, because it increases the
+    // available time to write from RAM to GRAM without tearing.
+    data[0] = 0x5F; // Front Porching
+    data[1] = 0x5F; // Back  Porching
+    data[2] = 0x0A; // Default
+    data[3] = 0x14; // Default
+    LCD_WriteBuffer(LCD_REG_BLANKING_PORCH_CONTROL, data, 4);
 
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
