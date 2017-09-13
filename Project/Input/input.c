@@ -94,11 +94,11 @@ void EXTI0_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
     {
-        if(INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
-        {   
+        if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
+        {
             LCD_PrintKaro(0, g_KaroOffset++);
         }
-        
+
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
 }
