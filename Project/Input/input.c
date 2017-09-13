@@ -2,7 +2,7 @@
 
 void Input_Initialize() 
 {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
     // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
@@ -73,7 +73,7 @@ void Input_Initialize()
     INITIALIZE_NVIC_CHANNEL(INPUT_FADE_RIGHT_NVIC_CHANNEL);
     INITIALIZE_NVIC_CHANNEL(INPUT_FADE_BOTTOM_NVIC_CHANNEL);
     INITIALIZE_NVIC_CHANNEL(INPUT_FADE_LEFT_NVIC_CHANNEL);
-    //INITIALIZE_NVIC_CHANNEL(INPUT_FRAME_NVIC_CHANNEL); // ToDo: WHY YOU NO WORKING??!
+    INITIALIZE_NVIC_CHANNEL(INPUT_FRAME_NVIC_CHANNEL);
 
     //-----------DEBUG LED----------
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
@@ -99,6 +99,7 @@ void EXTI1_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line1);
     }
 }
@@ -107,6 +108,7 @@ void EXTI2_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line2) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line2);
     }
 }
@@ -115,6 +117,7 @@ void EXTI3_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line3) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line3);
     }
 }
@@ -123,15 +126,6 @@ void EXTI4_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
     {
-        /*if(INPUT_B_PORT->ODR & INPUT_B_PIN)
-
-        {
-            GPIO_SetBits(GPIOB, GPIO_Pin_0);
-        }
-        else
-        {
-            GPIO_ResetBits(GPIOB, GPIO_Pin_0);
-        }*/
         GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
 
         EXTI_ClearITPendingBit(EXTI_Line4);
@@ -142,18 +136,22 @@ void EXTI9_5_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line5);
     }
     else if (EXTI_GetITStatus(EXTI_Line6) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
     else if (EXTI_GetITStatus(EXTI_Line7) != RESET) 
     { 
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line7);
     }
     else if (EXTI_GetITStatus(EXTI_Line8) != RESET) 
     {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         EXTI_ClearITPendingBit(EXTI_Line8);
     }
     else if (EXTI_GetITStatus(EXTI_Line9) != RESET) 
