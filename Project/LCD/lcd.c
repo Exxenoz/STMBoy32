@@ -95,7 +95,7 @@ bool LCD_Initialize(void)
 
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 
-    LCD_WriteCommand(LCD_REG_TEARING_EFFECT_LINE_ON);
+    LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
 
     LCD_FrameRateControlData_t frameRateControlData = {0};
     frameRateControlData.DivisionRatio = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
