@@ -22,6 +22,7 @@
 
 void LCD_Initialize_Pins(void);
 bool LCD_Initialize(void);
+void LCD_Initialize_Karo(void); // Debug
 
 void LCD_WriteAddr(uint16_t addr);
 void LCD_WriteData(uint16_t data);
@@ -38,5 +39,6 @@ void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow);
 void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void LCD_ClearColor(uint16_t color);
+void LCD_PrintKaro(uint16_t color, uint16_t offset); // Debug
 
 #endif //LCD_H

@@ -1,5 +1,7 @@
 #include "lcd.h"
 
+uint16_t g_KaroData[LCD_DISPLAY_SIZE_Y];
+
 void LCD_Initialize_Pins(void)
 {
     GPIO_InitTypeDef GPIO_InitObject;
@@ -32,6 +34,7 @@ bool LCD_Initialize(void)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
 
     LCD_Initialize_Pins();
+    LCD_Initialize_Karo(); // Debug
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
     // Wait ~120ms (ILI9341 Datasheet p. 90)
@@ -114,6 +117,23 @@ bool LCD_Initialize(void)
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
 
     return false;
+}
+
+void LCD_Initialize_Karo()
+{
+    for (int i = 0, j = 0; i < LCD_DISPLAY_SIZE_Y; i++)
+    {
+        g_KaroData[i] = j;
+
+        if (i < LCD_HALF_DISPLAY_SIZE_Y) 
+        {
+            j++;
+        }
+        else 
+        {
+            j--;
+        }
+    }
 }
 
 void LCD_WriteAddr(uint16_t addr)
@@ -225,6 +245,40 @@ void LCD_ClearColor(uint16_t color)
         LCD_DATA_PORT->ODR = color;
         LCD_RST_WR; // Set to write
         LCD_SET_WR;
+    }
+    LCD_SET_CS;
+}
+
+void LCD_PrintKaro(uint16_t color, uint16_t offset)
+{
+    offset %= LCD_DISPLAY_SIZE_Y;
+    
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (long i = 0, j = offset; i < LCD_DISPLAY_PIXELS; j++)
+    {
+        if (j >= LCD_DISPLAY_SIZE_Y)
+        {
+            j = 0;
+        }
+
+        uint16_t start = LCD_HALF_DISPLAY_SIZE_X - g_KaroData[j];
+        uint16_t end   = LCD_HALF_DISPLAY_SIZE_X + g_KaroData[j];
+
+        for (int k = 0; k < LCD_DISPLAY_SIZE_X; k++, i++)
+        {
+            if (k >= start && k <= end)
+            {
+                LCD_DATA_PORT->ODR = color;
+            }
+            else
+            {
+                LCD_DATA_PORT->ODR = 0x000F;
+            }
+
+            LCD_RST_WR; 
+            LCD_SET_WR;
+        }     
     }
     LCD_SET_CS;
 }
