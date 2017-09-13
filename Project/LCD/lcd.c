@@ -57,10 +57,6 @@ bool LCD_Initialize(void)
 
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
 
-    data[0] = 0x00;
-    data[1] = 0x1B; // 70 Hz (Default)
-    LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, data, 2);
-
     LCD_Write(LCD_REG_GAMMA_SET, 0x01);
 
     data[0]  = 0x1f;
