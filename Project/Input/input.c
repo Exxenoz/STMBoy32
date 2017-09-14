@@ -119,7 +119,10 @@ void EXTI1_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        if (INPUT_A_PORT->IDR & INPUT_A_PIN)
+        {
+            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        }
         EXTI_ClearITPendingBit(EXTI_Line1);
     }
 }
@@ -140,7 +143,10 @@ void EXTI3_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line3) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        if (INPUT_START_PORT->IDR & INPUT_START_PIN)
+        {
+            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        }
         EXTI_ClearITPendingBit(EXTI_Line3);
     }
 }
@@ -149,8 +155,11 @@ void EXTI4_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
 
+        if (INPUT_SELECT_PORT->IDR & INPUT_SELECT_PIN)
+        {
+            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        }
         EXTI_ClearITPendingBit(EXTI_Line4);
     }
 }
