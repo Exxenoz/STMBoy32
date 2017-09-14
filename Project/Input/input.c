@@ -3,7 +3,7 @@
 
 void Input_Initialize() 
 {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
     // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
     // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
@@ -77,11 +77,9 @@ void Input_Initialize()
     INITIALIZE_NVIC_CHANNEL(INPUT_FRAME_NVIC_CHANNEL);
 
     //-----------DEBUG LED----------
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
     GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = GPIO_Pin_0;
+    GPIO_InitObject.GPIO_Pin   = GPIO_Pin_14;
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOB, &GPIO_InitObject);
@@ -121,7 +119,7 @@ void EXTI1_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line1);
     }
 }
@@ -130,7 +128,10 @@ void EXTI2_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line2) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        if (INPUT_B_PORT->IDR & INPUT_B_PIN)
+        {
+            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        }
         EXTI_ClearITPendingBit(EXTI_Line2);
     }
 }
@@ -139,7 +140,7 @@ void EXTI3_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line3) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line3);
     }
 }
@@ -148,7 +149,7 @@ void EXTI4_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
 
         EXTI_ClearITPendingBit(EXTI_Line4);
     }
@@ -158,22 +159,22 @@ void EXTI9_5_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line5);
     }
     else if (EXTI_GetITStatus(EXTI_Line6) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
     else if (EXTI_GetITStatus(EXTI_Line7) != RESET) 
     { 
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line7);
     }
     else if (EXTI_GetITStatus(EXTI_Line8) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         EXTI_ClearITPendingBit(EXTI_Line8);
     }
     else if (EXTI_GetITStatus(EXTI_Line9) != RESET) 
