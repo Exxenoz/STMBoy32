@@ -9,6 +9,7 @@
   */
 
 #include "common.h"
+#include "led.h"
 #include "lcd.h"
 #include "input.h"
 
@@ -36,6 +37,8 @@ int main(void)
     // Uncomment the following line if you want
     // to debug clock frequency settings using GPIO
     //ClockDebug_Initialize();
+
+    LED_Initialize();
 
     Input_Initialize();
 
