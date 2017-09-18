@@ -20,6 +20,7 @@ void LCD_Initialize_Pins(void)
     INITIALIZE_OUTPUT_PIN(LCD_RD_PORT,    LCD_RD_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_WR_PORT,    LCD_WR_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_Pin_All);
+    INITIALIZE_OUTPUT_PIN(LCD_BACKLIT_PORT, LCD_BACKLIT_PIN);
 
     LCD_SET_RESET;
     LCD_SET_RS;
@@ -30,6 +31,7 @@ void LCD_Initialize_Pins(void)
 
 bool LCD_Initialize(void)
 {
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
 
@@ -123,6 +125,8 @@ bool LCD_Initialize(void)
 
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
+
+    LCD_SET_BACKLIT;
 
     return false;
 }
