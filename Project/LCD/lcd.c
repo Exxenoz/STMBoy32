@@ -20,7 +20,15 @@ void LCD_Initialize_Pins(void)
     INITIALIZE_OUTPUT_PIN(LCD_RD_PORT,    LCD_RD_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_WR_PORT,    LCD_WR_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_Pin_All);
-    INITIALIZE_OUTPUT_PIN(LCD_BACKLIT_PORT, LCD_BACKLIT_PIN);
+
+    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitObject.GPIO_Pin   = LCD_BACKLIT_PIN;
+    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
+
+    GPIO_PinAFConfig(LCD_BACKLIT_PORT, LCD_BACKLIT_PIN_SOURCE, GPIO_AF_TIM1);
 
     LCD_SET_RESET;
     LCD_SET_RS;
@@ -29,14 +37,40 @@ void LCD_Initialize_Pins(void)
     LCD_SET_WR;
 }
 
+void LCD_InitializeTimer()
+{
+    TIM_TimeBaseInitTypeDef TIM_BaseObject = {0};
+    TIM_BaseObject.TIM_Prescaler = 9000 - 1;
+    TIM_BaseObject.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period = 4500 - 1;
+    TIM_BaseObject.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_RepetitionCounter = 0;
+    TIM_TimeBaseInit(TIM1, &TIM_BaseObject);
+
+    TIM_Cmd(TIM1, ENABLE);
+
+    TIM_OCInitTypeDef TIM_OCObject = {0};
+    TIM_OCObject.TIM_OCMode = TIM_OCMode_PWM1;
+    TIM_OCObject.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OCObject.TIM_Pulse = 2250;
+    TIM_OC4Init(TIM1, &TIM_OCObject);
+
+    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+}
+
 bool LCD_Initialize(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
 
+    // Enable Timer 1 clock.
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+
     LCD_Initialize_Pins();
     LCD_Initialize_Karo(); // Debug
+    LCD_InitializeTimer();
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
     // Wait ~120ms (ILI9341 Datasheet p. 90)
@@ -125,8 +159,6 @@ bool LCD_Initialize(void)
 
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
-
-    LCD_SET_BACKLIT;
 
     return false;
 }
