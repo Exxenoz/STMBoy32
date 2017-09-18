@@ -33,8 +33,8 @@
 /* Uncomment the line below to enable peripheral header file inclusion */
 /*#include "stm32f4xx_adc.h"
 #include "stm32f4xx_crc.h"
-#include "stm32f4xx_dbgmcu.h"
-#include "stm32f4xx_dma.h"*/
+#include "stm32f4xx_dbgmcu.h"*/
+#include "stm32f4xx_dma.h"
 #include "stm32f4xx_exti.h"
 //#include "stm32f4xx_flash.h"
 #include "stm32f4xx_gpio.h"
