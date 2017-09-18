@@ -54,9 +54,9 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
 
     MemoryAccessControlData_t memoryAccessControlData = {0};
-    memoryAccessControlData.RowAddressOrder = 1;
-    memoryAccessControlData.ColumnAddressOrder = 1;
-    memoryAccessControlData.RowColumnExchange = 1;
+    memoryAccessControlData.RowAddressOrder = 0;
+    memoryAccessControlData.ColumnAddressOrder = 0;
+    memoryAccessControlData.RowColumnExchange = 0;
     memoryAccessControlData.RGBBGROrder = 1;
     LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
 
@@ -98,13 +98,13 @@ bool LCD_Initialize(void)
     data[14] = 0x1F;
     LCD_WriteBuffer(LCD_REG_NEGATIVE_GAMMA_CORRECTION, data, 15);
 
-    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_Y, LCD_DISPLAY_SIZE_X);
 
     LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
 
     LCD_FrameRateControlData_t frameRateControlData = {0};
     frameRateControlData.DivisionRatio = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
-    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_83HZ;
+    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
 
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
@@ -117,11 +117,11 @@ bool LCD_Initialize(void)
 
     // Setting of porching is needed, because it increases the
     // available time to write from RAM to GRAM without tearing.
-    data[0] = 0x5F; // Front Porching
+    /*data[0] = 0x5F; // Front Porching
     data[1] = 0x5F; // Back  Porching
     data[2] = 0x0A; // Default
     data[3] = 0x14; // Default
-    LCD_WriteBuffer(LCD_REG_BLANKING_PORCH_CONTROL, data, 4);
+    LCD_WriteBuffer(LCD_REG_BLANKING_PORCH_CONTROL, data, 4);*/
 
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
@@ -263,21 +263,21 @@ void LCD_ClearColor(uint16_t color)
 
 void LCD_PrintKaro(uint16_t color, uint16_t offset)
 {
-    offset %= LCD_DISPLAY_SIZE_Y;
+    offset %= LCD_DISPLAY_SIZE_X;
     
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0, j = offset; i < LCD_DISPLAY_PIXELS; j++)
     {
-        if (j >= LCD_DISPLAY_SIZE_Y)
+        if (j >= LCD_DISPLAY_SIZE_X)
         {
             j = 0;
         }
 
-        uint16_t start = LCD_HALF_DISPLAY_SIZE_X - g_KaroData[j];
-        uint16_t end   = LCD_HALF_DISPLAY_SIZE_X + g_KaroData[j];
+        uint16_t start = LCD_HALF_DISPLAY_SIZE_Y - g_KaroData[j];
+        uint16_t end   = LCD_HALF_DISPLAY_SIZE_Y + g_KaroData[j];
 
-        for (int k = 0; k < LCD_DISPLAY_SIZE_X; k++, i++)
+        for (int k = 0; k < LCD_DISPLAY_SIZE_Y; k++, i++)
         {
             if (k >= start && k <= end)
             {
