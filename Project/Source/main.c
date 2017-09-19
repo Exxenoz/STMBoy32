@@ -9,6 +9,7 @@
   */
 
 #include "common.h"
+#include "audio.h"
 #include "led.h"
 #include "lcd.h"
 #include "input.h"
@@ -39,6 +40,8 @@ int main(void)
     //ClockDebug_Initialize();
 
     LED_Initialize();
+
+    Audio_Initialize();
 
     Input_Initialize();
 

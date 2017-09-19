@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;../../../Utilities/STM32_EVAL/Common;../../../Utilities/STM32_EVAL/STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;../../../Utilities/STM32_EVAL/Common;../../../Utilities/STM32_EVAL/STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -442,6 +442,11 @@
               <FileName>stm32f4xx_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -557,6 +562,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1002,6 +1027,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1154,6 +1184,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1598,6 +1648,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1750,6 +1805,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2192,6 +2267,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2344,6 +2424,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2786,6 +2886,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2938,6 +3043,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3380,6 +3505,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3532,6 +3662,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3976,6 +4126,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4128,6 +4283,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4570,6 +4745,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4722,6 +4902,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5166,6 +5366,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5318,6 +5523,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5763,6 +5988,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5915,6 +6145,26 @@
               <FileName>led_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LED\led_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Audio\audio.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Audio\audio_config.h</FilePath>
             </File>
           </Files>
         </Group>
