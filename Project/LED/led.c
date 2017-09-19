@@ -3,7 +3,6 @@
 void LED_Initialize(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitObject;
 

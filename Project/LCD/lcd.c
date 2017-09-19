@@ -40,23 +40,25 @@ void LCD_Initialize_Pins(void)
 void LCD_InitializeTimer()
 {
     TIM_TimeBaseInitTypeDef TIM_BaseObject = {0};
-    TIM_BaseObject.TIM_Prescaler = 9000 - 1;
+    TIM_BaseObject.TIM_Prescaler = 16;
     TIM_BaseObject.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period = 4500 - 1;
+    TIM_BaseObject.TIM_Period = 281;
     TIM_BaseObject.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM1, &TIM_BaseObject);
 
-    TIM_Cmd(TIM1, ENABLE);
-
     TIM_OCInitTypeDef TIM_OCObject = {0};
     TIM_OCObject.TIM_OCMode = TIM_OCMode_PWM1;
     TIM_OCObject.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_High;
-    TIM_OCObject.TIM_Pulse = 2250;
+    TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_Low;
+    TIM_OCObject.TIM_Pulse = 281;
     TIM_OC4Init(TIM1, &TIM_OCObject);
 
     TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+
+    TIM_Cmd(TIM1, ENABLE);
+
+    TIM_CtrlPWMOutputs(TIM1, ENABLE);
 }
 
 bool LCD_Initialize(void)
@@ -160,6 +162,9 @@ bool LCD_Initialize(void)
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
 
+    // ToDo: Move to somewhere else
+    LCD_DimBacklight(0);
+
     return false;
 }
 
@@ -178,6 +183,20 @@ void LCD_Initialize_Karo()
             j--;
         }
     }
+}
+
+void LCD_DimBacklight(long percent)
+{
+    if (percent < 0)
+    {
+        percent = 0;
+    }
+    else if (percent > 100)
+    {
+        percent = 100;
+    }
+
+    TIM_SetCompare4(TIM1, 2.81f * percent);
 }
 
 void LCD_WriteAddr(uint16_t addr)

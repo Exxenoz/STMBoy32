@@ -20,12 +20,11 @@
 #define LCD_SET_WR      LCD_WR_PORT->BSRRL |= LCD_WR_PIN
 #define LCD_RST_WR      LCD_WR_PORT->BSRRH |= LCD_WR_PIN
 
-#define LCD_SET_BACKLIT LCD_BACKLIT_PORT->BSRRL |= LCD_BACKLIT_PIN
-#define LCD_RST_BACKLIT LCD_BACKLIT_PORT->BSRRH |= LCD_BACKLIT_PIN
-
 void LCD_Initialize_Pins(void);
 bool LCD_Initialize(void);
 void LCD_Initialize_Karo(void); // Debug
+
+void LCD_DimBacklight(long percent);
 
 void LCD_WriteAddr(uint16_t addr);
 void LCD_WriteData(uint16_t data);
