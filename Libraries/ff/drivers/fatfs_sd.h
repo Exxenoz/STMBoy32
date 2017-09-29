@@ -15,7 +15,7 @@
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"
 #include "misc.h"
-#include "defines.h"
+#include "ffdefines.h"
 
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_delay.h"
