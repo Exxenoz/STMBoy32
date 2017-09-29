@@ -1,4 +1,12 @@
 #include "sdc.h"
+#include "led.h"
+#include "tm_stm32f4_delay.h"
+#include "tm_stm32f4_fatfs.h"
+
+/* Fatfs object */
+FATFS g_FatFs;
+/* File object */
+FIL g_File;
 
 void SDC_GPIOConfig()
 {
@@ -34,14 +42,14 @@ void SDC_SDIOConfig()
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, ENABLE);
 
-    SDIO_InitTypeDef SDIO_InitObject;
+    /*SDIO_InitTypeDef SDIO_InitObject;
     SDIO_InitObject.SDIO_ClockDiv = 150;
     SDIO_InitObject.SDIO_ClockEdge = SDIO_ClockEdge_Rising;
     SDIO_InitObject.SDIO_ClockBypass = SDIO_ClockBypass_Disable;
     SDIO_InitObject.SDIO_ClockPowerSave = SDIO_ClockPowerSave_Disable;
     SDIO_InitObject.SDIO_BusWide = SDIO_BusWide_1b;
     SDIO_InitObject.SDIO_HardwareFlowControl = SDIO_HardwareFlowControl_Disable;
-    SDIO_Init(&SDIO_InitObject);
+    SDIO_Init(&SDIO_InitObject);*/
 
     SDIO_SetPowerState(SDIO_PowerState_ON);
     SDIO_ClockCmd(ENABLE);
@@ -90,9 +98,23 @@ void SDC_DMAConfig(void)
 
 void SDC_Initialize()
 {
-   SDC_GPIOConfig();
-   SDC_SDIOConfig();
-  // SDC_DMAConfig();
+   //SDC_GPIOConfig();
+   //SDC_SDIOConfig();
+   //SDC_DMAConfig();
+   //SDC_InterruptConfig();
 
-  // SDC_InterruptConfig();
+    TM_DELAY_Init();
+
+    long result = f_mount(&g_FatFs, "0:", 1);
+
+    // Mount
+    if (result != FR_OK)
+    {
+        return;
+    }
+
+    LED_EnableGreen(true);
+
+    // Unmount
+    f_mount(NULL, "0:", 1);
 }
