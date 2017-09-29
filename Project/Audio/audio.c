@@ -7,9 +7,6 @@ uint16_t aSine12bit[32] = {
 
 void Audio_GPIOConfig(void)
 {
-    for (int i = 0; i < 32; i++)
-        aSine12bit[i] /= 2;
-
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitObject = {0};

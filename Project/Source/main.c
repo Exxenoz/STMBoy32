@@ -13,6 +13,7 @@
 #include "led.h"
 #include "lcd.h"
 #include "input.h"
+#include "sdc.h"
 
 void ClockDebug_Initialize()
 {
@@ -27,6 +28,7 @@ void ClockDebug_Initialize()
     GPIO_Init(GPIOC, &GPIO_InitObject);
 }
 
+
 int main(void)
 {
     /*!< At this stage the microcontroller clock setting is already configured, 
@@ -37,19 +39,43 @@ int main(void)
     
     // Uncomment the following line if you want
     // to debug clock frequency settings using GPIO
-    //ClockDebug_Initialize();
+    // ClockDebug_Initialize();
 
     LED_Initialize();
-
     Audio_Initialize();
-
     Input_Initialize();
-
     LCD_Initialize();
+    SDC_Initialize();
+    
+    uint32_t volatile data = 0;
+
+    SDIO_CmdInitTypeDef SDIO_CmdInitObject;
+    
+    SDIO_CmdInitObject.SDIO_Argument = 0x0;
+    SDIO_CmdInitObject.SDIO_CmdIndex = 0x0;
+    SDIO_CmdInitObject.SDIO_Response = SDIO_Response_No;
+    SDIO_CmdInitObject.SDIO_Wait = SDIO_Wait_No;
+    SDIO_CmdInitObject.SDIO_CPSM = SDIO_CPSM_Disable;
+    SDIO_SendCommand(&SDIO_CmdInitObject);
+    
+    SDIO_CmdInitObject.SDIO_Argument = 0x0;
+    SDIO_CmdInitObject.SDIO_CmdIndex = 2;
+    SDIO_CmdInitObject.SDIO_Response = SDIO_Response_Long;
+    SDIO_CmdInitObject.SDIO_Wait = SDIO_Wait_No;
+    SDIO_CmdInitObject.SDIO_CPSM = SDIO_CPSM_Disable;
+    SDIO_SendCommand(&SDIO_CmdInitObject);
+    
+    data = 1;
+    data = SDIO_GetResponse(SDIO_RESP1);
+    data = SDIO_GetResponse(SDIO_RESP2);
+    data = SDIO_GetResponse(SDIO_RESP3);
+    data = SDIO_GetResponse(SDIO_RESP4);
+    data = SDIO_GetCommandResponse();
+    
+    data = data + 1;
 
     /* Infinite loop */
     while (1)
     {
-         
     }
 }
