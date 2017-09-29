@@ -33,9 +33,8 @@ void SDC_GPIOConfig()
 void SDC_SDIOConfig()
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, ENABLE);
-    
-    SDIO_InitTypeDef SDIO_InitObject;
 
+    SDIO_InitTypeDef SDIO_InitObject;
     SDIO_InitObject.SDIO_ClockDiv = 150;
     SDIO_InitObject.SDIO_ClockEdge = SDIO_ClockEdge_Rising;
     SDIO_InitObject.SDIO_ClockBypass = SDIO_ClockBypass_Disable;
@@ -43,7 +42,7 @@ void SDC_SDIOConfig()
     SDIO_InitObject.SDIO_BusWide = SDIO_BusWide_1b;
     SDIO_InitObject.SDIO_HardwareFlowControl = SDIO_HardwareFlowControl_Disable;
     SDIO_Init(&SDIO_InitObject);
-    
+
     SDIO_SetPowerState(SDIO_PowerState_ON);
     SDIO_ClockCmd(ENABLE);
 }
@@ -67,8 +66,7 @@ void SDC_DMAConfig(void)
 {
     RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_DMA1, ENABLE);
 
-    DMA_InitTypeDef  DMA_InitObject;
-    
+    DMA_InitTypeDef DMA_InitObject;
     DMA_InitObject.DMA_Channel = 0;
     DMA_InitObject.DMA_PeripheralBaseAddr = 0;
     DMA_InitObject.DMA_Memory0BaseAddr = 0;
