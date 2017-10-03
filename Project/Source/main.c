@@ -46,33 +46,6 @@ int main(void)
     Input_Initialize();
     LCD_Initialize();
     SDC_Initialize();
-    
-    uint32_t volatile data = 0;
-
-    SDIO_CmdInitTypeDef SDIO_CmdInitObject;
-    
-    SDIO_CmdInitObject.SDIO_Argument = 0x0;
-    SDIO_CmdInitObject.SDIO_CmdIndex = 0x0;
-    SDIO_CmdInitObject.SDIO_Response = SDIO_Response_No;
-    SDIO_CmdInitObject.SDIO_Wait = SDIO_Wait_No;
-    SDIO_CmdInitObject.SDIO_CPSM = SDIO_CPSM_Disable;
-    SDIO_SendCommand(&SDIO_CmdInitObject);
-    
-    SDIO_CmdInitObject.SDIO_Argument = 0x0;
-    SDIO_CmdInitObject.SDIO_CmdIndex = 2;
-    SDIO_CmdInitObject.SDIO_Response = SDIO_Response_Long;
-    SDIO_CmdInitObject.SDIO_Wait = SDIO_Wait_No;
-    SDIO_CmdInitObject.SDIO_CPSM = SDIO_CPSM_Disable;
-    SDIO_SendCommand(&SDIO_CmdInitObject);
-    
-    data = 1;
-    data = SDIO_GetResponse(SDIO_RESP1);
-    data = SDIO_GetResponse(SDIO_RESP2);
-    data = SDIO_GetResponse(SDIO_RESP3);
-    data = SDIO_GetResponse(SDIO_RESP4);
-    data = SDIO_GetCommandResponse();
-    
-    data = data + 1;
 
     /* Infinite loop */
     while (1)
