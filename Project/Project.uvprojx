@@ -589,16 +589,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -1336,16 +1326,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -2082,16 +2062,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -2825,16 +2795,6 @@
         <Group>
           <GroupName>TM</GroupName>
           <Files>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
             <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
@@ -3570,16 +3530,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -4313,16 +4263,6 @@
         <Group>
           <GroupName>TM</GroupName>
           <Files>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
             <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
@@ -5060,16 +5000,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -5803,16 +5733,6 @@
         <Group>
           <GroupName>TM</GroupName>
           <Files>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
             <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
@@ -6550,16 +6470,6 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\tm\tm_stm32f4_fatfs.c</FilePath>
@@ -7296,16 +7206,6 @@
         <Group>
           <GroupName>TM</GroupName>
           <Files>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\tm\tm_stm32f4_delay.h</FilePath>
-            </File>
             <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
               <FileType>1</FileType>
