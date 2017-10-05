@@ -1,7 +1,7 @@
 #include "sdc.h"
 #include "led.h"
-#include "tm_stm32f4_delay.h"
 #include "tm_stm32f4_fatfs.h"
+#include "fatfs_sd_sdio.h"
 
 /* Fatfs object */
 FATFS g_FatFs;
@@ -103,15 +103,34 @@ void SDC_Initialize()
    //SDC_DMAConfig();
    //SDC_InterruptConfig();
 
-    TM_DELAY_Init();
+    //TM_FATFS_SD_SDIO_disk_initialize();
+    SD_Error status;
+    //status = SD_Init();
+    
+    //while (1);
+    
+    //if (status != SD_OK) return;
+    
+    
+    //uint32_t psdstatus[16] = {0};
+    //status = SD_SendSDStatus(psdstatus);
 
-    long result = f_mount(&g_FatFs, "0:", 1);
+    long result = f_mount(&g_FatFs, "", 1);
 
     // Mount
     if (result != FR_OK)
     {
         return;
     }
+    
+    uint8_t buffer[512] = {0};
+    SD_LowLevel_Init();
+    status = SD_Init();
+    
+    status = SD_ReadBlock(buffer, 0, 512);
+    
+    if (status != 0) return;
+    
 
     LED_EnableGreen(true);
 
