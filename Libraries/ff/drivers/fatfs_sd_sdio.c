@@ -434,7 +434,7 @@ DRESULT TM_FATFS_SD_SDIO_disk_ioctl(BYTE cmd, void *buff) {
 			*(DWORD *) buff = 32;
 		break;
 		case CTRL_SYNC :
-		case CTRL_ERASE_SECTOR :
+		//case CTRL_ERASE_SECTOR :
 		break;
 	}
 
@@ -487,7 +487,7 @@ SD_Error SD_Init (void)
 	__IO SD_Error errorstatus = SD_OK;
 
 	/* SDIO Peripheral Low Level Init */
-	//SD_LowLevel_Init();
+	SD_LowLevel_Init();
 	SDIO_DeInit ();
 	errorstatus = SD_PowerON ();
 

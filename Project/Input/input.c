@@ -94,11 +94,11 @@ void EXTI0_IRQHandler(void)
     {
         if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
         {
-            //LCD_PrintKaro(0, g_KaroOffset++);
+            LCD_PrintKaro(0, g_KaroOffset++);
             
             //for (long i = 0; i < 1000000; i++);
 
-            if (g_KaroOffset == 0 || g_KaroOffset == 120)
+            /*if (g_KaroOffset == 0 || g_KaroOffset == 120)
             {
                 LCD_ClearColor(0x00FF);
                 g_KaroOffset = 0;
@@ -108,7 +108,7 @@ void EXTI0_IRQHandler(void)
                 LCD_ClearColor(0xFF00);
             }
 
-            g_KaroOffset++;
+            g_KaroOffset++;*/
         }
 
         EXTI_ClearITPendingBit(EXTI_Line0);

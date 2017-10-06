@@ -649,21 +649,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -674,24 +659,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -1386,21 +1366,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -1411,24 +1376,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -2122,21 +2082,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -2147,24 +2092,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -2856,21 +2796,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -2881,24 +2806,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -3590,21 +3510,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -3615,24 +3520,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -4324,21 +4224,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -4349,24 +4234,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -5060,21 +4940,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -5085,24 +4950,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -5794,21 +5654,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -5819,24 +5664,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -6530,21 +6370,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -6555,24 +6380,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
@@ -7267,21 +7087,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -7292,24 +7097,19 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
             </File>
             <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
-            </File>
-            <File>
               <FileName>integer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_sd_sdio.h</FileName>
