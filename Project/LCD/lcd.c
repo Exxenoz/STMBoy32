@@ -314,13 +314,13 @@ void LCD_ClearColor(uint16_t color)
 
 void LCD_PrintKaro(uint16_t color, uint16_t offset)
 {
-    offset %= LCD_DISPLAY_SIZE_X;
+    offset %= LCD_DISPLAY_SIZE_Y;
     
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0, j = offset; i < LCD_DISPLAY_PIXELS; j++)
     {
-        if (j >= LCD_DISPLAY_SIZE_X)
+        if (j >= LCD_DISPLAY_SIZE_Y)
         {
             j = 0;
         }
