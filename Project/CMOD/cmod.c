@@ -28,4 +28,42 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_CLK_PORT, CMOD_CLK_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT, CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT, CMOD_DATA_PINS);
+    
+    CMOD_Initialize_Interrupt();
+}
+
+void CMOD_Initialize_Interrupt()
+{
+    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
+
+    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
+    // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+    EXTI_InitTypeDef EXTI_InitObject;
+    NVIC_InitTypeDef NVIC_InitObject;
+    
+    SYSCFG_EXTILineConfig(CMOD_DETECT_EXTI_PORT, CMOD_DETECT_EXTI_PIN);
+
+    EXTI_InitObject.EXTI_Line    = CMOD_DETECT_EXTI_LINE;                         
+    EXTI_InitObject.EXTI_Mode    = EXTI_Mode_Interrupt;          
+    EXTI_InitObject.EXTI_Trigger = EXTI_Trigger_Rising_Falling;  
+    EXTI_InitObject.EXTI_LineCmd = ENABLE;                       
+    EXTI_Init(&EXTI_InitObject);                                 
+
+    NVIC_InitObject.NVIC_IRQChannel                   = CMOD_DETECT_NVIC_CHANNEL; 
+    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0x0F;    
+    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0x0F;    
+    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;  
+    NVIC_Init(&NVIC_InitObject);                                 
+    NVIC_EnableIRQ(CMOD_DETECT_NVIC_CHANNEL);                                     
+}
+
+void EXTI15_10_IRQHandler(void) 
+{
+    if (EXTI_GetITStatus(EXTI_Line11) != RESET) 
+    {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        EXTI_ClearITPendingBit(EXTI_Line11);
+    }
 }

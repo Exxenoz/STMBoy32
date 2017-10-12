@@ -21,5 +21,7 @@
 #define CMOD_GET_DATA()     CMOD_DATA_PORT->IDR & 0xFF
 
 void CMOD_Initialize(void);
+void CMOD_Initialize_Interrupt(void);
+void EXTI15_10_IRQHandler(void); 
 
 #endif
