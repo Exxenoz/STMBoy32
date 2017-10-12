@@ -11,20 +11,20 @@
 
 #define LCD_DISPLAY_PIXELS 76800 // LCD_DISPLAY_SIZE_X * LCD_DISPLAY_SIZE_Y
 
-#define LCD_RESET_PORT   GPIOG
-#define LCD_RESET_PIN    GPIO_Pin_0
+#define LCD_RESET_PORT   GPIOD
+#define LCD_RESET_PIN    GPIO_Pin_6
 
-#define LCD_RS_PORT      GPIOG
-#define LCD_RS_PIN       GPIO_Pin_1
+#define LCD_RS_PORT      GPIOD
+#define LCD_RS_PIN       GPIO_Pin_7
 
-#define LCD_CS_PORT      GPIOG
-#define LCD_CS_PIN       GPIO_Pin_2
+#define LCD_CS_PORT      GPIOD
+#define LCD_CS_PIN       GPIO_Pin_8
 
-#define LCD_RD_PORT      GPIOG
-#define LCD_RD_PIN       GPIO_Pin_3
+#define LCD_RD_PORT      GPIOD
+#define LCD_RD_PIN       GPIO_Pin_9
 
-#define LCD_WR_PORT      GPIOG
-#define LCD_WR_PIN       GPIO_Pin_4
+#define LCD_WR_PORT      GPIOD
+#define LCD_WR_PIN       GPIO_Pin_10
 
 #define LCD_BACKLIT_PORT GPIOA
 #define LCD_BACKLIT_PIN  GPIO_Pin_11

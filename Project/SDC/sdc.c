@@ -115,22 +115,40 @@ void SDC_Initialize()
     //uint32_t psdstatus[16] = {0};
     //status = SD_SendSDStatus(psdstatus);
 
-    long result = f_mount(&g_FatFs, "", 1);
+    /*long result = f_mount(&g_FatFs, "0:", 1);
 
     // Mount
     if (result != FR_OK)
     {
         return;
-    }
+    }*/
     
     uint8_t buffer[512] = {0};
-    SD_LowLevel_Init();
     status = SD_Init();
     
-    status = SD_ReadBlock(buffer, 0, 512);
+    if (status != 0) return;
+
+    SD_CardInfo info;
+    status = SD_GetCardInfo(&info);
     
     if (status != 0) return;
     
+    for (int i = 0; i < 100000; i++);
+    
+    while (1) {
+       status = SD_ReadBlock(buffer, 512*7, 512);
+       if (buffer[510] != 0x55 || buffer[511] != 0xAA || status != SD_OK)
+       {
+           return;
+       }
+    }
+    
+    if (status != 0) return;
+
+    /*SD_CardStatus s;
+    status = SD_GetCardStatus(&s);
+
+    if (status != 0) return;*/
 
     LED_EnableGreen(true);
 

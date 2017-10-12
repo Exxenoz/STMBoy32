@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\ff\drivers;..\Libraries\ff\option;..\Libraries\tm;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\ff\drivers;..\Libraries\ff\option;..\Libraries\tm;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -649,21 +649,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -674,19 +659,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -694,9 +669,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1386,21 +1386,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -1411,19 +1396,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -1431,9 +1406,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2122,21 +2122,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -2147,19 +2132,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -2167,9 +2142,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2856,21 +2856,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -2881,19 +2866,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -2901,9 +2876,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3590,21 +3590,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -3615,19 +3600,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -3635,9 +3610,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4324,21 +4324,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -4349,19 +4334,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -4369,9 +4344,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5060,21 +5060,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -5085,19 +5070,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -5105,9 +5080,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5794,21 +5794,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -5819,19 +5804,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -5839,9 +5814,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6530,21 +6530,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -6555,19 +6540,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -6575,9 +6550,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7267,21 +7267,6 @@
               <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>unicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\option\unicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
               <FileName>diskio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\diskio.h</FilePath>
@@ -7292,19 +7277,9 @@
               <FilePath>..\Libraries\ff\ff.h</FilePath>
             </File>
             <File>
-              <FileName>ffattributes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffattributes.h</FilePath>
-            </File>
-            <File>
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffdefines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffdefines.h</FilePath>
             </File>
             <File>
               <FileName>integer.h</FileName>
@@ -7312,9 +7287,34 @@
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
             <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>

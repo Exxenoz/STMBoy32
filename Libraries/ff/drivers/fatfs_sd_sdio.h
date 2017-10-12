@@ -39,7 +39,6 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"
-#include "ffdefines.h"
 
 #include "tm_stm32f4_fatfs.h"
 #include "tm_stm32f4_gpio.h"
@@ -312,8 +311,8 @@ typedef struct {
 
 /* Uncomment the following line to select the SDIO Data transfer mode */
 #if !defined (SD_DMA_MODE) && !defined (SD_POLLING_MODE)
-#define SD_DMA_MODE                                ((uint32_t)0x00000000)
-//#define SD_POLLING_MODE                            ((uint32_t)0x00000002)
+//#define SD_DMA_MODE                                ((uint32_t)0x00000000)
+#define SD_POLLING_MODE                            ((uint32_t)0x00000002)
 #endif
 
 /**
