@@ -516,10 +516,11 @@ uint8_t SD_Detect(void)
   __IO uint8_t status = SD_PRESENT;
 
   /*!< Check GPIO to detect SD */
-  if (IOE16_MonitorIOPin(SD_DETECT_PIN) != IOE16_BitReset) 
+  // ToDo: Check detect pin
+  /*if (IOE16_MonitorIOPin(SD_DETECT_PIN) != IOE16_BitReset) 
   {
     status = SD_NOT_PRESENT;
-  }
+  }*/
   return status;
 }
 

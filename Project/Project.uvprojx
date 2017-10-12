@@ -10,12 +10,13 @@
       <TargetName>STM32F429_439xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060300::V5.06 update 3 (build 300)::ARMCC</pCCUsed>
+      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F429ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x30000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x200000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -335,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\ff\drivers;..\Libraries\ff\option;..\Libraries\tm;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\tm;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -446,6 +447,11 @@
               <FileName>stm32f4xx_dac.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -667,16 +673,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -700,6 +696,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -709,11 +735,12 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060300::V5.06 update 3 (build 300)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F437IIHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2002FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x81FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1145,6 +1172,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1403,16 +1435,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1436,6 +1458,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -1444,11 +1496,12 @@
       <TargetName>STM32F40_41xxx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F417IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1880,6 +1933,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2138,16 +2196,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2171,6 +2219,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2179,6 +2257,7 @@
       <TargetName>STM32F401xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F401VCTx</Device>
@@ -2613,6 +2692,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2871,16 +2955,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2904,6 +2978,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2912,6 +3016,7 @@
       <TargetName>STM32F411xE</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F411RETx</Device>
@@ -3346,6 +3451,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3604,16 +3714,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3637,6 +3737,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -3645,6 +3775,7 @@
       <TargetName>STM32F446xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F446ZETx</Device>
@@ -4079,6 +4210,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4337,16 +4473,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4370,6 +4496,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4378,11 +4534,12 @@
       <TargetName>STM32F469_479xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F479NIHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2004FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x81FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -4814,6 +4971,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5072,16 +5234,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -5105,6 +5257,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -5113,6 +5295,7 @@
       <TargetName>STM32F410xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F410RBTx</Device>
@@ -5547,6 +5730,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5805,16 +5993,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -5838,6 +6016,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -5846,11 +6054,12 @@
       <TargetName>STM32F412xG</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F429ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x30000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x200000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -6282,6 +6491,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6540,16 +6754,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -6573,6 +6777,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -6582,6 +6816,7 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060300::V5.06 update 3 (build 300)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F413ZHTx</Device>
@@ -7018,6 +7253,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7276,16 +7516,6 @@
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\integer.h</FilePath>
             </File>
-            <File>
-              <FileName>fatfs_sd_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>fatfs_sd_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -7305,6 +7535,36 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>EVAL</GroupName>
+          <Files>
+            <File>
+              <FileName>stm324x9i_eval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm324x9i_eval_sdio_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\STM324x9I_EVAL\stm324x9i_eval_sdio_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_eval_legacy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
           </Files>
         </Group>

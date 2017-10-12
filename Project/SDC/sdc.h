@@ -6,9 +6,8 @@
 
 void SDC_Initialize(void);
 
-void SDC_GPIOConfig(void);
-void SDC_SDIOConfig(void);
-void SDC_InterruptConfig(void);
-void SDC_DMAConfig(void);
+// Interrupt Handler
+void SDIO_IRQHandler(void);
+void SD_SDIO_DMA_IRQHANDLER(void);
 
 #endif //SDC_H

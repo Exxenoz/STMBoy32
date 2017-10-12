@@ -47,8 +47,8 @@
 //#include "stm32f4xx_spi.h"
 #include "stm32f4xx_syscfg.h"
 #include "stm32f4xx_tim.h"
-/*#include "stm32f4xx_usart.h"
-#include "stm32f4xx_wwdg.h"*/
+#include "stm32f4xx_usart.h"
+//#include "stm32f4xx_wwdg.h"
 #include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 
 #if defined(STM32F429_439xx) || defined(STM32F446xx) || defined(STM32F469_479xx)
