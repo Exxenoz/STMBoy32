@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\ff\drivers;..\Libraries\ff\option;..\Libraries\tm;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\ff\drivers;..\Libraries\ff\option;..\Libraries\tm;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -677,6 +677,26 @@
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1398,6 +1418,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2110,6 +2150,26 @@
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2828,6 +2888,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -3542,6 +3622,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4252,6 +4352,26 @@
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4972,6 +5092,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -5682,6 +5822,26 @@
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6402,6 +6562,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -7115,6 +7295,26 @@
               <FileName>fatfs_sd_sdio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Libraries\ff\drivers\fatfs_sd_sdio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMOD</GroupName>
+          <Files>
+            <File>
+              <FileName>cmod.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -14,6 +14,7 @@
 #include "lcd.h"
 #include "input.h"
 #include "sdc.h"
+#include "cmod.h"
 
 void ClockDebug_Initialize()
 {
@@ -45,6 +46,7 @@ int main(void)
     Audio_Initialize();
     Input_Initialize();
     LCD_Initialize();
+    CMOD_Initialize();
     SDC_Initialize();
 
     /* Infinite loop */
