@@ -27,35 +27,40 @@ void SDC_InitializeInterrupts(void)
 void SDC_Initialize()
 {
     SDC_InitializeInterrupts();
-
-    uint8_t buffer[512] = {0};
-    SD_Error status = SD_Init();
     
-    if (status != 0) return;
-
-    SD_CardInfo info;
-    status = SD_GetCardInfo(&info);
+    long status = SD_Init();
     
-    if (status != 0) return;
+    if (status != SD_OK) return;
+    
+    BYTE buffer[512] = {0};
+    status = SD_ReadBlock(buffer, 0, 512);
+    status = SD_WaitReadOperation();
+    while(SD_GetStatus() != SD_TRANSFER_OK);
+    
+    if (status != SD_OK) return;
 
-    while (1)
+    long result = f_mount(&g_FatFs, "", 1);
+    // Mount drive
+    if (result == FR_OK)
     {
-        status = SD_ReadBlock(buffer, 0, 512);
-        status = SD_WaitReadOperation();
-        while(SD_GetStatus() != SD_TRANSFER_OK);
+        // Mounted OK, turn on RED LED
+        LED_EnableRed(true);
 
-        if (buffer[510] != 0x55 || buffer[511] != 0xAA || status != SD_OK)
+        // Try to open file
+        if (f_open(&g_File, "TEST.TXT", FA_OPEN_ALWAYS | FA_READ | FA_WRITE) == FR_OK)
         {
-            return;
+            // File opened, turn off RED and turn on GREEN led
+            LED_EnableGreen(true);
+
+            f_mkdir("Hallo");
+            
+            // Close file, don't forget this!
+            f_close(&g_File);
         }
+
+        // Unmount drive, don't forget this!
+        f_mount(0, "", 1);
     }
-    
-    if (status != 0) return;
-
-    /*SD_CardStatus s;
-    status = SD_GetCardStatus(&s);
-
-    if (status != 0) return;*/
 
     LED_EnableGreen(true);
 }
