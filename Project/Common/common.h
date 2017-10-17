@@ -28,4 +28,7 @@ typedef enum bool_e
 }
 bool;
 
+// Null pointer define
+#define NULL 0
+
 #endif //COMMON_H
