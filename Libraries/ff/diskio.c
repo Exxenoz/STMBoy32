@@ -24,37 +24,26 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat = RES_ERROR;
-	int result;
+	switch (pdrv)
+    {
+        case DEV_RAM :
+        {
+            if (SD_Detect() != SD_PRESENT)
+            {
+                return RES_NOTRDY;
+            }
 
-	switch (pdrv) {
-	case DEV_RAM :
-		result = SD_GetStatus();
+            // ToDo: Check for write protection and send RES_WRPRT if needed
 
-		// translate the reslut code here
-        if (result == SD_TRANSFER_OK)
-            stat = RES_OK;
+            return RES_OK;
+        }
+        case DEV_MMC :
+            return RES_NOTRDY;
 
-		return stat;
-
-	case DEV_MMC :
-		result = SD_GetStatus();
-
-		// translate the reslut code here
-        if (result == SD_TRANSFER_OK)
-            stat = RES_OK;
-
-		return stat;
-
-	case DEV_USB :
-		result = SD_GetStatus();
-
-		// translate the reslut code here
-        if (result == SD_TRANSFER_OK)
-            stat = RES_OK;
-
-		return stat;
+        case DEV_USB :
+            return RES_NOTRDY;
 	}
+
 	return STA_NOINIT;
 }
 
@@ -68,37 +57,26 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat = RES_ERROR;
-	int result;
+	switch (pdrv)
+    {
+        case DEV_RAM :
+        {
+            SD_Error status = SD_Init();
 
-	switch (pdrv) {
-	case DEV_RAM :
-		result = SD_Init();
+            if (status == SD_OK)
+            {
+                return RES_OK;
+            }
 
-		// translate the reslut code here
-        if (result == SD_OK)
-            stat = RES_OK;
+            return RES_ERROR;
+        }
+        case DEV_MMC :
+            return RES_NOTRDY;
 
-		return stat;
-
-	case DEV_MMC :
-		result = SD_Init();
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            stat = RES_OK;
-
-		return stat;
-
-	case DEV_USB :
-		result = SD_Init();
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            stat = RES_OK;
-
-		return stat;
+        case DEV_USB :
+            return RES_NOTRDY;
 	}
+
 	return STA_NOINIT;
 }
 
@@ -115,44 +93,37 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	DRESULT res = RES_ERROR;
-	int result;
+	switch (pdrv)
+    {
+        case DEV_RAM :
+        {
+            SD_Error status = SD_ReadMultiBlocks(buff, sector << 9, 512, count);
 
-    //sector += 7;
-    
-	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
+            if (status == SD_OK)
+            {
+                SDTransferState state;
 
-		result = SD_ReadBlock(buff, sector * 512, count * 512);
+                status = SD_WaitReadOperation();
 
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
+                while ((state = SD_GetStatus()) == SD_TRANSFER_BUSY);
 
-		return res;
+                if ((state == SD_TRANSFER_ERROR) || (status != SD_OK))
+                {
+                    return RES_ERROR;
+                }
+                else
+                {
+                    return RES_OK;
+                }			
+            }
 
-	case DEV_MMC :
-		// translate the arguments here
+            return RES_ERROR;
+        }
+        case DEV_MMC :
+            return RES_NOTRDY;
 
-		result = SD_ReadBlock(buff, sector * 512, count * 512);
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
-
-		return res;
-
-	case DEV_USB :
-		// translate the arguments here
-
-		result = SD_ReadBlock(buff, sector * 512, count * 512);
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
-
-		return res;
+        case DEV_USB :
+            return RES_NOTRDY;
 	}
 
 	return RES_PARERR;
@@ -166,49 +137,42 @@ DRESULT disk_read (
 
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
-	BYTE *buff,	/* Data to be written */
+	BYTE *buff,	        /* Data to be written */
 	DWORD sector,		/* Start sector in LBA */
 	UINT count			/* Number of sectors to write */
 )
 {
-	DRESULT res = RES_ERROR;
-	int result;
+	switch (pdrv)
+    {
+        case DEV_RAM :
+        {
+            SD_Error result = SD_WriteMultiBlocks((uint8_t *)buff, sector << 9, 512, count); // 4GB Compliant
 
-    //sector += 7;
+            if (result == SD_OK)
+            {
+                SDTransferState state;
 
-	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
+                result = SD_WaitWriteOperation(); // Check if the Transfer is finished
 
-		result = SD_WriteBlock(buff, sector * 512, count * 512);
+                while ((state = SD_GetStatus()) == SD_TRANSFER_BUSY); // BUSY, OK (DONE), ERROR (FAIL)
 
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
+                if ((state == SD_TRANSFER_ERROR) || (result != SD_OK))
+                {
+                    return RES_ERROR;
+                }
+                else
+                {
+                    return RES_OK;
+                }
+            }
 
-		return res;
+            return RES_ERROR;
+        }
+        case DEV_MMC :
+            return RES_NOTRDY;
 
-	case DEV_MMC :
-		// translate the arguments here
-
-		result = SD_WriteBlock(buff, sector * 512, count * 512);
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
-
-		return res;
-
-	case DEV_USB :
-		// translate the arguments here
-
-		result = SD_WriteBlock(buff, sector * 512, count * 512);
-
-		// translate the reslut code here
-        if (result == SD_OK)
-            res = RES_OK;
-
-		return res;
+        case DEV_USB :
+            return RES_NOTRDY;
 	}
 
 	return RES_PARERR;
@@ -226,27 +190,28 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res = RES_ERROR;
-	int result;
+	switch (pdrv)
+    {
+        case DEV_RAM :
+            switch (cmd)
+            {
+                case GET_SECTOR_SIZE :     // Get R/W sector size (WORD) 
+                    *(WORD *) buff = 512;
+                    break;
+                case GET_BLOCK_SIZE :      // Get erase block size in unit of sector (DWORD)
+                    *(DWORD *) buff = 32;
+                    break;
+                case CTRL_SYNC :
+                    break;
+            }
 
-	switch (pdrv) {
-	case DEV_RAM :
+            return RES_OK;
 
-		// Process of the command for the RAM drive
+        case DEV_MMC :
+            return RES_NOTRDY;
 
-		return res;
-
-	case DEV_MMC :
-
-		// Process of the command for the MMC/SD card
-
-		return res;
-
-	case DEV_USB :
-
-		// Process of the command the USB drive
-
-		return res;
+        case DEV_USB :
+            return RES_NOTRDY;
 	}
 
 	return RES_PARERR;

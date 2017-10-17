@@ -1,5 +1,4 @@
 #include "sdc.h"
-#include "led.h"
 #include "ff.h"
 #include "stm324x9i_eval_sdio_sd.h"
 
@@ -27,42 +26,6 @@ void SDC_InitializeInterrupts(void)
 void SDC_Initialize()
 {
     SDC_InitializeInterrupts();
-    
-    long status = SD_Init();
-    
-    if (status != SD_OK) return;
-    
-    BYTE buffer[512] = {0};
-    status = SD_ReadBlock(buffer, 0, 512);
-    status = SD_WaitReadOperation();
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-    
-    if (status != SD_OK) return;
-
-    long result = f_mount(&g_FatFs, "", 1);
-    // Mount drive
-    if (result == FR_OK)
-    {
-        // Mounted OK, turn on RED LED
-        LED_EnableRed(true);
-
-        // Try to open file
-        if (f_open(&g_File, "TEST.TXT", FA_OPEN_ALWAYS | FA_READ | FA_WRITE) == FR_OK)
-        {
-            // File opened, turn off RED and turn on GREEN led
-            LED_EnableGreen(true);
-
-            f_mkdir("Hallo");
-            
-            // Close file, don't forget this!
-            f_close(&g_File);
-        }
-
-        // Unmount drive, don't forget this!
-        f_mount(0, "", 1);
-    }
-
-    LED_EnableGreen(true);
 }
 
 void SDIO_IRQHandler(void)
