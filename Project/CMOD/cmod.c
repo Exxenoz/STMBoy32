@@ -25,12 +25,64 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT, CMOD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT, CMOD_RD_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT, CMOD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_CLK_PORT, CMOD_CLK_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT, CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT, CMOD_DATA_PINS);
     
+    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;    
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;    
+    GPIO_InitObject.GPIO_Pin   = CMOD_CLK_PIN;              
+    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL; 
+    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);             
+    
+    GPIO_PinAFConfig(CMOD_CLK_PORT, CMOD_CLK_PINSOURCE, CMOD_CLK_AF);
+    
+    CMOD_Initialize_Timer();
+    CMOD_Initialize_PWM();
     CMOD_Initialize_Interrupt();
 }
+
+void CMOD_Initialize_Timer(void) 
+{
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    
+    TIM_TimeBaseInitTypeDef TIM_BaseObject;
+/*	
+	TIM4 is connected to APB1 bus, which has ?MHz clock 				
+	?But, timer has internal PLL, which double this frequency for timer, up to ?MHz 			
+    
+	Max value for tim4 is 16bit = 65535
+
+	timer_tick_frequency = Timer_default_frequency / (prescaller_set + 1)			
+	TIM_Period = (timer_tick_frequency / PWM_frequency) - 1
+*/
+    TIM_BaseObject.TIM_Prescaler = 0;
+    TIM_BaseObject.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period = 89; 
+    TIM_BaseObject.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_RepetitionCounter = 0;
+    TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
+
+    TIM_Cmd(TIM4, ENABLE);
+}
+
+void CMOD_Initialize_PWM(void) 
+{
+	TIM_OCInitTypeDef TIM_OCObject;
+		
+	/* PWM mode 2 = Clear on compare match */
+	/* PWM mode 1 = Set on compare match */
+    //pulse_length = ((TIM_Period + 1) * DutyCycle) / 100 - 1
+
+	TIM_OCObject.TIM_OCMode = TIM_OCMode_PWM2;
+	TIM_OCObject.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_Low;
+	TIM_OCObject.TIM_Pulse = 45; 
+	TIM_OC1Init(TIM4, &TIM_OCObject);
+    
+	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+}
+//----------------------------------------------------------------------------------------
 
 void CMOD_Initialize_Interrupt()
 {
