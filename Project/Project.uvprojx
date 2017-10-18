@@ -10,7 +10,7 @@
       <TargetName>STM32F429_439xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060300::V5.06 update 3 (build 300)::ARMCC</pCCUsed>
+      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F429ZITx</Device>
@@ -721,6 +721,31 @@
               <FileName>stm32_eval_legacy.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1486,6 +1511,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2242,6 +2292,31 @@
               <FileName>stm32_eval_legacy.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3004,6 +3079,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -3762,6 +3862,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4516,6 +4641,31 @@
               <FileName>stm32_eval_legacy.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5280,6 +5430,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -6034,6 +6209,31 @@
               <FileName>stm32_eval_legacy.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6798,6 +6998,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -7555,6 +7780,31 @@
               <FileName>stm32_eval_legacy.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GBC</GroupName>
+          <Files>
+            <File>
+              <FileName>gbc_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_cpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_mem.h</FilePath>
             </File>
           </Files>
         </Group>
