@@ -2,6 +2,7 @@
 #define CMOD_H
 
 #include "common.h"
+#include "led.h"
 #include "cmod_config.h"
 
 #define CMOD_SET_RESET   CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
@@ -23,7 +24,8 @@
 void CMOD_Initialize(void);
 void CMOD_Initialize_Timer(void);
 void CMOD_Initialize_PWM(void);
-void CMOD_Initialize_Interrupt(void);
+void CMOD_Initialize_CLK_Interrupt(void);
+void CMOD_Initialize_Insertion_Interrupt(void);
 void EXTI15_10_IRQHandler(void); 
 
 #endif

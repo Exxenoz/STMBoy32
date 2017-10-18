@@ -39,7 +39,8 @@ void CMOD_Initialize(void)
     
     CMOD_Initialize_Timer();
     CMOD_Initialize_PWM();
-    CMOD_Initialize_Interrupt();
+    CMOD_Initialize_CLK_Interrupt();
+    CMOD_Initialize_Insertion_Interrupt();
 }
 
 void CMOD_Initialize_Timer(void) 
@@ -47,19 +48,11 @@ void CMOD_Initialize_Timer(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
     
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
-/*	
-	TIM4 is connected to APB1 bus, which has ?MHz clock 				
-	?But, timer has internal PLL, which double this frequency for timer, up to ?MHz 			
-    
-	Max value for tim4 is 16bit = 65535
 
-	timer_tick_frequency = Timer_default_frequency / (prescaller_set + 1)			
-	TIM_Period = (timer_tick_frequency / PWM_frequency) - 1
-*/
-    TIM_BaseObject.TIM_Prescaler = 0;
-    TIM_BaseObject.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period = 89; 
-    TIM_BaseObject.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_Prescaler         = 0;
+    TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period            = 89;                  // TIM_Period = ((timer_tick_frequency / PWM_frequency)) - 1
+    TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
 
@@ -69,22 +62,22 @@ void CMOD_Initialize_Timer(void)
 void CMOD_Initialize_PWM(void) 
 {
 	TIM_OCInitTypeDef TIM_OCObject;
-		
-	/* PWM mode 2 = Clear on compare match */
-	/* PWM mode 1 = Set on compare match */
-    //pulse_length = ((TIM_Period + 1) * DutyCycle) / 100 - 1
 
-	TIM_OCObject.TIM_OCMode = TIM_OCMode_PWM2;
+	TIM_OCObject.TIM_OCMode      = TIM_OCMode_PWM2;
 	TIM_OCObject.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_Low;
-	TIM_OCObject.TIM_Pulse = 45; 
-	TIM_OC1Init(TIM4, &TIM_OCObject);
+	TIM_OCObject.TIM_OCPolarity  = TIM_OCPolarity_Low;
+	TIM_OCObject.TIM_Pulse       = 44;                          // TIM_Pulse = (((TIM_Period + 1) * DutyCycle) / 100) - 1
+	TIM_OC4Init(TIM4, &TIM_OCObject);
     
-	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
 }
-//----------------------------------------------------------------------------------------
 
-void CMOD_Initialize_Interrupt()
+void CMOD_Initialize_CLK_Interrupt(void)
+{
+    // TODO
+}
+
+void CMOD_Initialize_Insertion_Interrupt()
 {
     RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
 
@@ -115,7 +108,8 @@ void EXTI15_10_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line11) != RESET) 
     {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        EXTI_ClearITPendingBit(EXTI_Line11);
+        LED_EnableRed(false);
+        LED_EnableGreen(true);
+        LED_EnableBlue(true);
     }
 }
