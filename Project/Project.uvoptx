@@ -9732,7 +9732,7 @@
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
-      <CLKADS>8000000</CLKADS>
+      <CLKADS>12000000</CLKADS>
       <OPTTT>
         <gFlags>1</gFlags>
         <BeepAtEnd>1</BeepAtEnd>
@@ -9824,7 +9824,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1536 -FS08000000 -FL0180000 -FP0($$Device:STM32F413ZHTx$CMSIS\Flash\STM32F4xx_1536.FLM))</Name>
+          <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC1000 -FD20000000 -FF0STM32F4xx_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32F429ZITx$CMSIS\Flash\STM32F4xx_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -11717,8 +11717,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\GBC\gbc_mem.c</PathWithFileName>
-      <FilenameWithoutPath>gbc_mem.c</FilenameWithoutPath>
+      <PathWithFileName>.\GBC\gbc_mmu.c</PathWithFileName>
+      <FilenameWithoutPath>gbc_mmu.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -11729,8 +11729,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\GBC\gbc_mem.h</PathWithFileName>
-      <FilenameWithoutPath>gbc_mem.h</FilenameWithoutPath>
+      <PathWithFileName>.\GBC\gbc_mmu.h</PathWithFileName>
+      <FilenameWithoutPath>gbc_mmu.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
