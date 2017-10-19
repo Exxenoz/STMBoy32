@@ -22,10 +22,9 @@
 #define CMOD_GET_DATA()     CMOD_DATA_PORT->IDR & 0xFF
 
 void CMOD_Initialize(void);
-void CMOD_Initialize_Timer(void);
-void CMOD_Initialize_PWM(void);
-void CMOD_Initialize_CLK_Interrupt(void);
+void CMOD_Initialize_CLK(void);
 void CMOD_Initialize_Insertion_Interrupt(void);
+void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 
 
 #endif
