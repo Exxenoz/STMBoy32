@@ -84,4 +84,13 @@ typedef struct GBC_CPU_Instruction_s
 }
 GBC_CPU_Instruction_t;
 
+enum GBC_CPU_Flags_e
+{
+    // Bits 0-3 should always be zero
+    GBC_CPU_FLAGS_CARRY       = 1 << 4,
+    GBC_CPU_FLAGS_HALFCARRY   = 1 << 5,
+    GBC_CPU_FLAGS_SUBTRACTION = 1 << 6,
+    GBC_CPU_FLAGS_ZERO        = 1 << 7,
+};
+
 #endif
