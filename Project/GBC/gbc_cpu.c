@@ -171,6 +171,90 @@ uint16_t GBC_CPU_AddShorts(uint16_t a, uint16_t b)
     return result;
 }
 
+uint8_t GBC_CPU_AND_Operator(uint8_t a, uint8_t b)
+{
+    uint8_t result = a & b;
+
+    if (result)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO);
+    }
+
+    return result;
+}
+
+uint8_t GBC_CPU_OR_Operator(uint8_t a, uint8_t b)
+{
+    uint8_t result = a | b;
+
+    if (result)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ALL);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return result;
+}
+
+uint8_t GBC_CPU_XOR_Operator(uint8_t a, uint8_t b)
+{
+    uint8_t result = a ^ b;
+
+    if (result)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ALL);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return result;
+}
+
+void GBC_CPU_COMPARE_Operator(uint8_t a, uint8_t b)
+{
+    if (a < b)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    if ((a & 0xF) < (b & 0xF))
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    }
+
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (a == b)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+}
+
 void GBC_CPU_NOP()                      // 0x00 - No operation
 {
     // Do nothing
@@ -1164,10 +1248,170 @@ void GBC_CPU_SDC_A_A()                  // 0x9F - Subtract A and carry flag from
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.A + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
+void GBC_CPU_AND_A_B()                  // 0xA0 - Logical AND B against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_AND_A_C()                  // 0xA1 - Logical AND C against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_AND_A_D()                  // 0xA2 - Logical AND D against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_AND_A_E()                  // 0xA3 - Logical AND E against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_AND_A_H()                  // 0xA4 - Logical AND H against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_AND_A_L()                  // 0xA5 - Logical AND L against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_AND_A_HLP()                // 0xA6 - Logical AND value pointed by HL against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_AND_A_A()                  // 0xA7 - Logical AND A against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_XOR_A_B()                  // 0xA8 - Logical XOR B against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_XOR_A_C()                  // 0xA9 - Logical XOR C against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_XOR_A_D()                  // 0xAA - Logical XOR D against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_XOR_A_E()                  // 0xAB - Logical XOR E against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_XOR_A_H()                  // 0xAD - Logical XOR H against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_XOR_A_L()                  // 0xAD - Logical XOR L against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_XOR_A_HLP()                // 0xAE - Logical XOR value pointed by HL against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_XOR_A_A()                  // 0xAF - Logical XOR A against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_OR_A_B()                  // 0xB0 - Logical OR B against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_OR_A_C()                  // 0xB1 - Logical OR C against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_OR_A_D()                  // 0xB2 - Logical OR D against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_OR_A_E()                  // 0xB3 - Logical OR E against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_OR_A_H()                  // 0xB4 - Logical OR H against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_OR_A_L()                  // 0xB5 - Logical OR L against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_OR_A_HLP()                // 0xB6 - Logical OR value pointed by HL against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_OR_A_A()                  // 0xB7 - Logical OR A against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_CP_A_B()                  // 0xB8 - Compare B against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_CP_A_C()                  // 0xB9 - Compare C against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_CP_A_D()                  // 0xBA - Compare D against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_CP_A_E()                  // 0xBB - Compare E against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_CP_A_H()                  // 0xBC - Compare H against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_CP_A_L()                  // 0xBD - Compare L against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_CP_A_HLP()                // 0xBE - Compare value pointed by HL against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_CP_A_A()                  // 0xBF - Compare A against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[160] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[192] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1329,4 +1573,36 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[160] =
     { GBC_CPU_SDC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9D - Subtract L and carry flag from A
     { GBC_CPU_SDC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9E - Subtract value pointed by HL and carry flag from A
     { GBC_CPU_SDC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9F - Subtract A and carry flag from A
+    { GBC_CPU_AND_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA0 - Logical AND B against A
+    { GBC_CPU_AND_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA1 - Logical AND C against A
+    { GBC_CPU_AND_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA2 - Logical AND D against A
+    { GBC_CPU_AND_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA3 - Logical AND E against A
+    { GBC_CPU_AND_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA4 - Logical AND H against A
+    { GBC_CPU_AND_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA5 - Logical AND L against A
+    { GBC_CPU_AND_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA6 - Logical AND value pointed by HL against A
+    { GBC_CPU_AND_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA7 - Logical AND A against A
+    { GBC_CPU_XOR_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA8 - Logical XOR B against A
+    { GBC_CPU_XOR_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA9 - Logical XOR C against A
+    { GBC_CPU_XOR_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAA - Logical XOR D against A
+    { GBC_CPU_XOR_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAB - Logical XOR E against A
+    { GBC_CPU_XOR_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAC - Logical XOR H against A
+    { GBC_CPU_XOR_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAD - Logical XOR L against A
+    { GBC_CPU_XOR_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAE - Logical XOR value pointed by HL against A
+    { GBC_CPU_XOR_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAF - Logical XOR A against A
+    { GBC_CPU_OR_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB0 - Logical OR B against A
+    { GBC_CPU_OR_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB1 - Logical OR C against A
+    { GBC_CPU_OR_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB2 - Logical OR D against A
+    { GBC_CPU_OR_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB3 - Logical OR E against A
+    { GBC_CPU_OR_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB4 - Logical OR H against A
+    { GBC_CPU_OR_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB5 - Logical OR L against A
+    { GBC_CPU_OR_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB6 - Logical OR value pointed by HL against A
+    { GBC_CPU_OR_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB7 - Logical OR A against A
+    { GBC_CPU_CP_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB8 - Compare B against A
+    { GBC_CPU_CP_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB9 - Compare C against A
+    { GBC_CPU_CP_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBA - Compare D against A
+    { GBC_CPU_CP_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBB - Compare E against A
+    { GBC_CPU_CP_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBC - Compare H against A
+    { GBC_CPU_CP_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBD - Compare L against A
+    { GBC_CPU_CP_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBE - Compare value pointed by HL against A
+    { GBC_CPU_CP_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBF - Compare A against A
 };
