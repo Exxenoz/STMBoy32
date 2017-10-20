@@ -161,7 +161,7 @@ void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
     GBC_CPU_Register.A = value;
 }
 
-void GBC_CPU_LD_XX_SP(uint16_t operand) // 0x08 - Save SP to given address
+void GBC_CPU_LD_XXP_SP(uint16_t operand)// 0x08 - Save SP to given address
 {
     GBC_MMU_WriteShort(operand, GBC_CPU_Register.SP);
 }
@@ -184,6 +184,6 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[10] =
     { GBC_CPU_DEC_B,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x05 - Decrement B
     { GBC_CPU_LD_B_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x06 - Load 8-bit immediate into B
     { GBC_CPU_RLC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x07 - Rotate A left with carry
-    { GBC_CPU_LD_XX_SP,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_10 }, // 0x08 - Save SP to given address
+    { GBC_CPU_LD_XXP_SP, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_10 }, // 0x08 - Save SP to given address
     { GBC_CPU_ADD_HL_BC, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x09 - Add 16-bit BC to HL
 };
