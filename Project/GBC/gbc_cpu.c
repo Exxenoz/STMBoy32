@@ -68,7 +68,7 @@ uint8_t GBC_CPU_DecrementByte(uint8_t value)
 
 uint8_t GBC_CPU_AddBytes(uint8_t a, uint8_t b)
 {
-    uint32_t result = a + b;
+    uint32_t result = a + b; // ToDo: Make overflow possible
 
     if (result & 0x100)
     {
@@ -104,10 +104,46 @@ uint8_t GBC_CPU_AddBytes(uint8_t a, uint8_t b)
     return result;
 }
 
+uint8_t GBC_CPU_SubBytes(uint8_t a, uint8_t b)
+{
+    uint8_t result = a - b;
+
+    if (b > a)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    if ((b & 0xF) > (a & 0xF))
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    }
+
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (result)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return result;
+}
+
 uint16_t GBC_CPU_AddShorts(uint16_t a, uint16_t b)
 {
-    uint32_t result = a + b;
-    
+    uint32_t result = a + b; // ToDo: Make overflow possible
+
     if (result & 0x10000)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
@@ -1048,10 +1084,90 @@ void GBC_CPU_ADC_A_A()                  // 0x8F - Add A and carry flag to A
     GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.A + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
+void GBC_CPU_SUB_A_B()                  // 0x90 - Subtract B from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_SUB_A_C()                  // 0x91 - Subtract C from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_SUB_A_D()                  // 0x92 - Subtract D from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_SUB_A_E()                  // 0x93 - Subtract E from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_SUB_A_H()                  // 0x94 - Subtract H from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_SUB_A_L()                  // 0x95 - Subtract L from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_SUB_A_HLP()                // 0x96 - Subtract value pointed by HL from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_SUB_A_A()                  // 0x97 - Subtract A from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_SDC_A_B()                  // 0x98 - Subtract B and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.B + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_C()                  // 0x99 - Subtract C and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.C + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_D()                  // 0x9A - Subtract D and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.D + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_E()                  // 0x9B - Subtract E and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.E + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_H()                  // 0x9C - Subtract H and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.H + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_L()                  // 0x9D - Subtract L and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.L + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_HLP()                // 0x9E - Subtract value pointed by HL and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL) + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_SDC_A_A()                  // 0x9F - Subtract A and carry flag from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.A + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[144] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[160] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1197,4 +1313,20 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[144] =
     { GBC_CPU_ADC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8D - Add L and carry flag to A
     { GBC_CPU_ADC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8E - Add value pointed by HL and carry flag to A
     { GBC_CPU_ADC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8F - Add A and carry flag to A
+    { GBC_CPU_SUB_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x90 - Subtract B from A
+    { GBC_CPU_SUB_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x91 - Subtract C from A
+    { GBC_CPU_SUB_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x92 - Subtract D from A
+    { GBC_CPU_SUB_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x93 - Subtract E from A
+    { GBC_CPU_SUB_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x94 - Subtract H from A
+    { GBC_CPU_SUB_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x95 - Subtract L from A
+    { GBC_CPU_SUB_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x96 - Subtract value pointed by HL from A
+    { GBC_CPU_SUB_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x97 - Subtract A from A
+    { GBC_CPU_SDC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x98 - Subtract B and carry flag from A
+    { GBC_CPU_SDC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x99 - Subtract C and carry flag from A
+    { GBC_CPU_SDC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9A - Subtract D and carry flag from A
+    { GBC_CPU_SDC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9B - Subtract E and carry flag from A
+    { GBC_CPU_SDC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9C - Subtract H and carry flag from A
+    { GBC_CPU_SDC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9D - Subtract L and carry flag from A
+    { GBC_CPU_SDC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9E - Subtract value pointed by HL and carry flag from A
+    { GBC_CPU_SDC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9F - Subtract A and carry flag from A
 };
