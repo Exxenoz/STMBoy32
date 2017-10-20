@@ -531,10 +531,124 @@ void GBC_CPU_CPL()                      // 0x2F - Complement (logical NOT) on A 
     // Zero flag not affected
 }
 
+void GBC_CPU_JR_NC_X(int8_t operand)    // 0x30 - Relative jump by signed immediate if last result caused no carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Ticks += 8;
+    }
+    else
+    {
+        GBC_CPU_Register.PC += operand;
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_LD_SP_XX(uint16_t operand) // 0x31 - Load 16-bit immediate into SP
+{
+    GBC_CPU_Register.SP = operand;
+}
+
+void GBC_CPU_LDD_HLP_A()                // 0x32 - Save A to address pointed by HL, and decrement HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL--, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_INC_SP()                   // 0x33 - Increment 16-bit SP
+{
+    GBC_CPU_Register.SP++;
+
+    // Flags not affected
+}
+
+void GBC_CPU_INC_HLP()                  // 0x34 - Increment value pointed by HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_IncrementByte(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_DEC_HLP()                  // 0x35 - Decrement value pointed by HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_DecrementByte(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_LD_HLP_X(uint8_t operand)  // 0x36 - Load 8-bit immediate into address pointed by HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, operand);
+}
+
+void GBC_CPU_SCF()                      // 0x37 - Set carry flag
+{
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
+    // Zero flag not affected
+}
+
+void GBC_CPU_JR_C_X(int8_t operand)     // 0x38 - Relative jump by signed immediate if last result caused carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Register.PC += operand;
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 8;
+    }
+}
+
+void GBC_CPU_ADD_HL_SP()                // 0x39 - Add 16-bit SP to HL
+{
+    GBC_CPU_Register.HL = GBC_CPU_AddShorts(GBC_CPU_Register.HL, GBC_CPU_Register.SP);
+}
+
+void GBC_CPU_LDD_A_HLP()                // 0x3A - Load A from address pointed to by HL, and decrement HL
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.HL--);
+}
+
+void GBC_CPU_DEC_SP()                   // 0x3B - Decrement 16-bit SP
+{
+    GBC_CPU_Register.SP--;
+
+    // No flags affected
+}
+
+void GBC_CPU_INC_A()                    // 0x3C - Increment A
+{
+    GBC_CPU_Register.A = GBC_CPU_IncrementByte(GBC_CPU_Register.A);
+}
+
+void GBC_CPU_DEC_A()                    // 0x3D - Decrement A
+{
+    GBC_CPU_Register.A = GBC_CPU_DecrementByte(GBC_CPU_Register.A);
+}
+
+void GBC_CPU_LD_A_X(uint8_t operand)    // 0x3E - Load 8-bit immediate into A
+{
+    GBC_CPU_Register.A = operand;
+}
+
+void GBC_CPU_CCF()                      // 0x3F - Complement carry flag
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
+    // Zero flag not affected
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[48] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[64] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -584,4 +698,20 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[48] =
     { GBC_CPU_DEC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2D - Decrement L
     { GBC_CPU_LD_L_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x2E - Load 8-bit immediate into L
     { GBC_CPU_CPL,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2F - Complement (logical NOT) on A (flip all bits)
+    { GBC_CPU_JR_NC_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x30 - Relative jump by signed immediate if last result caused no carry
+    { GBC_CPU_LD_SP_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x31 - Load 16-bit immediate into SP
+    { GBC_CPU_LDD_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x32 - Save A to address pointed by HL, and decrement HL
+    { GBC_CPU_INC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x33 - Increment 16-bit SP
+    { GBC_CPU_INC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0x34 - Increment value pointed by HL
+    { GBC_CPU_DEC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0x35 - Decrement value pointed by HL
+    { GBC_CPU_LD_HLP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0x36 - Load 8-bit immediate into address pointed by HL
+    { GBC_CPU_SCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x37 - Set carry flag
+    { GBC_CPU_JR_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x38 - Relative jump by signed immediate if last result caused carry
+    { GBC_CPU_ADD_HL_SP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x39 - Add 16-bit SP to HL
+    { GBC_CPU_LDD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3A - Load A from address pointed to by HL, and decrement HL
+    { GBC_CPU_DEC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3B - Decrement 16-bit SP
+    { GBC_CPU_INC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3C - Increment A
+    { GBC_CPU_DEC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3D - Decrement A
+    { GBC_CPU_LD_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x3E - Load 8-bit immediate into A
+    { GBC_CPU_CCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3F - Complement carry flag
 };
