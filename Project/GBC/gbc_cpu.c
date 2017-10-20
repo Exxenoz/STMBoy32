@@ -134,14 +134,14 @@ void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
 
     if (value & 0x8)
     {
-        value <<= 1;
-        value  |= 1;
+        value <<= 0x1;
+        value  |= 0x1;
 
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
     else
     {
-        value <<= 1;
+        value <<= 0x1;
 
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
@@ -171,10 +171,70 @@ void GBC_CPU_ADD_HL_BC()                // 0x09 - Add 16-bit BC to HL
     GBC_CPU_Register.HL = GBC_CPU_AddShorts(GBC_CPU_Register.HL, GBC_CPU_Register.BC);
 }
 
+void GBC_CPU_LD_A_BCP()                 // 0x0A - Load A from address pointed to by BC
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.BC);
+}
+
+void GBC_CPU_DEC_BC()                   // 0x0B - Decrement 16-bit BC
+{
+    GBC_CPU_Register.BC--;
+
+    // No flags affected
+}
+
+void GBC_CPU_INC_C()                    // 0x0C - Increment C
+{
+    GBC_CPU_Register.C = GBC_CPU_IncrementByte(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_DEC_C()                    // 0x0D - Decrement C
+{
+    GBC_CPU_Register.C = GBC_CPU_DecrementByte(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_LD_C_X(uint8_t operand)    // 0x0E - Load 8-bit immediate into C
+{
+    GBC_CPU_Register.C = operand;
+}
+
+void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
+{
+    uint8_t value = GBC_CPU_Register.A;
+
+    if (value & 0x1)
+    {
+        value >>= 0x1;
+        value  |= 0x8;
+
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        value >>= 0x1;
+
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    GBC_CPU_Register.A = value;
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[10] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[16] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -186,4 +246,10 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[10] =
     { GBC_CPU_RLC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x07 - Rotate A left with carry
     { GBC_CPU_LD_XXP_SP, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_10 }, // 0x08 - Save SP to given address
     { GBC_CPU_ADD_HL_BC, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x09 - Add 16-bit BC to HL
+    { GBC_CPU_LD_A_BCP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0A - Load A from address pointed to by BC
+    { GBC_CPU_DEC_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0B - Decrement 16-bit BC
+    { GBC_CPU_INC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x0C - Increment C
+    { GBC_CPU_DEC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x0D - Decrement C
+    { GBC_CPU_LD_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x0E - Load 8-bit immediate into C
+    { GBC_CPU_RRC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0F - Rotate A right with carry
 };
