@@ -3,6 +3,8 @@
 
 // Global GBC CPU register
 GBC_CPU_Register_t GBC_CPU_Register;
+// Global GBC CPU ticks
+uint32_t GBC_CPU_Ticks = 0;
 // Global GBC CPU stopped state
 bool GBC_CPU_Stopped = false;
 
@@ -373,10 +375,166 @@ void GBC_CPU_RR_A()                     // 0x1F - Rotate A right
     GBC_CPU_Register.A = value;
 }
 
+void GBC_CPU_JR_NZ_X(int8_t operand)    // 0x20 - Relative jump by signed immediate if last result was not zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Ticks += 8;
+    }
+    else
+    {
+        GBC_CPU_Register.PC += operand;
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_LD_HL_XX(uint16_t operand) // 0x21 - Load 16-bit immediate into HL
+{
+    GBC_CPU_Register.HL = operand;
+}
+
+void GBC_CPU_LDI_HLP_A()                // 0x22 - Save A to address pointed by HL, and increment HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL++, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_INC_HL()                   // 0x23 - Increment 16-bit HL
+{
+    GBC_CPU_Register.HL++;
+
+    // Flags not affected
+}
+
+void GBC_CPU_INC_H()                    // 0x24 - Increment H
+{
+    GBC_CPU_Register.H = GBC_CPU_IncrementByte(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_DEC_H()                    // 0x25 - Decrement H
+{
+    GBC_CPU_Register.H = GBC_CPU_DecrementByte(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_LD_H_X(uint8_t operand)    // 0x26 - Load 8-bit immediate into H
+{
+    GBC_CPU_Register.H = operand;
+}
+
+void GBC_CPU_DA_A()                     // 0x27 - Adjust A for BCD (Binary Coded Decimal) addition
+{
+    uint16_t value = GBC_CPU_Register.A;
+
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_SUBTRACTION))
+    {
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_HALFCARRY))
+        {
+            value = (value - 6) & 0xFF;
+        }
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+        {
+            value -= 0x6;
+        }
+    }
+    else
+    {
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_HALFCARRY) || (value & 0xF) > 9)
+        {
+            value += 0x6;
+        }
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) || value > 0x9F)
+        {
+            value += 0x6;
+        }
+    }
+    
+    if ((value & 0x100) == 0x100)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+
+    // Subtraction flag not affected
+
+    value &= 0xFF;
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    GBC_CPU_Register.A = value;
+}
+
+void GBC_CPU_JR_Z_X(int8_t operand)     // 0x28 - Relative jump by signed immediate if last result was zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Register.PC += operand;
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 8;
+    }
+}
+
+void GBC_CPU_ADD_HL_HL()                // 0x29 - Add 16-bit HL to HL
+{
+    GBC_CPU_Register.HL = GBC_CPU_AddShorts(GBC_CPU_Register.HL, GBC_CPU_Register.HL);
+}
+
+void GBC_CPU_LDI_A_HLP()                // 0x2A - Load A from address pointed to by HL, and increment HL
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.HL++);
+}
+
+void GBC_CPU_DEC_HL()                   // 0x2B - Decrement 16-bit HL
+{
+    GBC_CPU_Register.HL--;
+
+    // No flags affected
+}
+
+void GBC_CPU_INC_L()                    // 0x2C - Increment L
+{
+    GBC_CPU_Register.L = GBC_CPU_IncrementByte(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_DEC_L()                    // 0x2D - Decrement L
+{
+    GBC_CPU_Register.L = GBC_CPU_DecrementByte(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_LD_L_X(uint8_t operand)    // 0x2E - Load 8-bit immediate into L
+{
+    GBC_CPU_Register.L = operand;
+}
+
+void GBC_CPU_CPL()                      // 0x2F - Complement (logical NOT) on A (flip all bits)
+{
+    GBC_CPU_Register.A = ~GBC_CPU_Register.A;
+
+    // Carry flag not affected
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
+    // Zero flag not affected
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[32] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[48] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -410,4 +568,20 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[32] =
     { GBC_CPU_DEC_E,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x1D - Decrement E
     { GBC_CPU_LD_E_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x1E - Load 8-bit immediate into E
     { GBC_CPU_RR_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1F - Rotate A right
+    { GBC_CPU_JR_NZ_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x20 - Relative jump by signed immediate if last result was not zero
+    { GBC_CPU_LD_HL_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x21 - Load 16-bit immediate into HL
+    { GBC_CPU_LDI_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x22 - Save A to address pointed by HL, and increment HL
+    { GBC_CPU_INC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x23 - Increment 16-bit HL
+    { GBC_CPU_INC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x24 - Increment H
+    { GBC_CPU_DEC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x25 - Decrement H
+    { GBC_CPU_LD_H_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x26 - Load 8-bit immediate into H
+    { GBC_CPU_DA_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x27 - Adjust A for BCD (Binary Coded Decimal) addition
+    { GBC_CPU_JR_Z_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x28 - Relative jump by signed immediate if last result was zero
+    { GBC_CPU_ADD_HL_HL, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x29 - Add 16-bit HL to HL
+    { GBC_CPU_LDI_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2A - Load A from address pointed to by HL, and increment HL
+    { GBC_CPU_DEC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2B - Decrement 16-bit HL
+    { GBC_CPU_INC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2C - Increment L
+    { GBC_CPU_DEC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2D - Decrement L
+    { GBC_CPU_LD_L_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x2E - Load 8-bit immediate into L
+    { GBC_CPU_CPL,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2F - Complement (logical NOT) on A (flip all bits)
 };
