@@ -63,7 +63,7 @@ void GBC_CPU_NOP()                      // 0x00 - No operation
     // Do nothing
 }
 
-void GBC_CPU_LD_BC_XX(uint16_t operand) // 0x01 - Load 2 bytes into BC
+void GBC_CPU_LD_BC_XX(uint16_t operand) // 0x01 - Load 16-bit immediate into BC
 {
     GBC_CPU_Register.BC = operand;
 }
@@ -73,27 +73,66 @@ void GBC_CPU_LD_BCP_A()                 // 0x02 - Save A to address pointed by B
     GBC_MMU_WriteByte(GBC_CPU_Register.BC, GBC_CPU_Register.A);
 }
 
-void GBC_CPU_INC_BC()                   // 0x03 - Increment register BC
+void GBC_CPU_INC_BC()                   // 0x03 - Increment 16-bit BC
 {
     GBC_CPU_Register.BC++;
 }
 
-void GBC_CPU_INC_B()                    // 0x04 - Increment register B
+void GBC_CPU_INC_B()                    // 0x04 - Increment B
 {
     GBC_CPU_Register.B = GBC_CPU_IncrementByte(GBC_CPU_Register.B);
 }
 
-void GBC_CPU_DEC_B()                    // 0x05 - Decrement register B
+void GBC_CPU_DEC_B()                    // 0x05 - Decrement B
 {
     GBC_CPU_Register.B = GBC_CPU_DecrementByte(GBC_CPU_Register.B);
 }
 
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[6] =
+void GBC_CPU_LD_B_X(uint8_t operand)    // 0x06 - Load 8-bit immediate into B
 {
-    { GBC_CPU_NOP,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2 }, // 0x00 - No operation
-    { GBC_CPU_LD_BC_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6 }, // 0x01 - Load 2 bytes into BC
-    { GBC_CPU_LD_BCP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4 }, // 0x02 - Save A to address pointed by BC
-    { GBC_CPU_INC_BC,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4 }, // 0x03 - Increment register BC
-    { GBC_CPU_INC_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2 }, // 0x04 - Increment register B
-    { GBC_CPU_DEC_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2 }, // 0x05 - Decrement register B
+    GBC_CPU_Register.B = operand;
+}
+
+void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
+{
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ALL);
+
+    uint8_t value = GBC_CPU_Register.A;
+
+    if (value & 0x8)
+    {
+        value <<= 1;
+        value  |= 1;
+
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        value <<= 1;
+    }
+
+    GBC_CPU_Register.A = value;
+
+    // ToDo: Zero flag check?
+}
+
+void GBC_CPU_LD_XX_SP(uint16_t operand) // 0x08 - Save SP to given address
+{
+    GBC_MMU_WriteShort(operand, GBC_CPU_Register.SP);
+}
+
+/*******************************************************************************/
+/* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
+/*******************************************************************************/
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[9] =
+{
+    { GBC_CPU_NOP,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
+    { GBC_CPU_LD_BC_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
+    { GBC_CPU_LD_BCP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x02 - Save A to address pointed by BC
+    { GBC_CPU_INC_BC,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x03 - Increment 16-bit BC
+    { GBC_CPU_INC_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x04 - Increment B
+    { GBC_CPU_DEC_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x05 - Decrement B
+    { GBC_CPU_LD_B_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x06 - Load 8-bit immediate into B
+    { GBC_CPU_RLC_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x07 - Rotate A left with carry
+    { GBC_CPU_LD_XX_SP, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_10 }, // 0x08 - Save SP to given address
 };

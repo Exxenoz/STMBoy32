@@ -91,6 +91,12 @@ enum GBC_CPU_Flags_e
     GBC_CPU_FLAGS_HALFCARRY   = 1 << 5,
     GBC_CPU_FLAGS_SUBTRACTION = 1 << 6,
     GBC_CPU_FLAGS_ZERO        = 1 << 7,
+
+    GBC_CPU_FLAGS_ALL = GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY |
+                        GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO,
 };
+
+#define GBC_CPU_FLAGS_SET(FLAGS)   (GBC_CPU_Register.F |=  (FLAGS))
+#define GBC_CPU_FLAGS_CLEAR(FLAGS) (GBC_CPU_Register.F &= ~(FLAGS))
 
 #endif
