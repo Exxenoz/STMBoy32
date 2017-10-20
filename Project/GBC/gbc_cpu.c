@@ -1606,3 +1606,42 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[192] =
     { GBC_CPU_CP_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBE - Compare value pointed by HL against A
     { GBC_CPU_CP_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBF - Compare A against A
 };
+
+void GBC_CPU_Step()
+{
+    if (GBC_CPU_Stopped)
+    {
+        return;
+    }
+
+    GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(GBC_CPU_Register.PC++)];
+
+    switch (instruction.OperandBytes)
+    {
+        case GBC_CPU_OPERAND_BYTES_0:
+        {
+            ((void (*)(void))instruction.Handler)();
+            break;
+        }
+        case GBC_CPU_OPERAND_BYTES_1:
+        {
+            uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+            GBC_CPU_Register.PC++;
+
+            ((void (*)(uint8_t))instruction.Handler)(operand);
+            break;
+        }
+        case GBC_CPU_OPERAND_BYTES_2:
+        {
+            uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+            GBC_CPU_Register.PC += 2;
+
+            ((void (*)(uint16_t))instruction.Handler)(operand);
+            break;
+        }
+    }
+
+    GBC_CPU_Ticks += instruction.Ticks;
+}
