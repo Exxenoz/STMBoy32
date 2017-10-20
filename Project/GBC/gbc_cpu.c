@@ -785,10 +785,80 @@ void GBC_CPU_LD_E_A()                   // 0x5F - Copy A to E
     GBC_CPU_Register.E = GBC_CPU_Register.A;
 }
 
+void GBC_CPU_LD_H_B()                   // 0x60 - Copy B to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.B;
+}
+
+void GBC_CPU_LD_H_C()                   // 0x61 - Copy C to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.C;
+}
+
+void GBC_CPU_LD_H_D()                   // 0x62 - Copy D to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.D;
+}
+
+void GBC_CPU_LD_H_E()                   // 0x63 - Copy E to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.E;
+}
+
+void GBC_CPU_LD_H_L()                   // 0x65 - Copy L to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.L;
+}
+
+void GBC_CPU_LD_H_HLP()                 // 0x66 - Copy value pointed by HL to H
+{
+    GBC_CPU_Register.H = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+}
+
+void GBC_CPU_LD_H_A()                   // 0x67 - Copy A to H
+{
+    GBC_CPU_Register.H = GBC_CPU_Register.A;
+}
+
+void GBC_CPU_LD_L_B()                   // 0x68 - Copy B to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.B;
+}
+
+void GBC_CPU_LD_L_C()                   // 0x69 - Copy C to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.C;
+}
+
+void GBC_CPU_LD_L_D()                   // 0x6A - Copy D to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.D;
+}
+
+void GBC_CPU_LD_L_E()                   // 0x6B - Copy E to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.E;
+}
+
+void GBC_CPU_LD_L_H()                   // 0x6C - Copy H to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.H;
+}
+
+void GBC_CPU_LD_L_HLP()                 // 0x6E - Copy value pointed by HL to L
+{
+    GBC_CPU_Register.L = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+}
+
+void GBC_CPU_LD_L_A()                   // 0x6F - Copy A to L
+{
+    GBC_CPU_Register.L = GBC_CPU_Register.A;
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[96] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[112] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -886,4 +956,20 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[96] =
     { GBC_CPU_LD_E_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5D - Copy L to E
     { GBC_CPU_LD_E_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5E - Copy value pointed by HL to E
     { GBC_CPU_LD_E_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5F - Copy A to E
+    { GBC_CPU_LD_H_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x60 - Copy B to H
+    { GBC_CPU_LD_H_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x61 - Copy C to H
+    { GBC_CPU_LD_H_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x62 - Copy D to H
+    { GBC_CPU_LD_H_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x63 - Copy E to H
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x64 - Copy H to H
+    { GBC_CPU_LD_H_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x65 - Copy L to H
+    { GBC_CPU_LD_H_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x66 - Copy value pointed by HL to H
+    { GBC_CPU_LD_H_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x67 - Copy A to H
+    { GBC_CPU_LD_L_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x68 - Copy B to L
+    { GBC_CPU_LD_L_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x69 - Copy C to L
+    { GBC_CPU_LD_L_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6A - Copy D to L
+    { GBC_CPU_LD_L_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6B - Copy E to L
+    { GBC_CPU_LD_L_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6C - Copy H to L
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6D - Copy L to L
+    { GBC_CPU_LD_L_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6E - Copy value pointed by HL to L
+    { GBC_CPU_LD_L_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6F - Copy A to L
 };
