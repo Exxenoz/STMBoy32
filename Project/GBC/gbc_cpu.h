@@ -98,5 +98,6 @@ enum GBC_CPU_Flags_e
 
 #define GBC_CPU_FLAGS_SET(FLAGS)   (GBC_CPU_Register.F |=  (FLAGS))
 #define GBC_CPU_FLAGS_CLEAR(FLAGS) (GBC_CPU_Register.F &= ~(FLAGS))
+#define GBC_CPU_FLAGS_HAS(FLAGS)   (GBC_CPU_Register.F & (FLAGS))
 
 #endif
