@@ -66,6 +66,44 @@ uint8_t GBC_CPU_DecrementByte(uint8_t value)
     return value;
 }
 
+uint8_t GBC_CPU_AddBytes(uint8_t a, uint8_t b)
+{
+    uint32_t result = a + b;
+
+    if (result & 0x100)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    if (((a & 0xF) + (b & 0xF)) & 0x10)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
+
+    result &= 0xFF;
+
+    if (result)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return result;
+}
+
 uint16_t GBC_CPU_AddShorts(uint16_t a, uint16_t b)
 {
     uint32_t result = a + b;
@@ -930,10 +968,90 @@ void GBC_CPU_LD_A_HLP()                 // 0x7E - Copy value pointed by HL to A
     GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
 }
 
+void GBC_CPU_ADD_A_B()                  // 0x80 - Add B to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.B);
+}
+
+void GBC_CPU_ADD_A_C()                  // 0x81 - Add C to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.C);
+}
+
+void GBC_CPU_ADD_A_D()                  // 0x82 - Add D to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.D);
+}
+
+void GBC_CPU_ADD_A_E()                  // 0x83 - Add E to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.E);
+}
+
+void GBC_CPU_ADD_A_H()                  // 0x84 - Add H to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.H);
+}
+
+void GBC_CPU_ADD_A_L()                  // 0x85 - Add L to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.L);
+}
+
+void GBC_CPU_ADD_A_HLP()                // 0x86 - Add value pointed by HL to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
+
+void GBC_CPU_ADD_A_A()                  // 0x87 - Add A to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_ADC_A_B()                  // 0x88 - Add B and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.B + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_C()                  // 0x89 - Add C and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.C + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_D()                  // 0x8A - Add D and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.D + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_E()                  // 0x8B - Add E and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.E + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_H()                  // 0x8C - Add H and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.H + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_L()                  // 0x8D - Add L and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.L + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_HLP()                // 0x8E - Add value pointed by HL and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL) + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_ADC_A_A()                  // 0x8F - Add A and carry flag to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, GBC_CPU_Register.A + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[128] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[144] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1063,4 +1181,20 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[128] =
     { GBC_CPU_LD_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7D - Copy L to A
     { GBC_CPU_LD_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7E - Copy value pointed by HL to A
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7F - Copy A to A
+    { GBC_CPU_ADD_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x80 - Add B to A
+    { GBC_CPU_ADD_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x81 - Add C to A
+    { GBC_CPU_ADD_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x82 - Add D to A
+    { GBC_CPU_ADD_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x83 - Add E to A
+    { GBC_CPU_ADD_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x84 - Add H to A
+    { GBC_CPU_ADD_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x85 - Add L to A
+    { GBC_CPU_ADD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x86 - Add value pointed by HL to A
+    { GBC_CPU_ADD_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x87 - Add A to A
+    { GBC_CPU_ADC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x88 - Add B and carry flag to A
+    { GBC_CPU_ADC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x89 - Add C and carry flag to A
+    { GBC_CPU_ADC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8A - Add D and carry flag to A
+    { GBC_CPU_ADC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8B - Add E and carry flag to A
+    { GBC_CPU_ADC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8C - Add H and carry flag to A
+    { GBC_CPU_ADC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8D - Add L and carry flag to A
+    { GBC_CPU_ADC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8E - Add value pointed by HL and carry flag to A
+    { GBC_CPU_ADC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8F - Add A and carry flag to A
 };
