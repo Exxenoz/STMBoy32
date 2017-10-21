@@ -747,6 +747,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1533,6 +1543,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2318,6 +2338,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3100,6 +3130,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3884,6 +3924,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4666,6 +4716,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5452,6 +5512,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6234,6 +6304,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7020,6 +7100,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7805,6 +7895,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_gpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_gpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_gpu.c</FilePath>
             </File>
           </Files>
         </Group>

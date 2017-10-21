@@ -16,6 +16,11 @@ enum GBC_MMU_InterruptFlags_e
 enum GBC_MMU_MemoryLocations_e
 {
     GBC_MMU_MEMLOC_INTERRUPT_FLAGS  = 0xFF0F,
+    GBC_MMU_MEMLOC_GPU_CONTROL      = 0xFF40,
+    GBC_MMU_MEMLOC_GPU_SCROLL_Y     = 0xFF42,
+    GBC_MMU_MEMLOC_GPU_SCROLL_X     = 0xFF43,
+    GBC_MMU_MEMLOC_GPU_SCANLINE     = 0xFF44,
+    GBC_MMU_MEMLOC_GPU_BG_PALETTE   = 0xFF47,
     GBC_MMU_MEMLOC_INTERRUPT_ENABLE = 0xFFFF,
 };
 
@@ -37,6 +42,17 @@ typedef struct GBC_MMU_Memory_s
             uint8_t IO[128];                 // FF00-FF7F: 128B Memory-mapped I/O
             uint8_t HRAM[127];               // FF80-FFFE: 127B High RAM
             uint8_t InterruptEnableRegister; // FFFF:        1B Interrupt enable register
+        };
+
+        struct
+        {
+            uint8_t NoName1[65295];
+            uint8_t InterruptFlags;          // 0xFF0F
+            uint8_t NoName2[48];
+            uint8_t GPUControlFlags;         // 0xFF40
+            uint8_t NoName3;
+            uint8_t GPUScrollY;              // 0xFF42
+            uint8_t GPUScrollX;              // 0xFF43
         };
 
         uint8_t Data[65536];                 // 65kB GBC Memory
