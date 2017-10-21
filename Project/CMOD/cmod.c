@@ -27,8 +27,9 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT, CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT, CMOD_DATA_PINS);
  
+    GPIO_SetBits(CMOD_WR_PORT, CMOD_WR_PIN);
     CMOD_Initialize_CLK();
-    CMOD_Initialize_Insertion_Interrupt();
+    //CMOD_Initialize_Insertion_Interrupt();
 }
 
 void CMOD_Initialize_CLK(void)
@@ -49,54 +50,42 @@ void CMOD_Initialize_CLK(void)
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);              
     GPIO_PinAFConfig(CMOD_CLK_PORT, CMOD_CLK_PINSOURCE, CMOD_CLK_AF);
-    
-    
+      
     TIM_BaseObject.TIM_Prescaler         = 0;
     TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period            = 89;                  // TIM_Period = ((timer_tick_frequency / PWM_frequency)) - 1
+    TIM_BaseObject.TIM_Period            = 89;                  
     TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
-
-    TIM_OCInitObject.TIM_OCMode      = TIM_OCMode_PWM2;
-	TIM_OCInitObject.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitObject.TIM_OCPolarity  = TIM_OCPolarity_Low;
-	TIM_OCInitObject.TIM_Pulse       = 44;                      // TIM_Pulse = (((TIM_Period + 1) * DutyCycle) / 100) - 1
+    
+    TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_PWM2;
+	TIM_OCInitObject.TIM_OutputState  = TIM_OutputState_Enable;
+	TIM_OCInitObject.TIM_OCPolarity   = TIM_OCPolarity_Low;
+	TIM_OCInitObject.TIM_Pulse        = 44;                      
 	TIM_OC4Init(TIM4, &TIM_OCInitObject);  
 	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
-
-    TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_Active;
-    TIM_OCInitObject.TIM_OutputState  = TIM_OutputState_Disable;
-    TIM_OCInitObject.TIM_OutputNState = TIM_OutputNState_Disable;
-    TIM_OCInitObject.TIM_Pulse        = 44;
-    TIM_OCInitObject.TIM_OCPolarity   = TIM_OCPolarity_High;
-    TIM_OCInitObject.TIM_OCNPolarity  = TIM_OCPolarity_High;
-    TIM_OCInitObject.TIM_OCIdleState  = TIM_OCIdleState_Reset;
-    TIM_OCInitObject.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
-    TIM_OC3Init (TIM4, &TIM_OCInitObject);
     
-    TIM_ITConfig(TIM4, TIM_IT_CC3 | TIM_IT_CC4, ENABLE);
-    TIM_ClearITPendingBit (TIM4, TIM_IT_CC3 | TIM_IT_CC4);
+    // TIM_ITConfig(TIM4, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_CC3, DISABLE);
+    // TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+    TIM_ClearITPendingBit(TIM4, TIM_IT_CC4);
     TIM_Cmd(TIM4, ENABLE);
-
 
     NVIC_InitObject.NVIC_IRQChannel                   = TIM4_IRQn;
     NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 1;
+    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitObject);
+    NVIC_EnableIRQ(TIM4_IRQn);                                     
 }
 
 void CMOD_Initialize_Insertion_Interrupt()
 {
     RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
-
-    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
-    // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
     EXTI_InitTypeDef EXTI_InitObject;
     NVIC_InitTypeDef NVIC_InitObject;
+    
     
     SYSCFG_EXTILineConfig(CMOD_DETECT_EXTI_PORT, CMOD_DETECT_EXTI_PIN);
 
@@ -116,12 +105,11 @@ void CMOD_Initialize_Insertion_Interrupt()
 
 void TIM4_IRQHandler(void)
 {
-  if (TIM_GetITStatus (TIM4, TIM_IT_CC3) != RESET) 
+  if (TIM_GetITStatus (TIM4, TIM_IT_Update) != RESET) 
   {
     GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
 
-    TIM_SetCompare3(TIM4, TIM_GetCapture3(TIM4) + 44);
-    TIM_ClearITPendingBit (TIM4, TIM_IT_CC3);
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
 }
 
