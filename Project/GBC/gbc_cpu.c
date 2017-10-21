@@ -255,6 +255,19 @@ void GBC_CPU_COMPARE_Operator(uint8_t a, uint8_t b)
     }
 }
 
+uint16_t GBC_CPU_PopFromStack()
+{
+    uint16_t result = GBC_MMU_ReadShort(GBC_CPU_Register.SP);
+    GBC_CPU_Register.SP += 2;
+    return result;
+}
+
+void GBC_CPU_PushToStack(uint16_t value)
+{
+    GBC_CPU_Register.SP -= 2;
+    GBC_MMU_WriteShort(GBC_CPU_Register.SP, value);
+}
+
 void GBC_CPU_NOP()                      // 0x00 - No operation
 {
     // Do nothing
@@ -1328,90 +1341,224 @@ void GBC_CPU_XOR_A_A()                  // 0xAF - Logical XOR A against A
     GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
-void GBC_CPU_OR_A_B()                  // 0xB0 - Logical OR B against A
+void GBC_CPU_OR_A_B()                   // 0xB0 - Logical OR B against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
-void GBC_CPU_OR_A_C()                  // 0xB1 - Logical OR C against A
+void GBC_CPU_OR_A_C()                   // 0xB1 - Logical OR C against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
-void GBC_CPU_OR_A_D()                  // 0xB2 - Logical OR D against A
+void GBC_CPU_OR_A_D()                   // 0xB2 - Logical OR D against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
-void GBC_CPU_OR_A_E()                  // 0xB3 - Logical OR E against A
+void GBC_CPU_OR_A_E()                   // 0xB3 - Logical OR E against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
-void GBC_CPU_OR_A_H()                  // 0xB4 - Logical OR H against A
+void GBC_CPU_OR_A_H()                   // 0xB4 - Logical OR H against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
-void GBC_CPU_OR_A_L()                  // 0xB5 - Logical OR L against A
+void GBC_CPU_OR_A_L()                   // 0xB5 - Logical OR L against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
-void GBC_CPU_OR_A_HLP()                // 0xB6 - Logical OR value pointed by HL against A
+void GBC_CPU_OR_A_HLP()                 // 0xB6 - Logical OR value pointed by HL against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
 
-void GBC_CPU_OR_A_A()                  // 0xB7 - Logical OR A against A
+void GBC_CPU_OR_A_A()                   // 0xB7 - Logical OR A against A
 {
     GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
-void GBC_CPU_CP_A_B()                  // 0xB8 - Compare B against A
+void GBC_CPU_CP_A_B()                   // 0xB8 - Compare B against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
-void GBC_CPU_CP_A_C()                  // 0xB9 - Compare C against A
+void GBC_CPU_CP_A_C()                   // 0xB9 - Compare C against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
-void GBC_CPU_CP_A_D()                  // 0xBA - Compare D against A
+void GBC_CPU_CP_A_D()                   // 0xBA - Compare D against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
-void GBC_CPU_CP_A_E()                  // 0xBB - Compare E against A
+void GBC_CPU_CP_A_E()                   // 0xBB - Compare E against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
-void GBC_CPU_CP_A_H()                  // 0xBC - Compare H against A
+void GBC_CPU_CP_A_H()                   // 0xBC - Compare H against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
-void GBC_CPU_CP_A_L()                  // 0xBD - Compare L against A
+void GBC_CPU_CP_A_L()                   // 0xBD - Compare L against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
-void GBC_CPU_CP_A_HLP()                // 0xBE - Compare value pointed by HL against A
+void GBC_CPU_CP_A_HLP()                 // 0xBE - Compare value pointed by HL against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
 
-void GBC_CPU_CP_A_A()                  // 0xBF - Compare A against A
+void GBC_CPU_CP_A_A()                   // 0xBF - Compare A against A
 {
     GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_RET_NZ()                   // 0xC0 - Return if last result was not zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Ticks += 8;
+    }
+    else
+    {
+        
+        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_Ticks += 20;
+    }
+}
+
+void GBC_CPU_POP_BC()                   // 0xC1 - Pop 16-bit value from stack into BC
+{
+    GBC_CPU_Register.BC = GBC_CPU_PopFromStack();
+}
+
+void GBC_CPU_JP_NZ_XX(uint16_t operand) // 0xC2 - Absolute jump to 16-bit location if last result was not zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 16;
+    }
+}
+
+void GBC_CPU_JP_XX(uint16_t operand)    // 0xC3 - Absolute jump to 16-bit location
+{
+    GBC_CPU_Register.PC = operand;
+}
+
+void GBC_CPU_CALL_NZ_XX(uint16_t operand)   // 0xC4 - Call routine at 16-bit location if last result was not zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 24;
+    }
+}
+
+void GBC_CPU_PUSH_BC()                  // 0xC5 - Push 16-bit BC onto stack
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.BC);
+}
+
+void GBC_CPU_ADD_A_X(uint8_t operand)   // 0xC6 - Add 8-bit immediate to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_0H()                   // 0xC7 - Call routine at address 0000h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0;
+}
+
+void GBC_CPU_RET_Z()                    // 0xC8 - Return if last result was zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_Ticks += 20;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 8;
+    }
+}
+
+void GBC_CPU_RET()                      // 0xC9 - Return to calling routine
+{
+    GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+}
+
+void GBC_CPU_JP_Z_XX(uint16_t operand)  // 0xCA - Absolute jump to 16-bit location if last result was zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 16;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_EXT_OPS(uint8_t operand)   // 0xCB - Extended operations (two-byte instruction code)
+{
+    // ToDo
+}
+
+void GBC_CPU_CALL_Z_XX(uint16_t operand)    // 0xCC - Call routine at 16-bit location if last result was zero
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+    {
+        GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 24;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_CALL_XX(uint16_t operand)      // 0xCD - Call routine at 16-bit location
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = operand;
+}
+
+void GBC_CPU_ADC_A_X(uint8_t operand)       // 0xCE - Add 8-bit immediate and carry to A
+{
+    GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, operand + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_RST_8H()                       // 0xCF - Call routine at address 0008h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x8;
 }
 
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[192] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[208] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1605,6 +1752,22 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[192] =
     { GBC_CPU_CP_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBD - Compare L against A
     { GBC_CPU_CP_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBE - Compare value pointed by HL against A
     { GBC_CPU_CP_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBF - Compare A against A
+    { GBC_CPU_RET_NZ,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xC0 - Return if last result was not zero
+    { GBC_CPU_POP_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xC1 - Pop 16-bit value from stack into BC
+    { GBC_CPU_JP_NZ_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xC2 - Absolute jump to 16-bit location if last result was not zero
+    { GBC_CPU_JP_XX,     GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0xC3 - Absolute jump to 16-bit location
+    { GBC_CPU_CALL_NZ_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xC4 - Call routine at 16-bit location if last result was not zero
+    { GBC_CPU_PUSH_BC,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC5 - Push 16-bit BC onto stack
+    { GBC_CPU_ADD_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xC6 - Add 8-bit immediate to A
+    { GBC_CPU_RST_0H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC7 - Call routine at address 0000h
+    { GBC_CPU_RET_Z,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xC8 - Return if last result was zero
+    { GBC_CPU_RET,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xC9 - Return to calling routine
+    { GBC_CPU_JP_Z_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xCA - Absolute jump to 16-bit location if last result was zero
+    { GBC_CPU_EXT_OPS,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0xCB - Extended operations (two-byte instruction code)
+    { GBC_CPU_CALL_Z_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xCC - Call routine at 16-bit location if last result was zero
+    { GBC_CPU_CALL_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0xCD - Call routine at 16-bit location
+    { GBC_CPU_ADC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xCE - Add 8-bit immediate and carry to A
+    { GBC_CPU_RST_8H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xCF - Call routine at address 0008h
 };
 
 void GBC_CPU_Step()
