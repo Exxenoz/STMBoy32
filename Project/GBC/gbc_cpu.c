@@ -5,6 +5,8 @@
 GBC_CPU_Register_t GBC_CPU_Register;
 // Global GBC CPU ticks
 uint32_t GBC_CPU_Ticks = 0;
+// Global GBC CPU interrupt master
+bool GBC_CPU_InterruptMasterEnable = true;
 // Global GBC CPU stopped state
 bool GBC_CPU_Stopped = false;
 
@@ -1632,7 +1634,8 @@ void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused c
 
 void GBC_CPU_RETI()                     // 0xD9 - Enable interrupts and return to calling routine
 {
-    // ToDo
+    GBC_CPU_InterruptMasterEnable = true;
+    GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
 }
 
 void GBC_CPU_JP_C_XX(uint16_t operand)  // 0xDA - Absolute jump to 16-bit location if last result caused carry
@@ -1773,7 +1776,7 @@ void GBC_CPU_LDH_A_CP()                 // 0xF2 - Load A from address pointed to
 
 void GBC_CPU_DI()                       // 0xF3 - Disable Interrupts
 {
-    // ToDo
+    GBC_CPU_InterruptMasterEnable = false;
 }
 
 void GBC_CPU_PUSH_AF()                  // 0xF5 - Push 16-bit AF onto stack
@@ -1835,7 +1838,7 @@ void GBC_CPU_LD_A_XXP(uint16_t operand) // 0xFA - Load A from given 16-bit addre
 
 void GBC_CPU_EI()                       // 0xFB - Enable Interrupts
 {
-    // ToDo
+    GBC_CPU_InterruptMasterEnable = true;
 }
 
 void GBC_CPU_CP_A_X(uint8_t operand)    // 0xFE - Compare 8-bit value immediate against A

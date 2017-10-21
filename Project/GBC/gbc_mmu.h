@@ -3,6 +3,22 @@
 
 #include "common.h"
 
+enum GBC_MMU_InterruptFlags_e
+{
+    GBC_MMU_INTERRUPT_FLAGS_NONE     =  0,
+    GBC_MMU_INTERRUPT_FLAGS_VBLANK   =  1,
+    GBC_MMU_INTERRUPT_FLAGS_LCD_STAT =  2,
+    GBC_MMU_INTERRUPT_FLAGS_TIMER    =  4,
+    GBC_MMU_INTERRUPT_FLAGS_SERIAL   =  8,
+    GBC_MMU_INTERRUPT_FLAGS_JOYPAD   = 16,
+};
+
+enum GBC_MMU_MemoryLocations_e
+{
+    GBC_MMU_MEMLOC_INTERRUPT_FLAGS  = 0xFF0F,
+    GBC_MMU_MEMLOC_INTERRUPT_ENABLE = 0xFFFF,
+};
+
 typedef struct GBC_MMU_Memory_s
 {
     union
