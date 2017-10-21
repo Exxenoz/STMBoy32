@@ -1756,10 +1756,103 @@ void GBC_CPU_RST_28H()                  // 0xEF - Call routine at address 0028h
     GBC_CPU_Register.PC = 0x28;
 }
 
+void GBC_CPU_LDH_A_XP(uint8_t operand)  // 0xF0 - Load A from address pointed to by (FF00h + 8-bit immediate)
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + operand);
+}
+
+void GBC_CPU_POP_AF()                   // 0xF1 - Pop 16-bit value from stack into AF
+{
+    GBC_CPU_Register.AF = GBC_CPU_PopFromStack();
+}
+
+void GBC_CPU_LDH_A_CP()                 // 0xF2 - Load A from address pointed to by (FF00h + C)
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + GBC_CPU_Register.C);
+}
+
+void GBC_CPU_DI()                       // 0xF3 - Disable Interrupts
+{
+    // ToDo
+}
+
+void GBC_CPU_PUSH_AF()                  // 0xF5 - Push 16-bit AF onto stack
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.AF);
+}
+
+void GBC_CPU_OR_A_X(uint8_t operand)    // 0xF6 - Logical OR 8-bit value immediate against A
+{
+    GBC_CPU_Register.A = GBC_CPU_OR_Operator(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_30H()                  // 0xF7 - Call routine at address 0030h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x30;
+}
+
+void GBC_CPU_LDHL_SP_X(int8_t operand)  // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
+{
+    uint16_t sp = GBC_CPU_Register.SP;
+    uint32_t result = sp + operand;
+
+    if (result > 0xFF)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    if (((sp & 0xF) + (operand & 0xF)) > 0xF)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    }
+
+    // GBC_CPU_FLAGS_ZERO is cleared according to documentation
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+    result &= 0xFFFF;
+
+    GBC_CPU_Register.HL = result;
+}
+
+void GBC_CPU_LD_SP_HL()                 // 0xF9 - Copy HL to SP
+{
+    GBC_CPU_Register.SP = GBC_CPU_Register.HL;
+}
+
+void GBC_CPU_LD_A_XXP(uint16_t operand) // 0xFA - Load A from given 16-bit address
+{
+    GBC_CPU_Register.A = GBC_MMU_ReadByte(operand);
+}
+
+void GBC_CPU_EI()                       // 0xFB - Enable Interrupts
+{
+    // ToDo
+}
+
+void GBC_CPU_CP_A_X(uint8_t operand)    // 0xFE - Compare 8-bit value immediate against A
+{
+    GBC_CPU_COMPARE_Operator(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_38H()                  // 0xFF - Call routine at address 0038h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x38;
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[240] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[256] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -2001,6 +2094,22 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[240] =
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xED - Operation removed in this CPU
     { GBC_CPU_XOR_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xEE - Logical XOR 8-bit value immediate against A
     { GBC_CPU_RST_28H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xEF - Call routine at address 0028h
+    { GBC_CPU_LDH_A_XP,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xF0 - Load A from address pointed to by (FF00h + 8-bit immediate)
+    { GBC_CPU_POP_AF,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xF1 - Pop 16-bit value from stack into AF
+    { GBC_CPU_LDH_A_CP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xF2 - Load A from address pointed to by (FF00h + C)
+    { GBC_CPU_DI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xF3 - Disable Interrupts
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xF4 - Operation removed in this CPU
+    { GBC_CPU_PUSH_AF,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF5 - Push 16-bit AF onto stack
+    { GBC_CPU_OR_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xF6 - Logical OR 8-bit value immediate against A
+    { GBC_CPU_RST_30H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF7 - Call routine at address 0030h
+    { GBC_CPU_LDHL_SP_X, GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
+    { GBC_CPU_LD_SP_HL,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xF9 - Copy HL to SP
+    { GBC_CPU_LD_A_XXP,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_8  }, // 0xFA - Load A from given 16-bit address
+    { GBC_CPU_EI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xFB - Enable Interrupts
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xFC - Operation removed in this CPU
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xFD - Operation removed in this CPU
+    { GBC_CPU_CP_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xFE - Compare 8-bit value immediate against A
+    { GBC_CPU_RST_38H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xFF - Call routine at address 0038h
 };
 
 void GBC_CPU_Step()
