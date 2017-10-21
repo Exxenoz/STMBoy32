@@ -5,20 +5,23 @@
 #include "lcd_config.h"
 #include "lcd_regdef.h"
 
-#define LCD_SET_RESET   LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
-#define LCD_RST_RESET   LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
+#define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
+#define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
+                            
+#define LCD_SET_RS          LCD_RS_PORT->BSRRL |= LCD_RS_PIN
+#define LCD_RST_RS          LCD_RS_PORT->BSRRH |= LCD_RS_PIN
+                            
+#define LCD_SET_CS          LCD_CS_PORT->BSRRL |= LCD_CS_PIN
+#define LCD_RST_CS          LCD_CS_PORT->BSRRH |= LCD_CS_PIN
+                            
+#define LCD_SET_RD          LCD_RD_PORT->BSRRL |= LCD_RD_PIN
+#define LCD_RST_RD          LCD_RD_PORT->BSRRH |= LCD_RD_PIN
+                            
+#define LCD_SET_WR          LCD_WR_PORT->BSRRL |= LCD_WR_PIN
+#define LCD_RST_WR          LCD_WR_PORT->BSRRH |= LCD_WR_PIN
 
-#define LCD_SET_RS      LCD_RS_PORT->BSRRL |= LCD_RS_PIN
-#define LCD_RST_RS      LCD_RS_PORT->BSRRH |= LCD_RS_PIN
-
-#define LCD_SET_CS      LCD_CS_PORT->BSRRL |= LCD_CS_PIN
-#define LCD_RST_CS      LCD_CS_PORT->BSRRH |= LCD_CS_PIN
-
-#define LCD_SET_RD      LCD_RD_PORT->BSRRL |= LCD_RD_PIN
-#define LCD_RST_RD      LCD_RD_PORT->BSRRH |= LCD_RD_PIN
-
-#define LCD_SET_WR      LCD_WR_PORT->BSRRL |= LCD_WR_PIN
-#define LCD_RST_WR      LCD_WR_PORT->BSRRH |= LCD_WR_PIN
+#define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
+#define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
 
 void LCD_Initialize_Pins(void);
 bool LCD_Initialize(void);

@@ -1,5 +1,7 @@
 #include "cmod.h"
 
+bool CMOD_RISING_CLK_FLAG = false;
+
 void CMOD_Initialize(void)
 {
     RCC_AHB1PeriphClockCmd(CMOD_RESET_BUS, ENABLE);
@@ -107,8 +109,7 @@ void TIM4_IRQHandler(void)
 {
   if (TIM_GetITStatus (TIM4, TIM_IT_Update) != RESET) 
   {
-    GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
-
+    CMOD_SET_RISING_CLK_FLAG;
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
 }

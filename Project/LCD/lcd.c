@@ -1,5 +1,6 @@
 #include "lcd.h"
 
+bool LCD_READY_FLAG;
 uint16_t g_KaroData[LCD_DISPLAY_SIZE_Y];
 
 void LCD_Initialize_Pins(void)
