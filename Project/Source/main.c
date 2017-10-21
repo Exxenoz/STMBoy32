@@ -15,6 +15,7 @@
 #include "input.h"
 #include "sdc.h"
 #include "cmod.h"
+#include "gbc_mmu.h"
 
 void ClockDebug_Initialize()
 {
@@ -47,6 +48,12 @@ int main(void)
     LCD_Initialize();
     CMOD_Initialize();
     SDC_Initialize();
+
+    if (!GBC_MMU_LoadROM("red.gb"))
+    {
+        LED_EnableRed(true);
+        return 0;
+    }
 
     int g_KaroOffset = 0;
 
