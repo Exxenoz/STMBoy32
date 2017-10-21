@@ -1673,10 +1673,93 @@ void GBC_CPU_RST_18H()                  // 0xDF - Call routine at address 0018h
     GBC_CPU_Register.PC = 0x18;
 }
 
+void GBC_CPU_LDH_XP_A(uint8_t operand)  // 0xE0 - Save A at address pointed to by (FF00h + 8-bit immediate)
+{
+    GBC_MMU_WriteByte(0xFF00 + operand, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_POP_HL()                   // 0xE1 - Pop 16-bit value from stack into HL
+{
+    GBC_CPU_Register.HL = GBC_CPU_PopFromStack();
+}
+
+void GBC_CPU_LDH_CP_A()                 // 0xE2 - Save A at address pointed to by (FF00h + C)
+{
+    GBC_MMU_WriteByte(0xFF00 + GBC_CPU_Register.C, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_PUSH_HL()                  // 0xE5 - Push 16-bit HL onto stack
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.HL);
+}
+
+void GBC_CPU_AND_A_X(uint8_t operand)   // 0xE6 - Logical AND 8-bit value immediate against A
+{
+    GBC_CPU_Register.A = GBC_CPU_AND_Operator(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_20H()                  // 0xE7 - Call routine at address 0020h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x20;
+}
+
+void GBC_CPU_ADD_SP_X(int8_t operand)   // 0xE8 - Add signed 8-bit immediate to SP
+{
+    uint16_t sp = GBC_CPU_Register.SP;
+    uint32_t result = sp + operand;
+
+    if (result > 0xFF)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    if (((sp & 0xF) + (operand & 0xF)) > 0xF)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+    }
+
+    // GBC_CPU_FLAGS_ZERO is cleared according to documentation
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+    result &= 0xFFFF;
+
+    GBC_CPU_Register.SP = result;
+}
+
+void GBC_CPU_JP_HLP()                   // 0xE9 - Jump to 16-bit value pointed by HL
+{
+    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.HL);
+}
+
+void GBC_CPU_LD_XXP_A(uint16_t operand) // 0xEA - Save A at given 16-bit address
+{
+    GBC_MMU_WriteByte(operand, GBC_CPU_Register.A);
+}
+
+void GBC_CPU_XOR_A_X(uint8_t operand)   // 0xEE - Logical XOR 8-bit value immediate against A
+{
+    GBC_CPU_Register.A = GBC_CPU_XOR_Operator(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_28H()                  // 0xEF - Call routine at address 0028h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x28;
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[224] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[240] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1902,6 +1985,22 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[224] =
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xDD - Operation removed in this CPU
     { GBC_CPU_SBC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xDE - Subtract 8-bit immediate and carry from A
     { GBC_CPU_RST_18H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xDF - Call routine at address 0018h
+    { GBC_CPU_LDH_XP_A,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xE0 - Save A at address pointed to by (FF00h + 8-bit immediate)
+    { GBC_CPU_POP_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xE1 - Pop 16-bit value from stack into HL
+    { GBC_CPU_LDH_CP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xE2 - Save A at address pointed to by (FF00h + C)
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xE3 - Operation removed in this CPU
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xE4 - Operation removed in this CPU
+    { GBC_CPU_PUSH_HL,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE5 - Push 16-bit HL onto stack
+    { GBC_CPU_AND_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xE6 - Logical AND 8-bit value immediate against A
+    { GBC_CPU_RST_20H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE7 - Call routine at address 0020h
+    { GBC_CPU_ADD_SP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xE8 - Add signed 8-bit immediate to SP
+    { GBC_CPU_JP_HLP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xE9 - Jump to 16-bit value pointed by HL
+    { GBC_CPU_LD_XXP_A,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_8  }, // 0xEA - Save A at given 16-bit address
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEB - Operation removed in this CPU
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEC - Operation removed in this CPU
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xED - Operation removed in this CPU
+    { GBC_CPU_XOR_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xEE - Logical XOR 8-bit value immediate against A
+    { GBC_CPU_RST_28H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xEF - Call routine at address 0028h
 };
 
 void GBC_CPU_Step()
@@ -1918,6 +2017,7 @@ void GBC_CPU_Step()
         case GBC_CPU_OPERAND_BYTES_0:
         {
             ((void (*)(void))instruction.Handler)();
+
             break;
         }
         case GBC_CPU_OPERAND_BYTES_1:
@@ -1927,6 +2027,7 @@ void GBC_CPU_Step()
             GBC_CPU_Register.PC++;
 
             ((void (*)(uint8_t))instruction.Handler)(operand);
+
             break;
         }
         case GBC_CPU_OPERAND_BYTES_2:
@@ -1936,6 +2037,7 @@ void GBC_CPU_Step()
             GBC_CPU_Register.PC += 2;
 
             ((void (*)(uint16_t))instruction.Handler)(operand);
+
             break;
         }
     }
