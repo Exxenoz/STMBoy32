@@ -1221,42 +1221,42 @@ void GBC_CPU_SUB_A_A()                  // 0x97 - Subtract A from A
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
-void GBC_CPU_SDC_A_B()                  // 0x98 - Subtract B and carry flag from A
+void GBC_CPU_SBC_A_B()                  // 0x98 - Subtract B and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.B + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_C()                  // 0x99 - Subtract C and carry flag from A
+void GBC_CPU_SBC_A_C()                  // 0x99 - Subtract C and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.C + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_D()                  // 0x9A - Subtract D and carry flag from A
+void GBC_CPU_SBC_A_D()                  // 0x9A - Subtract D and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.D + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_E()                  // 0x9B - Subtract E and carry flag from A
+void GBC_CPU_SBC_A_E()                  // 0x9B - Subtract E and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.E + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_H()                  // 0x9C - Subtract H and carry flag from A
+void GBC_CPU_SBC_A_H()                  // 0x9C - Subtract H and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.H + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_L()                  // 0x9D - Subtract L and carry flag from A
+void GBC_CPU_SBC_A_L()                  // 0x9D - Subtract L and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.L + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_HLP()                // 0x9E - Subtract value pointed by HL and carry flag from A
+void GBC_CPU_SBC_A_HLP()                // 0x9E - Subtract value pointed by HL and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL) + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_SDC_A_A()                  // 0x9F - Subtract A and carry flag from A
+void GBC_CPU_SBC_A_A()                  // 0x9F - Subtract A and carry flag from A
 {
     GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, GBC_CPU_Register.A + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
@@ -1524,7 +1524,7 @@ void GBC_CPU_EXT_OPS(uint8_t operand)   // 0xCB - Extended operations (two-byte 
     // ToDo
 }
 
-void GBC_CPU_CALL_Z_XX(uint16_t operand)    // 0xCC - Call routine at 16-bit location if last result was zero
+void GBC_CPU_CALL_Z_XX(uint16_t operand)// 0xCC - Call routine at 16-bit location if last result was zero
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
@@ -1538,27 +1538,145 @@ void GBC_CPU_CALL_Z_XX(uint16_t operand)    // 0xCC - Call routine at 16-bit loc
     }
 }
 
-void GBC_CPU_CALL_XX(uint16_t operand)      // 0xCD - Call routine at 16-bit location
+void GBC_CPU_CALL_XX(uint16_t operand)  // 0xCD - Call routine at 16-bit location
 {
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = operand;
 }
 
-void GBC_CPU_ADC_A_X(uint8_t operand)       // 0xCE - Add 8-bit immediate and carry to A
+void GBC_CPU_ADC_A_X(uint8_t operand)   // 0xCE - Add 8-bit immediate and carry to A
 {
     GBC_CPU_Register.A = GBC_CPU_AddBytes(GBC_CPU_Register.A, operand + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
 }
 
-void GBC_CPU_RST_8H()                       // 0xCF - Call routine at address 0008h
+void GBC_CPU_RST_8H()                   // 0xCF - Call routine at address 0008h
 {
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x8;
 }
 
+void GBC_CPU_RET_NC()                   // 0xD0 - Return if last result caused no carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Ticks += 8;
+    }
+    else
+    {
+        
+        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_Ticks += 20;
+    }
+}
+
+void GBC_CPU_POP_DE()                   // 0xD1 - Pop 16-bit value from stack into DE
+{
+    GBC_CPU_Register.DE = GBC_CPU_PopFromStack();
+}
+
+void GBC_CPU_JP_NC_XX(uint16_t operand) // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 16;
+    }
+}
+
+void GBC_CPU_CALL_NC_XX(uint16_t operand)// 0xD4 - Call routine at 16-bit location if last result caused no carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Ticks += 12;
+    }
+    else
+    {
+        GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 24;
+    }
+}
+
+void GBC_CPU_PUSH_DE()                  // 0xD5 - Push 16-bit DE onto stack
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.DE);
+}
+
+void GBC_CPU_SUB_A_X(uint8_t operand)   // 0xD6 - Subtract 8-bit immediate from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, operand);
+}
+
+void GBC_CPU_RST_10H()                  // 0xD7 - Call routine at address 0010h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x10;
+}
+
+void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_Ticks += 20;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 8;
+    }
+}
+
+void GBC_CPU_RETI()                     // 0xD9 - Enable interrupts and return to calling routine
+{
+    // ToDo
+}
+
+void GBC_CPU_JP_C_XX(uint16_t operand)  // 0xDA - Absolute jump to 16-bit location if last result caused carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 16;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_CALL_C_XX(uint16_t operand)// 0xDC - Call routine at 16-bit location if last result caused carry
+{
+    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+    {
+        GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+        GBC_CPU_Register.PC = operand;
+        GBC_CPU_Ticks += 24;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 12;
+    }
+}
+
+void GBC_CPU_SBC_A_X(uint8_t operand)   // 0xDE - Subtract 8-bit immediate and carry from A
+{
+    GBC_CPU_Register.A = GBC_CPU_SubBytes(GBC_CPU_Register.A, operand + GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
+}
+
+void GBC_CPU_RST_18H()                  // 0xDF - Call routine at address 0018h
+{
+    GBC_CPU_PushToStack(GBC_CPU_Register.PC);
+    GBC_CPU_Register.PC = 0x18;
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_Instruction_t GBC_CPU_Instructions[208] =
+const GBC_CPU_Instruction_t GBC_CPU_Instructions[224] =
 {
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
     { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
@@ -1712,14 +1830,14 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[208] =
     { GBC_CPU_SUB_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x95 - Subtract L from A
     { GBC_CPU_SUB_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x96 - Subtract value pointed by HL from A
     { GBC_CPU_SUB_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x97 - Subtract A from A
-    { GBC_CPU_SDC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x98 - Subtract B and carry flag from A
-    { GBC_CPU_SDC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x99 - Subtract C and carry flag from A
-    { GBC_CPU_SDC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9A - Subtract D and carry flag from A
-    { GBC_CPU_SDC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9B - Subtract E and carry flag from A
-    { GBC_CPU_SDC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9C - Subtract H and carry flag from A
-    { GBC_CPU_SDC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9D - Subtract L and carry flag from A
-    { GBC_CPU_SDC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9E - Subtract value pointed by HL and carry flag from A
-    { GBC_CPU_SDC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9F - Subtract A and carry flag from A
+    { GBC_CPU_SBC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x98 - Subtract B and carry flag from A
+    { GBC_CPU_SBC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x99 - Subtract C and carry flag from A
+    { GBC_CPU_SBC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9A - Subtract D and carry flag from A
+    { GBC_CPU_SBC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9B - Subtract E and carry flag from A
+    { GBC_CPU_SBC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9C - Subtract H and carry flag from A
+    { GBC_CPU_SBC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9D - Subtract L and carry flag from A
+    { GBC_CPU_SBC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9E - Subtract value pointed by HL and carry flag from A
+    { GBC_CPU_SBC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9F - Subtract A and carry flag from A
     { GBC_CPU_AND_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA0 - Logical AND B against A
     { GBC_CPU_AND_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA1 - Logical AND C against A
     { GBC_CPU_AND_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA2 - Logical AND D against A
@@ -1768,6 +1886,22 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[208] =
     { GBC_CPU_CALL_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0xCD - Call routine at 16-bit location
     { GBC_CPU_ADC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xCE - Add 8-bit immediate and carry to A
     { GBC_CPU_RST_8H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xCF - Call routine at address 0008h
+    { GBC_CPU_RET_NC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD0 - Return if last result caused no carry
+    { GBC_CPU_POP_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xD1 - Pop 16-bit value from stack into DE
+    { GBC_CPU_JP_NC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD3 - Operation removed in this CPU
+    { GBC_CPU_CALL_NC_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xD4 - Call routine at 16-bit location if last result caused no carry
+    { GBC_CPU_PUSH_DE,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD5 - Push 16-bit DE onto stack
+    { GBC_CPU_SUB_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xD6 - Subtract 8-bit immediate from A
+    { GBC_CPU_RST_10H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD7 - Call routine at address 0010h
+    { GBC_CPU_RET_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD8 - Return if last result caused carry
+    { GBC_CPU_RETI,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD9 - Enable interrupts and return to calling routine
+    { GBC_CPU_JP_C_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xDA - Absolute jump to 16-bit location if last result caused carry
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xDB - Operation removed in this CPU
+    { GBC_CPU_CALL_C_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xDC - Call routine at 16-bit location if last result caused carry
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xDD - Operation removed in this CPU
+    { GBC_CPU_SBC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xDE - Subtract 8-bit immediate and carry from A
+    { GBC_CPU_RST_18H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xDF - Call routine at address 0018h
 };
 
 void GBC_CPU_Step()
