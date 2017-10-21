@@ -19,12 +19,12 @@
 #define SDC_DAT3_PIN          GPIO_Pin_11
 #define SDC_DAT3_PIN_SOURCE   GPIO_PinSource11
 
-#define SDC_CLK_PORT         GPIOC
-#define SDC_CLK_PIN          GPIO_Pin_12
-#define SDC_CLK_PIN_SOURCE   GPIO_PinSource12
-
-#define SDC_CMD_PORT         GPIOD
-#define SDC_CMD_PIN          GPIO_Pin_2
-#define SDC_CMD_PIN_SOURCE   GPIO_PinSource2
+#define SDC_CLK_PORT          GPIOC
+#define SDC_CLK_PIN           GPIO_Pin_12
+#define SDC_CLK_PIN_SOURCE    GPIO_PinSource12
+                              
+#define SDC_CMD_PORT          GPIOD
+#define SDC_CMD_PIN           GPIO_Pin_2
+#define SDC_CMD_PIN_SOURCE    GPIO_PinSource2
 
 #endif //SDC_CONFIG_H
