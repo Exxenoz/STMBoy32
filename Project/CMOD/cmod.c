@@ -31,7 +31,7 @@ void CMOD_Initialize(void)
  
     GPIO_SetBits(CMOD_WR_PORT, CMOD_WR_PIN);
     CMOD_Initialize_CLK();
-    //CMOD_Initialize_Insertion_Interrupt();
+    CMOD_Initialize_Insertion_Interrupt();
 }
 
 void CMOD_Initialize_CLK(void)
@@ -55,7 +55,7 @@ void CMOD_Initialize_CLK(void)
       
     TIM_BaseObject.TIM_Prescaler         = 0;
     TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period            = 89;                  
+    TIM_BaseObject.TIM_Period            = 85;                  
     TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
@@ -63,7 +63,7 @@ void CMOD_Initialize_CLK(void)
     TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_PWM2;
 	TIM_OCInitObject.TIM_OutputState  = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity   = TIM_OCPolarity_Low;
-	TIM_OCInitObject.TIM_Pulse        = 44;                      
+	TIM_OCInitObject.TIM_Pulse        = 42;                      
 	TIM_OC4Init(TIM4, &TIM_OCInitObject);  
 	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
     

@@ -42,6 +42,8 @@ int main(void)
     // to debug clock frequency settings using GPIO
     // ClockDebug_Initialize();
 
+    int KaroOffset = 0;
+
     LED_Initialize();
     Audio_Initialize();
     Input_Initialize();
@@ -54,8 +56,6 @@ int main(void)
         LED_EnableRed(true);
         return 0;
     }
-
-    int g_KaroOffset = 0;
 
     /* Infinite loop */
     while (1)
@@ -70,19 +70,19 @@ int main(void)
         {
             if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
             {
-                LCD_PrintKaro(0, g_KaroOffset++);
+                LCD_PrintKaro(0, KaroOffset++);
                 
                 /*for (long i = 0; i < 1000000; i++);
-                if (g_KaroOffset == 0 || g_KaroOffset == 120)
+                if (KaroOffset == 0 || KaroOffset == 120)
                 {
                     LCD_ClearColor(0x00FF);
-                    g_KaroOffset = 0;
+                    KaroOffset = 0;
                 }
-                else if (g_KaroOffset == 60)
+                else if (KaroOffset == 60)
                 {
                     LCD_ClearColor(0xFF00);
                 }
-                g_KaroOffset++;*/
+                KaroOffset++;*/
             }
             LCD_RST_READY_FLAG;
         }
