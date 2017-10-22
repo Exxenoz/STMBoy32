@@ -5,8 +5,8 @@ CMOD_STATUS  CMOD_Status       = CMOD_WAITING;
 uint16_t     CMOD_Address      = 0x0000;
 uint8_t      *CMOD_DataOut     = NULL;
 uint8_t      *CMOD_DataIn      = NULL;
-int          CMOD_BytesToRead  = 1;
-int          CMOD_BytesToWrite = 1;
+int          CMOD_BytesToRead  = 0;
+int          CMOD_BytesToWrite = 0;
 
 CMOD_STATUS CMOD_GetStatus(void) 
 { 
@@ -55,9 +55,10 @@ void CMOD_Write_Byte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
     
-    CMOD_Action  = CMOD_READ;
-    CMOD_Address = address;
-    CMOD_DataOut = data;
+    CMOD_Action       = CMOD_READ;
+    CMOD_Address      = address;
+    CMOD_DataOut      = data;
+    CMOD_BytesToWrite = 1;
     
     CMOD_Status  = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
@@ -178,23 +179,38 @@ void CMOD_Initialize(void)
     CMOD_Initialize_Insertion_Interrupt();
 }
 
-void CMOD_Enable_Interrupt(void)
+void CMOD_EnableInterrupt(void)
 {
     NVIC_EnableIRQ(TIM4_IRQn);
 }
 
-void CMOD_Disable_Interrupt(void)
+void CMOD_DisableInterrupt(void)
 {
     NVIC_DisableIRQ(TIM4_IRQn);
 }
 
 void TIM4_IRQHandler(void)
 {
-  if (TIM_GetITStatus (TIM4, TIM_IT_Update) != RESET) 
+  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) // ToDo: Directly access Register
   {
-    // WIP
+    if (CMOD_Action == CMOD_READ)
+    {
+        
+        CMOD_BytesToRead--;
+    }
+    else if (CMOD_Action == CMOD_WRITE)
+    {
+        
+        CMOD_BytesToWrite--;
+    }
+    
+    if (CMOD_BytesToRead == 0 && CMOD_BytesToWrite == 0)
+    {
+        CMOD_Action = CMOD_NOACTION;
+        CMOD_DisableInterrupt();
+    }
     GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update); // ToDo: Directly access Register
   }
 }
 
