@@ -1,79 +1,79 @@
 #include "cmod.h"
 
-CMOD_ACTION  cmod_action;
-CMOD_STATUS  cmod_status      = WAITING;
-uint16_t     cmod_address     = 0x0000;
-uint8_t      cmod_data_in     = 0x00;
-uint8_t      *cmod_data_out   = NULL;
-int          cmod_bytesToRead = 1;
+CMOD_ACTION  CMOD_Action       = CMOD_NOACTION;
+CMOD_STATUS  CMOD_Status       = CMOD_WAITING;
+uint16_t     CMOD_Address      = 0x0000;
+uint8_t      *CMOD_DataOut     = NULL;
+uint8_t      *CMOD_DataIn      = NULL;
+int          CMOD_BytesToRead  = 1;
+int          CMOD_BytesToWrite = 1;
 
 CMOD_STATUS CMOD_GetStatus(void) 
 { 
-    return cmod_status; 
+    return CMOD_Status; 
+}
+
+bool CMOD_Detect(void)
+{
+    // Check for a GB-Cartridge by trying to read the first byte of the Nintendo Logo
+    uint8_t data;
+    
+    CMOD_ReadByte(0x0104, &data);
+    while (CMOD_Status == CMOD_PROCESSING);
+    
+    if (data == 0xCE) return true;
+    else              return false;
 }
 
 void CMOD_Read_Byte(uint16_t address, uint8_t *data)
 {
-    cmod_status      = PROCESSING;
-    cmod_address     = address;
-    cmod_data_out    = data;
-    cmod_action      = CMOD_READ;
-    cmod_bytesToRead = 1;
+    while (CMOD_Status == CMOD_PROCESSING);
     
-    CMOD_Enable_Interrupt();
+    CMOD_Action      = CMOD_READ;
+    CMOD_Address     = address;
+    CMOD_DataIn      = data;
+    CMOD_BytesToRead = 1;
+    
+    CMOD_Status      = CMOD_PROCESSING;
+    CMOD_EnableInterrupt();
 }
 
-void CMOD_Read_Bytes(uint16_t starting_address, int bytes, uint8_t *data)
+void CMOD_Read_Bytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
-    cmod_status      = PROCESSING;
-    cmod_address     = starting_address;
-    cmod_data_out    = data;
-    cmod_action      = CMOD_READ;
-    cmod_bytesToRead = bytes;
+    while (CMOD_Status == CMOD_PROCESSING);
     
-    CMOD_Enable_Interrupt();
+    CMOD_Action      = CMOD_READ;
+    CMOD_Address     = startingAddress;
+    CMOD_DataIn      = data;
+    CMOD_BytesToRead = bytes;
+    
+    CMOD_Status      = CMOD_PROCESSING;
+    CMOD_EnableInterrupt();
 }
 
-void CMOD_Write_Byte(uint16_t address, uint8_t data)
+void CMOD_Write_Byte(uint16_t address, uint8_t *data)
 {
-    cmod_status  = PROCESSING;
-    cmod_address = address;
-    cmod_data_in = data;
-    cmod_action  = CMOD_READ;
+    while (CMOD_Status == CMOD_PROCESSING);
     
-    CMOD_Enable_Interrupt();
+    CMOD_Action  = CMOD_READ;
+    CMOD_Address = address;
+    CMOD_DataOut = data;
+    
+    CMOD_Status  = CMOD_PROCESSING;
+    CMOD_EnableInterrupt();
 }
 
-void CMOD_Initialize(void)
+void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
-    RCC_AHB1PeriphClockCmd(CMOD_RESET_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_CS_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_RD_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_WR_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_ADDR_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DATA_BUS, ENABLE);
-
-    GPIO_InitTypeDef GPIO_InitObject;
-
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
-
-    INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT, CMOD_CS_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT, CMOD_RD_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT, CMOD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT, CMOD_ADDR_PINS);
-    INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT, CMOD_DATA_PINS);
- 
-    GPIO_SetBits(CMOD_WR_PORT, CMOD_WR_PIN);
-    CMOD_Initialize_CLK();
-    CMOD_Initialize_Insertion_Interrupt();
+    while (CMOD_Status == CMOD_PROCESSING);
+    
+    CMOD_Action       = CMOD_WRITE;
+    CMOD_Address      = startingAddress;
+    CMOD_DataOut      = data;
+    CMOD_BytesToWrite = bytes;
+    
+    CMOD_Status       = CMOD_PROCESSING;
+    CMOD_EnableInterrupt();
 }
 
 void CMOD_Initialize_CLK(void)
@@ -81,7 +81,7 @@ void CMOD_Initialize_CLK(void)
     RCC_AHB1PeriphClockCmd(CMOD_CLK_BUS, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
-    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitTypeDef        GPIO_InitObject;
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
     TIM_OCInitTypeDef       TIM_OCInitObject;
     NVIC_InitTypeDef        NVIC_InitObject;
@@ -144,6 +144,38 @@ void CMOD_Initialize_Insertion_Interrupt()
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;  
     NVIC_Init(&NVIC_InitObject);                                 
     NVIC_EnableIRQ(CMOD_DETECT_NVIC_CHANNEL);                                     
+}
+
+void CMOD_Initialize(void)
+{
+    RCC_AHB1PeriphClockCmd(CMOD_RESET_BUS,  ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_CS_BUS,     ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_RD_BUS,     ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_WR_BUS,     ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_ADDR_BUS,   ENABLE);
+    RCC_AHB1PeriphClockCmd(CMOD_DATA_BUS,   ENABLE);
+
+    GPIO_InitTypeDef GPIO_InitObject;
+
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
+    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
+    GPIO_InitObject.GPIO_Pin   = PIN;               \
+    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
+    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
+    GPIO_Init(PORT, &GPIO_InitObject);              \
+
+    INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT,    CMOD_RD_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT,    CMOD_WR_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
+    INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
+ 
+    GPIO_SetBits(CMOD_WR_PORT, CMOD_WR_PIN);
+    CMOD_Initialize_CLK();
+    CMOD_Initialize_Insertion_Interrupt();
 }
 
 void CMOD_Enable_Interrupt(void)

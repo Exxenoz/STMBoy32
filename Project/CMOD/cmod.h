@@ -26,31 +26,32 @@
 
 typedef enum 
 {
-    WAITING,
-    PROCESSING,
-    DATA_READY,
-    WRITE_COMPLETE,
-    CMOD_ERROR
+    CMOD_WAITING,
+    CMOD_PROCESSING,
+    CMOD_DATA_READY,
+    CMOD_WRITE_COMPLETE,
+    CMOD_NOCARD
 } CMOD_STATUS;
 
 typedef enum
 {
     CMOD_READ,
     CMOD_WRITE,
+    CMOD_NOACTION
 } CMOD_ACTION;
 
 CMOD_STATUS CMOD_GetStatus(void);
+bool        CMOD_Detect(void);
 
-void CMOD_Read_Byte(uint16_t address, uint8_t *data);
-void CMOD_Read_Bytes(uint16_t starting_address, int bytes, uint8_t *data);
-void CMOD_Write_Byte(uint16_t address, uint8_t data);
+void CMOD_ReadByte(uint16_t address, uint8_t *data);                        
+void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);
+void CMOD_WriteByte(uint16_t address, uint8_t *data);
+void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);
 
 void CMOD_Initialize(void);
-void CMOD_Initialize_CLK(void);
-void CMOD_Initialize_Insertion_Interrupt(void);
 
-void CMOD_Enable_Interrupt(void);
-void CMOD_Disable_Interrupt(void);
+void CMOD_EnableInterrupt(void);
+void CMOD_DisableInterrupt(void);
 
 void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 
