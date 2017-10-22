@@ -24,12 +24,33 @@
 #define CMOD_DATA_MODE_IN    GPIOG->MODER = 0x00000000
 #define CMOD_DATA_MODE_OUT   GPIOG->MODER = 0x00005555
 
-#define CMOD_SET_RISING_CLK_FLAG CMOD_RISING_CLK_FLAG = true;
-#define CMOD_RST_RISING_CLK_FLAG CMOD_RISING_CLK_FLAG = false;
+typedef enum 
+{
+    WAITING,
+    PROCESSING,
+    DATA_READY,
+    WRITE_COMPLETE,
+    CMOD_ERROR
+} CMOD_STATUS;
+
+typedef enum
+{
+    CMOD_READ,
+    CMOD_WRITE,
+} CMOD_ACTION;
+
+CMOD_STATUS CMOD_GetStatus(void);
+
+void CMOD_Read_Byte(uint16_t address, uint8_t *data);
+void CMOD_Read_Bytes(uint16_t starting_address, int bytes, uint8_t *data);
+void CMOD_Write_Byte(uint16_t address, uint8_t data);
 
 void CMOD_Initialize(void);
 void CMOD_Initialize_CLK(void);
 void CMOD_Initialize_Insertion_Interrupt(void);
+
+void CMOD_Enable_Interrupt(void);
+void CMOD_Disable_Interrupt(void);
 
 void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 

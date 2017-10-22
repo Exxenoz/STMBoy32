@@ -1,6 +1,48 @@
 #include "cmod.h"
 
-bool CMOD_RISING_CLK_FLAG = false;
+CMOD_ACTION  cmod_action;
+CMOD_STATUS  cmod_status      = WAITING;
+uint16_t     cmod_address     = 0x0000;
+uint8_t      cmod_data_in     = 0x00;
+uint8_t      *cmod_data_out   = NULL;
+int          cmod_bytesToRead = 1;
+
+CMOD_STATUS CMOD_GetStatus(void) 
+{ 
+    return cmod_status; 
+}
+
+void CMOD_Read_Byte(uint16_t address, uint8_t *data)
+{
+    cmod_status      = PROCESSING;
+    cmod_address     = address;
+    cmod_data_out    = data;
+    cmod_action      = CMOD_READ;
+    cmod_bytesToRead = 1;
+    
+    CMOD_Enable_Interrupt();
+}
+
+void CMOD_Read_Bytes(uint16_t starting_address, int bytes, uint8_t *data)
+{
+    cmod_status      = PROCESSING;
+    cmod_address     = starting_address;
+    cmod_data_out    = data;
+    cmod_action      = CMOD_READ;
+    cmod_bytesToRead = bytes;
+    
+    CMOD_Enable_Interrupt();
+}
+
+void CMOD_Write_Byte(uint16_t address, uint8_t data)
+{
+    cmod_status  = PROCESSING;
+    cmod_address = address;
+    cmod_data_in = data;
+    cmod_action  = CMOD_READ;
+    
+    CMOD_Enable_Interrupt();
+}
 
 void CMOD_Initialize(void)
 {
@@ -76,8 +118,7 @@ void CMOD_Initialize_CLK(void)
     NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitObject);
-    NVIC_EnableIRQ(TIM4_IRQn);                                     
+    NVIC_Init(&NVIC_InitObject);                                     
 }
 
 void CMOD_Initialize_Insertion_Interrupt()
@@ -105,11 +146,22 @@ void CMOD_Initialize_Insertion_Interrupt()
     NVIC_EnableIRQ(CMOD_DETECT_NVIC_CHANNEL);                                     
 }
 
+void CMOD_Enable_Interrupt(void)
+{
+    NVIC_EnableIRQ(TIM4_IRQn);
+}
+
+void CMOD_Disable_Interrupt(void)
+{
+    NVIC_DisableIRQ(TIM4_IRQn);
+}
+
 void TIM4_IRQHandler(void)
 {
   if (TIM_GetITStatus (TIM4, TIM_IT_Update) != RESET) 
   {
-    CMOD_SET_RISING_CLK_FLAG;
+    // WIP
+    GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
 }

@@ -59,13 +59,7 @@ int main(void)
 
     /* Infinite loop */
     while (1)
-    {
-        if (CMOD_RISING_CLK_FLAG)
-        {
-            GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
-            CMOD_RST_RISING_CLK_FLAG;
-        }
-        
+    {   
         if(LCD_READY_FLAG)
         {
             if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
