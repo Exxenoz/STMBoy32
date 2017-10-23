@@ -6,7 +6,9 @@ uint16_t     CMOD_Address      = 0x0000;
 uint8_t      *CMOD_DataOut     = NULL;
 uint8_t      *CMOD_DataIn      = NULL;
 int          CMOD_BytesToRead  = 0;
+int          CMOD_BytesRead    = 0;
 int          CMOD_BytesToWrite = 0;
+int          CMOD_BytesWritten = 0;
 
 CMOD_STATUS CMOD_GetStatus(void) 
 { 
@@ -16,7 +18,7 @@ CMOD_STATUS CMOD_GetStatus(void)
 bool CMOD_Detect(void)
 {
     // Check for a GB-Cartridge by trying to read the first byte of the Nintendo Logo
-    uint8_t data;
+    uint8_t data = 0x00;
     
     CMOD_ReadByte(0x0104, &data);
     while (CMOD_Status == CMOD_PROCESSING);
@@ -33,6 +35,7 @@ void CMOD_Read_Byte(uint16_t address, uint8_t *data)
     CMOD_Address     = address;
     CMOD_DataIn      = data;
     CMOD_BytesToRead = 1;
+    CMOD_BytesRead   = 0;
     
     CMOD_Status      = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
@@ -46,6 +49,7 @@ void CMOD_Read_Bytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_Address     = startingAddress;
     CMOD_DataIn      = data;
     CMOD_BytesToRead = bytes;
+    CMOD_BytesRead   = 0;
     
     CMOD_Status      = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
@@ -59,6 +63,7 @@ void CMOD_Write_Byte(uint16_t address, uint8_t *data)
     CMOD_Address      = address;
     CMOD_DataOut      = data;
     CMOD_BytesToWrite = 1;
+    CMOD_BytesWritten = 0;
     
     CMOD_Status  = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
@@ -72,6 +77,7 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_Address      = startingAddress;
     CMOD_DataOut      = data;
     CMOD_BytesToWrite = bytes;
+    CMOD_BytesWritten = 0;
     
     CMOD_Status       = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
@@ -103,7 +109,7 @@ void CMOD_Initialize_CLK(void)
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
     
-    TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_PWM2;
+    TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_PWM1;
 	TIM_OCInitObject.TIM_OutputState  = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity   = TIM_OCPolarity_Low;
 	TIM_OCInitObject.TIM_Pulse        = 42;                      
@@ -119,7 +125,8 @@ void CMOD_Initialize_CLK(void)
     NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitObject);                                     
+    NVIC_Init(&NVIC_InitObject);                          
+    NVIC_EnableIRQ(TIM4_IRQn);    
 }
 
 void CMOD_Initialize_Insertion_Interrupt()
@@ -174,43 +181,75 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
  
-    GPIO_SetBits(CMOD_WR_PORT, CMOD_WR_PIN);
+    CMOD_SET_CS;
+    CMOD_SET_RD;
+    CMOD_SET_WR;
+    CMOD_SET_RESET;
+    
     CMOD_Initialize_CLK();
     CMOD_Initialize_Insertion_Interrupt();
 }
 
 void CMOD_EnableInterrupt(void)
 {
-    NVIC_EnableIRQ(TIM4_IRQn);
+    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
 }
 
 void CMOD_DisableInterrupt(void)
 {
-    NVIC_DisableIRQ(TIM4_IRQn);
+    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
 }
 
 void TIM4_IRQHandler(void)
 {
-  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) // ToDo: Directly access Register
-  {
-    if (CMOD_Action == CMOD_READ)
-    {
-        
-        CMOD_BytesToRead--;
-    }
-    else if (CMOD_Action == CMOD_WRITE)
-    {
-        
-        CMOD_BytesToWrite--;
-    }
+  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             // ToDo: Directly access Register
+  {/* // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises, needs testing                                                            
+      CMOD_SET_WR; 
+      CMOD_SET_CS;                                               // CS rises at 0ns (after CLK Flank) 
+                                                               
+      if (CMOD_Action == CMOD_READ && CMOD_BytesRead != 0)       // If a Byte was read, store it
+      {                                                          // Gameboy stops driving Data Bus at 0ns -> Data ready
+          CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();      // Store the nt byte at CMOD_DataIn[n-1]
+      }
+      
+      if (CMOD_Action == CMOD_READ && CMOD_BytesRead == CMOD_BytesToRead)          // Read all Data?
+      {                                                                          
+          CMOD_Status = CMOD_DATA_READY;                                           // -> Data Ready
+          CMOD_Action = CMOD_NOACTION;                                             // All actions finished
+          CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
+          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
+          return;                                               // Needed?
+      }
+      else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
+      {
+          CMOD_Status = CMOD_WRITE_COMPLETE;                                       // -> Write complete
+          CMOD_Action = CMOD_NOACTION;                                             // All actions finished
+          CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
+          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
+          return;
+      }
+      
+      if (CMOD_Action == CMOD_READ)                              // Do we want to read?
+      {
+          CMOD_RST_RD;                                           // RD goes low for a read at 30ns (in GB)
+          CMOD_SET_ADDR(CMOD_Address + CMOD_BytesRead);          // Address changes at 140ns (in GB)
+          CMOD_RST_CS;                                           // CS goes low at 240ns (in GB)
+          CMOD_BytesRead++;                                      // Increase BytesRead in good faith
+          CMOD_DATA_MODE_IN;                                     // Set the DataPins to Input mode for a read
+      }
+      else if (CMOD_Action == CMOD_WRITE)
+      {
+          CMOD_SET_RD;                                           // RD rises before a write at 140ns (in GB)
+          CMOD_SET_ADDR(CMOD_Address + CMOD_BytesWritten);       // Address changes at 140ns (in GB)
+          CMOD_RST_CS;                                           // CS goes low at 240ns (in GB)
+          CMOD_BytesWritten++;                                   // Increase BytesWritten in good faith
+          CMOD_DATA_MODE_OUT;                                    // Set the DataPins to Output mode for a write
+          CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);    // Data Bus is driven at 480ns (falling CLK) (in GB)
+          CMOD_RST_WR;                                           // WR goes low for a write at 480ns (falling CLK) (in GB)
+      }*/
     
-    if (CMOD_BytesToRead == 0 && CMOD_BytesToWrite == 0)
-    {
-        CMOD_Action = CMOD_NOACTION;
-        CMOD_DisableInterrupt();
-    }
     GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update); // ToDo: Directly access Register
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  // ToDo: Directly access Register
   }
 }
 
