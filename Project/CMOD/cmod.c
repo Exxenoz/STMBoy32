@@ -27,7 +27,7 @@ bool CMOD_Detect(void)
     else              return false;
 }
 
-void CMOD_Read_Byte(uint16_t address, uint8_t *data)
+void CMOD_ReadByte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
     
@@ -41,7 +41,7 @@ void CMOD_Read_Byte(uint16_t address, uint8_t *data)
     CMOD_EnableInterrupt();
 }
 
-void CMOD_Read_Bytes(uint16_t startingAddress, int bytes, uint8_t *data)
+void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
     
@@ -55,7 +55,7 @@ void CMOD_Read_Bytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_EnableInterrupt();
 }
 
-void CMOD_Write_Byte(uint16_t address, uint8_t *data)
+void CMOD_WriteByte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
     
@@ -116,8 +116,7 @@ void CMOD_Initialize_CLK(void)
 	TIM_OC4Init(TIM4, &TIM_OCInitObject);  
 	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
     
-    // TIM_ITConfig(TIM4, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_CC3, DISABLE);
-    // TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+    TIM_ITConfig(TIM4, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update, DISABLE);
     TIM_ClearITPendingBit(TIM4, TIM_IT_CC4);
     TIM_Cmd(TIM4, ENABLE);
 
@@ -129,7 +128,7 @@ void CMOD_Initialize_CLK(void)
     NVIC_EnableIRQ(TIM4_IRQn);    
 }
 
-void CMOD_Initialize_Insertion_Interrupt()
+void CMOD_Initialize_InsertionInterrupt()
 {
     RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
@@ -187,7 +186,7 @@ void CMOD_Initialize(void)
     CMOD_SET_RESET;
     
     CMOD_Initialize_CLK();
-    CMOD_Initialize_Insertion_Interrupt();
+    CMOD_Initialize_InsertionInterrupt();
 }
 
 void CMOD_EnableInterrupt(void)
@@ -203,7 +202,7 @@ void CMOD_DisableInterrupt(void)
 void TIM4_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             // ToDo: Directly access Register
-  {/* // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises, needs testing                                                            
+  { // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises, needs testing                                                            
       CMOD_SET_WR; 
       CMOD_SET_CS;                                               // CS rises at 0ns (after CLK Flank) 
                                                                
@@ -246,9 +245,9 @@ void TIM4_IRQHandler(void)
           CMOD_DATA_MODE_OUT;                                    // Set the DataPins to Output mode for a write
           CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);    // Data Bus is driven at 480ns (falling CLK) (in GB)
           CMOD_RST_WR;                                           // WR goes low for a write at 480ns (falling CLK) (in GB)
-      }*/
+      }
     
-    GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
+    //GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  // ToDo: Directly access Register
   }
 }

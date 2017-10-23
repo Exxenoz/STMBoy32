@@ -50,7 +50,15 @@ int main(void)
     LCD_Initialize();
     CMOD_Initialize();
     SDC_Initialize();
-
+    
+    if (CMOD_Detect())
+    { 
+        uint8_t name[11];
+        
+        CMOD_ReadBytes(0x0134, 11, name);
+        while (CMOD_GetStatus() == CMOD_PROCESSING);
+    }
+    
     if (!GBC_MMU_LoadROM("red.gb"))
     {
         LED_EnableRed(true);
@@ -65,7 +73,7 @@ int main(void)
             if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
             {
                 LCD_PrintKaro(0, KaroOffset++);
-                
+                if (KaroOffset == 2400) KaroOffset = 0;
                 /*for (long i = 0; i < 1000000; i++);
                 if (KaroOffset == 0 || KaroOffset == 120)
                 {
@@ -79,6 +87,6 @@ int main(void)
                 KaroOffset++;*/
             }
             LCD_RST_READY_FLAG;
-        }
+        } 
     }
 }
