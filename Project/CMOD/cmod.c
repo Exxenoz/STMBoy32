@@ -10,14 +10,15 @@ int          CMOD_BytesRead    = 0;
 int          CMOD_BytesToWrite = 0;
 int          CMOD_BytesWritten = 0;
 
+// Returns the current Status of the Cartridge Modul (for example CMOD_PROCESSING)
 CMOD_STATUS CMOD_GetStatus(void) 
 { 
     return CMOD_Status; 
 }
 
+// Check for a GB-Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_Detect(void)
 {
-    // Check for a GB-Cartridge by trying to read the first byte of the Nintendo Logo
     uint8_t data = 0x00;
     
     CMOD_ReadByte(0x0104, &data);
@@ -25,6 +26,16 @@ bool CMOD_Detect(void)
     
     if (data == 0xCE) return true;
     else              return false;
+}
+
+// Returns false if no Card is detected, otherwise stores its Sepzifications in &cardridgeSpecs
+bool CMOD_GetCSpecs(CARTRIDGE_SPECS *cardridgeSpecs)
+{
+    if (!CMOD_Detect()) return false;
+    
+    // WIP
+    
+    return true;
 }
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data)

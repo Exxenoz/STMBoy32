@@ -40,13 +40,41 @@ typedef enum
     CMOD_NOACTION
 } CMOD_ACTION;
 
+typedef enum
+{
+    C_NOT_SUPPORTED,           // The cardridge has a MBV which is not supported (currently only BANDAI TAMA5)
+    C_NO_MBC,                  // The cardridge only has ROM (Tetris for example)
+    C_MBC1,                    // The cardridge has MC1   build in
+    C_MBC2,                    // The cardridge has MC2   build in
+    C_MBC3,                    // The cardridge has MC3   build in
+    C_MBC5,                    // The cardridge has MC5   build in
+    C_MBC6,                    // The cardridge has MC6   build in
+    C_MBC7,                    // The cardridge has MC7   build in
+    C_HuC1,                    // The cardridge has HuC1  build in (?)
+    C_HuC3,                    // The cardridge has HuC3  build in (?)
+    C_MMM01                    // The cardridge has MMM01 build in (?)
+} CARTRIDGE_MBC;
+
+typedef struct
+{
+    CARTRIDGE_MBC C_Mbc;        // Which Memory Block Controller is used by the cartridge
+    bool          C_Battery;    // Is there a battery build into the cartridge
+    bool          C_Timer;      // Is there a battery build into the cartridge
+    bool          C_Rumble;     // Is there rumble build into the cartridge (?)
+    int           C_KByteROM;   // How much KByte ROM does the Cartridge have
+    int           C_ROMBanks;   // How many ROM Banks does the cartridge have
+    int           C_KByteRAM;   // How much KByte RAM does the Cartridge have
+    int           C_RAMBanks;   // How many RAM Banks does the cartridge have (0 for MBC2, has 512x4bit tho)
+} CARTRIDGE_SPECS;
+
 CMOD_STATUS CMOD_GetStatus(void);
 bool        CMOD_Detect(void);
+bool        CMOD_GetCSpecs(CARTRIDGE_SPECS *cardridgeSpecs);
 
-void CMOD_ReadByte(uint16_t address, uint8_t *data);                        
-void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);
-void CMOD_WriteByte(uint16_t address, uint8_t *data);
-void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);
+void CMOD_ReadByte(uint16_t address, uint8_t *data);                       // Read a Byte from the Cartridge 
+void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);   // Read multiple Bytes from the Cartridge
+void CMOD_WriteByte(uint16_t address, uint8_t *data);                      // Write a Byte to the Cartridge
+void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  // Write multiple Bytes to the Cartridge
 
 void CMOD_Initialize(void);
 
