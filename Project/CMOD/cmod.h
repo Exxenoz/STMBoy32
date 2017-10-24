@@ -57,6 +57,7 @@ typedef enum
 
 typedef struct
 {
+    uint8_t       C_Title[11];  // Title of the Game
     CARTRIDGE_MBC C_Mbc;        // Which Memory Block Controller is used by the cartridge
     bool          C_Battery;    // Is there a battery build into the cartridge
     bool          C_Timer;      // Is there a battery build into the cartridge
@@ -79,10 +80,14 @@ void CMOD_WriteByte(uint16_t address, uint8_t *data);
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
 void CMOD_Initialize(void);
-
 void CMOD_EnableInterrupt(void);  
 void CMOD_DisableInterrupt(void); 
 
+void C_Initialize(CARTRIDGE_SPECS *cSpecs);
+void C_GetType(uint8_t type, CARTRIDGE_SPECS *cSpecs);
+void C_GetROM(uint8_t rom, CARTRIDGE_SPECS *cSpecs);
+void C_GetRAM(uint8_t ram, CARTRIDGE_SPECS *cSpecs);
+    
 void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 
 

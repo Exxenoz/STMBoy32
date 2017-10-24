@@ -51,13 +51,16 @@ int main(void)
     CMOD_Initialize();
     SDC_Initialize();
     
-    if (CMOD_Detect())
-    { 
-        uint8_t name[11];
-        
-        CMOD_ReadBytes(0x0134, 11, name);
-        while (CMOD_GetStatus() == CMOD_PROCESSING);
-    }
+    //CARTRIDGE_SPECS specs;
+    //bool cardDetected = CMOD_GetCSpecs(&specs);
+    uint8_t data1[128];
+    uint8_t romBank1 = 0x01;
+    uint8_t romBank3 = 0x03;
+    CMOD_WriteByte(0x2001, &romBank3);
+    CMOD_ReadBytes(0x4000, 128, data1);
+    while(CMOD_GetStatus() == CMOD_PROCESSING);
+    //CMOD_WriteByte(0x2001, &romBank2);
+
     
     if (!GBC_MMU_LoadROM("red.gb"))
     {
