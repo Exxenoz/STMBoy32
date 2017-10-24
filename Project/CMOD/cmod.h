@@ -61,25 +61,27 @@ typedef struct
     bool          C_Battery;    // Is there a battery build into the cartridge
     bool          C_Timer;      // Is there a battery build into the cartridge
     bool          C_Rumble;     // Is there rumble build into the cartridge (?)
+    bool          C_Sensor;     // Is a sensor build into the crtridge (only MC7) (?)
+    bool          C_GBCGame;    // False if the Game is a normal GB Game
     int           C_KByteROM;   // How much KByte ROM does the Cartridge have
     int           C_ROMBanks;   // How many ROM Banks does the cartridge have
     int           C_KByteRAM;   // How much KByte RAM does the Cartridge have
     int           C_RAMBanks;   // How many RAM Banks does the cartridge have (0 for MBC2, has 512x4bit tho)
 } CARTRIDGE_SPECS;
 
-CMOD_STATUS CMOD_GetStatus(void);
-bool        CMOD_Detect(void);
-bool        CMOD_GetCSpecs(CARTRIDGE_SPECS *cardridgeSpecs);
+CMOD_STATUS CMOD_GetStatus(void); 
+bool        CMOD_Detect(void);           
+bool        CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs);
 
-void CMOD_ReadByte(uint16_t address, uint8_t *data);                       // Read a Byte from the Cartridge 
-void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);   // Read multiple Bytes from the Cartridge
-void CMOD_WriteByte(uint16_t address, uint8_t *data);                      // Write a Byte to the Cartridge
-void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  // Write multiple Bytes to the Cartridge
+void CMOD_ReadByte(uint16_t address, uint8_t *data);                       
+void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);   
+void CMOD_WriteByte(uint16_t address, uint8_t *data);                      
+void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
 void CMOD_Initialize(void);
 
-void CMOD_EnableInterrupt(void);
-void CMOD_DisableInterrupt(void);
+void CMOD_EnableInterrupt(void);  
+void CMOD_DisableInterrupt(void); 
 
 void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 

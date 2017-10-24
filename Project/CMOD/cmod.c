@@ -10,13 +10,12 @@ int          CMOD_BytesRead    = 0;
 int          CMOD_BytesToWrite = 0;
 int          CMOD_BytesWritten = 0;
 
-// Returns the current Status of the Cartridge Modul (for example CMOD_PROCESSING)
 CMOD_STATUS CMOD_GetStatus(void) 
 { 
     return CMOD_Status; 
 }
 
-// Check for a GB-Cartridge by trying to read the first byte of the Nintendo Logo
+// Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_Detect(void)
 {
     uint8_t data = 0x00;
@@ -26,16 +25,6 @@ bool CMOD_Detect(void)
     
     if (data == 0xCE) return true;
     else              return false;
-}
-
-// Returns false if no Card is detected, otherwise stores its Sepzifications in &cardridgeSpecs
-bool CMOD_GetCSpecs(CARTRIDGE_SPECS *cardridgeSpecs)
-{
-    if (!CMOD_Detect()) return false;
-    
-    // WIP
-    
-    return true;
 }
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data)
@@ -92,6 +81,224 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
     
     CMOD_Status       = CMOD_PROCESSING;
     CMOD_EnableInterrupt();
+}
+
+// Returns false if no Card is detected, otherwise stores its Specifications
+bool CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs)
+{
+    if (!CMOD_Detect()) return false;
+    
+    uint8_t cgbFlag;
+    uint8_t type_rom_ram[3];
+    
+    // Initialize cSpecs
+    (*cSpecs).C_Mbc      = C_NOT_SUPPORTED;
+    (*cSpecs).C_Battery  = false;
+    (*cSpecs).C_Timer    = false;
+    (*cSpecs).C_Rumble   = false;
+    (*cSpecs).C_Sensor   = false;
+    (*cSpecs).C_GBCGame  = false;
+    (*cSpecs).C_KByteROM = 0;
+    (*cSpecs).C_ROMBanks = 0;
+    (*cSpecs).C_KByteRAM = 0;
+    (*cSpecs).C_RAMBanks = 0;
+    
+    // Read the Specifications
+    CMOD_ReadByte(0x0143, &cgbFlag);
+    CMOD_ReadBytes(0x0147, 3, type_rom_ram);
+    
+    // Set the Specifications of the current cartridge
+    if ((cgbFlag & 0x80) != 0x00) (*cSpecs).C_GBCGame = true;    
+    
+    switch (type_rom_ram[0])
+    {
+      case 0x08:
+      case 0x00:
+          (*cSpecs).C_Mbc     = C_NO_MBC;
+          break;
+      
+      case 0x01:
+      case 0x02:
+          (*cSpecs).C_Mbc     = C_MBC1;
+          break;
+      
+      case 0x03:
+          (*cSpecs).C_Mbc     = C_MBC1;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      case 0x05:
+          (*cSpecs).C_Mbc     = C_MBC2;
+          break;
+      
+      case 0x06:
+          (*cSpecs).C_Mbc     = C_MBC2;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      case 0x09:
+          (*cSpecs).C_Mbc     = C_NO_MBC;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      case 0x0B:
+      case 0x0C:
+          (*cSpecs).C_Mbc     = C_MMM01;
+          break;
+      
+      case 0x0D:
+          (*cSpecs).C_Mbc     = C_MMM01;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      case 0x0F:
+      case 0x10:
+          (*cSpecs).C_Mbc     = C_MBC3;
+          (*cSpecs).C_Battery = true;
+          (*cSpecs).C_Timer   = true;
+          break;
+      
+      case 0x11:
+      case 0x12:
+          (*cSpecs).C_Mbc     = C_MBC3;
+          break;
+      
+      case 0x1B:
+      case 0x13:
+          (*cSpecs).C_Mbc     = C_MBC3;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      case 0x19:
+      case 0x1A:
+          (*cSpecs).C_Mbc     = C_MBC5;
+          break;
+      
+      case 0x1C:
+      case 0x1D:
+          (*cSpecs).C_Mbc     = C_MBC3;
+          (*cSpecs).C_Rumble  = true;
+          break;
+      
+      case 0x1E:
+          (*cSpecs).C_Mbc     = C_MBC3;
+          (*cSpecs).C_Battery = true;
+          (*cSpecs).C_Rumble  = true;
+          break;
+      
+      case 0x20:
+          (*cSpecs).C_Mbc     = C_MBC6;
+          break;
+      
+      case 0x22:
+          (*cSpecs).C_Mbc     = C_MBC7;
+          (*cSpecs).C_Battery = true;
+          (*cSpecs).C_Rumble  = true;
+          (*cSpecs).C_Sensor  = true;
+          break;
+      
+      case 0xFE:
+          (*cSpecs).C_Mbc     = C_HuC3;
+          break;
+      
+      case 0xFF:
+          (*cSpecs).C_Mbc     = C_HuC1;
+          (*cSpecs).C_Battery = true;
+          break;
+      
+      default:
+          break;
+    }
+    
+    switch (type_rom_ram[1])
+    {
+      case 0x00:
+            (*cSpecs).C_KByteROM = 32;
+            break;
+      
+      case 0x01:
+            (*cSpecs).C_ROMBanks = 4;
+            break;
+      
+      case 0x02:
+            (*cSpecs).C_ROMBanks = 8;
+            break;
+      
+      case 0x03:
+            (*cSpecs).C_ROMBanks = 16;
+            break;
+      
+      case 0x04:
+            (*cSpecs).C_ROMBanks = 32;
+            break;
+      
+      case 0x05:
+            if ((*cSpecs).C_Mbc == C_MBC1) (*cSpecs).C_ROMBanks = 63;
+            else                           (*cSpecs).C_ROMBanks = 64;    
+            break;
+      
+      case 0x06:
+            if ((*cSpecs).C_Mbc == C_MBC1) (*cSpecs).C_ROMBanks = 125;
+            else                           (*cSpecs).C_ROMBanks = 128;    
+            break;
+      
+      case 0x07:
+            (*cSpecs).C_ROMBanks = 256;
+            break;
+      
+      case 0x08:
+            (*cSpecs).C_ROMBanks = 512;
+            break;
+      
+      case 0x52:
+            (*cSpecs).C_ROMBanks = 72;
+            break;
+      
+      case 0x53:
+            (*cSpecs).C_ROMBanks = 80;
+            break;
+      
+      case 0x54:
+            (*cSpecs).C_ROMBanks = 96;
+            break;
+      
+      default:
+          break;
+    }
+    if ((*cSpecs).C_ROMBanks != 0) (*cSpecs).C_KByteROM = (*cSpecs).C_ROMBanks * 16;
+    
+    switch (type_rom_ram[2])
+    {      
+      case 0x00:
+            if ((*cSpecs).C_Mbc == C_MBC2) (*cSpecs).C_KByteRAM = 2048;
+            break;
+        
+      case 0x01:
+            (*cSpecs).C_KByteRAM = 2;
+            break;
+      
+      case 0x02:
+            (*cSpecs).C_RAMBanks = 1;
+            break;
+      
+      case 0x03:
+            (*cSpecs).C_RAMBanks = 4;
+            break;
+      
+      case 0x04:
+            (*cSpecs).C_RAMBanks = 16;
+            break;
+      
+      case 0x05:
+            (*cSpecs).C_RAMBanks = 8;
+            break;
+      
+      default:
+          break;
+    }
+    if ((*cSpecs).C_RAMBanks != 0) (*cSpecs).C_KByteRAM = (*cSpecs).C_RAMBanks * 8;
+    
+    return true;
 }
 
 void CMOD_Initialize_CLK(void)
