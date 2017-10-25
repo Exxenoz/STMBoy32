@@ -16,13 +16,24 @@ GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
 // Current ROM Bank ID
 uint8_t GBC_MMU_CurrentROMBankID = 1;
 // Current ROM Bank Start Address
-uint32_t GBC_MMU_CurrentROMBankAddress = 16384;
+uint16_t GBC_MMU_CurrentROMBankAddress = 16384;
 // ROM/RAM Mode Select
 GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;
 // External RAM Enabled State
 bool GBC_MMU_ERAMEnabled = false;
 // Current ERAM Bank ID
 uint8_t GBC_MMU_CurrentERAMBankID = 0;
+// Current ERAM Bank Start Address
+uint16_t GBC_MMU_CurrentERAMBankAddress = 0;
+// External RTC Selected State (ERAM address space redirects
+// to RTCRegister, when ERTC selected is true and ERAM is enabled)
+bool GBC_MMU_RTC_Selected = false;
+// External RTC Register
+GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;
+// External RTC Register ID
+uint8_t GBC_MMU_RTC_RegisterID = 0;
+// Used to indicate if last write was zero
+uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;
 
 void GBC_MMU_OnROMBank0Loaded()
 {
@@ -111,7 +122,24 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     // External RAM bank X
     else if (address <= 0xBFFF)
     {
-        // ToDo: Implement External RAM bank reading
+        if (GBC_IsLoadedFromCartridge())
+        {
+            uint8_t result = 0;
+            CMOD_ReadByte(address, &result);
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+            return result;
+        }
+        else if (GBC_MMU_ERAMEnabled)
+        {
+            if (GBC_MMU_RTC_Selected)
+            {
+                return GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID];
+            }
+            else
+            {
+                return GBC_MMU_Memory.ERAMBank0[GBC_MMU_CurrentERAMBankAddress + (address - 0xA000)];
+            }
+        }
     }
     // Work RAM Bank 0
     else if (address <= 0xCFFF)
@@ -213,6 +241,7 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
                 break;
             case GBC_MMU_MBC1_MODE_RAM: // Select a RAM Bank in range from 00-03h
                 GBC_MMU_CurrentERAMBankID = value;
+                GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
                 break;
         }
     }
@@ -253,7 +282,50 @@ void GBC_MMU_MBC2_Write(uint16_t address, uint8_t value)
 
 void GBC_MMU_MBC3_Write(uint16_t address, uint8_t value)
 {
-    
+    // RAM and Timer Enable
+    if (address <= 0x1FFF)
+    {
+        GBC_MMU_ERAMEnabled = value & 0xA ? true : false;
+    }
+    // ROM Bank Number
+    else if (address <= 0x3FFF)
+    {
+        GBC_MMU_CurrentROMBankID = value & 0x7F;
+
+        if (GBC_MMU_CurrentROMBankID == 0)
+        {
+            GBC_MMU_CurrentROMBankID++;
+        }
+
+        GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+    }
+    // RAM Bank Number 
+    else if (address <= 0x5FFF)
+    {
+        if (value <= 0x3)
+        {
+            GBC_MMU_RTC_Selected = false;
+
+            GBC_MMU_CurrentERAMBankID = value;
+            GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
+        }
+        else if (value >= 0x8 && value <= 0xC)
+        {
+            GBC_MMU_RTC_Selected = true;
+            GBC_MMU_RTC_RegisterID = value - 0x8;
+        }
+    }
+    // Latch Clock Data
+    else // address <= 0x7FFF
+    {
+        // When writing 00h, and then 01h to this variable, the current time becomes latched into the RTC registers
+        if (GBC_MMU_RTC_LatchClockDataHelper == 0 && value == 1)
+        {
+            // ToDo: Write to RTC registers
+        }
+
+        GBC_MMU_RTC_LatchClockDataHelper = value;
+    }
 }
 
 void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
@@ -278,6 +350,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         if (GBC_IsLoadedFromCartridge())
         {
             CMOD_WriteByte(address, &value);
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
         }
         else // Loaded from SDC
         {
@@ -292,7 +365,22 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // External RAM bank X
     else if (address <= 0xBFFF)
     {
-        // ToDo: Implement External RAM bank writing
+        if (GBC_IsLoadedFromCartridge())
+        {
+            CMOD_WriteByte(address, &value);
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+        }
+        else if (GBC_MMU_ERAMEnabled)
+        {
+            if (GBC_MMU_RTC_Selected)
+            {
+                GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID] = value;
+            }
+            else
+            {
+                GBC_MMU_Memory.ERAMBank0[GBC_MMU_CurrentERAMBankAddress + (address - 0xA000)] = value;
+            }
+        }
     }
     // Work RAM Bank 0
     else if (address <= 0xCFFF)

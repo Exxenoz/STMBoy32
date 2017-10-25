@@ -104,7 +104,7 @@ typedef struct GBC_MMU_Memory_s
     //------CartridgeBankX                   4000-7FFF: 16kB Cartridge ROM bank X
     uint8_t VRAMBank0[8192];              // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
     uint8_t VRAMBank1[8192];
-    uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X
+    uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
     uint8_t ERAMBank2[8192];
     uint8_t ERAMBank3[8192];
@@ -138,6 +138,24 @@ typedef struct GBC_MMU_Memory_s
     uint8_t InterruptEnableRegister;      // FFFF:        1B Interrupt enable register
 }
 GBC_MMU_Memory_t;
+
+typedef union GBC_MMU_RTC_Register_s
+{
+    uint8_t Data[5];
+
+    struct
+    {
+        uint8_t S;  // Seconds 0-59 (0-3Bh)
+        uint8_t M;  // Minutes 0-59 (0-3Bh)
+        uint8_t H;  // Hours 0-23 (0-17h)
+        uint8_t DL; // Lower 8 bits of Day Counter (0-FFh)
+        uint8_t DH; // Upper 1 bit of Day Counter, Carry Bit, Halt Flag
+             // Bit 0  Most significant bit of Day Counter (Bit 8)
+             // Bit 6  Halt (0=Active, 1=Stop Timer)
+             // Bit 7  Day Counter Carry Bit (1=Counter Overflow)
+    };
+}
+GBC_MMU_RTC_Register_t;
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);
