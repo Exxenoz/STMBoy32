@@ -3,6 +3,7 @@
 #include "sdc.h"
 #include "ff.h"
 #include "cmod.h"
+#include "string.h"
 
 GBC_MMU_Memory_t GBC_MMU_Memory;                                                // GBC Memory
 
@@ -23,15 +24,53 @@ GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                    
 uint8_t GBC_MMU_RTC_RegisterID = 0;                                             // External RTC Register ID
 uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;                                   // Used to indicate if last write was zero
 
+const uint8_t GBC_MMU_NintendoLogo[48] =
+{
+    0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
+    0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E, 0xDC, 0xCC, 0x6E, 0xE6, 0xDD, 0xDD, 0xD9, 0x99,
+    0xBB, 0xBB, 0x67, 0x63, 0x6E, 0x0E, 0xEC, 0xCC, 0xDD, 0xDC, 0x99, 0x9F, 0xBB, 0xB9, 0x33, 0x3E
+};
+
 void GBC_MMU_OnROMBank0Loaded(void)
 {
     GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
 }
 
+bool GBC_MMU_IsValidROMHeader(void)
+{
+    for (long i = 0; i < 48; i++)
+    {
+        if (GBC_MMU_Memory.NintendoLogo[i] != GBC_MMU_NintendoLogo[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool GBC_MMU_LoadFromCartridge(void)
 {
-    // ToDo
-    return false;
+    if (!CMOD_Detect())
+    {
+        return false;
+    }
+
+    GBC_MMU_Unload();
+
+    // Read ROM Bank 0
+    CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+    // Check ROM Header
+    if (!GBC_MMU_IsValidROMHeader())
+    {
+        return false;
+    }
+
+    GBC_MMU_OnROMBank0Loaded();
+
+    return true;
 }
 
 bool GBC_MMU_LoadFromSDC(char* fileName)
@@ -48,14 +87,22 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         uint32_t bytesRead = 0;
 
         // Read ROM Bank 0
-        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesRead) == FR_OK && bytesRead == 16384)
+        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesRead) != FR_OK || bytesRead != 16384)
         {
-            GBC_MMU_SDC_ROMFileStreamOpen = true;
-            GBC_MMU_OnROMBank0Loaded();
-            return true;
+            f_close(&GBC_MMU_SDC_ROMFile);
+            return false;
         }
 
-        f_close(&GBC_MMU_SDC_ROMFile);
+        // Check ROM Header
+        if (!GBC_MMU_IsValidROMHeader())
+        {
+            f_close(&GBC_MMU_SDC_ROMFile);
+            return false;
+        }
+        
+        GBC_MMU_SDC_ROMFileStreamOpen = true;
+        GBC_MMU_OnROMBank0Loaded();
+        return true;
     }
 
     return false;
@@ -70,6 +117,8 @@ void GBC_MMU_Unload(void)
         f_close(&GBC_MMU_SDC_ROMFile);
     }
 
+    memset(&GBC_MMU_Memory, 0, sizeof(GBC_MMU_Memory_t));
+
     GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
     GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;
     GBC_MMU_CurrentROMBankID = 1;
@@ -80,10 +129,7 @@ void GBC_MMU_Unload(void)
     GBC_MMU_CurrentERAMBankAddress = 0;
 
     GBC_MMU_RTC_Selected = false;
-    for (long i = 0; i < 5; i++)
-    {
-        GBC_MMU_RTC_Register.Data[i] = 0;
-    }
+    memset(&GBC_MMU_RTC_Register, 0, sizeof(GBC_MMU_RTC_Register_t));
     GBC_MMU_RTC_RegisterID = 0;
     GBC_MMU_RTC_LatchClockDataHelper = 0;
 }
