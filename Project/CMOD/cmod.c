@@ -83,11 +83,9 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_EnableInterrupt();
 }
 
-// Returns false if no Card is detected, otherwise stores its Specifications
-bool CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs)
+// Stores the Secifications of the inserted cartridge
+void CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs)
 {
-    if (!CMOD_Detect()) return false;
-    
     uint8_t cgbFlag;
     uint8_t type_rom_ram[3];  
     
@@ -96,15 +94,12 @@ bool CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs)
     CMOD_ReadBytes(0x0147, 3, type_rom_ram);
     while (CMOD_Status == CMOD_PROCESSING);
     
-    // Set the Specifications of the current cartridge
     C_Initialize(cSpecs);
     C_GetType(type_rom_ram[0], cSpecs);
     C_GetROM(type_rom_ram[1], cSpecs);
     C_GetRAM(type_rom_ram[2], cSpecs);
     
     if ((cgbFlag == 0x80 || cgbFlag == 0xC0)) (*cSpecs).C_GBCGame = true; 
-    
-    return true;
 }
 
 void CMOD_Initialize_CLK(void)
@@ -225,16 +220,17 @@ void CMOD_DisableInterrupt(void)
 
 void C_Initialize(CARTRIDGE_SPECS *cSpecs)
 {
-    (*cSpecs).C_Mbc      = C_NOT_SUPPORTED;
-    (*cSpecs).C_Battery  = false;
-    (*cSpecs).C_Timer    = false;
-    (*cSpecs).C_Rumble   = false;
-    (*cSpecs).C_Sensor   = false;
-    (*cSpecs).C_GBCGame  = false;
-    (*cSpecs).C_KByteROM = 0;
-    (*cSpecs).C_ROMBanks = 0;
-    (*cSpecs).C_KByteRAM = 0;
-    (*cSpecs).C_RAMBanks = 0;
+    (*cSpecs).C_Mbc           = C_MBC_UNKNOWN;
+    (*cSpecs).C_PocketCamera  = false;
+    (*cSpecs).C_Battery       = false;
+    (*cSpecs).C_Timer         = false;
+    (*cSpecs).C_Rumble        = false;
+    (*cSpecs).C_Sensor        = false;
+    (*cSpecs).C_GBCGame       = false;
+    (*cSpecs).C_KByteROM      = 0;
+    (*cSpecs).C_ROMBanks      = 0;
+    (*cSpecs).C_KByteRAM      = 0;
+    (*cSpecs).C_RAMBanks      = 0;
 }
 
 void C_GetType(uint8_t type, CARTRIDGE_SPECS *cSpecs)
@@ -324,6 +320,14 @@ void C_GetType(uint8_t type, CARTRIDGE_SPECS *cSpecs)
           (*cSpecs).C_Battery = true;
           (*cSpecs).C_Rumble  = true;
           (*cSpecs).C_Sensor  = true;
+          break;
+      
+      case 0xFC:
+          (*cSpecs).C_PocketCamera = true;
+          break;
+      
+      case 0xFD:
+          (*cSpecs).C_Mbc = C_BANDAI;
           break;
       
       case 0xFE:
@@ -436,8 +440,9 @@ void C_GetRAM(uint8_t ram, CARTRIDGE_SPECS *cSpecs)
 
 void TIM4_IRQHandler(void)
 {
-  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             // ToDo: Directly access Register
-  { // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises, needs testing                                                            
+  TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                    //Test 
+  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             
+  { // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises                                                          
       CMOD_SET_WR; 
       CMOD_SET_CS;                                               // CS rises at 0ns (after CLK Flank) 
                                                                
@@ -451,7 +456,7 @@ void TIM4_IRQHandler(void)
           CMOD_Status = CMOD_DATA_READY;                                           // -> Data Ready
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
+          //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
           return;                                               // Needed?
       }
       else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
@@ -459,7 +464,7 @@ void TIM4_IRQHandler(void)
           CMOD_Status = CMOD_WRITE_COMPLETE;                                       // -> Write complete
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
+          //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
           return;
       }
       
@@ -480,10 +485,8 @@ void TIM4_IRQHandler(void)
           CMOD_DATA_MODE_OUT;                                    // Set the DataPins to Output mode for a write
           CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);    // Data Bus is driven at 480ns (falling CLK) (in GB)
           CMOD_RST_WR;                                           // WR goes low for a write at 480ns (falling CLK) (in GB)
-      }
-    
-    //GPIO_ToggleBits(CMOD_WR_PORT, CMOD_WR_PIN);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  // ToDo: Directly access Register
+      }   
+    //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  
   }
 }
 
