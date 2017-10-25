@@ -14,7 +14,7 @@ bool GBC_MMU_SDC_ROMFileStreamOpen = false;
 // Current Memory Bank Controller
 GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
 // Current ROM Bank ID
-uint8_t GBC_MMU_CurrentROMBankID = 1;
+uint16_t GBC_MMU_CurrentROMBankID = 1;
 // Current ROM Bank Start Address
 uint16_t GBC_MMU_CurrentROMBankAddress = 16384;
 // ROM/RAM Mode Select
@@ -240,8 +240,11 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
 
                 break;
             case GBC_MMU_MBC1_MODE_RAM: // Select a RAM Bank in range from 00-03h
-                GBC_MMU_CurrentERAMBankID = value;
-                GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
+                if (value <= 0x3)
+                {
+                    GBC_MMU_CurrentERAMBankID = value;
+                    GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
+                }
                 break;
         }
     }
@@ -330,7 +333,34 @@ void GBC_MMU_MBC3_Write(uint16_t address, uint8_t value)
 
 void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
 {
-    
+    // RAM Enable
+    if (address <= 0x1FFF)
+    {
+        GBC_MMU_ERAMEnabled = value & 0xA ? true : false;
+    }
+    // Low 8 bits of ROM Bank Number
+    else if (address <= 0x2FFF)
+    {
+        GBC_MMU_CurrentROMBankID &= ~0xFF;        // Set first 8 bits to 0
+        GBC_MMU_CurrentROMBankID |= value & 0xFF; // Set first 8 bits to value
+        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 << (GBC_MMU_CurrentROMBankID - 1);
+    }
+    // High bit of ROM Bank Number
+    else if (address <= 0x3FFF)
+    {
+        GBC_MMU_CurrentROMBankID &= ~0x100;             // Set bit 9 to 0
+        GBC_MMU_CurrentROMBankID |= (value & 0x1) << 8; // Set bit 9 to value
+        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 << (GBC_MMU_CurrentROMBankID - 1);
+    }
+    // RAM Bank Number
+    else if (address <= 0x5FFF)
+    {
+        if (value <= 0xF)
+        {
+            GBC_MMU_CurrentERAMBankID = value;
+            GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
+        }
+    }
 }
 
 void (*GBC_MMU_MBC_Table[5])(uint16_t, uint8_t) =
