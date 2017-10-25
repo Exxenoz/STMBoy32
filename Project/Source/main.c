@@ -53,7 +53,7 @@ int main(void)
     
     if(CMOD_Detect())
     {
-        CARTRIDGE_SPECS specs;
+        C_SPECS specs;
         CMOD_GetCSpecs(&specs);
         
         uint8_t data1[128];

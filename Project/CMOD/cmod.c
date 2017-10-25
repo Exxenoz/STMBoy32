@@ -84,7 +84,7 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 }
 
 // Stores the Secifications of the inserted cartridge
-void CMOD_GetCSpecs(CARTRIDGE_SPECS *cSpecs)
+void CMOD_GetCSpecs(C_SPECS *cSpecs)
 {
     uint8_t cgbFlag;
     uint8_t type_rom_ram[3];  
@@ -218,7 +218,7 @@ void CMOD_DisableInterrupt(void)
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
 }
 
-void C_Initialize(CARTRIDGE_SPECS *cSpecs)
+void C_Initialize(C_SPECS *cSpecs)
 {
     (*cSpecs).C_Mbc           = C_MBC_UNKNOWN;
     (*cSpecs).C_PocketCamera  = false;
@@ -233,7 +233,7 @@ void C_Initialize(CARTRIDGE_SPECS *cSpecs)
     (*cSpecs).C_RAMBanks      = 0;
 }
 
-void C_GetType(uint8_t type, CARTRIDGE_SPECS *cSpecs)
+void C_GetType(uint8_t type, C_SPECS *cSpecs)
 {
     switch (type)
     {
@@ -344,7 +344,7 @@ void C_GetType(uint8_t type, CARTRIDGE_SPECS *cSpecs)
     }
 }
 
-void C_GetROM(uint8_t rom, CARTRIDGE_SPECS *cSpecs)
+void C_GetROM(uint8_t rom, C_SPECS *cSpecs)
 {
     switch (rom)
     {
@@ -404,7 +404,7 @@ void C_GetROM(uint8_t rom, CARTRIDGE_SPECS *cSpecs)
     if ((*cSpecs).C_ROMBanks != 0) (*cSpecs).C_KByteROM = (*cSpecs).C_ROMBanks * 16;
 }
 
-void C_GetRAM(uint8_t ram, CARTRIDGE_SPECS *cSpecs)
+void C_GetRAM(uint8_t ram, C_SPECS *cSpecs)
 {
     switch (ram)
     {      
@@ -436,6 +436,26 @@ void C_GetRAM(uint8_t ram, CARTRIDGE_SPECS *cSpecs)
           break;
     }
     if ((*cSpecs).C_RAMBanks != 0) (*cSpecs).C_KByteRAM = (*cSpecs).C_RAMBanks * 8;
+}
+
+void C_SwitchMB(C_MBC mbc)
+{
+    if (mbc == C_MBC1)
+    {
+        
+    }
+    else if (mbc == C_MBC2 || mbc == C_MBC3)
+    {
+        
+    }
+    else if (mbc == C_MBC5)
+    {
+        
+    }
+    else
+    {
+        
+    }
 }
 
 void TIM4_IRQHandler(void)
