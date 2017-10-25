@@ -111,12 +111,6 @@ int main(void)
         CMOD_ReadBytes(0x4000, 128, data3);
         while(CMOD_GetStatus() == CMOD_PROCESSING);
     }
-    
-    if (!GBC_MMU_LoadROM("red.gb"))
-    {
-        LED_EnableRed(true);
-        return 0;
-    }
 
     /* Infinite loop */
     while (1)

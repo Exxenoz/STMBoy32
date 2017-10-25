@@ -1,6 +1,12 @@
 #include "sdc.h"
 #include "led.h"
+#include "ff.h"
 #include "stm324x9i_eval_sdio_sd.h"
+
+// Global FatFS object
+FATFS SDC_FatFS;
+// Global mounted state
+bool SDC_Mounted = false;
 
 void SDC_InitializeInterrupts(void)
 {
@@ -18,9 +24,40 @@ void SDC_InitializeInterrupts(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
-void SDC_Initialize()
+void SDC_Initialize(void)
 {
     SDC_InitializeInterrupts();
+}
+
+bool SDC_Mount(void)
+{
+    if (!SD_Detect())
+    {
+        return false;
+    }
+
+    if (SDC_Mounted)
+    {
+        SDC_Unmount();
+    }
+
+    if (f_mount(&SDC_FatFS, "", 1) != FR_OK)
+    {
+        return false;
+    }
+
+    return SDC_Mounted = true;
+}
+
+bool SDC_IsMounted(void)
+{
+    return SDC_Mounted;
+}
+
+void SDC_Unmount(void)
+{
+    f_mount(NULL, "", 1);
+    SDC_Mounted = false;
 }
 
 void SDIO_IRQHandler(void)

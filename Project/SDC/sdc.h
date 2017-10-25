@@ -5,6 +5,9 @@
 #include "sdc_config.h"
 
 void SDC_Initialize(void);
+bool SDC_Mount(void);
+bool SDC_IsMounted(void);
+void SDC_Unmount(void);
 
 // Interrupt Handler
 void SDIO_IRQHandler(void);

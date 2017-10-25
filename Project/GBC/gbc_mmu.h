@@ -66,6 +66,6 @@ uint16_t GBC_MMU_ReadShort(uint16_t address);
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value);
 void GBC_MMU_WriteShort(uint16_t address, uint16_t value);
 
-bool GBC_MMU_LoadROM(char* fileName);
+bool GBC_MMU_LoadFromSDC(char* fileName);
 
 #endif
