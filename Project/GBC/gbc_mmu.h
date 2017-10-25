@@ -63,17 +63,6 @@ enum GBC_MMU_InterruptFlags_e
     GBC_MMU_INTERRUPT_FLAGS_JOYPAD   = 16,
 };
 
-enum GBC_MMU_MemoryLocations_e
-{
-    GBC_MMU_MEMLOC_INTERRUPT_FLAGS  = 0xFF0F,
-    GBC_MMU_MEMLOC_GPU_CONTROL      = 0xFF40,
-    GBC_MMU_MEMLOC_GPU_SCROLL_Y     = 0xFF42,
-    GBC_MMU_MEMLOC_GPU_SCROLL_X     = 0xFF43,
-    GBC_MMU_MEMLOC_GPU_SCANLINE     = 0xFF44,
-    GBC_MMU_MEMLOC_GPU_BG_PALETTE   = 0xFF47,
-    GBC_MMU_MEMLOC_INTERRUPT_ENABLE = 0xFFFF,
-};
-
 typedef struct GBC_MMU_Memory_s
 {
     union
@@ -129,9 +118,21 @@ typedef struct GBC_MMU_Memory_s
             uint8_t InterruptFlags;       // 0xFF0F
             uint8_t IO_Unk2[48];
             uint8_t GPUControlFlags;      // 0xFF40
-            uint8_t IO_Unk3;
+            uint8_t GPUStatus;            // 0xFF41
             uint8_t GPUScrollY;           // 0xFF42
             uint8_t GPUScrollX;           // 0xFF43
+            uint8_t GPUScanline;          // 0xFF44
+            uint8_t IO_Unk4[2];
+            uint8_t GPUBackgroundPalette; // 0xFF47
+            uint8_t IO_Unk5[5];
+            uint8_t PrepareSpeedSwitch;   // 0xFF4D                                           - Only in GBC mode
+            uint8_t IO_Unk11;
+            uint8_t VRAMBankID;           // 0xFF4F                                           - Only in GBC mode
+            uint8_t IO_Unk8[6];
+            uint8_t InfraredPort;         // 0xFF56                                           - Only in GBC mode
+            uint8_t IO_Unk9[25];
+            uint8_t WRAMBankID;           // 0xFF70                                           - Only in GBC mode
+            uint8_t IO_Unk10[15];
         };
     };
     uint8_t HRAM[127];                    // FF80-FFFE: 127B High RAM

@@ -117,7 +117,14 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     // Video RAM bank X
     else if (address <= 0x9FFF)
     {
-        // ToDo: Implement VRAM bank switching
+        if (GBC_MMU_Memory.VRAMBankID == 0)
+        {
+            return GBC_MMU_Memory.VRAMBank0[address - 0x8000];
+        }
+        else
+        {
+            return GBC_MMU_Memory.VRAMBank1[address - 0x8000];
+        }
     }
     // External RAM bank X
     else if (address <= 0xBFFF)
@@ -149,7 +156,14 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     // Work RAM Bank X
     else if (address <= 0xDFFF)
     {
-        // ToDo: Implement WRAM bank switching
+        if (GBC_MMU_Memory.WRAMBankID == 0)
+        {
+            return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
+        }
+        else
+        {
+            return GBC_MMU_Memory.WRAMBank0[(4096 << (GBC_MMU_Memory.WRAMBankID - 1)) + (address - 0xD000)];
+        }
     }
     // Shadow RAM redirection to WRAM
     else if (address <= 0xFDFF)
@@ -390,7 +404,14 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Video RAM bank X
     else if (address <= 0x9FFF)
     {
-        // ToDo: Implement VRAM bank switching
+        if (GBC_MMU_Memory.VRAMBankID == 0)
+        {
+            GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
+        }
+        else
+        {
+            GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
+        }
     }
     // External RAM bank X
     else if (address <= 0xBFFF)
@@ -420,7 +441,14 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Work RAM Bank X
     else if (address <= 0xDFFF)
     {
-        // ToDo: Implement WRAM bank switching
+        if (GBC_MMU_Memory.WRAMBankID == 0)
+        {
+            GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
+        }
+        else
+        {
+            GBC_MMU_Memory.WRAMBank0[(4096 << (GBC_MMU_Memory.WRAMBankID - 1)) + (address - 0xD000)] = value;
+        }
     }
     // Shadow RAM redirection to WRAM
     else if (address <= 0xFDFF)
