@@ -59,6 +59,10 @@ int main(void)
         uint8_t data1[128];
         uint8_t data2[128];
         uint8_t data3[128];
+        uint8_t rtcData1;
+        uint8_t nintendoLogo[48];
+        uint8_t ramData[48] = {0};
+            
         uint8_t romBank1 = 0x01;
         uint8_t romBank2 = 0x02;
         uint8_t romBank3 = 0x03;
@@ -73,12 +77,10 @@ int main(void)
             uint8_t enableRAM = 0x0A;
             uint8_t disableRAM = 0x00;
             uint8_t ramBank1  = 0x01;
-            uint8_t nintendoLogo[48];
-            uint8_t ramData[48] = {0};
             
             CMOD_WriteByte(0x0001, &enableRAM);         // Enable RAM/RTC
             CMOD_WriteByte(0x4001, &ramBank1);          // Select RAM Bank 1    
-            CMOD_ReadBytes(0x0134, 48, nintendoLogo);   // Read the nintendo Logo
+            CMOD_ReadBytes(0x0104, 48, nintendoLogo);   // Read the nintendo Logo
             CMOD_WriteBytes(0xA000, 48, nintendoLogo);  // Write the Logo into Ram Bank1
             CMOD_ReadBytes(0xA000, 48, ramData);        // Read the first 48 Bytes from Ram Bank1
             CMOD_WriteByte(0x0001, &disableRAM);        // Disable RAM/RTC
@@ -94,13 +96,13 @@ int main(void)
             uint8_t enableRTC = 0x0A;
             uint8_t disableRTC = 0x00;
             uint8_t rtcRegister = 0x08;
-            uint8_t rtcData;
             uint8_t writeTime[2] = {0x00, 0x01};
             
             CMOD_WriteBytes(0x6001, 2, writeTime);  // Write current Time to RTC
             CMOD_WriteByte(0x0001, &enableRTC);     // Enable RAM/RTC
             CMOD_WriteByte(0x4001, &rtcRegister);   // Select RTC
-            CMOD_ReadByte(0xA000, &rtcData);        // Read from RTC
+            CMOD_ReadByte(0xA000, &rtcData1);        // Read from RTC
+
             CMOD_WriteByte(0x0001, &disableRTC);    // Disable RTC/RAM
         }
 

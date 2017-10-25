@@ -440,7 +440,6 @@ void C_GetRAM(uint8_t ram, CARTRIDGE_SPECS *cSpecs)
 
 void TIM4_IRQHandler(void)
 {
-  TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                    //Test 
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             
   { // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises                                                          
       CMOD_SET_WR; 
@@ -456,7 +455,7 @@ void TIM4_IRQHandler(void)
           CMOD_Status = CMOD_DATA_READY;                                           // -> Data Ready
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
+          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
           return;                                               // Needed?
       }
       else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
@@ -464,7 +463,7 @@ void TIM4_IRQHandler(void)
           CMOD_Status = CMOD_WRITE_COMPLETE;                                       // -> Write complete
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
+          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
           return;
       }
       
@@ -486,7 +485,8 @@ void TIM4_IRQHandler(void)
           CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);    // Data Bus is driven at 480ns (falling CLK) (in GB)
           CMOD_RST_WR;                                           // WR goes low for a write at 480ns (falling CLK) (in GB)
       }   
-    //TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  
+    
+      TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  
   }
 }
 
