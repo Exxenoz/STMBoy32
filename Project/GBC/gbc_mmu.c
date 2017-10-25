@@ -225,7 +225,30 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
 
 void GBC_MMU_MBC2_Write(uint16_t address, uint8_t value)
 {
-    
+    // RAM Enable
+    if (address <= 0x1FFF)
+    {
+        // The least significant bit of the upper address byte must be zero to enable/disable cart RAM
+        if (!(address & 0x100))
+        {
+            GBC_MMU_ERAMEnabled = (GBC_MMU_ERAMEnabled == true) ? false : true;
+        }
+    }
+    // ROM Bank Number
+    else if (address <= 0x3FFF)
+    {
+        if (address & 0x100)
+        {
+            GBC_MMU_CurrentROMBankID = value & 0xF;
+
+            if (GBC_MMU_CurrentROMBankID == 0)
+            {
+                GBC_MMU_CurrentROMBankID++;
+            }
+
+            GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+        }
+    }
 }
 
 void GBC_MMU_MBC3_Write(uint16_t address, uint8_t value)
