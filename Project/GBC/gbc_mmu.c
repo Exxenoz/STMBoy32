@@ -9,6 +9,47 @@ FIL GBC_MMU_SDC_ROMFile;
 // Global SDC ROM file open state
 bool GBC_MMU_SDC_ROMFileStreamOpen = false;
 
+bool GBC_MMU_LoadFromCartridge(void)
+{
+    // ToDo
+    return false;
+}
+
+bool GBC_MMU_LoadFromSDC(char* fileName)
+{
+    if (!SDC_IsMounted())
+    {
+        return false;
+    }
+
+    GBC_MMU_Unload();
+
+    if (f_open(&GBC_MMU_SDC_ROMFile, fileName, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
+    {
+        uint32_t bytesRead = 0;
+
+        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.Data, 32768, &bytesRead) == FR_OK && bytesRead == 32768)
+        {
+            GBC_MMU_SDC_ROMFileStreamOpen = true;
+            return true;
+        }
+
+        f_close(&GBC_MMU_SDC_ROMFile);
+    }
+
+    return false;
+}
+
+void GBC_MMU_Unload(void)
+{
+    if (GBC_MMU_SDC_ROMFileStreamOpen)
+    {
+        GBC_MMU_SDC_ROMFileStreamOpen = false;
+
+        f_close(&GBC_MMU_SDC_ROMFile);
+    }
+}
+
 uint8_t GBC_MMU_ReadByte(uint16_t address)
 {
     // Shadow RAM redirection to WRAM
@@ -40,34 +81,4 @@ void GBC_MMU_WriteShort(uint16_t address, uint16_t value)
 {
     GBC_MMU_WriteByte(address, value & 0xFF);
     GBC_MMU_WriteByte(address + 1, (value & 0xFF00) >> 8);
-}
-
-bool GBC_MMU_LoadFromSDC(char* fileName)
-{
-    if (!SDC_IsMounted())
-    {
-        return false;
-    }
-
-    if (GBC_MMU_SDC_ROMFileStreamOpen)
-    {
-        GBC_MMU_SDC_ROMFileStreamOpen = false;
-
-        f_close(&GBC_MMU_SDC_ROMFile);
-    }
-
-    if (f_open(&GBC_MMU_SDC_ROMFile, fileName, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
-    {
-        uint32_t bytesRead = 0;
-
-        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.Data, 32768, &bytesRead) == FR_OK && bytesRead == 32768)
-        {
-            GBC_MMU_SDC_ROMFileStreamOpen = true;
-            return true;
-        }
-
-        f_close(&GBC_MMU_SDC_ROMFile);
-    }
-
-    return false;
 }

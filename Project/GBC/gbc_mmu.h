@@ -60,12 +60,14 @@ typedef struct GBC_MMU_Memory_s
 }
 GBC_MMU_Memory_t;
 
+bool GBC_MMU_LoadFromCartridge(void);
+bool GBC_MMU_LoadFromSDC(char* fileName);
+void GBC_MMU_Unload(void);
+
 uint8_t GBC_MMU_ReadByte(uint16_t address);
 uint16_t GBC_MMU_ReadShort(uint16_t address);
 
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value);
 void GBC_MMU_WriteShort(uint16_t address, uint16_t value);
-
-bool GBC_MMU_LoadFromSDC(char* fileName);
 
 #endif
