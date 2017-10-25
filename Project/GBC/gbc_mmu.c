@@ -4,38 +4,26 @@
 #include "ff.h"
 #include "cmod.h"
 
-// GBC Memory
-GBC_MMU_Memory_t GBC_MMU_Memory;
-// SDC ROM file object
-FIL GBC_MMU_SDC_ROMFile;
-// SDC ROM file open state
-bool GBC_MMU_SDC_ROMFileStreamOpen = false;
+GBC_MMU_Memory_t GBC_MMU_Memory;                                                // GBC Memory
 
-// Current Memory Bank Controller
-GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
-// Current ROM Bank ID
-uint16_t GBC_MMU_CurrentROMBankID = 1;
-// Current ROM Bank Start Address
-uint16_t GBC_MMU_CurrentROMBankAddress = 16384;
-// ROM/RAM Mode Select
-GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;
-// External RAM Enabled State
-bool GBC_MMU_ERAMEnabled = false;
-// Current ERAM Bank ID
-uint8_t GBC_MMU_CurrentERAMBankID = 0;
-// Current ERAM Bank Start Address
-uint16_t GBC_MMU_CurrentERAMBankAddress = 0;
-// External RTC Selected State (ERAM address space redirects
-// to RTCRegister, when ERTC selected is true and ERAM is enabled)
-bool GBC_MMU_RTC_Selected = false;
-// External RTC Register
-GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;
-// External RTC Register ID
-uint8_t GBC_MMU_RTC_RegisterID = 0;
-// Used to indicate if last write was zero
-uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;
+FIL GBC_MMU_SDC_ROMFile;                                                        // SDC ROM file object
+bool GBC_MMU_SDC_ROMFileStreamOpen = false;                                     // SDC ROM file open state
 
-void GBC_MMU_OnROMBank0Loaded()
+GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE; // Current Memory Bank Controller
+GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;                    // ROM/RAM Mode Select
+uint16_t GBC_MMU_CurrentROMBankID = 1;                                          // Current ROM Bank ID
+uint16_t GBC_MMU_CurrentROMBankAddress = 16384;                                 // Current ROM Bank Start Address
+
+bool GBC_MMU_ERAMEnabled = false;                                               // External RAM Enabled State
+uint8_t GBC_MMU_CurrentERAMBankID = 0;                                          // Current ERAM Bank ID
+uint16_t GBC_MMU_CurrentERAMBankAddress = 0;                                    // Current ERAM Bank Start Address
+
+bool GBC_MMU_RTC_Selected = false;                                              // External RTC Selected State
+GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                    // External RTC Register
+uint8_t GBC_MMU_RTC_RegisterID = 0;                                             // External RTC Register ID
+uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;                                   // Used to indicate if last write was zero
+
+void GBC_MMU_OnROMBank0Loaded(void)
 {
     GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
 }
@@ -82,10 +70,22 @@ void GBC_MMU_Unload(void)
         f_close(&GBC_MMU_SDC_ROMFile);
     }
 
-    // Reset ROM Bank ID to 1
+    GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
+    GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;
     GBC_MMU_CurrentROMBankID = 1;
-    // Reset Current ROM Bank Start Address to 16384
     GBC_MMU_CurrentROMBankAddress = 16384;
+
+    GBC_MMU_ERAMEnabled = false;
+    GBC_MMU_CurrentERAMBankID = 0;
+    GBC_MMU_CurrentERAMBankAddress = 0;
+
+    GBC_MMU_RTC_Selected = false;
+    for (long i = 0; i < 5; i++)
+    {
+        GBC_MMU_RTC_Register.Data[i] = 0;
+    }
+    GBC_MMU_RTC_RegisterID = 0;
+    GBC_MMU_RTC_LatchClockDataHelper = 0;
 }
 
 uint8_t GBC_MMU_ReadByte(uint16_t address)
