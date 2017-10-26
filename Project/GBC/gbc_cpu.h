@@ -74,6 +74,8 @@ enum
     GBC_CPU_TICKS_8  =  8,
     GBC_CPU_TICKS_9  =  9,
     GBC_CPU_TICKS_10 = 10,
+    GBC_CPU_TICKS_12 = 12,
+    GBC_CPU_TICKS_16 = 16,
 };
 
 typedef struct GBC_CPU_Instruction_s
@@ -99,6 +101,8 @@ enum GBC_CPU_Flags_e
 #define GBC_CPU_FLAGS_SET(FLAGS)   (GBC_CPU_Register.F |=  (FLAGS))
 #define GBC_CPU_FLAGS_CLEAR(FLAGS) (GBC_CPU_Register.F &= ~(FLAGS))
 #define GBC_CPU_FLAGS_HAS(FLAGS)   (GBC_CPU_Register.F & (FLAGS))
+
+extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
 
 void GBC_CPU_Step(void);
 

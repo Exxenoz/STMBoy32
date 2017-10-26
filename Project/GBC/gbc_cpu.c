@@ -1,4 +1,5 @@
 #include "gbc_cpu.h"
+#include "gbc_cpu_ex.h"
 #include "gbc_mmu.h"
 
 // Global GBC CPU register
@@ -1523,7 +1524,11 @@ void GBC_CPU_JP_Z_XX(uint16_t operand)  // 0xCA - Absolute jump to 16-bit locati
 
 void GBC_CPU_EXT_OPS(uint8_t operand)   // 0xCB - Extended operations (two-byte instruction code)
 {
-    // ToDo
+    GBC_CPU_EX_Instruction_t instruction = GBC_CPU_EX_Instructions[operand];    // Get extended instruction
+
+    ((void (*)(void))instruction.Handler)();                                    // Execute extended instruction
+
+    GBC_CPU_Ticks += instruction.Ticks;                                         // Add extended instruction ticks
 }
 
 void GBC_CPU_CALL_Z_XX(uint16_t operand)// 0xCC - Call routine at 16-bit location if last result was zero
