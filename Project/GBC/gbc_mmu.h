@@ -38,11 +38,12 @@ GBC_MMU_CartridgeType_t;
 
 typedef enum GBC_MMU_MemoryBankController_e
 {
-    GBC_MMU_MBC_NONE = 0,
-    GBC_MMU_MBC1     = 1,
-    GBC_MMU_MBC2     = 2,
-    GBC_MMU_MBC3     = 3,
-    GBC_MMU_MBC5     = 4,
+    GBC_MMU_MBC_UNKNOWN = 0,
+    GBC_MMU_MBC_NONE    = 1,
+    GBC_MMU_MBC1        = 2,
+    GBC_MMU_MBC2        = 3,
+    GBC_MMU_MBC3        = 4,
+    GBC_MMU_MBC5        = 5,
 }
 GBC_MMU_MemoryBankController_t;
 

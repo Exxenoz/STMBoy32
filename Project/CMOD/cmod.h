@@ -4,6 +4,7 @@
 #include "common.h"
 #include "led.h"
 #include "cmod_config.h"
+#include "gbc_mmu.h"
 
 #define CMOD_SET_RESET       CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
 #define CMOD_RST_RESET       CMOD_RESET_PORT->BSRRH |= CMOD_RESET_PIN
@@ -40,38 +41,6 @@ typedef enum
     CMOD_NOACTION
 } CMOD_ACTION;
 
-typedef enum
-{
-    C_MBC_UNKNOWN,             // The cardridge's MBC is unknown
-    C_NO_MBC,                  // The cardridge only has ROM (Tetris for example)
-    C_MBC1,                    // The cardridge has MC1   build in
-    C_MBC2,                    // The cardridge has MC2   build in
-    C_MBC3,                    // The cardridge has MC3   build in
-    C_MBC5,                    // The cardridge has MC5   build in
-    C_MBC6,                    // The cardridge has MC6   build in
-    C_MBC7,                    // The cardridge has MC7   build in
-    C_HuC1,                    // The cardridge has HuC1  build in (?)
-    C_HuC3,                    // The cardridge has HuC3  build in (?)
-    C_MMM01,                   // The cardridge has MMM01 build in (?)
-    C_BANDAI                   // Bandai Tama5, apparently only used in Tamagochi 
-} C_MBC;
-
-typedef struct
-{
-    uint8_t C_Title[11];       // Title of the Game
-    C_MBC   C_Mbc;             // Which Memory Block Controller is used by the cartridge
-    bool    C_PocketCamera;    // The GameBoy Pocket Camera is currently inserted
-    bool    C_GBCGame;         // False if the Game doesn't support GBC functions
-    bool    C_Battery;         // Is there a battery build into the cartridge
-    bool    C_Timer;           // Is there a battery build into the cartridge
-    bool    C_Rumble;          // Is there rumble build into the cartridge (?)
-    bool    C_Sensor;          // Is a sensor build into the crtridge (only MC7) (?)
-    int     C_KByteROM;        // How much KByte ROM does the Cartridge have
-    int     C_ROMBanks;        // How many ROM Banks does the cartridge have
-    int     C_KByteRAM;        // How much KByte RAM does the Cartridge have
-    int     C_RAMBanks;        // How many RAM Banks does the cartridge have (0 for MBC2, has 512x4bit tho)
-} C_SPECS;
-
 CMOD_STATUS CMOD_GetStatus(void); 
 bool        CMOD_Detect(void);           
 
@@ -80,18 +49,10 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);
 void CMOD_WriteByte(uint16_t address, uint8_t *data);                      
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
-void CMOD_Initialize(void);
-void CMOD_EnableInterrupt(void);  
-void CMOD_DisableInterrupt(void); 
+void CMOD_SaveCartridge(void);        // Needed arguments currently unknown
+void CMOD_SwitchMB(uint8_t bank);     // Switch active Memory Bank of the cartridge
 
-void CMOD_GetCSpecs(C_SPECS *cSpecs);
-void C_Initialize(C_SPECS *cSpecs);
-void C_GetType(uint8_t type, C_SPECS *cSpecs);
-void C_GetROM(uint8_t rom, C_SPECS *cSpecs);
-void C_GetRAM(uint8_t ram, C_SPECS *cSpecs);
-
-void CMOD_SaveCartridge(void); // Needed arguments currently unknown
-void C_SwitchMB(C_MBC mbc);    // Switch active Memory Bank of the cartridge
+void CMOD_Initialize(void); 
 
 void TIM4_IRQHandler(void);
 void EXTI15_10_IRQHandler(void); 

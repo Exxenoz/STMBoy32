@@ -27,6 +27,48 @@ bool CMOD_Detect(void)
     else              return false;
 }
 
+void CMOD_SaveCartridge(void)
+{
+    
+}
+
+// Manually switch the currently active Memory Bank of the Cartridge (to be able to save it)
+void CMOD_SwitchMB(uint8_t bank)
+{
+    GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
+    
+    if (GBC_MMU_MemoryBankController == GBC_MMU_MBC_NONE)
+    {
+        
+    }
+    else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC1)
+    {
+        
+    }
+    else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC2 || GBC_MMU_MemoryBankController == GBC_MMU_MBC3)
+    {
+        
+    }
+    else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC5)
+    {
+        
+    }
+    else
+    {
+        
+    }
+}
+
+void CMOD_EnableInterrupt(void)
+{
+    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+}
+
+void CMOD_DisableInterrupt(void)
+{
+    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
+}
+
 void CMOD_ReadByte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
@@ -83,25 +125,6 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_EnableInterrupt();
 }
 
-// Stores the Secifications of the inserted cartridge
-void CMOD_GetCSpecs(C_SPECS *cSpecs)
-{
-    uint8_t cgbFlag;
-    uint8_t type_rom_ram[3];  
-    
-    CMOD_ReadBytes(0x0134, 11, (*cSpecs).C_Title);
-    CMOD_ReadByte(0x0143, &cgbFlag);
-    CMOD_ReadBytes(0x0147, 3, type_rom_ram);
-    while (CMOD_Status == CMOD_PROCESSING);
-    
-    C_Initialize(cSpecs);
-    C_GetType(type_rom_ram[0], cSpecs);
-    C_GetROM(type_rom_ram[1], cSpecs);
-    C_GetRAM(type_rom_ram[2], cSpecs);
-    
-    if ((cgbFlag == 0x80 || cgbFlag == 0xC0)) (*cSpecs).C_GBCGame = true; 
-}
-
 void CMOD_Initialize_CLK(void)
 {
     RCC_AHB1PeriphClockCmd(CMOD_CLK_BUS, ENABLE);
@@ -128,10 +151,10 @@ void CMOD_Initialize_CLK(void)
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
     
-    TIM_OCInitObject.TIM_OCMode       = TIM_OCMode_PWM1;
-	TIM_OCInitObject.TIM_OutputState  = TIM_OutputState_Enable;
-	TIM_OCInitObject.TIM_OCPolarity   = TIM_OCPolarity_Low;
-	TIM_OCInitObject.TIM_Pulse        = 42;                      
+    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
+	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
+	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
+	TIM_OCInitObject.TIM_Pulse           = 42;                      
 	TIM_OC4Init(TIM4, &TIM_OCInitObject);  
 	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
     
@@ -208,256 +231,6 @@ void CMOD_Initialize(void)
     CMOD_Initialize_InsertionInterrupt();
 }
 
-void CMOD_EnableInterrupt(void)
-{
-    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
-}
-
-void CMOD_DisableInterrupt(void)
-{
-    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
-}
-
-void C_Initialize(C_SPECS *cSpecs)
-{
-    (*cSpecs).C_Mbc           = C_MBC_UNKNOWN;
-    (*cSpecs).C_PocketCamera  = false;
-    (*cSpecs).C_Battery       = false;
-    (*cSpecs).C_Timer         = false;
-    (*cSpecs).C_Rumble        = false;
-    (*cSpecs).C_Sensor        = false;
-    (*cSpecs).C_GBCGame       = false;
-    (*cSpecs).C_KByteROM      = 0;
-    (*cSpecs).C_ROMBanks      = 0;
-    (*cSpecs).C_KByteRAM      = 0;
-    (*cSpecs).C_RAMBanks      = 0;
-}
-
-void C_GetType(uint8_t type, C_SPECS *cSpecs)
-{
-    switch (type)
-    {
-      case 0x08:
-      case 0x00:
-          (*cSpecs).C_Mbc     = C_NO_MBC;
-          break;
-      
-      case 0x01:
-      case 0x02:
-          (*cSpecs).C_Mbc     = C_MBC1;
-          break;
-      
-      case 0x03:
-          (*cSpecs).C_Mbc     = C_MBC1;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      case 0x05:
-          (*cSpecs).C_Mbc     = C_MBC2;
-          break;
-      
-      case 0x06:
-          (*cSpecs).C_Mbc     = C_MBC2;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      case 0x09:
-          (*cSpecs).C_Mbc     = C_NO_MBC;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      case 0x0B:
-      case 0x0C:
-          (*cSpecs).C_Mbc     = C_MMM01;
-          break;
-      
-      case 0x0D:
-          (*cSpecs).C_Mbc     = C_MMM01;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      case 0x0F:
-      case 0x10:
-          (*cSpecs).C_Mbc     = C_MBC3;
-          (*cSpecs).C_Battery = true;
-          (*cSpecs).C_Timer   = true;
-          break;
-      
-      case 0x11:
-      case 0x12:
-          (*cSpecs).C_Mbc     = C_MBC3;
-          break;
-      
-      case 0x1B:
-      case 0x13:
-          (*cSpecs).C_Mbc     = C_MBC3;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      case 0x19:
-      case 0x1A:
-          (*cSpecs).C_Mbc     = C_MBC5;
-          break;
-      
-      case 0x1C:
-      case 0x1D:
-          (*cSpecs).C_Mbc     = C_MBC3;
-          (*cSpecs).C_Rumble  = true;
-          break;
-      
-      case 0x1E:
-          (*cSpecs).C_Mbc     = C_MBC3;
-          (*cSpecs).C_Battery = true;
-          (*cSpecs).C_Rumble  = true;
-          break;
-      
-      case 0x20:
-          (*cSpecs).C_Mbc     = C_MBC6;
-          break;
-      
-      case 0x22:
-          (*cSpecs).C_Mbc     = C_MBC7;
-          (*cSpecs).C_Battery = true;
-          (*cSpecs).C_Rumble  = true;
-          (*cSpecs).C_Sensor  = true;
-          break;
-      
-      case 0xFC:
-          (*cSpecs).C_PocketCamera = true;
-          break;
-      
-      case 0xFD:
-          (*cSpecs).C_Mbc = C_BANDAI;
-          break;
-      
-      case 0xFE:
-          (*cSpecs).C_Mbc     = C_HuC3;
-          break;
-      
-      case 0xFF:
-          (*cSpecs).C_Mbc     = C_HuC1;
-          (*cSpecs).C_Battery = true;
-          break;
-      
-      default:
-          break;
-    }
-}
-
-void C_GetROM(uint8_t rom, C_SPECS *cSpecs)
-{
-    switch (rom)
-    {
-      case 0x00:
-            (*cSpecs).C_KByteROM = 32;
-            break;
-      
-      case 0x01:
-            (*cSpecs).C_ROMBanks = 4;
-            break;
-      
-      case 0x02:
-            (*cSpecs).C_ROMBanks = 8;
-            break;
-      
-      case 0x03:
-            (*cSpecs).C_ROMBanks = 16;
-            break;
-      
-      case 0x04:
-            (*cSpecs).C_ROMBanks = 32;
-            break;
-      
-      case 0x05:
-            if ((*cSpecs).C_Mbc == C_MBC1) (*cSpecs).C_ROMBanks = 63;
-            else                           (*cSpecs).C_ROMBanks = 64;    
-            break;
-      
-      case 0x06:
-            if ((*cSpecs).C_Mbc == C_MBC1) (*cSpecs).C_ROMBanks = 125;
-            else                           (*cSpecs).C_ROMBanks = 128;    
-            break;
-      
-      case 0x07:
-            (*cSpecs).C_ROMBanks = 256;
-            break;
-      
-      case 0x08:
-            (*cSpecs).C_ROMBanks = 512;
-            break;
-      
-      case 0x52:
-            (*cSpecs).C_ROMBanks = 72;
-            break;
-      
-      case 0x53:
-            (*cSpecs).C_ROMBanks = 80;
-            break;
-      
-      case 0x54:
-            (*cSpecs).C_ROMBanks = 96;
-            break;
-      
-      default:
-          break;
-    }
-    if ((*cSpecs).C_ROMBanks != 0) (*cSpecs).C_KByteROM = (*cSpecs).C_ROMBanks * 16;
-}
-
-void C_GetRAM(uint8_t ram, C_SPECS *cSpecs)
-{
-    switch (ram)
-    {      
-      case 0x00:
-            if ((*cSpecs).C_Mbc == C_MBC2) (*cSpecs).C_KByteRAM = 2048;
-            break;
-        
-      case 0x01:
-            (*cSpecs).C_KByteRAM = 2;
-            break;
-      
-      case 0x02:
-            (*cSpecs).C_RAMBanks = 1;
-            break;
-      
-      case 0x03:
-            (*cSpecs).C_RAMBanks = 4;
-            break;
-      
-      case 0x04:
-            (*cSpecs).C_RAMBanks = 16;
-            break;
-      
-      case 0x05:
-            (*cSpecs).C_RAMBanks = 8;
-            break;
-      
-      default:
-          break;
-    }
-    if ((*cSpecs).C_RAMBanks != 0) (*cSpecs).C_KByteRAM = (*cSpecs).C_RAMBanks * 8;
-}
-
-void C_SwitchMB(C_MBC mbc)
-{
-    if (mbc == C_MBC1)
-    {
-        
-    }
-    else if (mbc == C_MBC2 || mbc == C_MBC3)
-    {
-        
-    }
-    else if (mbc == C_MBC5)
-    {
-        
-    }
-    else
-    {
-        
-    }
-}
-
 void TIM4_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)             
@@ -476,7 +249,7 @@ void TIM4_IRQHandler(void)
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
           TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
-          return;                                               // Needed?
+          return;                                                // Needed?
       }
       else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
       {
@@ -484,7 +257,7 @@ void TIM4_IRQHandler(void)
           CMOD_Action = CMOD_NOACTION;                                             // All actions finished
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
           TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
-          return;
+          return;                                                // Needed?
       }
       
       if (CMOD_Action == CMOD_READ)                              // Do we want to read?

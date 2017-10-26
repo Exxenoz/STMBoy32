@@ -5,25 +5,25 @@
 #include "cmod.h"
 #include "string.h"
 
-GBC_MMU_Memory_t GBC_MMU_Memory;                                                // GBC Memory
+GBC_MMU_Memory_t GBC_MMU_Memory;                                                   // GBC Memory
+                                                                                   
+FIL GBC_MMU_SDC_ROMFile;                                                           // SDC ROM file object
+bool GBC_MMU_SDC_ROMFileStreamOpen = false;                                        // SDC ROM file open state
 
-FIL GBC_MMU_SDC_ROMFile;                                                        // SDC ROM file object
-bool GBC_MMU_SDC_ROMFileStreamOpen = false;                                     // SDC ROM file open state
-
-GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE; // Current Memory Bank Controller
-GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;                    // ROM/RAM Mode Select
-uint16_t GBC_MMU_CurrentROMBankID = 1;                                          // Current ROM Bank ID
-uint16_t GBC_MMU_CurrentROMBankAddress = 16384;                                 // Current ROM Bank Start Address
-
-bool GBC_MMU_ERAMEnabled = false;                                               // External RAM Enabled State
-uint8_t GBC_MMU_CurrentERAMBankID = 0;                                          // Current ERAM Bank ID
-uint16_t GBC_MMU_CurrentERAMBankAddress = 0;                                    // Current ERAM Bank Start Address
-
-bool GBC_MMU_RTC_Selected = false;                                              // External RTC Selected State
-GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                    // External RTC Register
-uint8_t GBC_MMU_RTC_RegisterID = 0;                                             // External RTC Register ID
-uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;                                   // Used to indicate if last write was zero
-
+GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN; // Current Memory Bank Controller
+GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;                       // ROM/RAM Mode Select
+uint16_t GBC_MMU_CurrentROMBankID = 1;                                             // Current ROM Bank ID
+uint16_t GBC_MMU_CurrentROMBankAddress = 16384;                                    // Current ROM Bank Start Address
+                                                                                   
+bool GBC_MMU_ERAMEnabled = false;                                                  // External RAM Enabled State
+uint8_t GBC_MMU_CurrentERAMBankID = 0;                                             // Current ERAM Bank ID
+uint16_t GBC_MMU_CurrentERAMBankAddress = 0;                                       // Current ERAM Bank Start Address
+                                                                                   
+bool GBC_MMU_RTC_Selected = false;                                                 // External RTC Selected State
+GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                       // External RTC Register
+uint8_t GBC_MMU_RTC_RegisterID = 0;                                                // External RTC Register ID
+uint8_t GBC_MMU_RTC_LatchClockDataHelper = 0;                                      // Indicates if last write was zero
+                                                                                   
 const uint8_t GBC_MMU_NintendoLogo[48] =
 {
     0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
@@ -119,7 +119,7 @@ void GBC_MMU_Unload(void)
 
     memset(&GBC_MMU_Memory, 0, sizeof(GBC_MMU_Memory_t));
 
-    GBC_MMU_MemoryBankController = GBC_MMU_MBC_NONE;
+    GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN;
     GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;
     GBC_MMU_CurrentROMBankID = 1;
     GBC_MMU_CurrentROMBankAddress = 16384;
@@ -559,5 +559,5 @@ GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(void)
             return GBC_MMU_MBC5;
     }
 
-    return GBC_MMU_MBC_NONE;
+    return GBC_MMU_MBC_UNKNOWN;
 }
