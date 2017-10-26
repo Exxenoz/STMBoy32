@@ -114,24 +114,47 @@ typedef struct GBC_MMU_Memory_s
 
         struct
         {
-            uint8_t IO_Unk1[15];
-            uint8_t InterruptFlags;       // 0xFF0F
+            uint8_t Joypad;                  // 0xFF00
+            uint8_t SerialTransferData;      // 0xFF01
+            uint8_t SerialTransferControl;   // 0xFF02
+            uint8_t IO_Unk13;
+            uint8_t DividerRegister;         // 0xFF04
+            uint8_t TimerCounter;            // 0xFF05
+            uint8_t TimerModulo;             // 0xFF06
+            uint8_t TimerControl;            // 0xFF07
+            uint8_t IO_Unk1[7];
+            uint8_t InterruptFlags;          // 0xFF0F
             uint8_t IO_Unk2[48];
-            uint8_t GPUControlFlags;      // 0xFF40
-            uint8_t GPUStatus;            // 0xFF41
-            uint8_t GPUScrollY;           // 0xFF42
-            uint8_t GPUScrollX;           // 0xFF43
-            uint8_t GPUScanline;          // 0xFF44
-            uint8_t IO_Unk4[2];
-            uint8_t GPUBackgroundPalette; // 0xFF47
-            uint8_t IO_Unk5[5];
-            uint8_t PrepareSpeedSwitch;   // 0xFF4D                                           - Only in GBC mode
+            uint8_t GPUControlFlags;         // 0xFF40
+            uint8_t GPUStatus;               // 0xFF41
+            uint8_t ScrollY;                 // 0xFF42
+            uint8_t ScrollX;                 // 0xFF43
+            uint8_t Scanline;                // 0xFF44
+            uint8_t ScanlineCompare;         // 0xFF45
+            uint8_t DMATransferStartAddress; // 0xFF46
+            uint8_t GPUBackgroundPalette;    // 0xFF47                                           - Non GBC mode only
+            uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
+            uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
+            uint8_t WindowYPosition;         // 0xFF4A
+            uint8_t WindowXPositionMinus7;   // 0xFF4B
+            uint8_t IO_Unk5;
+            uint8_t PrepareSpeedSwitch;      // 0xFF4D                                           - Only in GBC mode
             uint8_t IO_Unk11;
-            uint8_t VRAMBankID;           // 0xFF4F                                           - Only in GBC mode
-            uint8_t IO_Unk8[6];
-            uint8_t InfraredPort;         // 0xFF56                                           - Only in GBC mode
-            uint8_t IO_Unk9[25];
-            uint8_t WRAMBankID;           // 0xFF70                                           - Only in GBC mode
+            uint8_t VRAMBankID;              // 0xFF4F                                           - Only in GBC mode
+            uint8_t IO_Unk8;
+            uint8_t NewDMASourceHigh;        // 0xFF51                                           - Only in GBC mode
+            uint8_t NewDMASourceLow;         // 0xFF52                                           - Only in GBC mode
+            uint8_t NewDMADestinationHigh;   // 0xFF53                                           - Only in GBC mode
+            uint8_t NewDMADestinationLow;    // 0xFF54                                           - Only in GBC mode
+            uint8_t NewDMALengthModeStart;   // 0xFF55                                           - Only in GBC mode
+            uint8_t InfraredPort;            // 0xFF56                                           - Only in GBC mode
+            uint8_t IO_Unk9[17];
+            uint8_t BackgroundPaletteIndex;  // 0xFF68                                           - Only in GBC mode
+            uint8_t BackgroundPaletteData;   // 0xFF69                                           - Only in GBC mode
+            uint8_t SpritePaletteIndex;      // 0xFF6A                                           - Only in GBC mode
+            uint8_t SpritePaletteData;       // 0xFF6B                                           - Only in GBC mode
+            uint8_t IO_Unk12[4];
+            uint8_t WRAMBankID;              // 0xFF70                                           - Only in GBC mode
             uint8_t IO_Unk10[15];
         };
     };
