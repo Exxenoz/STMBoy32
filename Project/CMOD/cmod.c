@@ -33,30 +33,55 @@ void CMOD_SaveCartridge(void)
 }
 
 // Manually switch the currently active Memory Bank of the Cartridge (to be able to save it)
-void CMOD_SwitchMB(uint8_t bank)
+bool CMOD_SwitchMB(uint16_t bank)
 {
     GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
     
     if (GBC_MMU_MemoryBankController == GBC_MMU_MBC_NONE)
     {
-        
+        // No switching Required
+        return true;
     }
     else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC1)
     {
+        uint8_t lower5Bit = bank & 0x1F;
+        uint8_t upper2Bit = (bank & 0x60) >> 5; 
         
+        CMOD_WriteByte(0x2100, &lower5Bit);      // Write lower 5 bit of rom bank number into 2000-3FFF
+        CMOD_WriteByte(0x6100, 0x00);            // Set 4000-5FFF to Rom mode
+        CMOD_WriteByte(0x4100, &upper2Bit);      // Write bit 6 & 7 of rom bank number into 4000-5FFF
+        while (CMOD_Status == CMOD_PROCESSING);
     }
     else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC2 || GBC_MMU_MemoryBankController == GBC_MMU_MBC3)
     {
-        
+        // Convert bank to a 8bit number (16bit are needed as parameter for MBC5)
+        uint8_t bankNumber8Bit = bank;
+        // Switch Bank by writing into 2000-3FFF (for MBC2 lsb of upper byte must be 1)
+        CMOD_WriteByte(0x2100, &bankNumber8Bit);
+        while (CMOD_Status == CMOD_PROCESSING);
     }
     else if (GBC_MMU_MemoryBankController == GBC_MMU_MBC5)
     {
+        uint8_t lower8Bit = bank;
+        uint8_t upperBit  = (bank & 0x100) >> 8; 
         
+        CMOD_WriteByte(0x2100, &lower8Bit);      // Write lower 8 bit of bank number into 2000-2FFF
+        CMOD_WriteByte(0x3100, &upperBit);       // Write upper 1 bit of bank number into 3000-3FFF
+        while (CMOD_Status == CMOD_PROCESSING);
     }
     else
     {
-        
+        return false;
     }
+    
+    return true;
+}
+
+void CMOD_ResetCartridge(void)
+{
+    CMOD_RST_RESET;                     // Reset Cartridge
+    for (int i = 0; i < 100; i++);      // Wait some ns
+    CMOD_SET_RESET;
 }
 
 void CMOD_EnableInterrupt(void)

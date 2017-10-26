@@ -58,7 +58,8 @@ int main(void)
         
         uint8_t data1[128];
         uint8_t data2[128];
-        uint8_t data3[128];
+        uint8_t resetedData[128];
+        uint8_t data3[128];        
         uint8_t rtcData1;
         uint8_t nintendoLogo[48];
         uint8_t ramData[48] = {0};
@@ -89,6 +90,11 @@ int main(void)
         // Read the first 128 Bytes of Rom-Bank 2
         CMOD_WriteByte(0x2001, &romBank2);
         CMOD_ReadBytes(0x4000, 128, data2);
+        
+        // Softreset
+        CMOD_ResetCartridge();
+        // Read the first 128 Bytes from 4000, should be Bank 1 now
+        CMOD_ReadBytes(0x4000, 128, resetedData);
         
         // If a card with MBC3 is inserted latch current time to RTC Register then read it
         if(GBC_MMU_MemoryBankController == GBC_MMU_MBC3)

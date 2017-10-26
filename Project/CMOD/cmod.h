@@ -50,7 +50,7 @@ void CMOD_WriteByte(uint16_t address, uint8_t *data);
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
 void CMOD_SaveCartridge(void);        // Needed arguments currently unknown
-void CMOD_SwitchMB(uint8_t bank);     // Switch active Memory Bank of the cartridge
+void CMOD_ResetCartridge(void);
 
 void CMOD_Initialize(void); 
 
