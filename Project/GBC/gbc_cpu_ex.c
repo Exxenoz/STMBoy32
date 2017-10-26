@@ -140,6 +140,60 @@ uint8_t GBC_CPU_EX_RR(uint8_t value)
     return value;
 }
 
+uint8_t GBC_CPU_EX_SLA(uint8_t value)
+{
+    if (value & 0x80)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    value <<= 1;
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
+uint8_t GBC_CPU_EX_SRA(uint8_t value)
+{
+    if (value & 0x01)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    value = (value & 0x80) | (value >> 1);
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
 void GBC_CPU_EX_RLC_B()                     // 0x00 - Rotate B left with carry
 {
     GBC_CPU_Register.B = GBC_CPU_EX_RLC(GBC_CPU_Register.B);
@@ -300,10 +354,90 @@ void GBC_CPU_EX_RR_A()                      // 0x1F - Rotate A right
     GBC_CPU_Register.A = GBC_CPU_EX_RR(GBC_CPU_Register.A);
 }
 
+void GBC_CPU_EX_SLA_B()                     // 0x20 - Shift B left preserving sign
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_SLA(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_SLA_C()                     // 0x21 - Shift C left preserving sign
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_SLA(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_SLA_D()                     // 0x22 - Shift D left preserving sign
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_SLA(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_SLA_E()                     // 0x23 - Shift E left preserving sign
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_SLA(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_SLA_H()                     // 0x24 - Shift H left preserving sign
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_SLA(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_SLA_L()                     // 0x25 - Shift L left preserving sign
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_SLA(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_SLA_HLP()                   // 0x26 - Shift value pointed by HL left preserving sign
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_SLA(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_SLA_A()                     // 0x27 - Shift A left preserving sign
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_SLA(GBC_CPU_Register.A);
+}
+
+void GBC_CPU_EX_SRA_B()                     // 0x28 - Shift B right preserving sign
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_SRA(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_SRA_C()                     // 0x29 - Shift C right preserving sign
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_SRA(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_SRA_D()                     // 0x2A - Shift D right preserving sign
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_SRA(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_SRA_E()                     // 0x2B - Shift E right preserving sign
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_SRA(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_SRA_H()                     // 0x2C - Shift H right preserving sign
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_SRA(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_SRA_L()                     // 0x2D - Shift L right preserving sign
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_SRA(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_SRA_HLP()                   // 0x2E - Shift value pointed by HL right preserving sign
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_SRA(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_SRA_A()                     // 0x2F - Shift A right preserving sign
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_SRA(GBC_CPU_Register.A);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[32] =
+const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[48] =
 {
     GBC_CPU_EX_RLC_B,   GBC_CPU_TICKS_8,  // 0x00 - Rotate B left with carry
     GBC_CPU_EX_RLC_C,   GBC_CPU_TICKS_8,  // 0x01 - Rotate C left with carry
@@ -337,4 +471,20 @@ const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[32] =
     GBC_CPU_EX_RR_L,    GBC_CPU_TICKS_8,  // 0x1D - Rotate L right
     GBC_CPU_EX_RR_HLP,  GBC_CPU_TICKS_16, // 0x1E - Rotate value pointed by HL right
     GBC_CPU_EX_RR_A,    GBC_CPU_TICKS_8,  // 0x1F - Rotate A right
+    GBC_CPU_EX_SLA_B,   GBC_CPU_TICKS_8,  // 0x20 - Shift B left preserving sign
+    GBC_CPU_EX_SLA_C,   GBC_CPU_TICKS_8,  // 0x21 - Shift C left preserving sign
+    GBC_CPU_EX_SLA_D,   GBC_CPU_TICKS_8,  // 0x22 - Shift D left preserving sign
+    GBC_CPU_EX_SLA_E,   GBC_CPU_TICKS_8,  // 0x23 - Shift E left preserving sign
+    GBC_CPU_EX_SLA_H,   GBC_CPU_TICKS_8,  // 0x24 - Shift H left preserving sign
+    GBC_CPU_EX_SLA_L,   GBC_CPU_TICKS_8,  // 0x25 - Shift L left preserving sign
+    GBC_CPU_EX_SLA_HLP, GBC_CPU_TICKS_16, // 0x26 - Shift value pointed by HL left preserving sign
+    GBC_CPU_EX_SLA_A,   GBC_CPU_TICKS_8,  // 0x27 - Shift A left preserving sign
+    GBC_CPU_EX_SRA_B,   GBC_CPU_TICKS_8,  // 0x28 - Shift B right preserving sign
+    GBC_CPU_EX_SRA_C,   GBC_CPU_TICKS_8,  // 0x29 - Shift C right preserving sign
+    GBC_CPU_EX_SRA_D,   GBC_CPU_TICKS_8,  // 0x2A - Shift D right preserving sign
+    GBC_CPU_EX_SRA_E,   GBC_CPU_TICKS_8,  // 0x2B - Shift E right preserving sign
+    GBC_CPU_EX_SRA_H,   GBC_CPU_TICKS_8,  // 0x2C - Shift H right preserving sign
+    GBC_CPU_EX_SRA_L,   GBC_CPU_TICKS_8,  // 0x2D - Shift L right preserving sign
+    GBC_CPU_EX_SRA_HLP, GBC_CPU_TICKS_16, // 0x2E - Shift value pointed by HL right preserving sign
+    GBC_CPU_EX_SRA_A,   GBC_CPU_TICKS_8,  // 0x2F - Shift A right preserving sign
 };
