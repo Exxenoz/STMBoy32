@@ -2,7 +2,9 @@
 
 void LED_Initialize(void)
 {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(LED_RED_BUS,   ENABLE);
+    RCC_AHB1PeriphClockCmd(LED_GREEN_BUS, ENABLE);
+    RCC_AHB1PeriphClockCmd(LED_BLUE_BUS,  ENABLE);
 
     GPIO_InitTypeDef GPIO_InitObject;
 
@@ -14,9 +16,9 @@ void LED_Initialize(void)
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
     GPIO_Init(PORT, &GPIO_InitObject);              \
 
-    INITIALIZE_OUTPUT_PIN(LED_RED_PORT, LED_RED_PIN);
+    INITIALIZE_OUTPUT_PIN(LED_RED_PORT,   LED_RED_PIN);
     INITIALIZE_OUTPUT_PIN(LED_GREEN_PORT, LED_GREEN_PIN);
-    INITIALIZE_OUTPUT_PIN(LED_BLUE_PORT, LED_BLUE_PIN);
+    INITIALIZE_OUTPUT_PIN(LED_BLUE_PORT,  LED_BLUE_PIN);
 
     LED_EnableRed(false);
     LED_EnableGreen(false);
