@@ -61,12 +61,12 @@ void CMOD_SwitchMB(uint8_t bank)
 
 void CMOD_EnableInterrupt(void)
 {
-    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, ENABLE);
 }
 
 void CMOD_DisableInterrupt(void)
 {
-    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
+    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, DISABLE);
 }
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data)
@@ -128,7 +128,7 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 void CMOD_Initialize_CLK(void)
 {
     RCC_AHB1PeriphClockCmd(CMOD_CLK_BUS, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+    RCC_APB1PeriphClockCmd(CMOD_TIM_BUS, ENABLE);
 
     GPIO_InitTypeDef        GPIO_InitObject;
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
@@ -149,25 +149,25 @@ void CMOD_Initialize_CLK(void)
     TIM_BaseObject.TIM_Period            = 85;                  
     TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(TIM4, &TIM_BaseObject);
+    TIM_TimeBaseInit(CMOD_TIM, &TIM_BaseObject);
     
     TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
 	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
 	TIM_OCInitObject.TIM_Pulse           = 42;                      
-	TIM_OC4Init(TIM4, &TIM_OCInitObject);  
-	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
+	TIM_OC4Init(CMOD_TIM, &TIM_OCInitObject);  
+	TIM_OC4PreloadConfig(CMOD_TIM, TIM_OCPreload_Enable);
     
-    TIM_ITConfig(TIM4, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update, DISABLE);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_CC4);
-    TIM_Cmd(TIM4, ENABLE);
+    TIM_ITConfig(CMOD_TIM, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update, DISABLE);
+    TIM_ClearITPendingBit(CMOD_TIM, TIM_IT_CC4);
+    TIM_Cmd(CMOD_TIM, ENABLE);
 
-    NVIC_InitObject.NVIC_IRQChannel                   = TIM4_IRQn;
+    NVIC_InitObject.NVIC_IRQChannel                   = CMOD_TIM_NVIC_CHANNEL;
     NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitObject);                          
-    NVIC_EnableIRQ(TIM4_IRQn);    
+    NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);    
 }
 
 void CMOD_Initialize_InsertionInterrupt()
