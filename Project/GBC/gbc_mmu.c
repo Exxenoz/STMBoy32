@@ -423,8 +423,9 @@ void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
     }
 }
 
-void (*GBC_MMU_MBC_Table[5])(uint16_t, uint8_t) =
+void (*GBC_MMU_MBC_Table[6])(uint16_t, uint8_t) =
 {
+    GBC_MMU_MBC_None,
     GBC_MMU_MBC_None,
     GBC_MMU_MBC1_Write,
     GBC_MMU_MBC2_Write,
