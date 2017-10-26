@@ -3,23 +3,21 @@
 #include "ff.h"
 #include "stm324x9i_eval_sdio_sd.h"
 
-// Global FatFS object
-FATFS SDC_FatFS;
-// Global mounted state
-bool SDC_Mounted = false;
+FATFS SDC_FatFS;                    // Global FatFS object
+bool SDC_Mounted = false;           // Global mounted state
 
 void SDC_InitializeInterrupts(void)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
     // SDIO Interrupt ENABLE
-    NVIC_InitStructure.NVIC_IRQChannel = SDIO_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel = SDC_SDIO_NVIC_CHANNEL;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     // DMA2 STREAMx Interrupt ENABLE
-    NVIC_InitStructure.NVIC_IRQChannel = SD_SDIO_DMA_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel = SDC_DMA_NVIC_CHANNEL;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_Init(&NVIC_InitStructure);
 }

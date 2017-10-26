@@ -40,36 +40,39 @@ void LCD_Initialize_Pins(void)
 
 void LCD_InitializeTimer()
 {
-    TIM_TimeBaseInitTypeDef TIM_BaseObject = {0};
-    TIM_BaseObject.TIM_Prescaler = 16;
-    TIM_BaseObject.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period = 281;
-    TIM_BaseObject.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_BaseObject.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(TIM1, &TIM_BaseObject);
+    TIM_TimeBaseInitTypeDef TIM_BaseObject  = {0};
+    TIM_BaseObject.TIM_Prescaler            = 16;
+    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period               = 281;
+    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_RepetitionCounter    = 0;
+    TIM_TimeBaseInit(LCD_TIM, &TIM_BaseObject);
 
-    TIM_OCInitTypeDef TIM_OCObject = {0};
-    TIM_OCObject.TIM_OCMode = TIM_OCMode_PWM1;
-    TIM_OCObject.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCObject.TIM_OCPolarity = TIM_OCPolarity_Low;
-    TIM_OCObject.TIM_Pulse = 281;
-    TIM_OC4Init(TIM1, &TIM_OCObject);
+    TIM_OCInitTypeDef TIM_OCObject          = {0};
+    TIM_OCObject.TIM_OCMode                 = TIM_OCMode_PWM1;
+    TIM_OCObject.TIM_OutputState            = TIM_OutputState_Enable;
+    TIM_OCObject.TIM_OCPolarity             = TIM_OCPolarity_Low;
+    TIM_OCObject.TIM_Pulse                  = 281;
+    TIM_OC4Init(LCD_TIM, &TIM_OCObject);
 
-    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(LCD_TIM, TIM_OCPreload_Enable);
 
-    TIM_Cmd(TIM1, ENABLE);
+    TIM_Cmd(LCD_TIM, ENABLE);
 
-    TIM_CtrlPWMOutputs(TIM1, ENABLE);
+    TIM_CtrlPWMOutputs(LCD_TIM, ENABLE);
 }
 
 bool LCD_Initialize(void)
 {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_RESET_BUS,   ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_RS_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_CS_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_RD_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_WR_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_BACKLIT_BUS, ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_DATA_BUS,    ENABLE);
 
-    // Enable Timer 1 clock.
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+    RCC_APB2PeriphClockCmd(LCD_TIM_BUS,     ENABLE);
 
     LCD_Initialize_Pins();
     LCD_Initialize_Karo(); // Debug
@@ -91,10 +94,10 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
 
     MemoryAccessControlData_t memoryAccessControlData = {0};
-    memoryAccessControlData.RowAddressOrder = 0;
-    memoryAccessControlData.ColumnAddressOrder = 0;
-    memoryAccessControlData.RowColumnExchange = 0;
-    memoryAccessControlData.RGBBGROrder = 1;
+    memoryAccessControlData.RowAddressOrder           = 0;
+    memoryAccessControlData.ColumnAddressOrder        = 0;
+    memoryAccessControlData.RowColumnExchange         = 0;
+    memoryAccessControlData.RGBBGROrder               = 1;
     LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
 
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
@@ -140,8 +143,8 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
 
     LCD_FrameRateControlData_t frameRateControlData = {0};
-    frameRateControlData.DivisionRatio = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
-    frameRateControlData.FrameRate = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
+    frameRateControlData.DivisionRatio              = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
+    frameRateControlData.FrameRate                  = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
 
     LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);

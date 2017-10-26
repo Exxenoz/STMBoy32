@@ -3,6 +3,9 @@
 
 #include "stm32f4xx_conf.h"
 
+// All Input Pins currently have the same Bus
+#define INPUT_BUS_ALL                       RCC_AHB1Periph_GPIOB
+
 #define INPUT_FRAME_PORT                    GPIOB
 #define INPUT_FRAME_PIN                     GPIO_Pin_0
 #define INPUT_FRAME_EXTI_PORT               EXTI_PortSourceGPIOB

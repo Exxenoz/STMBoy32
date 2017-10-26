@@ -3,6 +3,9 @@
 
 #include "stm32f4xx_conf.h"
 
+#define SDC_SDIO_NVIC_CHANNEL SDIO_IRQn
+#define SDC_DMA_NVIC_CHANNEL  SD_SDIO_DMA_IRQn
+
 #define SDC_DAT0_PORT         GPIOC
 #define SDC_DAT0_PIN          GPIO_Pin_8
 #define SDC_DAT0_PIN_SOURCE   GPIO_PinSource8
