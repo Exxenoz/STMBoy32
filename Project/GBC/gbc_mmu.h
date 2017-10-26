@@ -160,7 +160,7 @@ typedef struct GBC_MMU_Memory_s
         };
     };
     uint8_t HRAM[127];                    // FF80-FFFE: 127B High RAM
-    uint8_t InterruptEnableRegister;      // FFFF:        1B Interrupt enable register
+    uint8_t InterruptEnable;              // FFFF:        1B Interrupt enable register
 }
 GBC_MMU_Memory_t;
 
@@ -181,6 +181,8 @@ typedef union GBC_MMU_RTC_Register_s
     };
 }
 GBC_MMU_RTC_Register_t;
+
+extern GBC_MMU_Memory_t GBC_MMU_Memory; // External GBC Memory definition for direct CPU access
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);
