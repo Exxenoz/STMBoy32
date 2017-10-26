@@ -647,10 +647,90 @@ void GBC_CPU_EX_BIT_7_L()   { GBC_CPU_EX_BIT(1 << 7, GBC_CPU_Register.L);       
 void GBC_CPU_EX_BIT_7_HLP() { GBC_CPU_EX_BIT(1 << 7, GBC_MMU_ReadByte(GBC_CPU_Register.HL)); } // 0x7E - Test bit 7 of value pointed by HL
 void GBC_CPU_EX_BIT_7_A()   { GBC_CPU_EX_BIT(1 << 7, GBC_CPU_Register.A);                    } // 0x7F - Test bit 7 of A
 
+void GBC_CPU_EX_RES_0_B()  { GBC_CPU_Register.B &= ~(1 << 0);                                } // 0x80 - Clear (reset) bit 0 of B
+void GBC_CPU_EX_RES_0_C()  { GBC_CPU_Register.C &= ~(1 << 0);                                } // 0x81 - Clear (reset) bit 0 of C
+void GBC_CPU_EX_RES_0_D()  { GBC_CPU_Register.D &= ~(1 << 0);                                } // 0x82 - Clear (reset) bit 0 of D
+void GBC_CPU_EX_RES_0_E()  { GBC_CPU_Register.E &= ~(1 << 0);                                } // 0x83 - Clear (reset) bit 0 of E
+void GBC_CPU_EX_RES_0_H()  { GBC_CPU_Register.H &= ~(1 << 0);                                } // 0x84 - Clear (reset) bit 0 of H
+void GBC_CPU_EX_RES_0_L()  { GBC_CPU_Register.L &= ~(1 << 0);                                } // 0x85 - Clear (reset) bit 0 of L
+void GBC_CPU_EX_RES_0_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 0));                               } // 0x86 - Clear (reset) bit 0 of value pointed by HL
+void GBC_CPU_EX_RES_0_A()  { GBC_CPU_Register.A &= ~(1 << 0);                                } // 0x87 - Clear (reset) bit 0 of A
+
+void GBC_CPU_EX_RES_1_B()  { GBC_CPU_Register.B &= ~(1 << 1);                                } // 0x88 - Clear (reset) bit 1 of B
+void GBC_CPU_EX_RES_1_C()  { GBC_CPU_Register.C &= ~(1 << 1);                                } // 0x89 - Clear (reset) bit 1 of C
+void GBC_CPU_EX_RES_1_D()  { GBC_CPU_Register.D &= ~(1 << 1);                                } // 0x8A - Clear (reset) bit 1 of D
+void GBC_CPU_EX_RES_1_E()  { GBC_CPU_Register.E &= ~(1 << 1);                                } // 0x8B - Clear (reset) bit 1 of E
+void GBC_CPU_EX_RES_1_H()  { GBC_CPU_Register.H &= ~(1 << 1);                                } // 0x8C - Clear (reset) bit 1 of H
+void GBC_CPU_EX_RES_1_L()  { GBC_CPU_Register.L &= ~(1 << 1);                                } // 0x8D - Clear (reset) bit 1 of L
+void GBC_CPU_EX_RES_1_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 1));                               } // 0x8E - Clear (reset) bit 1 of value pointed by HL
+void GBC_CPU_EX_RES_1_A()  { GBC_CPU_Register.A &= ~(1 << 1);                                } // 0x8F - Clear (reset) bit 1 of A
+
+void GBC_CPU_EX_RES_2_B()  { GBC_CPU_Register.B &= ~(1 << 2);                                } // 0x90 - Clear (reset) bit 2 of B
+void GBC_CPU_EX_RES_2_C()  { GBC_CPU_Register.C &= ~(1 << 2);                                } // 0x91 - Clear (reset) bit 2 of C
+void GBC_CPU_EX_RES_2_D()  { GBC_CPU_Register.D &= ~(1 << 2);                                } // 0x92 - Clear (reset) bit 2 of D
+void GBC_CPU_EX_RES_2_E()  { GBC_CPU_Register.E &= ~(1 << 2);                                } // 0x93 - Clear (reset) bit 2 of E
+void GBC_CPU_EX_RES_2_H()  { GBC_CPU_Register.H &= ~(1 << 2);                                } // 0x94 - Clear (reset) bit 2 of H
+void GBC_CPU_EX_RES_2_L()  { GBC_CPU_Register.L &= ~(1 << 2);                                } // 0x95 - Clear (reset) bit 2 of L
+void GBC_CPU_EX_RES_2_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 2));                               } // 0x96 - Clear (reset) bit 2 of value pointed by HL
+void GBC_CPU_EX_RES_2_A()  { GBC_CPU_Register.A &= ~(1 << 2);                                } // 0x97 - Clear (reset) bit 2 of A
+
+void GBC_CPU_EX_RES_3_B()  { GBC_CPU_Register.B &= ~(1 << 3);                                } // 0x98 - Clear (reset) bit 3 of B
+void GBC_CPU_EX_RES_3_C()  { GBC_CPU_Register.C &= ~(1 << 3);                                } // 0x99 - Clear (reset) bit 3 of C
+void GBC_CPU_EX_RES_3_D()  { GBC_CPU_Register.D &= ~(1 << 3);                                } // 0x9A - Clear (reset) bit 3 of D
+void GBC_CPU_EX_RES_3_E()  { GBC_CPU_Register.E &= ~(1 << 3);                                } // 0x9B - Clear (reset) bit 3 of E
+void GBC_CPU_EX_RES_3_H()  { GBC_CPU_Register.H &= ~(1 << 3);                                } // 0x9C - Clear (reset) bit 3 of H
+void GBC_CPU_EX_RES_3_L()  { GBC_CPU_Register.L &= ~(1 << 3);                                } // 0x9D - Clear (reset) bit 3 of L
+void GBC_CPU_EX_RES_3_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 3));                               } // 0x9E - Clear (reset) bit 3 of value pointed by HL
+void GBC_CPU_EX_RES_3_A()  { GBC_CPU_Register.A &= ~(1 << 3);                                } // 0x9F - Clear (reset) bit 3 of A
+
+void GBC_CPU_EX_RES_4_B()  { GBC_CPU_Register.B &= ~(1 << 4);                                } // 0xA0 - Clear (reset) bit 4 of B
+void GBC_CPU_EX_RES_4_C()  { GBC_CPU_Register.C &= ~(1 << 4);                                } // 0xA1 - Clear (reset) bit 4 of C
+void GBC_CPU_EX_RES_4_D()  { GBC_CPU_Register.D &= ~(1 << 4);                                } // 0xA2 - Clear (reset) bit 4 of D
+void GBC_CPU_EX_RES_4_E()  { GBC_CPU_Register.E &= ~(1 << 4);                                } // 0xA3 - Clear (reset) bit 4 of E
+void GBC_CPU_EX_RES_4_H()  { GBC_CPU_Register.H &= ~(1 << 4);                                } // 0xA4 - Clear (reset) bit 4 of H
+void GBC_CPU_EX_RES_4_L()  { GBC_CPU_Register.L &= ~(1 << 4);                                } // 0xA5 - Clear (reset) bit 4 of L
+void GBC_CPU_EX_RES_4_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 4));                               } // 0xA6 - Clear (reset) bit 4 of value pointed by HL
+void GBC_CPU_EX_RES_4_A()  { GBC_CPU_Register.A &= ~(1 << 4);                                } // 0xA7 - Clear (reset) bit 4 of A
+
+void GBC_CPU_EX_RES_5_B()  { GBC_CPU_Register.B &= ~(1 << 5);                                } // 0xA8 - Clear (reset) bit 5 of B
+void GBC_CPU_EX_RES_5_C()  { GBC_CPU_Register.C &= ~(1 << 5);                                } // 0xA9 - Clear (reset) bit 5 of C
+void GBC_CPU_EX_RES_5_D()  { GBC_CPU_Register.D &= ~(1 << 5);                                } // 0xAA - Clear (reset) bit 5 of D
+void GBC_CPU_EX_RES_5_E()  { GBC_CPU_Register.E &= ~(1 << 5);                                } // 0xAB - Clear (reset) bit 5 of E
+void GBC_CPU_EX_RES_5_H()  { GBC_CPU_Register.H &= ~(1 << 5);                                } // 0xAC - Clear (reset) bit 5 of H
+void GBC_CPU_EX_RES_5_L()  { GBC_CPU_Register.L &= ~(1 << 5);                                } // 0xAD - Clear (reset) bit 5 of L
+void GBC_CPU_EX_RES_5_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 5));                               } // 0xAE - Clear (reset) bit 5 of value pointed by HL
+void GBC_CPU_EX_RES_5_A()  { GBC_CPU_Register.A &= ~(1 << 5);                                } // 0xAF - Clear (reset) bit 5 of A
+
+void GBC_CPU_EX_RES_6_B()  { GBC_CPU_Register.B &= ~(1 << 6);                                } // 0xB0 - Clear (reset) bit 6 of B
+void GBC_CPU_EX_RES_6_C()  { GBC_CPU_Register.C &= ~(1 << 6);                                } // 0xB1 - Clear (reset) bit 6 of C
+void GBC_CPU_EX_RES_6_D()  { GBC_CPU_Register.D &= ~(1 << 6);                                } // 0xB2 - Clear (reset) bit 6 of D
+void GBC_CPU_EX_RES_6_E()  { GBC_CPU_Register.E &= ~(1 << 6);                                } // 0xB3 - Clear (reset) bit 6 of E
+void GBC_CPU_EX_RES_6_H()  { GBC_CPU_Register.H &= ~(1 << 6);                                } // 0xB4 - Clear (reset) bit 6 of H
+void GBC_CPU_EX_RES_6_L()  { GBC_CPU_Register.L &= ~(1 << 6);                                } // 0xB5 - Clear (reset) bit 6 of L
+void GBC_CPU_EX_RES_6_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 6));                               } // 0xB6 - Clear (reset) bit 6 of value pointed by HL
+void GBC_CPU_EX_RES_6_A()  { GBC_CPU_Register.A &= ~(1 << 6);                                } // 0xB7 - Clear (reset) bit 6 of A
+
+void GBC_CPU_EX_RES_7_B()  { GBC_CPU_Register.B &= ~(1 << 7);                                } // 0xB8 - Clear (reset) bit 7 of B
+void GBC_CPU_EX_RES_7_C()  { GBC_CPU_Register.C &= ~(1 << 7);                                } // 0xB9 - Clear (reset) bit 7 of C
+void GBC_CPU_EX_RES_7_D()  { GBC_CPU_Register.D &= ~(1 << 7);                                } // 0xBA - Clear (reset) bit 7 of D
+void GBC_CPU_EX_RES_7_E()  { GBC_CPU_Register.E &= ~(1 << 7);                                } // 0xBB - Clear (reset) bit 7 of E
+void GBC_CPU_EX_RES_7_H()  { GBC_CPU_Register.H &= ~(1 << 7);                                } // 0xBC - Clear (reset) bit 7 of H
+void GBC_CPU_EX_RES_7_L()  { GBC_CPU_Register.L &= ~(1 << 7);                                } // 0xBD - Clear (reset) bit 7 of L
+void GBC_CPU_EX_RES_7_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 7));                               } // 0xBE - Clear (reset) bit 7 of value pointed by HL
+void GBC_CPU_EX_RES_7_A()  { GBC_CPU_Register.A &= ~(1 << 7);                                } // 0xBF - Clear (reset) bit 7 of A
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[128] =
+const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[192] =
 {
     GBC_CPU_EX_RLC_B,     GBC_CPU_TICKS_8,  // 0x00 - Rotate B left with carry
     GBC_CPU_EX_RLC_C,     GBC_CPU_TICKS_8,  // 0x01 - Rotate C left with carry
@@ -780,4 +860,68 @@ const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[128] =
     GBC_CPU_EX_BIT_7_L,   GBC_CPU_TICKS_8,  // 0x7D - Test bit 7 of L
     GBC_CPU_EX_BIT_7_HLP, GBC_CPU_TICKS_16, // 0x7E - Test bit 7 of value pointed by HL
     GBC_CPU_EX_BIT_7_A,   GBC_CPU_TICKS_8,  // 0x7F - Test bit 7 of A
+    GBC_CPU_EX_RES_0_B,   GBC_CPU_TICKS_8,  // 0x80 - Clear (reset) bit 0 of B
+    GBC_CPU_EX_RES_0_C,   GBC_CPU_TICKS_8,  // 0x81 - Clear (reset) bit 0 of C
+    GBC_CPU_EX_RES_0_D,   GBC_CPU_TICKS_8,  // 0x82 - Clear (reset) bit 0 of D
+    GBC_CPU_EX_RES_0_E,   GBC_CPU_TICKS_8,  // 0x83 - Clear (reset) bit 0 of E
+    GBC_CPU_EX_RES_0_H,   GBC_CPU_TICKS_8,  // 0x84 - Clear (reset) bit 0 of H
+    GBC_CPU_EX_RES_0_L,   GBC_CPU_TICKS_8,  // 0x85 - Clear (reset) bit 0 of L
+    GBC_CPU_EX_RES_0_HLP, GBC_CPU_TICKS_16, // 0x86 - Clear (reset) bit 0 of value pointed by HL
+    GBC_CPU_EX_RES_0_A,   GBC_CPU_TICKS_8,  // 0x87 - Clear (reset) bit 0 of A
+    GBC_CPU_EX_RES_1_B,   GBC_CPU_TICKS_8,  // 0x88 - Clear (reset) bit 1 of B
+    GBC_CPU_EX_RES_1_C,   GBC_CPU_TICKS_8,  // 0x89 - Clear (reset) bit 1 of C
+    GBC_CPU_EX_RES_1_D,   GBC_CPU_TICKS_8,  // 0x8A - Clear (reset) bit 1 of D
+    GBC_CPU_EX_RES_1_E,   GBC_CPU_TICKS_8,  // 0x8B - Clear (reset) bit 1 of E
+    GBC_CPU_EX_RES_1_H,   GBC_CPU_TICKS_8,  // 0x8C - Clear (reset) bit 1 of H
+    GBC_CPU_EX_RES_1_L,   GBC_CPU_TICKS_8,  // 0x8D - Clear (reset) bit 1 of L
+    GBC_CPU_EX_RES_1_HLP, GBC_CPU_TICKS_16, // 0x8E - Clear (reset) bit 1 of value pointed by HL
+    GBC_CPU_EX_RES_1_A,   GBC_CPU_TICKS_8,  // 0x8F - Clear (reset) bit 1 of A
+    GBC_CPU_EX_RES_2_B,   GBC_CPU_TICKS_8,  // 0x90 - Clear (reset) bit 2 of B
+    GBC_CPU_EX_RES_2_C,   GBC_CPU_TICKS_8,  // 0x91 - Clear (reset) bit 2 of C
+    GBC_CPU_EX_RES_2_D,   GBC_CPU_TICKS_8,  // 0x92 - Clear (reset) bit 2 of D
+    GBC_CPU_EX_RES_2_E,   GBC_CPU_TICKS_8,  // 0x93 - Clear (reset) bit 2 of E
+    GBC_CPU_EX_RES_2_H,   GBC_CPU_TICKS_8,  // 0x94 - Clear (reset) bit 2 of H
+    GBC_CPU_EX_RES_2_L,   GBC_CPU_TICKS_8,  // 0x95 - Clear (reset) bit 2 of L
+    GBC_CPU_EX_RES_2_HLP, GBC_CPU_TICKS_16, // 0x96 - Clear (reset) bit 2 of value pointed by HL
+    GBC_CPU_EX_RES_2_A,   GBC_CPU_TICKS_8,  // 0x97 - Clear (reset) bit 2 of A
+    GBC_CPU_EX_RES_3_B,   GBC_CPU_TICKS_8,  // 0x98 - Clear (reset) bit 3 of B
+    GBC_CPU_EX_RES_3_C,   GBC_CPU_TICKS_8,  // 0x99 - Clear (reset) bit 3 of C
+    GBC_CPU_EX_RES_3_D,   GBC_CPU_TICKS_8,  // 0x9A - Clear (reset) bit 3 of D
+    GBC_CPU_EX_RES_3_E,   GBC_CPU_TICKS_8,  // 0x9B - Clear (reset) bit 3 of E
+    GBC_CPU_EX_RES_3_H,   GBC_CPU_TICKS_8,  // 0x9C - Clear (reset) bit 3 of H
+    GBC_CPU_EX_RES_3_L,   GBC_CPU_TICKS_8,  // 0x9D - Clear (reset) bit 3 of L
+    GBC_CPU_EX_RES_3_HLP, GBC_CPU_TICKS_16, // 0x9E - Clear (reset) bit 3 of value pointed by HL
+    GBC_CPU_EX_RES_3_A,   GBC_CPU_TICKS_8,  // 0x9F - Clear (reset) bit 3 of A
+    GBC_CPU_EX_RES_4_B,   GBC_CPU_TICKS_8,  // 0xA0 - Clear (reset) bit 4 of B
+    GBC_CPU_EX_RES_4_C,   GBC_CPU_TICKS_8,  // 0xA1 - Clear (reset) bit 4 of C
+    GBC_CPU_EX_RES_4_D,   GBC_CPU_TICKS_8,  // 0xA2 - Clear (reset) bit 4 of D
+    GBC_CPU_EX_RES_4_E,   GBC_CPU_TICKS_8,  // 0xA3 - Clear (reset) bit 4 of E
+    GBC_CPU_EX_RES_4_H,   GBC_CPU_TICKS_8,  // 0xA4 - Clear (reset) bit 4 of H
+    GBC_CPU_EX_RES_4_L,   GBC_CPU_TICKS_8,  // 0xA5 - Clear (reset) bit 4 of L
+    GBC_CPU_EX_RES_4_HLP, GBC_CPU_TICKS_16, // 0xA6 - Clear (reset) bit 4 of value pointed by HL
+    GBC_CPU_EX_RES_4_A,   GBC_CPU_TICKS_8,  // 0xA7 - Clear (reset) bit 4 of A
+    GBC_CPU_EX_RES_5_B,   GBC_CPU_TICKS_8,  // 0xA8 - Clear (reset) bit 5 of B
+    GBC_CPU_EX_RES_5_C,   GBC_CPU_TICKS_8,  // 0xA9 - Clear (reset) bit 5 of C
+    GBC_CPU_EX_RES_5_D,   GBC_CPU_TICKS_8,  // 0xAA - Clear (reset) bit 5 of D
+    GBC_CPU_EX_RES_5_E,   GBC_CPU_TICKS_8,  // 0xAB - Clear (reset) bit 5 of E
+    GBC_CPU_EX_RES_5_H,   GBC_CPU_TICKS_8,  // 0xAC - Clear (reset) bit 5 of H
+    GBC_CPU_EX_RES_5_L,   GBC_CPU_TICKS_8,  // 0xAD - Clear (reset) bit 5 of L
+    GBC_CPU_EX_RES_5_HLP, GBC_CPU_TICKS_16, // 0xAE - Clear (reset) bit 5 of value pointed by HL
+    GBC_CPU_EX_RES_5_A,   GBC_CPU_TICKS_8,  // 0xAF - Clear (reset) bit 5 of A
+    GBC_CPU_EX_RES_6_B,   GBC_CPU_TICKS_8,  // 0xB0 - Clear (reset) bit 6 of B
+    GBC_CPU_EX_RES_6_C,   GBC_CPU_TICKS_8,  // 0xB1 - Clear (reset) bit 6 of C
+    GBC_CPU_EX_RES_6_D,   GBC_CPU_TICKS_8,  // 0xB2 - Clear (reset) bit 6 of D
+    GBC_CPU_EX_RES_6_E,   GBC_CPU_TICKS_8,  // 0xB3 - Clear (reset) bit 6 of E
+    GBC_CPU_EX_RES_6_H,   GBC_CPU_TICKS_8,  // 0xB4 - Clear (reset) bit 6 of H
+    GBC_CPU_EX_RES_6_L,   GBC_CPU_TICKS_8,  // 0xB5 - Clear (reset) bit 6 of L
+    GBC_CPU_EX_RES_6_HLP, GBC_CPU_TICKS_16, // 0xB6 - Clear (reset) bit 6 of value pointed by HL
+    GBC_CPU_EX_RES_6_A,   GBC_CPU_TICKS_8,  // 0xB7 - Clear (reset) bit 6 of A
+    GBC_CPU_EX_RES_7_B,   GBC_CPU_TICKS_8,  // 0xB8 - Clear (reset) bit 7 of B
+    GBC_CPU_EX_RES_7_C,   GBC_CPU_TICKS_8,  // 0xB9 - Clear (reset) bit 7 of C
+    GBC_CPU_EX_RES_7_D,   GBC_CPU_TICKS_8,  // 0xBA - Clear (reset) bit 7 of D
+    GBC_CPU_EX_RES_7_E,   GBC_CPU_TICKS_8,  // 0xBB - Clear (reset) bit 7 of E
+    GBC_CPU_EX_RES_7_H,   GBC_CPU_TICKS_8,  // 0xBC - Clear (reset) bit 7 of H
+    GBC_CPU_EX_RES_7_L,   GBC_CPU_TICKS_8,  // 0xBD - Clear (reset) bit 7 of L
+    GBC_CPU_EX_RES_7_HLP, GBC_CPU_TICKS_16, // 0xBE - Clear (reset) bit 7 of value pointed by HL
+    GBC_CPU_EX_RES_7_A,   GBC_CPU_TICKS_8,  // 0xBF - Clear (reset) bit 7 of A
 };
