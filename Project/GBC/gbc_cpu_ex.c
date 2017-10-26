@@ -9,7 +9,7 @@ uint8_t GBC_CPU_EX_RLC(uint8_t value)
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
 
         value <<= 1;
-        value  += 1;
+        value  |= 1;
     }
     else
     {
@@ -46,6 +46,84 @@ uint8_t GBC_CPU_EX_RRC(uint8_t value)
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
 
         value >>= 1;
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
+uint8_t GBC_CPU_EX_RL(uint8_t value)
+{
+    if (value & 0x80)
+    {
+        value <<= 1;
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+        {
+            value |= 1;
+        }
+
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        value <<= 1;
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+        {
+            value |= 1;
+        }
+
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
+uint8_t GBC_CPU_EX_RR(uint8_t value)
+{
+    if (value & 0x01)
+    {
+        value >>= 1;
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+        {
+            value |= 0x80;
+        }
+
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        value >>= 1;
+
+        if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+        {
+            value |= 0x80;
+        }
+
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
 
     GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
@@ -142,10 +220,90 @@ void GBC_CPU_EX_RRC_A()                     // 0x0F - Rotate A right with carry
     GBC_CPU_Register.A = GBC_CPU_EX_RRC(GBC_CPU_Register.A);
 }
 
+void GBC_CPU_EX_RL_B()                      // 0x10 - Rotate B left
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_RL(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_RL_C()                      // 0x11 - Rotate C left
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_RL(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_RL_D()                      // 0x12 - Rotate D left
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_RL(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_RL_E()                      // 0x13 - Rotate E left
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_RL(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_RL_H()                      // 0x14 - Rotate H left
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_RL(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_RL_L()                      // 0x15 - Rotate L left
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_RL(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_RL_HLP()                    // 0x16 - Rotate value pointed by HL left
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_RL(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_RL_A()                      // 0x17 - Rotate A left
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_RL(GBC_CPU_Register.A);
+}
+
+void GBC_CPU_EX_RR_B()                      // 0x18 - Rotate B right
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_RR(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_RR_C()                      // 0x19 - Rotate C right
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_RR(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_RR_D()                      // 0x1A - Rotate D right
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_RR(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_RR_E()                      // 0x1B - Rotate E right
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_RR(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_RR_H()                      // 0x1C - Rotate H right
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_RR(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_RR_L()                      // 0x1D - Rotate L right
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_RR(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_RR_HLP()                    // 0x1E - Rotate value pointed by HL right
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_RR(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_RR_A()                      // 0x1F - Rotate A right
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_RR(GBC_CPU_Register.A);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[16] =
+const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[32] =
 {
     GBC_CPU_EX_RLC_B,   GBC_CPU_TICKS_8,  // 0x00 - Rotate B left with carry
     GBC_CPU_EX_RLC_C,   GBC_CPU_TICKS_8,  // 0x01 - Rotate C left with carry
@@ -163,4 +321,20 @@ const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[16] =
     GBC_CPU_EX_RRC_L,   GBC_CPU_TICKS_8,  // 0x0D - Rotate L right with carry
     GBC_CPU_EX_RRC_HLP, GBC_CPU_TICKS_16, // 0x0E - Rotate value pointed by HL right with carry
     GBC_CPU_EX_RRC_A,   GBC_CPU_TICKS_8,  // 0x0F - Rotate A right with carry
+    GBC_CPU_EX_RL_B,    GBC_CPU_TICKS_8,  // 0x10 - Rotate B left
+    GBC_CPU_EX_RL_C,    GBC_CPU_TICKS_8,  // 0x11 - Rotate C left
+    GBC_CPU_EX_RL_D,    GBC_CPU_TICKS_8,  // 0x12 - Rotate D left
+    GBC_CPU_EX_RL_E,    GBC_CPU_TICKS_8,  // 0x13 - Rotate E left
+    GBC_CPU_EX_RL_H,    GBC_CPU_TICKS_8,  // 0x14 - Rotate H left
+    GBC_CPU_EX_RL_L,    GBC_CPU_TICKS_8,  // 0x15 - Rotate L left
+    GBC_CPU_EX_RL_HLP,  GBC_CPU_TICKS_16, // 0x16 - Rotate value pointed by HL left
+    GBC_CPU_EX_RL_A,    GBC_CPU_TICKS_8,  // 0x17 - Rotate A left
+    GBC_CPU_EX_RR_B,    GBC_CPU_TICKS_8,  // 0x18 - Rotate B right
+    GBC_CPU_EX_RR_C,    GBC_CPU_TICKS_8,  // 0x19 - Rotate C right
+    GBC_CPU_EX_RR_D,    GBC_CPU_TICKS_8,  // 0x1A - Rotate D right
+    GBC_CPU_EX_RR_E,    GBC_CPU_TICKS_8,  // 0x1B - Rotate E right
+    GBC_CPU_EX_RR_H,    GBC_CPU_TICKS_8,  // 0x1C - Rotate H right
+    GBC_CPU_EX_RR_L,    GBC_CPU_TICKS_8,  // 0x1D - Rotate L right
+    GBC_CPU_EX_RR_HLP,  GBC_CPU_TICKS_16, // 0x1E - Rotate value pointed by HL right
+    GBC_CPU_EX_RR_A,    GBC_CPU_TICKS_8,  // 0x1F - Rotate A right
 };

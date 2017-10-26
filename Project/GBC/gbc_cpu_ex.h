@@ -10,6 +10,6 @@ typedef struct GBC_CPU_EX_Instruction_s
 }
 GBC_CPU_EX_Instruction_t;
 
-extern const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[16]; // External declaration for base instruction 0xCB
+extern const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[32]; // External declaration for base instruction 0xCB
 
 #endif
