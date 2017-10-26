@@ -727,10 +727,90 @@ void GBC_CPU_EX_RES_7_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
            GBC_MMU_ReadByte(GBC_CPU_Register.HL) & ~(1 << 7));                               } // 0xBE - Clear (reset) bit 7 of value pointed by HL
 void GBC_CPU_EX_RES_7_A()  { GBC_CPU_Register.A &= ~(1 << 7);                                } // 0xBF - Clear (reset) bit 7 of A
 
+void GBC_CPU_EX_SET_0_B()  { GBC_CPU_Register.B |= (1 << 0);                                  } // 0xC0 - Set bit 0 of B
+void GBC_CPU_EX_SET_0_C()  { GBC_CPU_Register.C |= (1 << 0);                                  } // 0xC1 - Set bit 0 of C
+void GBC_CPU_EX_SET_0_D()  { GBC_CPU_Register.D |= (1 << 0);                                  } // 0xC2 - Set bit 0 of D
+void GBC_CPU_EX_SET_0_E()  { GBC_CPU_Register.E |= (1 << 0);                                  } // 0xC3 - Set bit 0 of E
+void GBC_CPU_EX_SET_0_H()  { GBC_CPU_Register.H |= (1 << 0);                                  } // 0xC4 - Set bit 0 of H
+void GBC_CPU_EX_SET_0_L()  { GBC_CPU_Register.L |= (1 << 0);                                  } // 0xC5 - Set bit 0 of L
+void GBC_CPU_EX_SET_0_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 0));                                 } // 0xC6 - Set bit 0 of value pointed by HL
+void GBC_CPU_EX_SET_0_A()  { GBC_CPU_Register.A |= (1 << 0);                                  } // 0xC7 - Set bit 0 of A
+
+void GBC_CPU_EX_SET_1_B()  { GBC_CPU_Register.B |= (1 << 1);                                  } // 0xC8 - Set bit 1 of B
+void GBC_CPU_EX_SET_1_C()  { GBC_CPU_Register.C |= (1 << 1);                                  } // 0xC9 - Set bit 1 of C
+void GBC_CPU_EX_SET_1_D()  { GBC_CPU_Register.D |= (1 << 1);                                  } // 0xCA - Set bit 1 of D
+void GBC_CPU_EX_SET_1_E()  { GBC_CPU_Register.E |= (1 << 1);                                  } // 0xCB - Set bit 1 of E
+void GBC_CPU_EX_SET_1_H()  { GBC_CPU_Register.H |= (1 << 1);                                  } // 0xCC - Set bit 1 of H
+void GBC_CPU_EX_SET_1_L()  { GBC_CPU_Register.L |= (1 << 1);                                  } // 0xCD - Set bit 1 of L
+void GBC_CPU_EX_SET_1_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 1));                                 } // 0xCE - Set bit 1 of value pointed by HL
+void GBC_CPU_EX_SET_1_A()  { GBC_CPU_Register.A |= (1 << 1);                                  } // 0xCF - Set bit 1 of A
+
+void GBC_CPU_EX_SET_2_B()  { GBC_CPU_Register.B |= (1 << 2);                                  } // 0xD0 - Set bit 2 of B
+void GBC_CPU_EX_SET_2_C()  { GBC_CPU_Register.C |= (1 << 2);                                  } // 0xD1 - Set bit 2 of C
+void GBC_CPU_EX_SET_2_D()  { GBC_CPU_Register.D |= (1 << 2);                                  } // 0xD2 - Set bit 2 of D
+void GBC_CPU_EX_SET_2_E()  { GBC_CPU_Register.E |= (1 << 2);                                  } // 0xD3 - Set bit 2 of E
+void GBC_CPU_EX_SET_2_H()  { GBC_CPU_Register.H |= (1 << 2);                                  } // 0xD4 - Set bit 2 of H
+void GBC_CPU_EX_SET_2_L()  { GBC_CPU_Register.L |= (1 << 2);                                  } // 0xD5 - Set bit 2 of L
+void GBC_CPU_EX_SET_2_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 2));                                 } // 0xD6 - Set bit 2 of value pointed by HL
+void GBC_CPU_EX_SET_2_A()  { GBC_CPU_Register.A |= (1 << 2);                                  } // 0xD7 - Set bit 2 of A
+
+void GBC_CPU_EX_SET_3_B()  { GBC_CPU_Register.B |= (1 << 3);                                  } // 0xD8 - Set bit 3 of B
+void GBC_CPU_EX_SET_3_C()  { GBC_CPU_Register.C |= (1 << 3);                                  } // 0xD9 - Set bit 3 of C
+void GBC_CPU_EX_SET_3_D()  { GBC_CPU_Register.D |= (1 << 3);                                  } // 0xDA - Set bit 3 of D
+void GBC_CPU_EX_SET_3_E()  { GBC_CPU_Register.E |= (1 << 3);                                  } // 0xDB - Set bit 3 of E
+void GBC_CPU_EX_SET_3_H()  { GBC_CPU_Register.H |= (1 << 3);                                  } // 0xDC - Set bit 3 of H
+void GBC_CPU_EX_SET_3_L()  { GBC_CPU_Register.L |= (1 << 3);                                  } // 0xDD - Set bit 3 of L
+void GBC_CPU_EX_SET_3_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 3));                                 } // 0xDE - Set bit 3 of value pointed by HL
+void GBC_CPU_EX_SET_3_A()  { GBC_CPU_Register.A |= (1 << 3);                                  } // 0xDF - Set bit 3 of A
+
+void GBC_CPU_EX_SET_4_B()  { GBC_CPU_Register.B |= (1 << 4);                                  } // 0xD0 - Set bit 4 of B
+void GBC_CPU_EX_SET_4_C()  { GBC_CPU_Register.C |= (1 << 4);                                  } // 0xD1 - Set bit 4 of C
+void GBC_CPU_EX_SET_4_D()  { GBC_CPU_Register.D |= (1 << 4);                                  } // 0xD2 - Set bit 4 of D
+void GBC_CPU_EX_SET_4_E()  { GBC_CPU_Register.E |= (1 << 4);                                  } // 0xD3 - Set bit 4 of E
+void GBC_CPU_EX_SET_4_H()  { GBC_CPU_Register.H |= (1 << 4);                                  } // 0xD4 - Set bit 4 of H
+void GBC_CPU_EX_SET_4_L()  { GBC_CPU_Register.L |= (1 << 4);                                  } // 0xD5 - Set bit 4 of L
+void GBC_CPU_EX_SET_4_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 4));                                 } // 0xD6 - Set bit 4 of value pointed by HL
+void GBC_CPU_EX_SET_4_A()  { GBC_CPU_Register.A |= (1 << 4);                                  } // 0xD7 - Set bit 4 of A
+
+void GBC_CPU_EX_SET_5_B()  { GBC_CPU_Register.B |= (1 << 5);                                  } // 0xE8 - Set bit 5 of B
+void GBC_CPU_EX_SET_5_C()  { GBC_CPU_Register.C |= (1 << 5);                                  } // 0xE9 - Set bit 5 of C
+void GBC_CPU_EX_SET_5_D()  { GBC_CPU_Register.D |= (1 << 5);                                  } // 0xEA - Set bit 5 of D
+void GBC_CPU_EX_SET_5_E()  { GBC_CPU_Register.E |= (1 << 5);                                  } // 0xEB - Set bit 5 of E
+void GBC_CPU_EX_SET_5_H()  { GBC_CPU_Register.H |= (1 << 5);                                  } // 0xEC - Set bit 5 of H
+void GBC_CPU_EX_SET_5_L()  { GBC_CPU_Register.L |= (1 << 5);                                  } // 0xED - Set bit 5 of L
+void GBC_CPU_EX_SET_5_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 5));                                 } // 0xEE - Set bit 5 of value pointed by HL
+void GBC_CPU_EX_SET_5_A()  { GBC_CPU_Register.A |= (1 << 5);                                  } // 0xEF - Set bit 5 of A
+
+void GBC_CPU_EX_SET_6_B()  { GBC_CPU_Register.B |= (1 << 6);                                  } // 0xF0 - Set bit 6 of B
+void GBC_CPU_EX_SET_6_C()  { GBC_CPU_Register.C |= (1 << 6);                                  } // 0xF1 - Set bit 6 of C
+void GBC_CPU_EX_SET_6_D()  { GBC_CPU_Register.D |= (1 << 6);                                  } // 0xF2 - Set bit 6 of D
+void GBC_CPU_EX_SET_6_E()  { GBC_CPU_Register.E |= (1 << 6);                                  } // 0xF3 - Set bit 6 of E
+void GBC_CPU_EX_SET_6_H()  { GBC_CPU_Register.H |= (1 << 6);                                  } // 0xF4 - Set bit 6 of H
+void GBC_CPU_EX_SET_6_L()  { GBC_CPU_Register.L |= (1 << 6);                                  } // 0xF5 - Set bit 6 of L
+void GBC_CPU_EX_SET_6_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 6));                                 } // 0xF6 - Set bit 6 of value pointed by HL
+void GBC_CPU_EX_SET_6_A()  { GBC_CPU_Register.A |= (1 << 6);                                  } // 0xF7 - Set bit 6 of A
+
+void GBC_CPU_EX_SET_7_B()  { GBC_CPU_Register.B |= (1 << 7);                                  } // 0xF8 - Set bit 7 of B
+void GBC_CPU_EX_SET_7_C()  { GBC_CPU_Register.C |= (1 << 7);                                  } // 0xF9 - Set bit 7 of C
+void GBC_CPU_EX_SET_7_D()  { GBC_CPU_Register.D |= (1 << 7);                                  } // 0xFA - Set bit 7 of D
+void GBC_CPU_EX_SET_7_E()  { GBC_CPU_Register.E |= (1 << 7);                                  } // 0xFB - Set bit 7 of E
+void GBC_CPU_EX_SET_7_H()  { GBC_CPU_Register.H |= (1 << 7);                                  } // 0xFC - Set bit 7 of H
+void GBC_CPU_EX_SET_7_L()  { GBC_CPU_Register.L |= (1 << 7);                                  } // 0xFD - Set bit 7 of L
+void GBC_CPU_EX_SET_7_HLP(){ GBC_MMU_WriteByte(GBC_CPU_Register.HL,
+           GBC_MMU_ReadByte(GBC_CPU_Register.HL) | (1 << 7));                                 } // 0xFE - Set bit 7 of value pointed by HL
+void GBC_CPU_EX_SET_7_A()  { GBC_CPU_Register.A |= (1 << 7);                                  } // 0xFF - Set bit 7 of A
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[192] =
+const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[256] =
 {
     GBC_CPU_EX_RLC_B,     GBC_CPU_TICKS_8,  // 0x00 - Rotate B left with carry
     GBC_CPU_EX_RLC_C,     GBC_CPU_TICKS_8,  // 0x01 - Rotate C left with carry
@@ -924,4 +1004,68 @@ const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[192] =
     GBC_CPU_EX_RES_7_L,   GBC_CPU_TICKS_8,  // 0xBD - Clear (reset) bit 7 of L
     GBC_CPU_EX_RES_7_HLP, GBC_CPU_TICKS_16, // 0xBE - Clear (reset) bit 7 of value pointed by HL
     GBC_CPU_EX_RES_7_A,   GBC_CPU_TICKS_8,  // 0xBF - Clear (reset) bit 7 of A
+    GBC_CPU_EX_SET_0_B,   GBC_CPU_TICKS_8,  // 0xC0 - Set bit 0 of B
+    GBC_CPU_EX_SET_0_C,   GBC_CPU_TICKS_8,  // 0xC1 - Set bit 0 of C
+    GBC_CPU_EX_SET_0_D,   GBC_CPU_TICKS_8,  // 0xC2 - Set bit 0 of D
+    GBC_CPU_EX_SET_0_E,   GBC_CPU_TICKS_8,  // 0xC3 - Set bit 0 of E
+    GBC_CPU_EX_SET_0_H,   GBC_CPU_TICKS_8,  // 0xC4 - Set bit 0 of H
+    GBC_CPU_EX_SET_0_L,   GBC_CPU_TICKS_8,  // 0xC5 - Set bit 0 of L
+    GBC_CPU_EX_SET_0_HLP, GBC_CPU_TICKS_16, // 0xC6 - Set bit 0 of value pointed by HL
+    GBC_CPU_EX_SET_0_A,   GBC_CPU_TICKS_8,  // 0xC7 - Set bit 0 of A
+    GBC_CPU_EX_SET_1_B,   GBC_CPU_TICKS_8,  // 0xC8 - Set bit 1 of B
+    GBC_CPU_EX_SET_1_C,   GBC_CPU_TICKS_8,  // 0xC9 - Set bit 1 of C
+    GBC_CPU_EX_SET_1_D,   GBC_CPU_TICKS_8,  // 0xCA - Set bit 1 of D
+    GBC_CPU_EX_SET_1_E,   GBC_CPU_TICKS_8,  // 0xCB - Set bit 1 of E
+    GBC_CPU_EX_SET_1_H,   GBC_CPU_TICKS_8,  // 0xCC - Set bit 1 of H
+    GBC_CPU_EX_SET_1_L,   GBC_CPU_TICKS_8,  // 0xCD - Set bit 1 of L
+    GBC_CPU_EX_SET_1_HLP, GBC_CPU_TICKS_16, // 0xCE - Set bit 1 of value pointed by HL
+    GBC_CPU_EX_SET_1_A,   GBC_CPU_TICKS_8,  // 0xCF - Set bit 1 of A
+    GBC_CPU_EX_SET_2_B,   GBC_CPU_TICKS_8,  // 0xD0 - Set bit 2 of B
+    GBC_CPU_EX_SET_2_C,   GBC_CPU_TICKS_8,  // 0xD1 - Set bit 2 of C
+    GBC_CPU_EX_SET_2_D,   GBC_CPU_TICKS_8,  // 0xD2 - Set bit 2 of D
+    GBC_CPU_EX_SET_2_E,   GBC_CPU_TICKS_8,  // 0xD3 - Set bit 2 of E
+    GBC_CPU_EX_SET_2_H,   GBC_CPU_TICKS_8,  // 0xD4 - Set bit 2 of H
+    GBC_CPU_EX_SET_2_L,   GBC_CPU_TICKS_8,  // 0xD5 - Set bit 2 of L
+    GBC_CPU_EX_SET_2_HLP, GBC_CPU_TICKS_16, // 0xD6 - Set bit 2 of value pointed by HL
+    GBC_CPU_EX_SET_2_A,   GBC_CPU_TICKS_8,  // 0xD7 - Set bit 2 of A
+    GBC_CPU_EX_SET_3_B,   GBC_CPU_TICKS_8,  // 0xD8 - Set bit 3 of B
+    GBC_CPU_EX_SET_3_C,   GBC_CPU_TICKS_8,  // 0xD9 - Set bit 3 of C
+    GBC_CPU_EX_SET_3_D,   GBC_CPU_TICKS_8,  // 0xDA - Set bit 3 of D
+    GBC_CPU_EX_SET_3_E,   GBC_CPU_TICKS_8,  // 0xDB - Set bit 3 of E
+    GBC_CPU_EX_SET_3_H,   GBC_CPU_TICKS_8,  // 0xDC - Set bit 3 of H
+    GBC_CPU_EX_SET_3_L,   GBC_CPU_TICKS_8,  // 0xDD - Set bit 3 of L
+    GBC_CPU_EX_SET_3_HLP, GBC_CPU_TICKS_16, // 0xDE - Set bit 3 of value pointed by HL
+    GBC_CPU_EX_SET_3_A,   GBC_CPU_TICKS_8,  // 0xDF - Set bit 3 of A
+    GBC_CPU_EX_SET_4_B,   GBC_CPU_TICKS_8,  // 0xE0 - Set bit 4 of B
+    GBC_CPU_EX_SET_4_C,   GBC_CPU_TICKS_8,  // 0xE1 - Set bit 4 of C
+    GBC_CPU_EX_SET_4_D,   GBC_CPU_TICKS_8,  // 0xE2 - Set bit 4 of D
+    GBC_CPU_EX_SET_4_E,   GBC_CPU_TICKS_8,  // 0xE3 - Set bit 4 of E
+    GBC_CPU_EX_SET_4_H,   GBC_CPU_TICKS_8,  // 0xE4 - Set bit 4 of H
+    GBC_CPU_EX_SET_4_L,   GBC_CPU_TICKS_8,  // 0xE5 - Set bit 4 of L
+    GBC_CPU_EX_SET_4_HLP, GBC_CPU_TICKS_16, // 0xE6 - Set bit 4 of value pointed by HL
+    GBC_CPU_EX_SET_4_A,   GBC_CPU_TICKS_8,  // 0xE7 - Set bit 4 of A
+    GBC_CPU_EX_SET_5_B,   GBC_CPU_TICKS_8,  // 0xE8 - Set bit 5 of B
+    GBC_CPU_EX_SET_5_C,   GBC_CPU_TICKS_8,  // 0xE9 - Set bit 5 of C
+    GBC_CPU_EX_SET_5_D,   GBC_CPU_TICKS_8,  // 0xEA - Set bit 5 of D
+    GBC_CPU_EX_SET_5_E,   GBC_CPU_TICKS_8,  // 0xEB - Set bit 5 of E
+    GBC_CPU_EX_SET_5_H,   GBC_CPU_TICKS_8,  // 0xEC - Set bit 5 of H
+    GBC_CPU_EX_SET_5_L,   GBC_CPU_TICKS_8,  // 0xED - Set bit 5 of L
+    GBC_CPU_EX_SET_5_HLP, GBC_CPU_TICKS_16, // 0xEE - Set bit 5 of value pointed by HL
+    GBC_CPU_EX_SET_5_A,   GBC_CPU_TICKS_8,  // 0xEF - Set bit 5 of A
+    GBC_CPU_EX_SET_6_B,   GBC_CPU_TICKS_8,  // 0xF0 - Set bit 6 of B
+    GBC_CPU_EX_SET_6_C,   GBC_CPU_TICKS_8,  // 0xF1 - Set bit 6 of C
+    GBC_CPU_EX_SET_6_D,   GBC_CPU_TICKS_8,  // 0xF2 - Set bit 6 of D
+    GBC_CPU_EX_SET_6_E,   GBC_CPU_TICKS_8,  // 0xF3 - Set bit 6 of E
+    GBC_CPU_EX_SET_6_H,   GBC_CPU_TICKS_8,  // 0xF4 - Set bit 6 of H
+    GBC_CPU_EX_SET_6_L,   GBC_CPU_TICKS_8,  // 0xF5 - Set bit 6 of L
+    GBC_CPU_EX_SET_6_HLP, GBC_CPU_TICKS_16, // 0xF6 - Set bit 6 of value pointed by HL
+    GBC_CPU_EX_SET_6_A,   GBC_CPU_TICKS_8,  // 0xF7 - Set bit 6 of A
+    GBC_CPU_EX_SET_7_B,   GBC_CPU_TICKS_8,  // 0xF8 - Set bit 7 of B
+    GBC_CPU_EX_SET_7_C,   GBC_CPU_TICKS_8,  // 0xF9 - Set bit 7 of C
+    GBC_CPU_EX_SET_7_D,   GBC_CPU_TICKS_8,  // 0xFA - Set bit 7 of D
+    GBC_CPU_EX_SET_7_E,   GBC_CPU_TICKS_8,  // 0xFB - Set bit 7 of E
+    GBC_CPU_EX_SET_7_H,   GBC_CPU_TICKS_8,  // 0xFC - Set bit 7 of H
+    GBC_CPU_EX_SET_7_L,   GBC_CPU_TICKS_8,  // 0xFD - Set bit 7 of L
+    GBC_CPU_EX_SET_7_HLP, GBC_CPU_TICKS_16, // 0xFE - Set bit 7 of value pointed by HL
+    GBC_CPU_EX_SET_7_A,   GBC_CPU_TICKS_8,  // 0xFF - Set bit 7 of A
 };
