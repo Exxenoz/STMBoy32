@@ -194,6 +194,51 @@ uint8_t GBC_CPU_EX_SRA(uint8_t value)
     return value;
 }
 
+uint8_t GBC_CPU_EX_SWAP(uint8_t value)              // Swap upper & lower nibbles of value
+{
+    value = ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
+uint8_t GBC_CPU_EX_SRL(uint8_t value)               // Shift value right into carry. MSB set to 0.
+{
+    if (value & 0x01)
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+    }
+
+    value >>= 1;
+
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+
+    if (value)
+    {
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
+    }
+    else
+    {
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+    }
+
+    return value;
+}
+
 void GBC_CPU_EX_RLC_B()                     // 0x00 - Rotate B left with carry
 {
     GBC_CPU_Register.B = GBC_CPU_EX_RLC(GBC_CPU_Register.B);
@@ -434,10 +479,90 @@ void GBC_CPU_EX_SRA_A()                     // 0x2F - Shift A right preserving s
     GBC_CPU_Register.A = GBC_CPU_EX_SRA(GBC_CPU_Register.A);
 }
 
+void GBC_CPU_EX_SWAP_B()                    // 0x30 - Swap nibbles in B
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_SWAP(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_SWAP_C()                    // 0x31 - Swap nibbles in C
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_SWAP(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_SWAP_D()                    // 0x32 - Swap nibbles in D
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_SWAP(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_SWAP_E()                    // 0x33 - Swap nibbles in E
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_SWAP(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_SWAP_H()                    // 0x34 - Swap nibbles in H
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_SWAP(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_SWAP_L()                    // 0x35 - Swap nibbles in L
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_SWAP(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_SWAP_HLP()                  // 0x36 - Swap nibbles in value pointed by HL
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_SWAP(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_SWAP_A()                    // 0x37 - Swap nibbles in A
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_SWAP(GBC_CPU_Register.A);
+}
+
+void GBC_CPU_EX_SRL_B()                     // 0x38 - Shift B right
+{
+    GBC_CPU_Register.B = GBC_CPU_EX_SRL(GBC_CPU_Register.B);
+}
+
+void GBC_CPU_EX_SRL_C()                     // 0x39 - Shift C right
+{
+    GBC_CPU_Register.C = GBC_CPU_EX_SRL(GBC_CPU_Register.C);
+}
+
+void GBC_CPU_EX_SRL_D()                     // 0x3A - Shift D right
+{
+    GBC_CPU_Register.D = GBC_CPU_EX_SRL(GBC_CPU_Register.D);
+}
+
+void GBC_CPU_EX_SRL_E()                     // 0x3B - Shift E right
+{
+    GBC_CPU_Register.E = GBC_CPU_EX_SRL(GBC_CPU_Register.E);
+}
+
+void GBC_CPU_EX_SRL_H()                     // 0x3C - Shift H right
+{
+    GBC_CPU_Register.H = GBC_CPU_EX_SRL(GBC_CPU_Register.H);
+}
+
+void GBC_CPU_EX_SRL_L()                     // 0x3D - Shift L right
+{
+    GBC_CPU_Register.L = GBC_CPU_EX_SRL(GBC_CPU_Register.L);
+}
+
+void GBC_CPU_EX_SRL_HLP()                   // 0x3E - Shift value pointed by HL right
+{
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_EX_SRL(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+}
+
+void GBC_CPU_EX_SRL_A()                     // 0x3F - Shift A right
+{
+    GBC_CPU_Register.A = GBC_CPU_EX_SRL(GBC_CPU_Register.A);
+}
+
 /*******************************************************************************/
 /* Opcode table and comments from http://imrannazar.com/Gameboy-Z80-Opcode-Map */
 /*******************************************************************************/
-const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[48] =
+const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[64] =
 {
     GBC_CPU_EX_RLC_B,   GBC_CPU_TICKS_8,  // 0x00 - Rotate B left with carry
     GBC_CPU_EX_RLC_C,   GBC_CPU_TICKS_8,  // 0x01 - Rotate C left with carry
@@ -487,4 +612,20 @@ const GBC_CPU_EX_Instruction_t GBC_CPU_EX_Instructions[48] =
     GBC_CPU_EX_SRA_L,   GBC_CPU_TICKS_8,  // 0x2D - Shift L right preserving sign
     GBC_CPU_EX_SRA_HLP, GBC_CPU_TICKS_16, // 0x2E - Shift value pointed by HL right preserving sign
     GBC_CPU_EX_SRA_A,   GBC_CPU_TICKS_8,  // 0x2F - Shift A right preserving sign
+    GBC_CPU_EX_SWAP_B,  GBC_CPU_TICKS_8,  // 0x30 - Swap nibbles in B
+    GBC_CPU_EX_SWAP_C,  GBC_CPU_TICKS_8,  // 0x31 - Swap nibbles in C
+    GBC_CPU_EX_SWAP_D,  GBC_CPU_TICKS_8,  // 0x32 - Swap nibbles in D
+    GBC_CPU_EX_SWAP_E,  GBC_CPU_TICKS_8,  // 0x33 - Swap nibbles in E
+    GBC_CPU_EX_SWAP_H,  GBC_CPU_TICKS_8,  // 0x34 - Swap nibbles in H
+    GBC_CPU_EX_SWAP_L,  GBC_CPU_TICKS_8,  // 0x35 - Swap nibbles in L
+    GBC_CPU_EX_SWAP_HLP,GBC_CPU_TICKS_16, // 0x36 - Swap nibbles in value pointed by HL
+    GBC_CPU_EX_SWAP_A,  GBC_CPU_TICKS_8,  // 0x37 - Swap nibbles in A
+    GBC_CPU_EX_SRL_B,   GBC_CPU_TICKS_8,  // 0x38 - Shift B right
+    GBC_CPU_EX_SRL_C,   GBC_CPU_TICKS_8,  // 0x39 - Shift B right
+    GBC_CPU_EX_SRL_D,   GBC_CPU_TICKS_8,  // 0x3A - Shift B right
+    GBC_CPU_EX_SRL_E,   GBC_CPU_TICKS_8,  // 0x3B - Shift B right
+    GBC_CPU_EX_SRL_H,   GBC_CPU_TICKS_8,  // 0x3C - Shift B right
+    GBC_CPU_EX_SRL_L,   GBC_CPU_TICKS_8,  // 0x3D - Shift B right
+    GBC_CPU_EX_SRL_HLP, GBC_CPU_TICKS_16, // 0x3E - Shift B right
+    GBC_CPU_EX_SRL_A,   GBC_CPU_TICKS_8,  // 0x3F - Shift B right
 };
