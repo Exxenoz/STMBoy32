@@ -126,8 +126,37 @@ typedef struct GBC_MMU_Memory_s
             uint8_t IO_Unk1[7];
             uint8_t InterruptFlags;          // 0xFF0F
             uint8_t IO_Unk2[48];
-            uint8_t GPUControlFlags;         // 0xFF40
-            uint8_t GPUStatus;               // 0xFF41
+            union
+            {
+                uint8_t GPUControlFlags;     // 0xFF40
+
+                struct
+                {
+                    uint8_t BGDisplay                  : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
+                    uint8_t SpriteDisplayEnable        : 1; // (0 = Off, 1 = On)
+                    uint8_t SpriteSize                 : 1; // (0 = 8x8, 1 = 8x16)
+                    uint8_t BGTileMapDisplaySelect     : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    uint8_t BGAndWindowDisplaySelect   : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
+                    uint8_t WindowDisplayEnable        : 1; // (0 = Off, 1 = On)
+                    uint8_t WindowTileMapDisplaySelect : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    uint8_t DisplayEnable              : 1; // (0 = Off, 1 = On)
+                };
+            };
+            union
+            {
+                uint8_t GPUStatus;           // 0xFF41
+
+                struct
+                {
+                    uint8_t GPUMode              : 2;
+                    uint8_t Coincidence          : 1;
+                    uint8_t HBlankInterrupt      : 1;
+                    uint8_t VBlankInterrupt      : 1;
+                    uint8_t OAMInterrupt         : 1;
+                    uint8_t CoincidenceInterrupt : 1;
+                    uint8_t                      : 1;
+                };
+            };
             uint8_t ScrollY;                 // 0xFF42
             uint8_t ScrollX;                 // 0xFF43
             uint8_t Scanline;                // 0xFF44
