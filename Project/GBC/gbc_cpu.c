@@ -1,6 +1,7 @@
 #include "gbc_cpu.h"
 #include "gbc_cpu_ex.h"
 #include "gbc_mmu.h"
+#include "string.h"
 
 GBC_CPU_Register_t GBC_CPU_Register;        // GBC CPU register
 uint32_t GBC_CPU_Ticks = 0;                 // GBC CPU ticks
@@ -2194,6 +2195,15 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[256] =
     { GBC_CPU_CP_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xFE - Compare 8-bit value immediate against A
     { GBC_CPU_RST_38H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xFF - Call routine at address 0038h
 };
+
+void GBC_CPU_Initialize()
+{
+    memset(&GBC_CPU_Register, 0, sizeof(GBC_CPU_Register_t));
+    GBC_CPU_Ticks = 0;
+    GBC_CPU_InterruptMasterEnable = true;
+    GBC_CPU_Halted = false;
+    GBC_CPU_Stopped = false;
+}
 
 void GBC_CPU_RST_40H()      // Start VBlank Handler
 {

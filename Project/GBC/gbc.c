@@ -1,4 +1,5 @@
 #include "gbc.h"
+#include "gbc_cpu.h"
 #include "gbc_mmu.h"
 #include "cmod.h"
 #include "sdc.h"
@@ -21,6 +22,8 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
         return GBC_LOAD_RESULT_NO_VALID_CARTRIDGE;
     }
 
+    GBC_CPU_Initialize();
+
     GBC_LoadState = GBC_LOAD_STATE_CARTRIDGE;
 
     return GBC_LOAD_RESULT_OK;
@@ -39,6 +42,8 @@ GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
     {
         return GBC_LOAD_RESULT_NO_ROM_FILE;
     }
+
+    GBC_CPU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_SDC;
 

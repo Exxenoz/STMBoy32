@@ -104,6 +104,7 @@ enum GBC_CPU_Flags_e
 
 extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
 
+void GBC_CPU_Initialize(void);
 void GBC_CPU_Step(void);
 
 #endif
