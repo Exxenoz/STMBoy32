@@ -132,8 +132,8 @@ typedef struct GBC_MMU_Memory_s
             uint8_t ScrollX;                 // 0xFF43
             uint8_t Scanline;                // 0xFF44
             uint8_t ScanlineCompare;         // 0xFF45
-            uint8_t DMATransferStartAddress; // 0xFF46
-            uint8_t GPUBackgroundPalette;    // 0xFF47                                           - Non GBC mode only
+            uint8_t OAMTransferStartAddress; // 0xFF46
+            uint8_t BackgroundPalette;       // 0xFF47                                           - Non GBC mode only
             uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
             uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
             uint8_t WindowYPosition;         // 0xFF4A
