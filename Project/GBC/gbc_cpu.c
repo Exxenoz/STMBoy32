@@ -5,6 +5,7 @@
 GBC_CPU_Register_t GBC_CPU_Register;        // GBC CPU register
 uint32_t GBC_CPU_Ticks = 0;                 // GBC CPU ticks
 bool GBC_CPU_InterruptMasterEnable = true;  // GBC CPU interrupt master
+bool GBC_CPU_Halted = false;                // GBC CPU halted state
 bool GBC_CPU_Stopped = false;               // GBC CPU stopped state
 
 uint8_t GBC_CPU_INC(uint8_t value)
@@ -1135,7 +1136,7 @@ void GBC_CPU_LD_HLP_L()                 // 0x75 - Copy L to address pointed by H
 
 void GBC_CPU_HALT()                     // 0x76 - Halt processor
 {
-    // ToDo
+    GBC_CPU_Halted = true;
 }
 
 void GBC_CPU_LD_HLP_A()                 // 0x77 - Copy A to address pointed by HL
@@ -2251,37 +2252,46 @@ void GBC_CPU_Step()
         return;
     }
 
-    GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(GBC_CPU_Register.PC++)];
-
-    // Instruction handling
-    switch (instruction.OperandBytes)
+    if (!GBC_CPU_Halted)    // If not waiting for interrupt to happen
     {
-        case GBC_CPU_OPERAND_BYTES_0:
+        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(GBC_CPU_Register.PC++)];
+
+        // Instruction handling
+        switch (instruction.OperandBytes)
         {
-            ((void (*)(void))instruction.Handler)();
+            case GBC_CPU_OPERAND_BYTES_0:
+            {
+                ((void (*)(void))instruction.Handler)();
 
-            break;
+                break;
+            }
+            case GBC_CPU_OPERAND_BYTES_1:
+            {
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC++;
+
+                ((void (*)(uint8_t))instruction.Handler)(operand);
+
+                break;
+            }
+            case GBC_CPU_OPERAND_BYTES_2:
+            {
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                ((void (*)(uint16_t))instruction.Handler)(operand);
+
+                break;
+            }
         }
-        case GBC_CPU_OPERAND_BYTES_1:
-        {
-            uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
 
-            GBC_CPU_Register.PC++;
-
-            ((void (*)(uint8_t))instruction.Handler)(operand);
-
-            break;
-        }
-        case GBC_CPU_OPERAND_BYTES_2:
-        {
-            uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
-
-            GBC_CPU_Register.PC += 2;
-
-            ((void (*)(uint16_t))instruction.Handler)(operand);
-
-            break;
-        }
+        GBC_CPU_Ticks += instruction.Ticks;
+    }
+    else
+    {
+        GBC_CPU_Ticks += 2; // NOP
     }
 
     // Interrupt handling
@@ -2289,6 +2299,8 @@ void GBC_CPU_Step()
         GBC_MMU_Memory.InterruptEnable &&   // At least one interrupt can be triggered
         GBC_MMU_Memory.InterruptFlags)      // At least one interrupt has happened
     {
+        GBC_CPU_Halted = false;
+
         uint8_t interrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
 
         if (interrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
@@ -2317,6 +2329,4 @@ void GBC_CPU_Step()
             GBC_CPU_RST_60H(); // Start Joypad Handler
         }
     }
-
-    GBC_CPU_Ticks += instruction.Ticks;
 }
