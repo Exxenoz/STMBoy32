@@ -493,6 +493,7 @@ void GBC_CPU_STOP()                     // 0x10 - Stop processor
     {
         if (GBC_MMU_Memory.PrepareSpeedSwitch)
         {
+            GBC_MMU_Memory.PrepareSpeedSwitch = 0;
             GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
         }
     }
