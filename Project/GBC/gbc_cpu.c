@@ -3,11 +3,12 @@
 #include "gbc_mmu.h"
 #include "string.h"
 
-GBC_CPU_Register_t GBC_CPU_Register;        // GBC CPU register
-uint32_t GBC_CPU_Ticks = 0;                 // GBC CPU ticks
-bool GBC_CPU_InterruptMasterEnable = true;  // GBC CPU interrupt master
-bool GBC_CPU_Halted = false;                // GBC CPU halted state
-bool GBC_CPU_Stopped = false;               // GBC CPU stopped state
+GBC_CPU_Register_t GBC_CPU_Register;       // Register
+uint32_t GBC_CPU_Ticks = 0;                // Ticks
+uint32_t GBC_CPU_StepTicks = 0;            // Step ticks
+bool GBC_CPU_InterruptMasterEnable = true; // Interrupt master
+bool GBC_CPU_Halted = false;               // Halted state
+bool GBC_CPU_Stopped = false;              // Stopped state
 
 uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -629,12 +630,12 @@ void GBC_CPU_JR_NZ_X(int8_t operand)    // 0x20 - Relative jump by signed immedi
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
     else
     {
         GBC_CPU_Register.PC += operand;
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -731,11 +732,11 @@ void GBC_CPU_JR_Z_X(int8_t operand)     // 0x28 - Relative jump by signed immedi
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC += operand;
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
 }
 
@@ -785,12 +786,12 @@ void GBC_CPU_JR_NC_X(int8_t operand)    // 0x30 - Relative jump by signed immedi
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
     else
     {
         GBC_CPU_Register.PC += operand;
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -839,11 +840,11 @@ void GBC_CPU_JR_C_X(int8_t operand)     // 0x38 - Relative jump by signed immedi
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC += operand;
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
 }
 
@@ -1504,13 +1505,13 @@ void GBC_CPU_RET_NZ()                   // 0xC0 - Return if last result was not 
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
     else
     {
         
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_Ticks += 20;
+        GBC_CPU_StepTicks += 20;
     }
 }
 
@@ -1523,12 +1524,12 @@ void GBC_CPU_JP_NZ_XX(uint16_t operand) // 0xC2 - Absolute jump to 16-bit locati
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 16;
+        GBC_CPU_StepTicks += 16;
     }
 }
 
@@ -1541,13 +1542,13 @@ void GBC_CPU_CALL_NZ_XX(uint16_t operand)   // 0xC4 - Call routine at 16-bit loc
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 24;
+        GBC_CPU_StepTicks += 24;
     }
 }
 
@@ -1572,11 +1573,11 @@ void GBC_CPU_RET_Z()                    // 0xC8 - Return if last result was zero
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_Ticks += 20;
+        GBC_CPU_StepTicks += 20;
     }
     else
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
 }
 
@@ -1590,11 +1591,11 @@ void GBC_CPU_JP_Z_XX(uint16_t operand)  // 0xCA - Absolute jump to 16-bit locati
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 16;
+        GBC_CPU_StepTicks += 16;
     }
     else
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1604,7 +1605,7 @@ void GBC_CPU_EXT_OPS(uint8_t operand)   // 0xCB - Extended operations (two-byte 
 
     ((void (*)(void))instruction.Handler)();                                    // Execute extended instruction
 
-    GBC_CPU_Ticks += instruction.Ticks;                                         // Add extended instruction ticks
+    GBC_CPU_StepTicks += instruction.Ticks;                                     // Add extended instruction ticks
 }
 
 void GBC_CPU_CALL_Z_XX(uint16_t operand)// 0xCC - Call routine at 16-bit location if last result was zero
@@ -1613,11 +1614,11 @@ void GBC_CPU_CALL_Z_XX(uint16_t operand)// 0xCC - Call routine at 16-bit locatio
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 24;
+        GBC_CPU_StepTicks += 24;
     }
     else
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1642,13 +1643,13 @@ void GBC_CPU_RET_NC()                   // 0xD0 - Return if last result caused n
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
     else
     {
         
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_Ticks += 20;
+        GBC_CPU_StepTicks += 20;
     }
 }
 
@@ -1661,12 +1662,12 @@ void GBC_CPU_JP_NC_XX(uint16_t operand) // 0xD2 - Absolute jump to 16-bit locati
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 16;
+        GBC_CPU_StepTicks += 16;
     }
 }
 
@@ -1674,13 +1675,13 @@ void GBC_CPU_CALL_NC_XX(uint16_t operand)// 0xD4 - Call routine at 16-bit locati
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
     else
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 24;
+        GBC_CPU_StepTicks += 24;
     }
 }
 
@@ -1705,11 +1706,11 @@ void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused c
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_Ticks += 20;
+        GBC_CPU_StepTicks += 20;
     }
     else
     {
-        GBC_CPU_Ticks += 8;
+        GBC_CPU_StepTicks += 8;
     }
 }
 
@@ -1724,11 +1725,11 @@ void GBC_CPU_JP_C_XX(uint16_t operand)  // 0xDA - Absolute jump to 16-bit locati
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 16;
+        GBC_CPU_StepTicks += 16;
     }
     else
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1738,11 +1739,11 @@ void GBC_CPU_CALL_C_XX(uint16_t operand)// 0xDC - Call routine at 16-bit locatio
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_Ticks += 24;
+        GBC_CPU_StepTicks += 24;
     }
     else
     {
-        GBC_CPU_Ticks += 12;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -2200,6 +2201,7 @@ void GBC_CPU_Initialize()
 {
     memset(&GBC_CPU_Register, 0, sizeof(GBC_CPU_Register_t));
     GBC_CPU_Ticks = 0;
+    GBC_CPU_StepTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
     GBC_CPU_Stopped = false;
@@ -2212,7 +2214,7 @@ void GBC_CPU_RST_40H()      // Start VBlank Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x40;
 
-    GBC_CPU_Ticks += 12;
+    GBC_CPU_StepTicks += 12;
 }
 
 void GBC_CPU_RST_48H()      // Start LCD-Stat Handler
@@ -2222,7 +2224,7 @@ void GBC_CPU_RST_48H()      // Start LCD-Stat Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x48;
 
-    GBC_CPU_Ticks += 12;
+    GBC_CPU_StepTicks += 12;
 }
 
 void GBC_CPU_RST_50H()      // Start Timer Handler
@@ -2232,7 +2234,7 @@ void GBC_CPU_RST_50H()      // Start Timer Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x50;
 
-    GBC_CPU_Ticks += 12;
+    GBC_CPU_StepTicks += 12;
 }
 
 void GBC_CPU_RST_58H()      // Start Serial Handler
@@ -2242,7 +2244,7 @@ void GBC_CPU_RST_58H()      // Start Serial Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x58;
 
-    GBC_CPU_Ticks += 12;
+    GBC_CPU_StepTicks += 12;
 }
 
 void GBC_CPU_RST_60H()      // Start Joypad Handler
@@ -2252,7 +2254,7 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x60;
 
-    GBC_CPU_Ticks += 12;
+    GBC_CPU_StepTicks += 12;
 }
 
 void GBC_CPU_Step()
@@ -2261,6 +2263,8 @@ void GBC_CPU_Step()
     {
         return;
     }
+
+    GBC_CPU_StepTicks = 0;
 
     if (!GBC_CPU_Halted)    // If not waiting for interrupt to happen
     {
@@ -2297,11 +2301,11 @@ void GBC_CPU_Step()
             }
         }
 
-        GBC_CPU_Ticks += instruction.Ticks;
+        GBC_CPU_StepTicks += instruction.Ticks;
     }
     else
     {
-        GBC_CPU_Ticks += 2; // NOP
+        GBC_CPU_StepTicks += 2; // NOP
     }
 
     // Interrupt handling
@@ -2339,4 +2343,6 @@ void GBC_CPU_Step()
             GBC_CPU_RST_60H(); // Start Joypad Handler
         }
     }
+
+    GBC_CPU_Ticks += GBC_CPU_StepTicks;
 }

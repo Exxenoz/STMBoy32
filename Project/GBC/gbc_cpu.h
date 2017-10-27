@@ -103,6 +103,7 @@ enum GBC_CPU_Flags_e
 #define GBC_CPU_FLAGS_HAS(FLAGS)   (GBC_CPU_Register.F & (FLAGS))
 
 extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
+extern uint32_t GBC_CPU_StepTicks;          // External declaration for GPU file
 
 void GBC_CPU_Initialize(void);
 void GBC_CPU_Step(void);
