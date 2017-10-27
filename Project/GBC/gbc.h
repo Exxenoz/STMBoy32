@@ -29,4 +29,6 @@ bool GBC_IsLoaded(void);
 bool GBC_IsLoadedFromCartridge(void);
 bool GBC_IsLoadedFromSDC(void);
 
+void GBC_Update(void);
+
 #endif

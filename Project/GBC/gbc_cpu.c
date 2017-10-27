@@ -8,7 +8,6 @@ uint32_t GBC_CPU_Ticks = 0;                // Ticks
 uint32_t GBC_CPU_StepTicks = 0;            // Step ticks
 bool GBC_CPU_InterruptMasterEnable = true; // Interrupt master
 bool GBC_CPU_Halted = false;               // Halted state
-bool GBC_CPU_Stopped = false;              // Stopped state
 
 uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -490,7 +489,13 @@ void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
 
 void GBC_CPU_STOP()                     // 0x10 - Stop processor
 {
-    GBC_CPU_Stopped = true;
+    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    {
+        if (GBC_MMU_Memory.PrepareSpeedSwitch)
+        {
+            GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
+        }
+    }
 }
 
 void GBC_CPU_LD_DE_XX(uint16_t operand) // 0x11 - Load 16-bit immediate into DE
@@ -2204,7 +2209,6 @@ void GBC_CPU_Initialize()
     GBC_CPU_StepTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
-    GBC_CPU_Stopped = false;
 }
 
 void GBC_CPU_RST_40H()      // Start VBlank Handler
@@ -2259,11 +2263,6 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
 
 void GBC_CPU_Step()
 {
-    if (GBC_CPU_Stopped)
-    {
-        return;
-    }
-
     GBC_CPU_StepTicks = 0;
 
     if (!GBC_CPU_Halted)    // If not waiting for interrupt to happen
@@ -2344,5 +2343,6 @@ void GBC_CPU_Step()
         }
     }
 
+    GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
     GBC_CPU_Ticks += GBC_CPU_StepTicks;
 }

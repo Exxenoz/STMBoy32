@@ -1,5 +1,6 @@
 #include "gbc.h"
 #include "gbc_cpu.h"
+#include "gbc_gpu.h"
 #include "gbc_mmu.h"
 #include "cmod.h"
 #include "sdc.h"
@@ -70,4 +71,19 @@ bool GBC_IsLoadedFromCartridge(void)
 bool GBC_IsLoadedFromSDC(void)
 {
     return GBC_LoadState == GBC_LOAD_STATE_SDC ? true : false;
+}
+
+void GBC_Update(void)
+{
+    // 70224 ticks correspond to exactly one frame
+    while (GBC_CPU_Ticks < 70224)
+    {
+        GBC_CPU_Step();
+        GBC_GPU_Step();
+    }
+
+    if (GBC_CPU_Ticks >= 70224)
+    {
+        GBC_CPU_Ticks -= 70224;
+    }
 }

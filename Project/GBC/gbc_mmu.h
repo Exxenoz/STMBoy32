@@ -3,6 +3,12 @@
 
 #include "common.h"
 
+enum GBC_MMU_CGBFlag_e
+{
+    GBC_MMU_CGB_FLAG_SUPPORTED = 0x80,
+    GBC_MMU_CGB_FLAG_ONLY      = 0xC0,
+};
+
 typedef enum GBC_MMU_CartridgeType_e
 {
     GBC_MMU_CARTRIDGE_TYPE_ROM_ONLY                       = 0x00,
@@ -62,6 +68,12 @@ enum GBC_MMU_InterruptFlags_e
     GBC_MMU_INTERRUPT_FLAGS_TIMER    =  4,
     GBC_MMU_INTERRUPT_FLAGS_SERIAL   =  8,
     GBC_MMU_INTERRUPT_FLAGS_JOYPAD   = 16,
+};
+
+enum GBC_MMU_CurrentSpeed_e
+{
+    GBC_MMU_CURRENT_SPEED_SINGLE = 0,
+    GBC_MMU_CURRENT_SPEED_DOUBLE = 1,
 };
 
 typedef struct GBC_MMU_Memory_s
@@ -168,7 +180,17 @@ typedef struct GBC_MMU_Memory_s
             uint8_t WindowYPosition;         // 0xFF4A
             uint8_t WindowXPositionMinus7;   // 0xFF4B
             uint8_t IO_Unk5;
-            uint8_t PrepareSpeedSwitch;      // 0xFF4D                                           - Only in GBC mode
+            union
+            {
+                uint8_t SpeedSwitch;         // 0xFF4D                                           - Only in GBC mode
+
+                struct
+                {
+                    uint8_t PrepareSpeedSwitch : 1; // (0 = No, 1 = Prepare)
+                    uint8_t                    : 6;
+                    uint8_t CurrentSpeed       : 1; // (0 = Normal, 1 = Double)
+                };
+            };
             uint8_t IO_Unk11;
             uint8_t VRAMBankID;              // 0xFF4F                                           - Only in GBC mode
             uint8_t IO_Unk8;
