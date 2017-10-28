@@ -1,4 +1,5 @@
 #include "cmod.h"
+#include "sdc.h"
 #include "ff.h"
 #include "string.h"
 
@@ -76,6 +77,12 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
 
 CMOD_SAVE_RESULT CMOD_SaveCartridge(bool overrideExisting)
 {
+    // If no SD Card is detected return failed
+    if (!SDC_Mount())
+    {
+        return CMOD_FAILED;
+    }
+    
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
     
     FIL      file;
