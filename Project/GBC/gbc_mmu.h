@@ -189,10 +189,10 @@ typedef struct GBC_MMU_Memory_s
 
                 struct
                 {
-                    uint8_t Color0 : 2;
-                    uint8_t Color1 : 2;
-                    uint8_t Color2 : 2;
-                    uint8_t Color3 : 2;
+                    uint8_t BackgroundPaletteColor0 : 2;
+                    uint8_t BackgroundPaletteColor1 : 2;
+                    uint8_t BackgroundPaletteColor2 : 2;
+                    uint8_t BackgroundPaletteColor3 : 2;
                 };
             };
             uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only

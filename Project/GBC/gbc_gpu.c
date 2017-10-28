@@ -59,10 +59,23 @@ void GBC_GPU_RenderScanline(void)
 
         for (; i < 160 && pixelX < 8; i++, pixelX++)
         {
-            uint8_t pixelColor = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
+            uint8_t pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
 
-            // ToDo: Use BackgroundPalette
-            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[pixelColor];
+            switch (pixel)
+            {
+                case 0:
+                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                    break;
+                case 1:
+                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                    break;
+                case 2:
+                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                    break;
+                case 3:
+                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                    break;
+            }
 
             tilePixelLine <<= 1;
         }
