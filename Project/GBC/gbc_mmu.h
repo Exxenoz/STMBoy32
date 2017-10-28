@@ -104,7 +104,16 @@ typedef struct GBC_MMU_Memory_s
         };
     };
     //------CartridgeBankX                   4000-7FFF: 16kB Cartridge ROM bank X
-    uint8_t VRAMBank0[8192];              // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+    union
+    {
+        uint8_t VRAMBank0[8192];          // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+
+        struct
+        {
+            uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
+            uint8_t TileMapData[2048];    // 9800-9FFF: Tilemap Data
+        };
+    };
     uint8_t VRAMBank1[8192];
     uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
@@ -148,7 +157,7 @@ typedef struct GBC_MMU_Memory_s
                     uint8_t SpriteDisplayEnable        : 1; // (0 = Off, 1 = On)
                     uint8_t SpriteSize                 : 1; // (0 = 8x8, 1 = 8x16)
                     uint8_t BGTileMapDisplaySelect     : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t BGAndWindowDisplaySelect   : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
+                    uint8_t BGTileSetDisplaySelect     : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
                     uint8_t WindowDisplayEnable        : 1; // (0 = Off, 1 = On)
                     uint8_t WindowTileMapDisplaySelect : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
                     uint8_t DisplayEnable              : 1; // (0 = Off, 1 = On)
@@ -174,7 +183,18 @@ typedef struct GBC_MMU_Memory_s
             uint8_t Scanline;                // 0xFF44
             uint8_t ScanlineCompare;         // 0xFF45
             uint8_t OAMTransferStartAddress; // 0xFF46
-            uint8_t BackgroundPalette;       // 0xFF47                                           - Non GBC mode only
+            union
+            {
+                uint8_t BackgroundPalette;       // 0xFF47                                       - Non GBC mode only
+
+                struct
+                {
+                    uint8_t Color0 : 2;
+                    uint8_t Color1 : 2;
+                    uint8_t Color2 : 2;
+                    uint8_t Color3 : 2;
+                };
+            };
             uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
             uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
             uint8_t WindowYPosition;         // 0xFF4A
