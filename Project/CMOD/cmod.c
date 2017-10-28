@@ -1,4 +1,7 @@
 #include "cmod.h"
+#include "ff.h"
+
+uint8_t      CMOD_ROMBankX[16348];
 
 CMOD_ACTION  CMOD_Action       = CMOD_NOACTION;
 CMOD_STATUS  CMOD_Status       = CMOD_WAITING;
@@ -29,7 +32,33 @@ bool CMOD_Detect(void)
 
 void CMOD_SaveCartridge(void)
 {
+    FIL file;
+    uint32_t bytesWritten = 0;
+    // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0
+    // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks
+    int romBanks = GBC_MMU_Memory.ROMSize == 0 ? 0 : 0x02 << (GBC_MMU_Memory.ROMSize & 0x0F);
+    if ((GBC_MMU_Memory.ROMSize & 0x50) == 0x50) 
+    {
+       romBanks += 64; 
+    }
     
+    // ToDo: Get correct name
+    // ToDo: Check for success and check which flags are needed 
+    f_open (&file, "name.rom", FA_WRITE | FA_OPEN_EXISTING | FA_CREATE_NEW);
+    
+    // Write Bank 0 
+    f_write(&file, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesWritten);
+    
+    // Write other Banks
+    // ToDo: Check for missing banks in mbc1
+    for (int i = 1; i <= romBanks; i++)
+    {
+        CMOD_ReadBytes(4000, 16348, CMOD_ROMBankX);
+        while (CMOD_Status == CMOD_PROCESSING);
+        
+        f_lseek (&file, i * 16348);	
+        f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten);
+    }
 }
 
 // Manually switch the currently active Memory Bank of the Cartridge (to be able to save it)
