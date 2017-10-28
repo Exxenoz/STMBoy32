@@ -41,6 +41,13 @@ typedef enum
     CMOD_NOACTION
 } CMOD_ACTION;
 
+typedef enum
+{
+    CMOD_SUCCESS,
+    CMOD_EXISTS,
+    CMOD_FAILED
+} CMOD_SAVE_RESULT;
+
 CMOD_STATUS CMOD_GetStatus(void); 
 bool        CMOD_Detect(void);           
 
@@ -49,8 +56,8 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);
 void CMOD_WriteByte(uint16_t address, uint8_t *data);                      
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
-void CMOD_SaveCartridge(void);        // Needed arguments currently unknown
-void CMOD_ResetCartridge(void);
+CMOD_SAVE_RESULT CMOD_SaveCartridge(bool overrideExisting);        
+void             CMOD_ResetCartridge(void);
 
 void CMOD_Initialize(void); 
 
