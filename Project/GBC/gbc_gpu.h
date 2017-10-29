@@ -24,7 +24,7 @@ typedef union GBC_GPU_Color_e
 }
 GBC_GPU_Color_t;
 
-GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144]; // External declaration for LCD access
+extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144]; // External declaration for LCD access
 
 void GBC_GPU_Step(void);
 
