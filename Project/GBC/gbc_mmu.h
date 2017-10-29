@@ -191,14 +191,14 @@ typedef struct GBC_MMU_Memory_s
 
                 struct
                 {
-                    uint8_t BGDisplayEnable            : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
-                    uint8_t SpriteDisplayEnable        : 1; // (0 = Off, 1 = On)
-                    uint8_t SpriteSize                 : 1; // (0 = 8x8, 1 = 8x16)
-                    uint8_t BGTileMapDisplaySelect     : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t BGTileSetDisplaySelect     : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
-                    uint8_t WindowDisplayEnable        : 1; // (0 = Off, 1 = On)
-                    uint8_t WindowTileMapDisplaySelect : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t DisplayEnable              : 1; // (0 = Off, 1 = On)
+                    uint8_t BGDisplayEnable                 : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
+                    uint8_t SpriteDisplayEnable             : 1; // (0 = Off, 1 = On)
+                    uint8_t SpriteSize                      : 1; // (0 = 8x8, 1 = 8x16)
+                    uint8_t BGTileMapDisplaySelect          : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    uint8_t BGAndWindowTileSetDisplaySelect : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
+                    uint8_t WindowDisplayEnable             : 1; // (0 = Off, 1 = On)
+                    uint8_t WindowTileMapDisplaySelect      : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    uint8_t DisplayEnable                   : 1; // (0 = Off, 1 = On)
                 };
             };
             union
@@ -235,8 +235,8 @@ typedef struct GBC_MMU_Memory_s
             };
             uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
             uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
-            uint8_t WindowYPosition;         // 0xFF4A
-            uint8_t WindowXPositionMinus7;   // 0xFF4B
+            uint8_t WindowPositionY;         // 0xFF4A
+            uint8_t WindowPositionXMinus7;   // 0xFF4B
             uint8_t IO_Unk5;
             union
             {
