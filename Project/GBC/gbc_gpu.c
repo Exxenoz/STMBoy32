@@ -14,6 +14,20 @@ GBC_GPU_Color_t GBC_CPU_BackgroundPaletteClassic[4] =
 
 void GBC_GPU_RenderScanline(void)
 {
+    // Where to render on the frame buffer
+    uint16_t frameBufferIndex = GBC_MMU_Memory.Scanline * 160;
+
+    // When the display is disabled the screen is blank (white)
+    if (!GBC_MMU_Memory.DisplayEnable)
+    {
+        for (long i = 0; i < 160; i++)
+        {
+            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[0];
+        }
+
+        return;
+    }
+
     // Which tile to start with in the map row
     uint8_t tileX = GBC_MMU_Memory.ScrollX >> 3;
 
@@ -36,9 +50,6 @@ void GBC_GPU_RenderScanline(void)
     {
         tileIndex += 1024; // Use tile map #2
     }
-
-    // Where to render on the frame buffer
-    uint16_t frameBufferIndex = GBC_MMU_Memory.Scanline * 160;
 
     // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
     if (GBC_MMU_Memory.BGDisplayEnable || (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
