@@ -3,6 +3,7 @@
 #include "sdc.h"
 #include "ff.h"
 #include "cmod.h"
+#include "input.h"
 #include "string.h"
 
 GBC_MMU_Memory_t GBC_MMU_Memory;                                                   // GBC Memory
@@ -516,6 +517,13 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     else if (address <= 0xFF7F)
     {
         GBC_MMU_Memory.IO[address - 0xFF00] = value;
+
+        switch (address)
+        {
+            case 0xFF00:
+                Input_HandleButtonState();
+                break;
+        }
     }
     // High RAM and Interrupt Enable Register
     else if (address <= 0xFFFF)
