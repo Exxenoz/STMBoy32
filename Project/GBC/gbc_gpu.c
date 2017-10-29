@@ -6,7 +6,7 @@ uint32_t GBC_GPU_ModeTicks = 0;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
-GBC_GPU_Color_t GBC_CPU_BackgroundPaletteClassic[4] =
+GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
 {
     0xFFFF, // 0 - White
     0x524A, // 1 - 33% on
@@ -32,7 +32,7 @@ void GBC_GPU_RenderScanline(void)
     {
         while (frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex)
         {
-            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[0];
+            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[0];
         }
 
         return;
@@ -91,16 +91,16 @@ void GBC_GPU_RenderScanline(void)
                 switch (pixel)
                 {
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
                         break;
                 }
 
@@ -113,7 +113,7 @@ void GBC_GPU_RenderScanline(void)
     // When BGDisplayEnable is false and we are not in GBC mode, the background becomes blank (white).
     else while (frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex)
     {
-        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[0];
+        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[0];
     }
 
     // The window becomes visible (if enabled) when positions are set in range WX = 0-166, WY = 0-143
@@ -182,16 +182,16 @@ void GBC_GPU_RenderScanline(void)
                 switch (pixel)
                 {
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
                         break;
                 }
 
