@@ -128,7 +128,31 @@ typedef struct GBC_MMU_Memory_s
     uint8_t WRAMBank6[4096];
     uint8_t WRAMBank7[4096];
     //------ShadowRAM                     // E000-FDFF: 7.5kB Shadow RAM                      - Unused due to the original GBC wiring
-    uint8_t OAM[160];                     // FE00-FE9F: 160B Object Attribute Memory
+    union
+    {
+        uint8_t OAM[160];                 // FE00-FE9F: 160B Object Attribute Memory
+
+        struct SpriteAttributes_s
+        {
+            uint8_t PositionY;            // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
+            uint8_t PositionX;            // Horizontal position on the screen minus 8.
+            uint8_t TileID;               // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
+            union
+            {
+                uint8_t AttributeFlags;
+
+                struct
+                {
+                    uint8_t PaletteNumber        : 3; // OBP0-7                                                    - Only in GBC mode
+                    uint8_t TileVRAMBank         : 1; // 0 = VRAM Bank 0, 1 = VRAM Bank 1                          - Only in GBC mode
+                    uint8_t PaletteNumberClassic : 1; // 0 = OBP0, 1 = OBP1                                        - Non GBC mode only
+                    uint8_t FlipX                : 1; // 0 = Normal, 1 = Vertically mirrored
+                    uint8_t FlipY                : 1; // 0 = Normal, 1 = Horizontally mirrored
+                    uint8_t RenderPriority       : 1; // 0 = Object above BG, 1 = Object behing BG color 1-3, BG color 0 is always behind object
+                };
+            };
+        } SpriteAttributes[40];
+    };
     //------Unused                        // FEA0-FEFF:  96B Unused
     union
     {
