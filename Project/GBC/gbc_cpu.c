@@ -2206,6 +2206,24 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[256] =
 void GBC_CPU_Initialize()
 {
     memset(&GBC_CPU_Register, 0, sizeof(GBC_CPU_Register_t));
+
+    // Initial value in register A is used for GBC detection
+    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    {
+        GBC_CPU_Register.AF = 0x11B0;
+    }
+    else
+    {
+        GBC_CPU_Register.AF = 0x01B0;
+    }
+
+    GBC_CPU_Register.BC = 0x0013;
+    GBC_CPU_Register.DE = 0x00D8;
+    GBC_CPU_Register.HL = 0x014D;
+
+    GBC_CPU_Register.PC = 0x0100;
+    GBC_CPU_Register.SP = 0xFFFE;
+
     GBC_CPU_Ticks = 0;
     GBC_CPU_StepTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
