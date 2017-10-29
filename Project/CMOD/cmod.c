@@ -296,6 +296,7 @@ void CMOD_Initialize_CLK(void)
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(CMOD_TIM, &TIM_BaseObject);
 
+    TIM_OCStructInit(&TIM_OCInitObject);
     TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
 	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
@@ -303,8 +304,6 @@ void CMOD_Initialize_CLK(void)
 	TIM_OC4Init(CMOD_TIM, &TIM_OCInitObject);
 	TIM_OC4PreloadConfig(CMOD_TIM, TIM_OCPreload_Enable);
 
-    TIM_ITConfig(CMOD_TIM, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update, DISABLE);
-    TIM_ClearITPendingBit(CMOD_TIM, TIM_IT_CC4);
     TIM_Cmd(CMOD_TIM, ENABLE);
 
     NVIC_InitObject.NVIC_IRQChannel                   = CMOD_TIM_NVIC_CHANNEL;
@@ -313,31 +312,6 @@ void CMOD_Initialize_CLK(void)
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitObject);
     NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
-}
-
-void CMOD_Initialize_InsertionInterrupt()
-{
-    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-    EXTI_InitTypeDef EXTI_InitObject;
-    NVIC_InitTypeDef NVIC_InitObject;
-
-
-    SYSCFG_EXTILineConfig(CMOD_DETECT_EXTI_PORT, CMOD_DETECT_EXTI_PIN);
-
-    EXTI_InitObject.EXTI_Line    = CMOD_DETECT_EXTI_LINE;
-    EXTI_InitObject.EXTI_Mode    = EXTI_Mode_Interrupt;
-    EXTI_InitObject.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-    EXTI_InitObject.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&EXTI_InitObject);
-
-    NVIC_InitObject.NVIC_IRQChannel                   = CMOD_DETECT_NVIC_CHANNEL;
-    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0x0F;
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0x0F;
-    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitObject);
-    NVIC_EnableIRQ(CMOD_DETECT_NVIC_CHANNEL);
 }
 
 void CMOD_Initialize(void)
@@ -373,7 +347,6 @@ void CMOD_Initialize(void)
     CMOD_SET_RESET;
 
     CMOD_Initialize_CLK();
-    CMOD_Initialize_InsertionInterrupt();
 }
 
 void TIM4_IRQHandler(void)
@@ -426,14 +399,4 @@ void TIM4_IRQHandler(void)
 
       TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
-}
-
-void EXTI15_10_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line11) != RESET)
-    {
-        LED_EnableRed(false);
-        LED_EnableGreen(true);
-        LED_EnableBlue(true);
-    }
 }
