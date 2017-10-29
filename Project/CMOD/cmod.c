@@ -3,7 +3,7 @@
 #include "ff.h"
 #include "string.h"
 
-uint8_t      CMOD_ROMBankX[16348];
+uint8_t        CMOD_ROMBankX[16348];
 
 CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
 CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
@@ -87,7 +87,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
     FIL      file;
     BYTE     mode = FA_WRITE;
-    char     name[12];
+    char     name[16];
     int      romBanks;
     uint8_t  romSize      = GBC_MMU_Memory.ROMSize;
     uint32_t bytesWritten = 0;
@@ -101,11 +101,27 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     }
 
     // Convert the 11 title bytes to a null terminated string
-    for (int i = 0; i < 11; i++)
+    int i;
+    for (i = 0; i < 11; i++)
     {
+        if (GBC_MMU_Memory.Title[i] == 0x00)
+        {
+            if (GBC_MMU_Memory.Title[i+1] == 0x00)
+            {
+                break;
+            }
+
+            name[i] = '_';
+            continue;
+        }
+
         name[i] = (char) GBC_MMU_Memory.Title[i];
     }
-    name[11] = '\0';
+    name[i]   = '.';
+    name[i++] = 'r';
+    name[i++] = 'o';
+    name[i++] = 'm';
+    name[i++] = '\0';
 
     // Specify behaviour if file already exists
     if (overrideExisting)
@@ -122,7 +138,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     if (openResult == FR_OK)
     {
         // Write Bank 0, if failed close and delete (if something has been written) the file
-        if (f_write(&file, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesWritten) != FR_OK | bytesWritten != 16384)
+        if (f_write(&file, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
         {
             f_close(&file);
             f_unlink(name);
@@ -133,7 +149,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         for (int x = 1; x <= romBanks; x++)
         {
             // If mbc 1 is used in the cartridge banks 0x20, 0x40 & 0x60 don't exist -> write 0s instead
-            if (mbc == GBC_MMU_MBC1 && (x == 0x20 | x == 0x40 | x == 0x60))
+            if (mbc == GBC_MMU_MBC1 && (x == 0x20 || x == 0x40 || x == 0x60))
             {
                 memset(CMOD_ROMBankX, 0, 16384);
             }
@@ -142,13 +158,13 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             {
                 CMOD_SwitchMB(mbc, x);
 
-                CMOD_ReadBytes(4000, 16348, CMOD_ROMBankX);
+                CMOD_ReadBytes(0x4000, 16348, CMOD_ROMBankX);
                 while (CMOD_Status == CMOD_PROCESSING);
             }
 
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
-            if (f_lseek(&file, x * 16348) != FR_OK |
-                f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK | bytesWritten != 16384)
+            if (f_lseek(&file, x * 16348) != FR_OK ||
+                f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
             {
                 f_close(&file);
                 f_unlink(name);
