@@ -3,7 +3,7 @@
 bool LCD_READY_FLAG;
 uint16_t g_KaroData[LCD_DISPLAY_SIZE_Y];
 
-void LCD_Initialize_Pins(void)
+void LCD_InitializePins(void)
 {
     GPIO_InitTypeDef GPIO_InitObject;
 
@@ -40,7 +40,10 @@ void LCD_Initialize_Pins(void)
 
 void LCD_InitializeTimer()
 {
-    TIM_TimeBaseInitTypeDef TIM_BaseObject  = {0};
+    TIM_TimeBaseInitTypeDef TIM_BaseObject;
+    TIM_OCInitTypeDef       TIM_OCInitObject;
+
+
     TIM_BaseObject.TIM_Prescaler            = 16;
     TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
     TIM_BaseObject.TIM_Period               = 281;
@@ -48,18 +51,61 @@ void LCD_InitializeTimer()
     TIM_BaseObject.TIM_RepetitionCounter    = 0;
     TIM_TimeBaseInit(LCD_TIM, &TIM_BaseObject);
 
-    TIM_OCInitTypeDef TIM_OCObject          = {0};
-    TIM_OCObject.TIM_OCMode                 = TIM_OCMode_PWM1;
-    TIM_OCObject.TIM_OutputState            = TIM_OutputState_Enable;
-    TIM_OCObject.TIM_OCPolarity             = TIM_OCPolarity_Low;
-    TIM_OCObject.TIM_Pulse                  = 281;
-    TIM_OC4Init(LCD_TIM, &TIM_OCObject);
-
+    TIM_OCStructInit(&TIM_OCInitObject);
+    TIM_OCInitObject.TIM_OCMode             = TIM_OCMode_PWM1;
+    TIM_OCInitObject.TIM_OutputState        = TIM_OutputState_Enable;
+    TIM_OCInitObject.TIM_OCPolarity         = TIM_OCPolarity_Low;
+    TIM_OCInitObject.TIM_Pulse              = 281; 
+    TIM_OC4Init(LCD_TIM, &TIM_OCInitObject);
     TIM_OC4PreloadConfig(LCD_TIM, TIM_OCPreload_Enable);
 
+    TIM_ClearITPendingBit(LCD_TIM, TIM_IT_CC4);
     TIM_Cmd(LCD_TIM, ENABLE);
 
-    TIM_CtrlPWMOutputs(LCD_TIM, ENABLE);
+    TIM_CtrlPWMOutputs(LCD_TIM, ENABLE);  
+}
+
+void LCD_InitializeInterrupt(void)
+{
+    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
+    // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+    EXTI_InitTypeDef EXTI_InitObject;
+    NVIC_InitTypeDef NVIC_InitObject;
+
+
+    SYSCFG_EXTILineConfig(INPUT_FRAME_EXTI_PORT, INPUT_FRAME_EXTI_PIN);
+    
+    EXTI_InitObject.EXTI_Line    = INPUT_FRAME_EXTI_LINE;                         
+    EXTI_InitObject.EXTI_Mode    = EXTI_Mode_Interrupt;          
+    EXTI_InitObject.EXTI_Trigger = EXTI_Trigger_Rising_Falling;  
+    EXTI_InitObject.EXTI_LineCmd = ENABLE;                       
+    EXTI_Init(&EXTI_InitObject);
+    
+    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_FRAME_NVIC_CHANNEL; 
+    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0x0F;    
+    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0x0F;    
+    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;  
+    NVIC_Init(&NVIC_InitObject);                                 
+    NVIC_EnableIRQ(INPUT_FRAME_NVIC_CHANNEL);
+}
+
+void LCD_InitializeKaro()
+{
+    for (int i = 0, j = 0; i < LCD_DISPLAY_SIZE_Y; i++)
+    {
+        g_KaroData[i] = j;
+
+        if (i < LCD_HALF_DISPLAY_SIZE_Y) 
+        {
+            j++;
+        }
+        else 
+        {
+            j--;
+        }
+    }
 }
 
 bool LCD_Initialize(void)
@@ -74,9 +120,10 @@ bool LCD_Initialize(void)
 
     RCC_APB2PeriphClockCmd(LCD_TIM_BUS,     ENABLE);
 
-    LCD_Initialize_Pins();
-    LCD_Initialize_Karo(); // Debug
+    LCD_InitializePins();
     LCD_InitializeTimer();
+    LCD_InitializeInterrupt();
+    LCD_InitializeKaro(); // Debug
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
     // Wait ~120ms (ILI9341 Datasheet p. 90)
@@ -169,24 +216,7 @@ bool LCD_Initialize(void)
     // ToDo: Move to somewhere else
     LCD_DimBacklight(0);
 
-    return false;
-}
-
-void LCD_Initialize_Karo()
-{
-    for (int i = 0, j = 0; i < LCD_DISPLAY_SIZE_Y; i++)
-    {
-        g_KaroData[i] = j;
-
-        if (i < LCD_HALF_DISPLAY_SIZE_Y) 
-        {
-            j++;
-        }
-        else 
-        {
-            j--;
-        }
-    }
+    return false; 
 }
 
 void LCD_DimBacklight(long percent)
@@ -348,4 +378,13 @@ void LCD_PrintKaro(uint16_t color, uint16_t offset)
         }     
     }
     LCD_SET_CS;
+}
+
+void EXTI0_IRQHandler(void)
+{
+    if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
+    {
+        LCD_SET_READY_FLAG;
+        EXTI_ClearITPendingBit(EXTI_Line0);
+    }
 }

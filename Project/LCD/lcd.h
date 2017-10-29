@@ -23,9 +23,7 @@
 #define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
 #define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
 
-void LCD_Initialize_Pins(void);
 bool LCD_Initialize(void);
-void LCD_Initialize_Karo(void); // Debug
 
 void LCD_DimBacklight(long percent);
 
@@ -45,5 +43,7 @@ void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void LCD_ClearColor(uint16_t color);
 void LCD_PrintKaro(uint16_t color, uint16_t offset); // Debug
+
+void EXTI0_IRQHandler(void);
 
 #endif //LCD_H
