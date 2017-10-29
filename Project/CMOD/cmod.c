@@ -75,6 +75,42 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
     return true;
 }
 
+// Convert the 11 title bytes to a null terminated string
+void CMOD_GetFileName(char* name)
+{
+    int i;
+
+    for (i = 0; i < 11; i++)
+    {
+        if (GBC_MMU_Memory.Title[i] == 0x00)
+        {
+            if (GBC_MMU_Memory.Title[i+1] == 0x00)
+            {
+                break;
+            }
+
+            name[i] = '_';
+            continue;
+        }
+
+        name[i] = (char) GBC_MMU_Memory.Title[i];
+    }
+    name[i++] = '.';
+    
+    if (GBC_MMU_Memory.CGBFlag)
+    {
+        name[i++] = 'g';
+        name[i++] = 'b';
+        name[i++] = 'c';  
+    }
+    else
+    {
+        name[i++] = 'g';
+        name[i++] = 'b';
+    }
+    name[i] = '\0';
+}
+
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 {
     // If no SD Card is detected return nocard
@@ -100,28 +136,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
        romBanks += 64;
     }
 
-    // Convert the 11 title bytes to a null terminated string
-    int i;
-    for (i = 0; i < 11; i++)
-    {
-        if (GBC_MMU_Memory.Title[i] == 0x00)
-        {
-            if (GBC_MMU_Memory.Title[i+1] == 0x00)
-            {
-                break;
-            }
-
-            name[i] = '_';
-            continue;
-        }
-
-        name[i] = (char) GBC_MMU_Memory.Title[i];
-    }
-    name[i]   = '.';
-    name[i++] = 'r';
-    name[i++] = 'o';
-    name[i++] = 'm';
-    name[i++] = '\0';
+    CMOD_GetFileName(name);
 
     // Specify behaviour if file already exists
     if (overrideExisting)
