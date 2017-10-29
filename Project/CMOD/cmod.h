@@ -1,9 +1,9 @@
 #ifndef CMOD_H
 #define CMOD_H
 
+#include "cmod_config.h"
 #include "common.h"
 #include "led.h"
-#include "cmod_config.h"
 #include "gbc_mmu.h"
 
 #define CMOD_SET_RESET       CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
@@ -30,34 +30,34 @@ typedef enum
     CMOD_WAITING,
     CMOD_PROCESSING,
     CMOD_DATA_READY,
-    CMOD_WRITE_COMPLETE,
-    CMOD_NOCARD
-} CMOD_STATUS;
+    CMOD_WRITE_COMPLETE
+} CMOD_Status_t;
 
 typedef enum
 {
     CMOD_READ,
     CMOD_WRITE,
     CMOD_NOACTION
-} CMOD_ACTION;
+} CMOD_Action_t;
 
 typedef enum
 {
     CMOD_SUCCESS,
     CMOD_EXISTS,
+    CMOD_NOCARD,
     CMOD_FAILED
-} CMOD_SAVE_RESULT;
+} CMOD_SaveResult_t;
 
-CMOD_STATUS CMOD_GetStatus(void); 
-bool        CMOD_Detect(void);           
+CMOD_Status_t CMOD_GetStatus(void); 
+bool          CMOD_Detect(void);           
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data);                       
 void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);   
 void CMOD_WriteByte(uint16_t address, uint8_t *data);                      
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);  
 
-CMOD_SAVE_RESULT CMOD_SaveCartridge(bool overrideExisting);        
-void             CMOD_ResetCartridge(void);
+CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting);        
+void              CMOD_ResetCartridge(void);
 
 void CMOD_Initialize(void); 
 
