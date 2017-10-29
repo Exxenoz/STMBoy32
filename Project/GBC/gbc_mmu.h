@@ -160,7 +160,21 @@ typedef struct GBC_MMU_Memory_s
 
         struct
         {
-            uint8_t Joypad;                  // 0xFF00
+            union
+            {
+                uint8_t Joypad;              // 0xFF00
+
+                struct
+                {
+                    uint8_t JoypadInputRightOrButtonA : 1; // (0 = Select)
+                    uint8_t JoypadInputLeftOrButtonB  : 1; // (0 = Select)
+                    uint8_t JoypadInputUpOrSelect     : 1; // (0 = Pressed) (ReadOnly)
+                    uint8_t JoypadInputDownOrStart    : 1; // (0 = Pressed) (ReadOnly)
+                    uint8_t JoypadInputSelectFade     : 1; // (0 = Pressed) (ReadOnly)
+                    uint8_t JoypadInputSelectButtons  : 1; // (0 = Pressed) (ReadOnly)
+                    uint8_t                           : 2;
+                };
+            };
             uint8_t SerialTransferData;      // 0xFF01
             uint8_t SerialTransferControl;   // 0xFF02
             uint8_t IO_Unk13;

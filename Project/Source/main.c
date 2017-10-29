@@ -125,26 +125,17 @@ int main(void)
 
     /* Infinite loop */
     while (1)
-    {   
+    {
+        Input_HandleButtonState();
+
         if(LCD_READY_FLAG)
         {
             if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
             {
                 LCD_PrintKaro(0, KaroOffset++);
                 if (KaroOffset == 2400) KaroOffset = 0;
-                /*for (long i = 0; i < 1000000; i++);
-                if (KaroOffset == 0 || KaroOffset == 120)
-                {
-                    LCD_ClearColor(0x00FF);
-                    KaroOffset = 0;
-                }
-                else if (KaroOffset == 60)
-                {
-                    LCD_ClearColor(0xFF00);
-                }
-                KaroOffset++;*/
             }
             LCD_RST_READY_FLAG;
-        } 
+        }
     }
 }

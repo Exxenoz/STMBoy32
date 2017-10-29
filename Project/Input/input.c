@@ -1,7 +1,8 @@
 #include "input.h"
 #include "lcd.h"
+#include "gbc_mmu.h"
 
-uint32_t INPUT_INTERRUPT_FLAGS = 0x0000;
+uint16_t INPUT_INTERRUPT_FLAGS = 0xFF;
 
 INPUT_ButtonState_t lastState[8]    = {INPUT_NOT_PRESSED};
 INPUT_ButtonState_t currentState[8] = {INPUT_NOT_PRESSED};
@@ -12,11 +13,11 @@ INPUT_InterruptFlags_t flagPositions[8] =
 {
     INPUT_INTERRUPT_FLAG_A,
     INPUT_INTERRUPT_FLAG_B,
-    INPUT_INTERRUPT_FLAG_START,
     INPUT_INTERRUPT_FLAG_SELECT,
-    INPUT_INTERRUPT_FLAG_FADE_TOP,
+    INPUT_INTERRUPT_FLAG_START,
     INPUT_INTERRUPT_FLAG_FADE_RIGHT,
     INPUT_INTERRUPT_FLAG_FADE_LEFT,
+    INPUT_INTERRUPT_FLAG_FADE_TOP,
     INPUT_INTERRUPT_FLAG_FADE_BOT,
 };
 
@@ -89,24 +90,49 @@ void Input_Initialize()
     //------------------------------
 }
 
+void Input_HandleButtonState(void)
+{
+    //-----------DEBUG LED----------
+    if (INPUT_INTERRUPT_FLAGS != 0xFF) GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+    //------------------------------
+    
+    if (GBC_MMU_Memory.JoypadInputSelectButtons)
+    {
+        GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= (INPUT_INTERRUPT_FLAGS >> 1) | 0xF0;   // Set lower 4 bits of Joypad to button states
+    }
+    
+    if (GBC_MMU_Memory.JoypadInputSelectFade)
+    {
+        GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= (INPUT_INTERRUPT_FLAGS >> 5) | 0xF0;   // Set lower 4 bits of Joypad to fade states
+    }
+}
+
 void TIM3_IRQHandler(void)
 {       
     for (int i = 0; i < 8; i++)
     {
+        // If the Input pin is low button/fade is pressed
         currentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
         
+        // If the input state didn't change since 1ms ago increase counter
         if (currentState[i] == lastState[i])
         {
             counter++;
         }
-        else
+        // If the input state changed since 1ms ago reset counter
+        else                                
         {
             counter = 0;
         }
-        
+
+        // If the input state didn't change since 5ms ago consider state as permanent
         if (counter >= 5)
         {
-            INPUT_INTERRUPT_FLAGS &= (~flagPositions[i] | (flagPositions[i] & currentState[i]));
+            // Set the corresponding Input Bit (not pressed) then set it according to the current state
+            INPUT_INTERRUPT_FLAGS |= flagPositions[i];
+            INPUT_INTERRUPT_FLAGS &= (~flagPositions[i] | currentState[i]);
         }
         
         lastState[i] = currentState[i];
