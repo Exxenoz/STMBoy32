@@ -1,18 +1,33 @@
 #include "input.h"
 #include "lcd.h"
 
-void Input_Initialize() 
+uint32_t INPUT_INTERRUPT_FLAGS = 0x0000;
+
+INPUT_ButtonState_t lastState[8]    = {INPUT_NOT_PRESSED};
+INPUT_ButtonState_t currentState[8] = {INPUT_NOT_PRESSED};
+
+uint8_t counter = 0x00;
+
+INPUT_InterruptFlags_t flagPositions[8] =
+{
+    INPUT_INTERRUPT_FLAG_A,
+    INPUT_INTERRUPT_FLAG_B,
+    INPUT_INTERRUPT_FLAG_START,
+    INPUT_INTERRUPT_FLAG_SELECT,
+    INPUT_INTERRUPT_FLAG_FADE_TOP,
+    INPUT_INTERRUPT_FLAG_FADE_RIGHT,
+    INPUT_INTERRUPT_FLAG_FADE_LEFT,
+    INPUT_INTERRUPT_FLAG_FADE_BOT,
+};
+
+
+void Input_InitializePins(void)
 {
     RCC_AHB1PeriphClockCmd(INPUT_BUS_ALL, ENABLE);
 
-    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
-    // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
-    EXTI_InitTypeDef EXTI_InitObject;
-    NVIC_InitTypeDef NVIC_InitObject;
 
+    
     #define INITIALIZE_GPIO_PIN(PORT, PIN)                       \
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_IN;                   \
     GPIO_InitObject.GPIO_OType = GPIO_OType_PP;                  \
@@ -20,21 +35,6 @@ void Input_Initialize()
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_DOWN;                 \
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;              \
     GPIO_Init(PORT, &GPIO_InitObject);                           \
-
-    #define INITIALIZE_EXTI_LINE(LINE)                           \
-    EXTI_InitObject.EXTI_Line    = LINE;                         \
-    EXTI_InitObject.EXTI_Mode    = EXTI_Mode_Interrupt;          \
-    EXTI_InitObject.EXTI_Trigger = EXTI_Trigger_Rising_Falling;  \
-    EXTI_InitObject.EXTI_LineCmd = ENABLE;                       \
-    EXTI_Init(&EXTI_InitObject);                                 \
-
-    #define INITIALIZE_NVIC_CHANNEL(CHANNEL)                     \
-    NVIC_InitObject.NVIC_IRQChannel                   = CHANNEL; \
-    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0x0F;    \
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0x0F;    \
-    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;  \
-    NVIC_Init(&NVIC_InitObject);                                 \
-    NVIC_EnableIRQ(CHANNEL);                                     \
 
     INITIALIZE_GPIO_PIN(INPUT_A_PORT,           INPUT_A_PIN);
     INITIALIZE_GPIO_PIN(INPUT_B_PORT,           INPUT_B_PIN);         
@@ -45,38 +45,41 @@ void Input_Initialize()
     INITIALIZE_GPIO_PIN(INPUT_FADE_BOTTOM_PORT, INPUT_FADE_BOTTOM_PIN);
     INITIALIZE_GPIO_PIN(INPUT_FADE_LEFT_PORT,   INPUT_FADE_LEFT_PIN);
     INITIALIZE_GPIO_PIN(INPUT_FRAME_PORT,       INPUT_FRAME_PIN);
+}
 
-    SYSCFG_EXTILineConfig(INPUT_A_EXTI_PORT,           INPUT_A_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_B_EXTI_PORT,           INPUT_B_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_START_EXTI_PORT,       INPUT_START_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_SELECT_EXTI_PORT,      INPUT_SELECT_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_FADE_TOP_EXTI_PORT,    INPUT_FADE_TOP_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_FADE_RIGHT_EXTI_PORT,  INPUT_FADE_RIGHT_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_FADE_BOTTOM_EXTI_PORT, INPUT_FADE_BOTTOM_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_FADE_LEFT_EXTI_PORT,   INPUT_FADE_LEFT_EXTI_PIN);
-    SYSCFG_EXTILineConfig(INPUT_FRAME_EXTI_PORT,       INPUT_FRAME_EXTI_PIN);
-    
-    INITIALIZE_EXTI_LINE(INPUT_A_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_B_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_START_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_SELECT_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_FADE_TOP_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_FADE_RIGHT_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_FADE_BOTTOM_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_FADE_LEFT_EXTI_LINE);
-    INITIALIZE_EXTI_LINE(INPUT_FRAME_EXTI_LINE);
+void Input_InitializeTimer(void)
+{
+    RCC_APB1PeriphClockCmd(INPUT_TIM_BUS, ENABLE);
 
-    INITIALIZE_NVIC_CHANNEL(INPUT_A_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_B_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_START_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_SELECT_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_FADE_TOP_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_FADE_RIGHT_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_FADE_BOTTOM_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_FADE_LEFT_NVIC_CHANNEL);
-    INITIALIZE_NVIC_CHANNEL(INPUT_FRAME_NVIC_CHANNEL);
+    TIM_TimeBaseInitTypeDef TIM_BaseObject;
+    NVIC_InitTypeDef        NVIC_InitObject;
+
+
+    TIM_BaseObject.TIM_Prescaler            = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz
+    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period               = 14;                  // Count 'til 14 (starting at 0) -> 1000 overflows/s
+    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_RepetitionCounter    = 0;
+    TIM_TimeBaseInit(INPUT_TIM, &TIM_BaseObject);
+
+    TIM_ClearITPendingBit(INPUT_TIM, TIM_IT_Update);
+    TIM_Cmd(INPUT_TIM, ENABLE);
+
+    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_TIM_NVIC_CHANNEL;
+    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
+    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
+    NVIC_Init(&NVIC_InitObject);
+    NVIC_EnableIRQ(INPUT_TIM_NVIC_CHANNEL);
+}
+
+void Input_Initialize() 
+{
+    Input_InitializePins();
+    Input_InitializeTimer();
 
     //-----------DEBUG LED----------
+    GPIO_InitTypeDef GPIO_InitObject;
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
     GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
     GPIO_InitObject.GPIO_Pin   = GPIO_Pin_14;
@@ -86,90 +89,26 @@ void Input_Initialize()
     //------------------------------
 }
 
-void EXTI0_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
+void TIM3_IRQHandler(void)
+{       
+    for (int i = 0; i < 8; i++)
     {
-        LCD_SET_READY_FLAG;
-        EXTI_ClearITPendingBit(EXTI_Line0);
-    }
-}
-
-void EXTI1_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line1) != RESET) 
-    {
-        if (INPUT_A_PORT->IDR & INPUT_A_PIN)
+        currentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
+        
+        if (currentState[i] == lastState[i])
         {
-            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+            counter++;
         }
-        EXTI_ClearITPendingBit(EXTI_Line1);
-    }
-}
-
-void EXTI2_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line2) != RESET) 
-    {
-        if (INPUT_B_PORT->IDR & INPUT_B_PIN)
+        else
         {
-            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+            counter = 0;
         }
-        EXTI_ClearITPendingBit(EXTI_Line2);
-    }
-}
-
-void EXTI3_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line3) != RESET) 
-    {
-        if (INPUT_START_PORT->IDR & INPUT_START_PIN)
+        
+        if (counter >= 5)
         {
-            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+            INPUT_INTERRUPT_FLAGS &= (~flagPositions[i] | (flagPositions[i] & currentState[i]));
         }
-        EXTI_ClearITPendingBit(EXTI_Line3);
-    }
-}
-
-void EXTI4_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line4) != RESET) 
-    {
-
-        if (INPUT_SELECT_PORT->IDR & INPUT_SELECT_PIN)
-        {
-            GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        }
-        EXTI_ClearITPendingBit(EXTI_Line4);
-    }
-}
-
-void EXTI9_5_IRQHandler(void) 
-{
-    if (EXTI_GetITStatus(EXTI_Line5) != RESET) 
-    {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        EXTI_ClearITPendingBit(EXTI_Line5);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line6) != RESET) 
-    {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        EXTI_ClearITPendingBit(EXTI_Line6);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line7) != RESET) 
-    { 
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        EXTI_ClearITPendingBit(EXTI_Line7);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line8) != RESET) 
-    {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-        EXTI_ClearITPendingBit(EXTI_Line8);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line9) != RESET) 
-    {
-        // Not used currently
-
-        EXTI_ClearITPendingBit(EXTI_Line9);
+        
+        lastState[i] = currentState[i];
     }
 }
