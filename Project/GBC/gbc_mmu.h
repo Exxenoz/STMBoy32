@@ -104,7 +104,16 @@ typedef struct GBC_MMU_Memory_s
         };
     };
     //------CartridgeBankX                   4000-7FFF: 16kB Cartridge ROM bank X
-    uint8_t VRAMBank0[8192];              // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+    union
+    {
+        uint8_t VRAMBank0[8192];          // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+
+        struct
+        {
+            uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
+            uint8_t TileMapData[2048];    // 9800-9FFF: Tilemap Data
+        };
+    };
     uint8_t VRAMBank1[8192];
     uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
@@ -119,7 +128,31 @@ typedef struct GBC_MMU_Memory_s
     uint8_t WRAMBank6[4096];
     uint8_t WRAMBank7[4096];
     //------ShadowRAM                     // E000-FDFF: 7.5kB Shadow RAM                      - Unused due to the original GBC wiring
-    uint8_t OAM[160];                     // FE00-FE9F: 160B Object Attribute Memory
+    union
+    {
+        uint8_t OAM[160];                 // FE00-FE9F: 160B Object Attribute Memory
+
+        struct SpriteAttributes_s
+        {
+            uint8_t PositionY;            // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
+            uint8_t PositionX;            // Horizontal position on the screen minus 8.
+            uint8_t TileID;               // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
+            union
+            {
+                uint8_t AttributeFlags;
+
+                struct
+                {
+                    uint8_t PaletteNumber        : 3; // OBP0-7                                                    - Only in GBC mode
+                    uint8_t TileVRAMBank         : 1; // 0 = VRAM Bank 0, 1 = VRAM Bank 1                          - Only in GBC mode
+                    uint8_t PaletteNumberClassic : 1; // 0 = OBP0, 1 = OBP1                                        - Non GBC mode only
+                    uint8_t FlipX                : 1; // 0 = Normal, 1 = Vertically mirrored
+                    uint8_t FlipY                : 1; // 0 = Normal, 1 = Horizontally mirrored
+                    uint8_t RenderPriority       : 1; // 0 = Object above BG, 1 = Object behing BG color 1-3, BG color 0 is always behind object
+                };
+            };
+        } SpriteAttributes[40];
+    };
     //------Unused                        // FEA0-FEFF:  96B Unused
     union
     {
@@ -144,11 +177,11 @@ typedef struct GBC_MMU_Memory_s
 
                 struct
                 {
-                    uint8_t BGDisplay                  : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
+                    uint8_t BGDisplayEnable            : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
                     uint8_t SpriteDisplayEnable        : 1; // (0 = Off, 1 = On)
                     uint8_t SpriteSize                 : 1; // (0 = 8x8, 1 = 8x16)
                     uint8_t BGTileMapDisplaySelect     : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t BGAndWindowDisplaySelect   : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
+                    uint8_t BGTileSetDisplaySelect     : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
                     uint8_t WindowDisplayEnable        : 1; // (0 = Off, 1 = On)
                     uint8_t WindowTileMapDisplaySelect : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
                     uint8_t DisplayEnable              : 1; // (0 = Off, 1 = On)
@@ -174,7 +207,18 @@ typedef struct GBC_MMU_Memory_s
             uint8_t Scanline;                // 0xFF44
             uint8_t ScanlineCompare;         // 0xFF45
             uint8_t OAMTransferStartAddress; // 0xFF46
-            uint8_t BackgroundPalette;       // 0xFF47                                           - Non GBC mode only
+            union
+            {
+                uint8_t BackgroundPalette;       // 0xFF47                                       - Non GBC mode only
+
+                struct
+                {
+                    uint8_t BackgroundPaletteColor0 : 2;
+                    uint8_t BackgroundPaletteColor1 : 2;
+                    uint8_t BackgroundPaletteColor2 : 2;
+                    uint8_t BackgroundPaletteColor3 : 2;
+                };
+            };
             uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
             uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
             uint8_t WindowYPosition;         // 0xFF4A

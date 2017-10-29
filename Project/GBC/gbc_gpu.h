@@ -11,6 +11,19 @@ enum GBC_GPU_Mode_e
     GBC_GPU_MODE_3_DURING_DATA_TRANSFER = 3, // During reading from OAM and VRAM, CPU can NOT access OAM and VRAM        - GBC mode: Can not accessed Palette Data (FF69, FF6B) too
 };
 
+typedef union GBC_GPU_Color_e
+{
+    uint16_t Color;
+
+    struct
+    {
+        uint8_t Blue  : 5; // LSB
+        uint8_t Green : 6;
+        uint8_t Red   : 5; // MSB
+    };
+}
+GBC_GPU_Color_t;
+
 void GBC_GPU_Step(void);
 
 #endif
