@@ -126,8 +126,6 @@ int main(void)
     /* Infinite loop */
     while (1)
     {
-        Input_HandleButtonState();
-
         if(LCD_READY_FLAG)
         {
             if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)

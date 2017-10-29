@@ -2,14 +2,14 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
-uint16_t INPUT_INTERRUPT_FLAGS = 0xFF;
+uint16_t Input_Interrupt_Flags = 0xFF;
 
-INPUT_ButtonState_t lastState[8]    = {INPUT_NOT_PRESSED};
-INPUT_ButtonState_t currentState[8] = {INPUT_NOT_PRESSED};
+Input_ButtonState_t Input_LastState[8]    = {INPUT_NOT_PRESSED};
+Input_ButtonState_t Input_CurrentState[8] = {INPUT_NOT_PRESSED};
 
 uint8_t counter = 0x00;
 
-INPUT_InterruptFlags_t flagPositions[8] =
+Input_InterruptFlags_t flagPositions[8] =
 {
     INPUT_INTERRUPT_FLAG_A,
     INPUT_INTERRUPT_FLAG_B,
@@ -90,22 +90,22 @@ void Input_Initialize()
     //------------------------------
 }
 
-void Input_HandleButtonState(void)
+void Input_UpdateJoypadState(void)
 {
     //-----------DEBUG LED----------
-    if (INPUT_INTERRUPT_FLAGS != 0xFF) GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+    if (Input_Interrupt_Flags != 0xFF) GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
     //------------------------------
     
     if (GBC_MMU_Memory.JoypadInputSelectButtons)
     {
         GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= (INPUT_INTERRUPT_FLAGS >> 1) | 0xF0;   // Set lower 4 bits of Joypad to button states
+        GBC_MMU_Memory.Joypad &= (Input_Interrupt_Flags >> 1) | 0xF0;   // Set lower 4 bits of Joypad to button states
     }
     
     if (GBC_MMU_Memory.JoypadInputSelectFade)
     {
         GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= (INPUT_INTERRUPT_FLAGS >> 5) | 0xF0;   // Set lower 4 bits of Joypad to fade states
+        GBC_MMU_Memory.Joypad &= (Input_Interrupt_Flags >> 5) | 0xF0;   // Set lower 4 bits of Joypad to fade states
     }
 }
 
@@ -114,10 +114,10 @@ void TIM3_IRQHandler(void)
     for (int i = 0; i < 8; i++)
     {
         // If the Input pin is low button/fade is pressed
-        currentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
+        Input_CurrentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
         
         // If the input state didn't change since 1ms ago increase counter
-        if (currentState[i] == lastState[i])
+        if (Input_CurrentState[i] == Input_LastState[i])
         {
             counter++;
         }
@@ -131,10 +131,10 @@ void TIM3_IRQHandler(void)
         if (counter >= 5)
         {
             // Set the corresponding Input Bit (not pressed) then set it according to the current state
-            INPUT_INTERRUPT_FLAGS |= flagPositions[i];
-            INPUT_INTERRUPT_FLAGS &= (~flagPositions[i] | currentState[i]);
+            Input_Interrupt_Flags |= flagPositions[i];
+            Input_Interrupt_Flags &= (~flagPositions[i] | Input_CurrentState[i]);
         }
         
-        lastState[i] = currentState[i];
+        Input_LastState[i] = Input_CurrentState[i];
     }
 }

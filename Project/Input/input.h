@@ -14,18 +14,18 @@ typedef enum INPUT_InterruptFlags_e
     INPUT_INTERRUPT_FLAG_FADE_LEFT   = 0x0040,
     INPUT_INTERRUPT_FLAG_FADE_TOP    = 0x0080,
     INPUT_INTERRUPT_FLAG_FADE_BOT    = 0x0100
-} INPUT_InterruptFlags_t;
+} Input_InterruptFlags_t;
 
 typedef enum INPUT_ButtonState_e
 {
     INPUT_NOT_PRESSED = 0xFFFF,
     INPUT_PRESSED     = 0x0000
-} INPUT_ButtonState_t;
+} Input_ButtonState_t;
 
-extern uint16_t INPUT_INTERRUPT_FLAGS;
+extern uint16_t Input_Interrupt_Flags;
 
 void Input_Initialize(void);
-void Input_HandleButtonState(void);
+void Input_UpdateJoypadState(void);
 
 void TIM3_IRQHandler(void);
 

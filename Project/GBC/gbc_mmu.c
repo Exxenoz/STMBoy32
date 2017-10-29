@@ -521,7 +521,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         switch (address)
         {
             case 0xFF00:
-                Input_HandleButtonState();
+                Input_UpdateJoypadState();
                 break;
         }
     }
