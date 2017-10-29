@@ -1,4 +1,5 @@
 #include "lcd.h"
+#include "gbc_gpu.h"
 
 bool LCD_READY_FLAG;
 uint16_t g_KaroData[LCD_DISPLAY_SIZE_Y];
@@ -376,6 +377,19 @@ void LCD_PrintKaro(uint16_t color, uint16_t offset)
             LCD_RST_WR; 
             LCD_SET_WR;
         }     
+    }
+    LCD_SET_CS;
+}
+
+void LCD_DrawFrameBuffer(void)
+{
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
+    {
+        LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
+        LCD_RST_WR;                                         // Set to write
+        LCD_SET_WR;
     }
     LCD_SET_CS;
 }
