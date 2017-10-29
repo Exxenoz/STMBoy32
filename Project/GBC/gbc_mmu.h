@@ -153,7 +153,7 @@ typedef struct GBC_MMU_Memory_s
 
                 struct
                 {
-                    uint8_t BGDisplay                  : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
+                    uint8_t BGDisplayEnable            : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
                     uint8_t SpriteDisplayEnable        : 1; // (0 = Off, 1 = On)
                     uint8_t SpriteSize                 : 1; // (0 = 8x8, 1 = 8x16)
                     uint8_t BGTileMapDisplaySelect     : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)

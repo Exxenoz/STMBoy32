@@ -40,47 +40,56 @@ void GBC_GPU_RenderScanline(void)
     // Where to render on the frame buffer
     uint16_t frameBufferIndex = GBC_MMU_Memory.Scanline * 160;
 
-    for (long i = 0; i < 160; i++, tileIndex++)
+    // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
+    if (GBC_MMU_Memory.BGDisplayEnable || (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
     {
-        // Read tile index from background map
-        uint16_t tileID = GBC_MMU_Memory.TileMapData[tileIndex];
-
-        // Calculate the real tile ID if tileID is signed due to tile set #0 selection
-        if (!GBC_MMU_Memory.BGTileSetDisplaySelect && tileID < 128)
+        for (long i = 0; i < 160; i++, tileIndex++)
         {
-            tileID += 256;
-        }
+            // Read tile index from background map
+            uint16_t tileID = GBC_MMU_Memory.TileMapData[tileIndex];
 
-        // Each tile is 8x8 pixel in size and uses 2 bytes per row or 2 bits per pixel
-        uint16_t tilePixelLine = GBC_MMU_Memory.TileSetData[(tileID << 3) + pixelY];
-
-        // Move first pixel bits to bit 15 (low) and bit 7 (high)
-        tilePixelLine <<= pixelX;
-
-        for (; i < 160 && pixelX < 8; i++, pixelX++)
-        {
-            uint8_t pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
-
-            switch (pixel)
+            // Calculate the real tile ID if tileID is signed due to tile set #0 selection
+            if (!GBC_MMU_Memory.BGTileSetDisplaySelect && tileID < 128)
             {
-                case 0:
-                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
-                    break;
-                case 1:
-                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
-                    break;
-                case 2:
-                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
-                    break;
-                case 3:
-                    GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
-                    break;
+                tileID += 256;
             }
 
-            tilePixelLine <<= 1;
-        }
+            // Each tile is 8x8 pixel in size and uses 2 bytes per row or 2 bits per pixel
+            uint16_t tilePixelLine = GBC_MMU_Memory.TileSetData[(tileID << 3) + pixelY];
 
-        pixelX = 0;
+            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            tilePixelLine <<= pixelX;
+
+            for (; i < 160 && pixelX < 8; i++, pixelX++)
+            {
+                uint8_t pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
+
+                switch (pixel)
+                {
+                    case 0:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        break;
+                    case 1:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        break;
+                    case 2:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        break;
+                    case 3:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        break;
+                }
+
+                tilePixelLine <<= 1;
+            }
+
+            pixelX = 0;
+        }
+    }
+    // When BGDisplayEnable is false and we are not in GBC mode, the background becomes blank (white).
+    else for (long i = 0; i < 160; i++)
+    {
+        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_CPU_BackgroundPaletteClassic[0];
     }
 }
 
