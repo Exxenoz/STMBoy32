@@ -24,6 +24,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
     }
 
     GBC_CPU_Initialize();
+    GBC_GPU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_CARTRIDGE;
 
@@ -45,6 +46,7 @@ GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
     }
 
     GBC_CPU_Initialize();
+    GBC_GPU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_SDC;
 

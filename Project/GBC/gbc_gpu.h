@@ -26,6 +26,7 @@ GBC_GPU_Color_t;
 
 extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144]; // External declaration for LCD access
 
+void GBC_GPU_Initialize(void);
 void GBC_GPU_Step(void);
 
 #endif

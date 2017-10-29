@@ -14,6 +14,14 @@ GBC_GPU_Color_t GBC_CPU_BackgroundPaletteClassic[4] =
     0x0000, // 3 - Black
 };
 
+void GBC_GPU_Initialize(void)
+{
+    GBC_GPU_ModeTicks = 0;
+    GBC_GPU_CurrentFrameBufferStartIndex = 0;
+    GBC_GPU_CurrentFrameBufferEndIndex = 160;
+    // Frame buffer must not be initialized
+}
+
 void GBC_GPU_RenderScanline(void)
 {
     // Where to render on the frame buffer
