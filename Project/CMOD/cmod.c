@@ -125,17 +125,13 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
     // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0
     // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks
-    romBanks = romSize == 0 ? 0 : (0x02 << (romSize & 0x0F));
+    romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));
     if ((romSize & 0x50) == 0x50)
     {
        romBanks += 64;
     }
 
-    //CMOD_GetFileName(name);
-    name[0] = 't';
-    name[1] = 'e';
-    name[2] = 's';
-    name[3] = 't';
+    CMOD_GetFileName(name);
     
     // Specify behaviour if file already exists
     if (overrideExisting)
