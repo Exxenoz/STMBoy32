@@ -137,4 +137,6 @@ void TIM3_IRQHandler(void)
         
         Input_LastState[i] = Input_CurrentState[i];
     }
+
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }
