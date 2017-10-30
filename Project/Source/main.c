@@ -52,11 +52,19 @@ int main(void)
     CMOD_Initialize();
     SDC_Initialize();
     
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitObject.GPIO_Pin   = GPIO_Pin_5;
+    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_Init(GPIOA, &GPIO_InitObject);
+    GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+    
     CMOD_SaveResult_t result;
     GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
     if(loaded == GBC_LOAD_RESULT_OK)
-    {     
-       result = CMOD_SaveCartridge(true);
+    {
+       /*result = CMOD_SaveCartridge(true);
        if(result == CMOD_SUCCESS)
        {
             LED_EnableBlue(true);
@@ -64,9 +72,9 @@ int main(void)
        else
        {
             LED_EnableRed(true);
-       }
+       }*/
     }
-    else if (GBC_LoadFromSDC("red.gbc") != GBC_LOAD_RESULT_OK)
+    else if (GBC_LoadFromSDC("cpu.gb") != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return 0;
@@ -75,14 +83,18 @@ int main(void)
     /* Infinite loop */
     while (1)
     {
-        if(LCD_READY_FLAG)
+        //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+        GBC_Update();
+        //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+
+        while (!LCD_READY_FLAG);
+
+        if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
         {
-            if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
-            {
-                LCD_PrintKaro(0, KaroOffset++);
-                if (KaroOffset == 2400) KaroOffset = 0;
-            }
-            LCD_RST_READY_FLAG;
+            //LCD_PrintKaro(0, KaroOffset++);
+            //if (KaroOffset == 2400) KaroOffset = 0;
+            LCD_DrawFrameBuffer();
         }
+        LCD_RST_READY_FLAG;
     }
 }
