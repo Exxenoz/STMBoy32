@@ -3,7 +3,7 @@
 #include "ff.h"
 #include "string.h"
 
-uint8_t        CMOD_ROMBankX[16348];
+uint8_t        CMOD_ROMBankX[16384];
 
 CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
 CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
@@ -80,15 +80,10 @@ void CMOD_GetFileName(char* name)
 {
     int i;
 
-    for (i = 0; i < 11; i++)
+    for (i = 0; i < 11 && GBC_MMU_Memory.Title[i] != 0x00; i++)
     {
-        if (GBC_MMU_Memory.Title[i] == 0x00)
+        if (GBC_MMU_Memory.Title[i] == 0x20)
         {
-            if (GBC_MMU_Memory.Title[i+1] == 0x00)
-            {
-                break;
-            }
-
             name[i] = '_';
             continue;
         }
@@ -124,7 +119,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     FIL      file;
     BYTE     mode = FA_WRITE;
     char     name[16];
-    int      romBanks;
+    uint8_t  romBanks;
     uint8_t  romSize      = GBC_MMU_Memory.ROMSize;
     uint32_t bytesWritten = 0;
 
@@ -136,8 +131,12 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
        romBanks += 64;
     }
 
-    CMOD_GetFileName(name);
-
+    //CMOD_GetFileName(name);
+    name[0] = 't';
+    name[1] = 'e';
+    name[2] = 's';
+    name[3] = 't';
+    
     // Specify behaviour if file already exists
     if (overrideExisting)
     {
@@ -173,7 +172,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             {
                 CMOD_SwitchMB(mbc, x);
 
-                CMOD_ReadBytes(0x4000, 16348, CMOD_ROMBankX);
+                CMOD_ReadBytes(0x4000, 16384, CMOD_ROMBankX);
                 while (CMOD_Status == CMOD_PROCESSING);
             }
 
@@ -187,6 +186,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             }
         }
 
+        f_close(&file);
         return CMOD_SUCCESS;
     }
     else if (openResult == FR_EXIST)

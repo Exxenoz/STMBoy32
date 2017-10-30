@@ -52,70 +52,19 @@ int main(void)
     CMOD_Initialize();
     SDC_Initialize();
     
-    if(GBC_LoadFromCartridge() == GBC_LOAD_RESULT_OK)
-    {   
-        GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
-        
-        uint8_t data1[128];
-        uint8_t data2[128];
-        uint8_t resetedData[128];
-        uint8_t data3[128];        
-        uint8_t rtcData1;
-        uint8_t nintendoLogo[48];
-        uint8_t ramData[48] = {0};
-            
-        uint8_t romBank1 = 0x01;
-        uint8_t romBank2 = 0x02;
-        uint8_t romBank3 = 0x03;
-        
-        // Read the first 128 Bytes of Rom-Bank 1
-        CMOD_WriteByte(0x2001, &romBank1);
-        CMOD_ReadBytes(0x4000, 128, data1);
-        
-        // If a card with MBC3 is inserted enable its RAM, write to / read from it and disable it again
-        if(GBC_MMU_MemoryBankController == GBC_MMU_MBC3)
-        {
-            uint8_t enableRAM = 0x0A;
-            uint8_t disableRAM = 0x00;
-            uint8_t ramBank1  = 0x01;
-            
-            CMOD_WriteByte(0x0001, &enableRAM);         // Enable RAM/RTC
-            CMOD_WriteByte(0x4001, &ramBank1);          // Select RAM Bank 1    
-            CMOD_ReadBytes(0x0104, 48, nintendoLogo);   // Read the nintendo Logo
-            CMOD_WriteBytes(0xA000, 48, nintendoLogo);  // Write the Logo into Ram Bank1
-            CMOD_ReadBytes(0xA000, 48, ramData);        // Read the first 48 Bytes from Ram Bank1
-            CMOD_WriteByte(0x0001, &disableRAM);        // Disable RAM/RTC
-        }
-        
-        // Read the first 128 Bytes of Rom-Bank 2
-        CMOD_WriteByte(0x2001, &romBank2);
-        CMOD_ReadBytes(0x4000, 128, data2);
-        
-        // Softreset
-        CMOD_ResetCartridge();
-        // Read the first 128 Bytes from 4000, should be Bank 1 now
-        CMOD_ReadBytes(0x4000, 128, resetedData);
-        
-        // If a card with MBC3 is inserted latch current time to RTC Register then read it
-        if(GBC_MMU_MemoryBankController == GBC_MMU_MBC3)
-        {
-            uint8_t enableRTC = 0x0A;
-            uint8_t disableRTC = 0x00;
-            uint8_t rtcRegister = 0x08;
-            uint8_t writeTime[2] = {0x00, 0x01};
-            
-            CMOD_WriteBytes(0x6001, 2, writeTime);  // Write current Time to RTC
-            CMOD_WriteByte(0x0001, &enableRTC);     // Enable RAM/RTC
-            CMOD_WriteByte(0x4001, &rtcRegister);   // Select RTC
-            CMOD_ReadByte(0xA000, &rtcData1);        // Read from RTC
-
-            CMOD_WriteByte(0x0001, &disableRTC);    // Disable RTC/RAM
-        }
-
-        // Read the first 128 Bytes of Rom-Bank 3
-        CMOD_WriteByte(0x2001, &romBank3);
-        CMOD_ReadBytes(0x4000, 128, data3);
-        while(CMOD_GetStatus() == CMOD_PROCESSING);
+    CMOD_SaveResult_t result;
+    GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
+    if(loaded == GBC_LOAD_RESULT_OK)
+    {     
+       result = CMOD_SaveCartridge(true);
+       if(result == CMOD_SUCCESS)
+       {
+            LED_EnableBlue(true);
+       }
+       else
+       {
+            LED_EnableRed(true);
+       }
     }
     else if (GBC_LoadFromSDC("red.gbc") != GBC_LOAD_RESULT_OK)
     {
