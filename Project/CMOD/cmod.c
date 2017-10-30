@@ -160,7 +160,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         }
 
         // Write other Banks
-        for (int x = 1; x <= romBanks; x++)
+        for (int x = 1; x < romBanks; x++)
         {
             // If mbc 1 is used in the cartridge banks 0x20, 0x40 & 0x60 don't exist -> write 0s instead
             if (mbc == GBC_MMU_MBC1 && (x == 0x20 || x == 0x40 || x == 0x60))
@@ -177,7 +177,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             }
 
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
-            if (f_lseek(&file, x * 16348) != FR_OK ||
+            if (f_lseek(&file, x * 16384) != FR_OK ||
                 f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
             {
                 f_close(&file);
