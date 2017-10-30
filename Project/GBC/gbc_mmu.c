@@ -298,7 +298,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         return GBC_MMU_Memory.HRAM[address - 0xFF80];
     }
 
-    return 0;
+    return 0xFF; // Return 0xFF for unused memory (!!!)
 }
 
 uint16_t GBC_MMU_ReadShort(uint16_t address)
