@@ -82,9 +82,9 @@ void CMOD_GetFileName(char* name)
 
     for (i = 0; i < 11 && GBC_MMU_Memory.Title[i] != 0x00; i++)
     {
-        if (GBC_MMU_Memory.Title[i] == 0x20)
+        if (GBC_MMU_Memory.Title[i] == 0x5F)        // Convert underscores to spaces for the sake of consistency
         {
-            name[i] = '_';
+            name[i] = ' ';
             continue;
         }
 
