@@ -3,6 +3,7 @@
 #include "gbc_mmu.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
+GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
@@ -17,6 +18,7 @@ GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
 void GBC_GPU_Initialize(void)
 {
     GBC_GPU_ModeTicks = 0;
+    GBC_GPU_StatusInterruptRequestState.RequestFlags = 0;
     GBC_GPU_CurrentFrameBufferStartIndex = 0;
     GBC_GPU_CurrentFrameBufferEndIndex = 160;
     // Frame buffer must not be initialized
@@ -203,6 +205,29 @@ void GBC_GPU_RenderScanline(void)
     }
 }
 
+inline void GBC_GPU_CompareScanline()
+{
+    if (GBC_MMU_Memory.Scanline == GBC_MMU_Memory.ScanlineCompare)
+    {
+        GBC_MMU_Memory.Coincidence = 1;
+
+        if (GBC_MMU_Memory.CoincidenceInterrupt)
+        {
+            if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
+            {
+                GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+            }
+
+            GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 1;
+        }
+    }
+    else
+    {
+        GBC_MMU_Memory.Coincidence = 0;
+        GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 0;
+    }
+}
+
 void GBC_GPU_Step(void)
 {
     GBC_GPU_ModeTicks += GBC_CPU_StepTicks;
@@ -216,20 +241,43 @@ void GBC_GPU_Step(void)
                 GBC_GPU_ModeTicks -= 204;
 
                 GBC_MMU_Memory.Scanline++;
+                GBC_GPU_CompareScanline();
 
                 GBC_GPU_CurrentFrameBufferStartIndex += 160;
                 GBC_GPU_CurrentFrameBufferEndIndex += 160;
 
                 if (GBC_MMU_Memory.Scanline >= 144)
                 {
-                    // ToDo: Send frame buffer to screen
-
                     GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
+
+                    if (GBC_MMU_Memory.VBlankInterrupt)
+                    {
+                        if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
+                        {
+                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                        }
+
+                        GBC_GPU_StatusInterruptRequestState.VBlankInterruptRequest = 1;
+                    }
+
+                    GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
                     GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_1_DURING_VBLANK;
                 }
                 else
                 {
+                    if (GBC_MMU_Memory.OAMInterrupt)
+                    {
+                        if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
+                        {
+                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                        }
+
+                        GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 1;
+                    }
+
+                    GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
+
                     GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_2_DURING_OAM_READING;
                 }
             }
@@ -241,16 +289,32 @@ void GBC_GPU_Step(void)
             {
                 GBC_GPU_ModeTicks -= 456;
 
-                GBC_MMU_Memory.Scanline++;
-
-                if (GBC_MMU_Memory.Scanline >= 154)
+                if (GBC_MMU_Memory.Scanline >= 153)
                 {
                     GBC_MMU_Memory.Scanline = 0;
+                    GBC_GPU_CompareScanline();
 
                     GBC_GPU_CurrentFrameBufferStartIndex = 0;
                     GBC_GPU_CurrentFrameBufferEndIndex = 160;
 
+                    if (GBC_MMU_Memory.OAMInterrupt)
+                    {
+                        if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
+                        {
+                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                        }
+
+                        GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 1;
+                    }
+
+                    GBC_GPU_StatusInterruptRequestState.VBlankInterruptRequest = 0;
+
                     GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_2_DURING_OAM_READING;
+                }
+                else
+                {
+                    GBC_MMU_Memory.Scanline++;
+                    GBC_GPU_CompareScanline();
                 }
             }
             break;
@@ -260,6 +324,8 @@ void GBC_GPU_Step(void)
             if (GBC_GPU_ModeTicks >= 80)
             {
                 GBC_GPU_ModeTicks -= 80;
+
+                GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 0;
 
                 GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_3_DURING_DATA_TRANSFER;
             }
@@ -272,6 +338,16 @@ void GBC_GPU_Step(void)
                 GBC_GPU_ModeTicks -= 172;
 
                 GBC_GPU_RenderScanline();
+
+                if (GBC_MMU_Memory.HBlankInterrupt)
+                {
+                    if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
+                    {
+                        GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                    }
+
+                    GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 1;
+                }
 
                 GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_0_DURING_HBLANK;
             }
