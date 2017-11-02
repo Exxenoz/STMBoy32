@@ -76,12 +76,15 @@ enum GBC_MMU_CurrentSpeed_e
     GBC_MMU_CURRENT_SPEED_DOUBLE = 1,
 };
 
+#pragma pack(1)
 typedef struct GBC_MMU_Memory_s
 {
+    #pragma pack(1)
     union
     {
         uint8_t CartridgeBank0[16384];    // 0000-3FFF: 16kB Cartridge ROM bank 0
 
+        #pragma pack(1)
         struct
         {
             uint8_t Bootstrap[256];       // 0000-00FF
@@ -104,10 +107,12 @@ typedef struct GBC_MMU_Memory_s
         };
     };
     //------CartridgeBankX                   4000-7FFF: 16kB Cartridge ROM bank X
+    #pragma pack(1)
     union
     {
         uint8_t VRAMBank0[8192];          // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
 
+        #pragma pack(1)
         struct
         {
             uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
@@ -128,51 +133,59 @@ typedef struct GBC_MMU_Memory_s
     uint8_t WRAMBank6[4096];
     uint8_t WRAMBank7[4096];
     //------ShadowRAM                     // E000-FDFF: 7.5kB Shadow RAM                      - Unused due to the original GBC wiring
+    #pragma pack(1)
     union
     {
         uint8_t OAM[160];                 // FE00-FE9F: 160B Object Attribute Memory
 
+        #pragma pack(1)
         struct SpriteAttributes_s
         {
-            uint8_t PositionY;            // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
-            uint8_t PositionX;            // Horizontal position on the screen minus 8.
-            uint8_t TileID;               // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
+            unsigned int PositionY;       // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
+            unsigned int PositionX;       // Horizontal position on the screen minus 8.
+            unsigned int TileID;          // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
+            #pragma pack(1)
             union
             {
                 uint8_t AttributeFlags;
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t PaletteNumber        : 3; // OBP0-7                                                    - Only in GBC mode
-                    uint8_t TileVRAMBank         : 1; // 0 = VRAM Bank 0, 1 = VRAM Bank 1                          - Only in GBC mode
-                    uint8_t PaletteNumberClassic : 1; // 0 = OBP0, 1 = OBP1                                        - Non GBC mode only
-                    uint8_t FlipX                : 1; // 0 = Normal, 1 = Vertically mirrored
-                    uint8_t FlipY                : 1; // 0 = Normal, 1 = Horizontally mirrored
-                    uint8_t RenderPriority       : 1; // 0 = Object above BG, 1 = Object behing BG color 1-3, BG color 0 is always behind object
+                    unsigned int PaletteNumber        : 3; // OBP0-7                                                    - Only in GBC mode
+                    unsigned int TileVRAMBank         : 1; // 0 = VRAM Bank 0, 1 = VRAM Bank 1                          - Only in GBC mode
+                    unsigned int PaletteNumberClassic : 1; // 0 = OBP0, 1 = OBP1                                        - Non GBC mode only
+                    unsigned int FlipX                : 1; // 0 = Normal, 1 = Vertically mirrored
+                    unsigned int FlipY                : 1; // 0 = Normal, 1 = Horizontally mirrored
+                    unsigned int RenderPriority       : 1; // 0 = Object above BG, 1 = Object behing BG color 1-3, BG color 0 is always behind object
                 };
             };
         } SpriteAttributes[40];
     };
     //------Unused                        // FEA0-FEFF:  96B Unused
+    #pragma pack(1)
     union
     {
         uint8_t IO[128];                  // FF00-FF7F: 128B Memory-mapped I/O
 
+        #pragma pack(1)
         struct
         {
+            #pragma pack(1)
             union
             {
                 uint8_t Joypad;              // 0xFF00
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t JoypadInputRightOrButtonA : 1; // (0 = Pressed) (ReadOnly)
-                    uint8_t JoypadInputLeftOrButtonB  : 1; // (0 = Pressed) (ReadOnly)
-                    uint8_t JoypadInputUpOrSelect     : 1; // (0 = Pressed) (ReadOnly)
-                    uint8_t JoypadInputDownOrStart    : 1; // (0 = Pressed) (ReadOnly)
-                    uint8_t JoypadInputSelectFade     : 1; // (0 = Selected)
-                    uint8_t JoypadInputSelectButtons  : 1; // (0 = Selected)
-                    uint8_t                           : 2;
+                    unsigned int JoypadInputRightOrButtonA : 1; // (0 = Pressed) (ReadOnly)
+                    unsigned int JoypadInputLeftOrButtonB  : 1; // (0 = Pressed) (ReadOnly)
+                    unsigned int JoypadInputUpOrSelect     : 1; // (0 = Pressed) (ReadOnly)
+                    unsigned int JoypadInputDownOrStart    : 1; // (0 = Pressed) (ReadOnly)
+                    unsigned int JoypadInputSelectFade     : 1; // (0 = Selected)
+                    unsigned int JoypadInputSelectButtons  : 1; // (0 = Selected)
+                    unsigned int                           : 2;
                 };
             };
             uint8_t SerialTransferData;      // 0xFF01
@@ -185,35 +198,39 @@ typedef struct GBC_MMU_Memory_s
             uint8_t IO_Unk1[7];
             uint8_t InterruptFlags;          // 0xFF0F
             uint8_t IO_Unk2[48];
+            #pragma pack(1)
             union
             {
                 uint8_t GPUControlFlags;     // 0xFF40
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t BGDisplayEnable                 : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
-                    uint8_t SpriteDisplayEnable             : 1; // (0 = Off, 1 = On)
-                    uint8_t SpriteSize                      : 1; // (0 = 8x8, 1 = 8x16)
-                    uint8_t BGTileMapDisplaySelect          : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t BGAndWindowTileSetDisplaySelect : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
-                    uint8_t WindowDisplayEnable             : 1; // (0 = Off, 1 = On)
-                    uint8_t WindowTileMapDisplaySelect      : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
-                    uint8_t DisplayEnable                   : 1; // (0 = Off, 1 = On)
+                    unsigned int BGDisplayEnable                 : 1; // (0 = Off, 1 = On)                - GBC mode: When cleared, the sprites will be always displayed on top of background and window
+                    unsigned int SpriteDisplayEnable             : 1; // (0 = Off, 1 = On)
+                    unsigned int SpriteSize                      : 1; // (0 = 8x8, 1 = 8x16)
+                    unsigned int BGTileMapDisplaySelect          : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    unsigned int BGAndWindowTileSetDisplaySelect : 1; // (0 = 8800-97FF, 1 = 8000-8FFF)
+                    unsigned int WindowDisplayEnable             : 1; // (0 = Off, 1 = On)
+                    unsigned int WindowTileMapDisplaySelect      : 1; // (0 = 9800-9BFF, 1 = 9C00-9FFF)
+                    unsigned int DisplayEnable                   : 1; // (0 = Off, 1 = On)
                 };
             };
+            #pragma pack(1)
             union
             {
                 uint8_t GPUStatus;           // 0xFF41
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t GPUMode              : 2;
-                    uint8_t Coincidence          : 1;
-                    uint8_t HBlankInterrupt      : 1;
-                    uint8_t VBlankInterrupt      : 1;
-                    uint8_t OAMInterrupt         : 1;
-                    uint8_t CoincidenceInterrupt : 1;
-                    uint8_t                      : 1;
+                    unsigned int GPUMode              : 2;
+                    unsigned int Coincidence          : 1;
+                    unsigned int HBlankInterrupt      : 1;
+                    unsigned int VBlankInterrupt      : 1;
+                    unsigned int OAMInterrupt         : 1;
+                    unsigned int CoincidenceInterrupt : 1;
+                    unsigned int                      : 1;
                 };
             };
             uint8_t ScrollY;                 // 0xFF42
@@ -221,54 +238,62 @@ typedef struct GBC_MMU_Memory_s
             uint8_t Scanline;                // 0xFF44
             uint8_t ScanlineCompare;         // 0xFF45
             uint8_t OAMTransferStartAddress; // 0xFF46
+            #pragma pack(1)
             union
             {
                 uint8_t BackgroundPalette;   // 0xFF47                                           - Non GBC mode only
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t BackgroundPaletteColor0 : 2;
-                    uint8_t BackgroundPaletteColor1 : 2;
-                    uint8_t BackgroundPaletteColor2 : 2;
-                    uint8_t BackgroundPaletteColor3 : 2;
+                    unsigned int BackgroundPaletteColor0 : 2;
+                    unsigned int BackgroundPaletteColor1 : 2;
+                    unsigned int BackgroundPaletteColor2 : 2;
+                    unsigned int BackgroundPaletteColor3 : 2;
                 };
             };
+            #pragma pack(1)
             union
             {
                 uint8_t ObjectPalette0;      // 0xFF48                                           - Non GBC mode only
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t ObjectPalette0Color0 : 2;
-                    uint8_t ObjectPalette0Color1 : 2;
-                    uint8_t ObjectPalette0Color2 : 2;
-                    uint8_t ObjectPalette0Color3 : 2;
+                    unsigned int ObjectPalette0Color0 : 2;
+                    unsigned int ObjectPalette0Color1 : 2;
+                    unsigned int ObjectPalette0Color2 : 2;
+                    unsigned int ObjectPalette0Color3 : 2;
                 };
             };
+            #pragma pack(1)
             union
             {
                 uint8_t ObjectPalette1;      // 0xFF49                                           - Non GBC mode only
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t ObjectPalette1Color0 : 2;
-                    uint8_t ObjectPalette1Color1 : 2;
-                    uint8_t ObjectPalette1Color2 : 2;
-                    uint8_t ObjectPalette1Color3 : 2;
+                    unsigned int ObjectPalette1Color0 : 2;
+                    unsigned int ObjectPalette1Color1 : 2;
+                    unsigned int ObjectPalette1Color2 : 2;
+                    unsigned int ObjectPalette1Color3 : 2;
                 };
             };
             uint8_t WindowPositionY;         // 0xFF4A
             uint8_t WindowPositionXMinus7;   // 0xFF4B
             uint8_t IO_Unk5;
+            #pragma pack(1)
             union
             {
                 uint8_t SpeedSwitch;         // 0xFF4D                                           - Only in GBC mode
 
+                #pragma pack(1)
                 struct
                 {
-                    uint8_t PrepareSpeedSwitch : 1; // (0 = No, 1 = Prepare)
-                    uint8_t                    : 6;
-                    uint8_t CurrentSpeed       : 1; // (0 = Normal, 1 = Double)
+                    unsigned int PrepareSpeedSwitch : 1; // (0 = No, 1 = Prepare)
+                    unsigned int                    : 6;
+                    unsigned int CurrentSpeed       : 1; // (0 = Normal, 1 = Double)
                 };
             };
             uint8_t IO_Unk11;

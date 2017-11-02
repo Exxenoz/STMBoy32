@@ -18,24 +18,26 @@ typedef union GBC_GPU_StatusInterruptRequestState_s
 
     struct
     {
-        uint8_t HBlankInterruptRequest      : 1;
-        uint8_t VBlankInterruptRequest      : 1;
-        uint8_t OAMInterruptRequest         : 1;
-        uint8_t CoincidenceInterruptRequest : 1;
-        uint8_t                             : 4;
+        unsigned int HBlankInterruptRequest      : 1;
+        unsigned int VBlankInterruptRequest      : 1;
+        unsigned int OAMInterruptRequest         : 1;
+        unsigned int CoincidenceInterruptRequest : 1;
+        unsigned int                             : 4;
     };
 }
 GBC_GPU_StatusInterruptRequestState_t;
 
+#pragma pack(1)
 typedef union GBC_GPU_Color_e
 {
     uint16_t Color;
 
+    #pragma pack(1)
     struct
     {
-        uint8_t Blue  : 5; // LSB
-        uint8_t Green : 6;
-        uint8_t Red   : 5; // MSB
+        unsigned int Blue  : 5; // LSB
+        unsigned int Green : 6;
+        unsigned int Red   : 5; // MSB
     };
 }
 GBC_GPU_Color_t;
