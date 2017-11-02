@@ -141,9 +141,9 @@ typedef struct GBC_MMU_Memory_s
         #pragma pack(1)
         struct SpriteAttributes_s
         {
-            unsigned int PositionY;       // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
-            unsigned int PositionX;       // Horizontal position on the screen minus 8.
-            unsigned int TileID;          // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
+            uint8_t PositionY;       // Vertical position on the screen minus 16. Offscreen values Y = 0 or Y >= 160 hides the sprite.
+            uint8_t PositionX;       // Horizontal position on the screen minus 8.
+            uint8_t TileID;          // Unsigned tile ID selects tile from memory at 8000h-8FFFh.      - GBC mode: Tile can be selected from VRAM Bank 0 or 1
             #pragma pack(1)
             union
             {
