@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-enum GBC_GPU_Mode_e
+typedef enum GBC_GPU_Mode_e
 {
     GBC_GPU_MODE_0_DURING_HBLANK        = 0, // During HBlank period and CPU can access VRAM and OAM
     GBC_GPU_MODE_1_DURING_VBLANK        = 1, // During VBlank period and CPU can access VRAM and OAM

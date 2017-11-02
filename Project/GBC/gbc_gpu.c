@@ -205,7 +205,7 @@ void GBC_GPU_RenderScanline(void)
     }
 }
 
-inline void GBC_GPU_CompareScanline()
+void GBC_GPU_CompareScanline()
 {
     if (GBC_MMU_Memory.Scanline == GBC_MMU_Memory.ScanlineCompare)
     {
