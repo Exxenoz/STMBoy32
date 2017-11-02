@@ -84,18 +84,18 @@ int main(void)
     while (1)
     {
         //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-        //GBC_Update();
+        GBC_Update();
         //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
         Input_UpdateJoypadState();
         
-        //while (!LCD_READY_FLAG);
-        if (LCD_READY_FLAG){
+        while (!LCD_READY_FLAG);
         if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
         {
+            //LCD_DrawLines(0xFFFF, 0x0000);
             LCD_PrintKaro(0, KaroOffset++);
             if (KaroOffset == 2400) KaroOffset = 0;
             //LCD_DrawFrameBuffer();
         }
         LCD_RST_READY_FLAG;
-    }}
+    }
 }

@@ -142,10 +142,12 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
 
     MemoryAccessControlData_t memoryAccessControlData = {0};
-    memoryAccessControlData.RowAddressOrder           = 0;
+    memoryAccessControlData.RowAddressOrder           = 1;
     memoryAccessControlData.ColumnAddressOrder        = 0;
-    memoryAccessControlData.RowColumnExchange         = 0;
+    memoryAccessControlData.RowColumnExchange         = 1;
+    memoryAccessControlData.VerticalRefreshOrder      = 1;
     memoryAccessControlData.RGBBGROrder               = 1;
+    memoryAccessControlData.HorizontalRefreshOrder    = 0;
     LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
 
     LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
@@ -343,6 +345,23 @@ void LCD_ClearColor(uint16_t color)
         LCD_DATA_PORT->ODR = color;
         LCD_RST_WR; // Set to write
         LCD_SET_WR;
+    }
+    LCD_SET_CS;
+}
+
+void LCD_DrawLines(uint16_t color1, uint16_t color2)
+{
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (int x = 0; x < LCD_DISPLAY_SIZE_X; x++)
+    {
+        for (long y = 0; y < LCD_DISPLAY_SIZE_Y; y++)
+        {
+            if (x % 2 == 0) LCD_DATA_PORT->ODR = color1;
+            else LCD_DATA_PORT->ODR = color2;
+            LCD_RST_WR; // Set to write
+            LCD_SET_WR;
+        }
     }
     LCD_SET_CS;
 }
