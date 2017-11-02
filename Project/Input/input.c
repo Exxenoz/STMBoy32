@@ -31,9 +31,8 @@ void Input_InitializePins(void)
     
     #define INITIALIZE_GPIO_PIN(PORT, PIN)                       \
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_IN;                   \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;                  \
     GPIO_InitObject.GPIO_Pin   = PIN;                            \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_DOWN;                 \
+    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_UP;                   \
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;              \
     GPIO_Init(PORT, &GPIO_InitObject);                           \
 
@@ -63,7 +62,7 @@ void Input_InitializeTimer(void)
     TIM_BaseObject.TIM_RepetitionCounter    = 0;
     TIM_TimeBaseInit(INPUT_TIM, &TIM_BaseObject);
 
-    TIM_ClearITPendingBit(INPUT_TIM, TIM_IT_Update);
+    TIM_ITConfig(INPUT_TIM, TIM_IT_Update, ENABLE);
     TIM_Cmd(INPUT_TIM, ENABLE);
 
     NVIC_InitObject.NVIC_IRQChannel                   = INPUT_TIM_NVIC_CHANNEL;
@@ -93,7 +92,8 @@ void Input_Initialize()
 void Input_UpdateJoypadState(void)
 {
     //-----------DEBUG LED----------
-    if (Input_Interrupt_Flags != 0xFF) GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+    if (((Input_Interrupt_Flags >> 1) & 0xFF)!= 0xFF) GPIO_SetBits(GPIOB, GPIO_Pin_14);
+    else GPIO_ResetBits(GPIOB, GPIO_Pin_14);
     //------------------------------
     
     if (GBC_MMU_Memory.JoypadInputSelectButtons)
@@ -127,16 +127,18 @@ void TIM3_IRQHandler(void)
             counter = 0;
         }
 
-        // If the input state didn't change since 5ms ago consider state as permanent
-        if (counter >= 5)
+        // If the input state didn't change since 10ms ago consider state as permanent
+        if (counter >= 10)
         {
             // Set the corresponding Input Bit (not pressed) then set it according to the current state
             Input_Interrupt_Flags |= flagPositions[i];
             Input_Interrupt_Flags &= (~flagPositions[i] | Input_CurrentState[i]);
+        
+            counter = 0;
         }
         
         Input_LastState[i] = Input_CurrentState[i];
     }
-
+    
     TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }
