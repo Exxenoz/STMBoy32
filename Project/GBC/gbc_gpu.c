@@ -1,6 +1,7 @@
 #include "gbc_gpu.h"
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
+#include "lcd.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
@@ -266,6 +267,8 @@ void GBC_GPU_Step(void)
                 if (GBC_MMU_Memory.Scanline >= 144)
                 {
                     GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
+
+                    LCD_DrawFrameBuffer();
 
                     if (GBC_MMU_Memory.VBlankInterrupt)
                     {

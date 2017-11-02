@@ -91,10 +91,10 @@ int main(void)
         while (!LCD_READY_FLAG);
         if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
         {
+            //LCD_ClearColor(0x0000);
             //LCD_DrawLines(0xFFFF, 0x0000);
-            LCD_PrintKaro(0, KaroOffset++);
-            if (KaroOffset == 2400) KaroOffset = 0;
-            //LCD_DrawFrameBuffer();
+            //LCD_PrintKaro(0, KaroOffset++);
+            //if (KaroOffset == 2400) KaroOffset = 0;
         }
         LCD_RST_READY_FLAG;
     }
