@@ -143,7 +143,7 @@ bool LCD_Initialize(void)
 
     MemoryAccessControlData_t memoryAccessControlData = {0};
     memoryAccessControlData.RowAddressOrder           = 1;
-    memoryAccessControlData.ColumnAddressOrder        = 0;
+    memoryAccessControlData.ColumnAddressOrder        = 1;
     memoryAccessControlData.RowColumnExchange         = 1;
     memoryAccessControlData.VerticalRefreshOrder      = 1;
     memoryAccessControlData.RGBBGROrder               = 1;
