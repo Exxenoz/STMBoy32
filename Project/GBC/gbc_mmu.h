@@ -223,7 +223,7 @@ typedef struct GBC_MMU_Memory_s
             uint8_t OAMTransferStartAddress; // 0xFF46
             union
             {
-                uint8_t BackgroundPalette;       // 0xFF47                                       - Non GBC mode only
+                uint8_t BackgroundPalette;   // 0xFF47                                           - Non GBC mode only
 
                 struct
                 {
@@ -233,8 +233,30 @@ typedef struct GBC_MMU_Memory_s
                     uint8_t BackgroundPaletteColor3 : 2;
                 };
             };
-            uint8_t ObjectPaletteData0;      // 0xFF48                                           - Non GBC mode only
-            uint8_t ObjectPaletteData1;      // 0xFF49                                           - Non GBC mode only
+            union
+            {
+                uint8_t ObjectPalette0;      // 0xFF48                                           - Non GBC mode only
+
+                struct
+                {
+                    uint8_t ObjectPalette0Color0 : 2;
+                    uint8_t ObjectPalette0Color1 : 2;
+                    uint8_t ObjectPalette0Color2 : 2;
+                    uint8_t ObjectPalette0Color3 : 2;
+                };
+            };
+            union
+            {
+                uint8_t ObjectPalette1;      // 0xFF49                                           - Non GBC mode only
+
+                struct
+                {
+                    uint8_t ObjectPalette1Color0 : 2;
+                    uint8_t ObjectPalette1Color1 : 2;
+                    uint8_t ObjectPalette1Color2 : 2;
+                    uint8_t ObjectPalette1Color3 : 2;
+                };
+            };
             uint8_t WindowPositionY;         // 0xFF4A
             uint8_t WindowPositionXMinus7;   // 0xFF4B
             uint8_t IO_Unk5;

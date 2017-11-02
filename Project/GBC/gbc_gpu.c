@@ -7,7 +7,24 @@ GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
+
 GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
+{
+    0xFFFF, // 0 - White
+    0x524A, // 1 - 33% on
+    0xA294, // 2 - 66% on
+    0x0000, // 3 - Black
+};
+
+GBC_GPU_Color_t GBC_GPU_ObjectPalette0Classic[4] =
+{
+    0xFFFF, // 0 - White
+    0x524A, // 1 - 33% on
+    0xA294, // 2 - 66% on
+    0x0000, // 3 - Black
+};
+
+GBC_GPU_Color_t GBC_GPU_ObjectPalette1Classic[4] =
 {
     0xFFFF, // 0 - White
     0x524A, // 1 - 33% on
