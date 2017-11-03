@@ -412,7 +412,7 @@ void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
 {
     uint8_t value = GBC_CPU_Register.A;
 
-    if (value & 0x8)
+    if (value & 0x80)
     {
         value <<= 1;
         value  |= 1;
