@@ -3,11 +3,19 @@
 #include "gbc_mmu.h"
 #include "string.h"
 
-GBC_CPU_Register_t GBC_CPU_Register;       // Register
-uint32_t GBC_CPU_Ticks = 0;                // Ticks
-uint32_t GBC_CPU_StepTicks = 0;            // Step ticks
-bool GBC_CPU_InterruptMasterEnable = true; // Interrupt master
-bool GBC_CPU_Halted = false;               // Halted state
+GBC_CPU_Register_t GBC_CPU_Register;                // Register
+
+uint32_t GBC_CPU_Ticks = 0;                         // Ticks
+uint32_t GBC_CPU_StepTicks = 0;                     // Step ticks
+
+bool GBC_CPU_InterruptMasterEnable = true;          // Interrupt master
+
+uint16_t GBC_CPU_InterruptBackupRegister_AF = 0;    // Interrupt backup register for AF register
+uint16_t GBC_CPU_InterruptBackupRegister_BC = 0;    // Interrupt backup register for BC register
+uint16_t GBC_CPU_InterruptBackupRegister_DE = 0;    // Interrupt backup register for DE register
+uint16_t GBC_CPU_InterruptBackupRegister_HL = 0;    // Interrupt backup register for HL register
+
+bool GBC_CPU_Halted = false;                        // Halted state
 
 uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -345,6 +353,22 @@ void GBC_CPU_PushToStack(uint16_t value)
 {
     GBC_CPU_Register.SP -= 2;
     GBC_MMU_WriteShort(GBC_CPU_Register.SP, value);
+}
+
+void GBC_CPU_BackupRegisterState()
+{
+    GBC_CPU_InterruptBackupRegister_AF = GBC_CPU_Register.AF;
+    GBC_CPU_InterruptBackupRegister_BC = GBC_CPU_Register.BC;
+    GBC_CPU_InterruptBackupRegister_DE = GBC_CPU_Register.DE;
+    GBC_CPU_InterruptBackupRegister_HL = GBC_CPU_Register.HL;
+}
+
+void GBC_CPU_RestoreRegisterState()
+{
+    GBC_CPU_Register.AF = GBC_CPU_InterruptBackupRegister_AF;
+    GBC_CPU_Register.BC = GBC_CPU_InterruptBackupRegister_BC;
+    GBC_CPU_Register.DE = GBC_CPU_InterruptBackupRegister_DE;
+    GBC_CPU_Register.HL = GBC_CPU_InterruptBackupRegister_HL;
 }
 
 void GBC_CPU_NOP()                      // 0x00 - No operation
@@ -1608,6 +1632,7 @@ void GBC_CPU_ADD_A_X(uint8_t operand)   // 0xC6 - Add 8-bit immediate to A
 
 void GBC_CPU_RST_0H()                   // 0xC7 - Call routine at address 0000h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0;
 }
@@ -1679,6 +1704,7 @@ void GBC_CPU_ADC_A_X(uint8_t operand)   // 0xCE - Add 8-bit immediate and carry 
 
 void GBC_CPU_RST_8H()                   // 0xCF - Call routine at address 0008h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x8;
 }
@@ -1740,6 +1766,7 @@ void GBC_CPU_SUB_A_X(uint8_t operand)   // 0xD6 - Subtract 8-bit immediate from 
 
 void GBC_CPU_RST_10H()                  // 0xD7 - Call routine at address 0010h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x10;
 }
@@ -1760,6 +1787,8 @@ void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused c
 void GBC_CPU_RETI()                     // 0xD9 - Enable interrupts and return to calling routine
 {
     GBC_CPU_InterruptMasterEnable = true;
+
+    GBC_CPU_RestoreRegisterState();
     GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
 }
 
@@ -1797,6 +1826,7 @@ void GBC_CPU_SBC_A_X(uint8_t operand)   // 0xDE - Subtract 8-bit immediate and c
 
 void GBC_CPU_RST_18H()                  // 0xDF - Call routine at address 0018h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x18;
 }
@@ -1828,6 +1858,7 @@ void GBC_CPU_AND_A_X(uint8_t operand)   // 0xE6 - Logical AND 8-bit value immedi
 
 void GBC_CPU_RST_20H()                  // 0xE7 - Call routine at address 0020h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x20;
 }
@@ -1890,6 +1921,7 @@ void GBC_CPU_XOR_A_X(uint8_t operand)   // 0xEE - Logical XOR 8-bit value immedi
 
 void GBC_CPU_RST_28H()                  // 0xEF - Call routine at address 0028h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x28;
 }
@@ -1926,6 +1958,7 @@ void GBC_CPU_OR_A_X(uint8_t operand)    // 0xF6 - Logical OR 8-bit value immedia
 
 void GBC_CPU_RST_30H()                  // 0xF7 - Call routine at address 0030h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x30;
 }
@@ -1993,6 +2026,7 @@ void GBC_CPU_CP_A_X(uint8_t operand)    // 0xFE - Compare 8-bit value immediate 
 
 void GBC_CPU_RST_38H()                  // 0xFF - Call routine at address 0038h
 {
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x38;
 }
@@ -2291,6 +2325,7 @@ void GBC_CPU_RST_40H()      // Start VBlank Handler
 {
     GBC_CPU_InterruptMasterEnable = false;
 
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x40;
 
@@ -2301,6 +2336,7 @@ void GBC_CPU_RST_48H()      // Start LCD-Stat Handler
 {
     GBC_CPU_InterruptMasterEnable = false;
 
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x48;
 
@@ -2311,6 +2347,7 @@ void GBC_CPU_RST_50H()      // Start Timer Handler
 {
     GBC_CPU_InterruptMasterEnable = false;
 
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x50;
 
@@ -2321,6 +2358,7 @@ void GBC_CPU_RST_58H()      // Start Serial Handler
 {
     GBC_CPU_InterruptMasterEnable = false;
 
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x58;
 
@@ -2331,6 +2369,7 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
 {
     GBC_CPU_InterruptMasterEnable = false;
 
+    GBC_CPU_BackupRegisterState();
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x60;
 
