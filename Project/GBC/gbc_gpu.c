@@ -221,6 +221,32 @@ void GBC_GPU_RenderScanline(void)
             pixelX = 0;
         }
     }
+
+    if (GBC_MMU_Memory.SpriteDisplayEnable)
+    {
+        uint8_t spriteHeight = 8;
+
+        if (GBC_MMU_Memory.SpriteSize)
+        {
+            spriteHeight = 16;
+        }
+
+        for (long i = 0; i < 40; i++)
+        {
+            struct SpriteAttributes_s sprite = GBC_MMU_Memory.SpriteAttributes[i];
+
+            // Check if sprite falls on this scanline
+            if (sprite.PositionY > GBC_MMU_Memory.Scanline ||
+               (sprite.PositionY + spriteHeight) <= GBC_MMU_Memory.Scanline ||
+                sprite.PositionX == 0 ||
+                sprite.PositionX >= 160)
+            {
+                continue;
+            }
+
+            
+        }
+    }
 }
 
 void GBC_GPU_CompareScanline()
