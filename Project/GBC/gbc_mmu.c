@@ -576,12 +576,17 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Memory-mapped I/O
     else if (address <= 0xFF7F)
     {
-        GBC_MMU_Memory.IO[address - 0xFF00] = value;
-
         switch (address)
         {
             case 0xFF00:
+                GBC_MMU_Memory.IO[address - 0xFF00] = value;
                 Input_UpdateJoypadState();
+                break;
+            case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
+                GBC_MMU_Memory.IO[address - 0xFF00] = 0;
+                break;
+            default:
+                GBC_MMU_Memory.IO[address - 0xFF00] = value;
                 break;
         }
     }

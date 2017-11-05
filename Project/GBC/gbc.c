@@ -2,6 +2,7 @@
 #include "gbc_cpu.h"
 #include "gbc_gpu.h"
 #include "gbc_mmu.h"
+#include "gbc_tim.h"
 #include "cmod.h"
 #include "sdc.h"
 
@@ -24,6 +25,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
     }
 
     GBC_CPU_Initialize();
+    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_CARTRIDGE;
@@ -46,6 +48,7 @@ GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
     }
 
     GBC_CPU_Initialize();
+    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_SDC;
@@ -81,6 +84,7 @@ void GBC_Update(void)
     while (GBC_CPU_Ticks < 70224)
     {
         GBC_CPU_Step();
+        GBC_TIM_Step();
         GBC_GPU_Step();
     }
 

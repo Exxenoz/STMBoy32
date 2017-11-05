@@ -777,6 +777,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1593,6 +1603,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2408,6 +2428,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3220,6 +3250,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4034,6 +4074,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4846,6 +4896,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5662,6 +5722,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6474,6 +6544,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7290,6 +7370,16 @@
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
             </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8105,6 +8195,16 @@
               <FileName>gbc_mmu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\GBC\gbc_mmu.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>gbc_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
           </Files>
         </Group>

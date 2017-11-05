@@ -76,6 +76,8 @@ enum GBC_MMU_CurrentSpeed_e
     GBC_MMU_CURRENT_SPEED_DOUBLE = 1,
 };
 
+// Thanks to Imran Nazar @ http://imrannazar.com and Marat Fayzullin, Pascal Felber, Paul Robson and Martin Korth for the Pan Docs!
+
 #pragma pack(1)
 typedef struct GBC_MMU_Memory_s
 {
@@ -191,10 +193,22 @@ typedef struct GBC_MMU_Memory_s
             uint8_t SerialTransferData;      // 0xFF01
             uint8_t SerialTransferControl;   // 0xFF02
             uint8_t IO_Unk13;
-            uint8_t DividerRegister;         // 0xFF04
-            uint8_t TimerCounter;            // 0xFF05
-            uint8_t TimerModulo;             // 0xFF06
-            uint8_t TimerControl;            // 0xFF07
+            uint8_t TimerDivider;            // 0xFF04  Counts up at a fixed 16384Hz; reset to 0 whenever written to
+            uint8_t TimerCounter;            // 0xFF05  Counts up at the specified rate; Triggers INT 0x50 when going 255->0
+            uint8_t TimerModulo;             // 0xFF06  When Counter overflows to 0, it is reset to start at TimerModulo
+            #pragma pack(1)
+            union
+            {
+                uint8_t TimerControl;        // 0xFF07
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int TimerSpeed   : 2; // 00: 4096Hz, 01: 262144Hz, 10: 65536Hz, 11: 16384Hz
+                    unsigned int TimerRunning : 1; // 1 to run timer, 0 to stop
+                    unsigned int              : 5; // Unused
+                };
+            };
             uint8_t IO_Unk1[7];
             uint8_t InterruptFlags;          // 0xFF0F
             uint8_t IO_Unk2[48];
