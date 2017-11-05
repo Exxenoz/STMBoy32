@@ -5,5 +5,6 @@
 
 void GBC_TIM_Initialize(void);
 void GBC_TIM_Step(void);
+void GBC_TIM_Reset(void);
 
 #endif

@@ -63,3 +63,9 @@ void GBC_TIM_Step(void)
         }
     }
 }
+
+void GBC_TIM_Reset(void)
+{
+    GBC_TIM_CounterTicks = 0;
+    GBC_MMU_Memory.TimerCounter = GBC_MMU_Memory.TimerModulo;
+}

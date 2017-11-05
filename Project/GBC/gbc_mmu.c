@@ -1,4 +1,5 @@
 #include "gbc_mmu.h"
+#include "gbc_tim.h"
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
@@ -578,12 +579,23 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     {
         switch (address)
         {
-            case 0xFF00:
-                GBC_MMU_Memory.IO[address - 0xFF00] = value;
+            case 0xFF00: // Joypad
+                GBC_MMU_Memory.Joypad = value;
+
                 Input_UpdateJoypadState();
                 break;
             case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
-                GBC_MMU_Memory.IO[address - 0xFF00] = 0;
+                GBC_MMU_Memory.TimerDivider = 0;
+                break;
+            case 0xFF07: // Timer Control
+                value &= 0x07;
+
+                if (GBC_MMU_Memory.TimerRunning != (value & 0x03))
+                {
+                    GBC_TIM_Reset();
+                }
+
+                GBC_MMU_Memory.TimerControl = value;
                 break;
             default:
                 GBC_MMU_Memory.IO[address - 0xFF00] = value;
