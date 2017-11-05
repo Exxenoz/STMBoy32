@@ -407,8 +407,29 @@ void LCD_DrawFrameBuffer(void)
     for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
     {
         LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
-        LCD_RST_WR;                                         // Set to write
+        LCD_RST_WR;
         LCD_SET_WR;
+    }
+    LCD_SET_CS;
+}
+
+void LCD_DrawFrameBufferScaled(void)
+{
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (int y = 0, i = 0; y < 240; y++)
+    {
+        for (long x = 0; x < 160; x++)
+        {
+            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[160 * i + x].Color;
+            LCD_RST_WR;
+            LCD_SET_WR;
+            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[160 * i + x].Color;
+            LCD_RST_WR;
+            LCD_SET_WR;
+        }
+        
+        if (y < 24 || y > 215 || y % 2 != 0) i++;
     }
     LCD_SET_CS;
 }
