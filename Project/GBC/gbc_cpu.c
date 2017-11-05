@@ -231,7 +231,7 @@ uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
 {
     uint32_t result = a + b;
 
-    if (result & 0x10000)
+    if (result > 0xFFFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
@@ -242,7 +242,7 @@ uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
 
     result &= 0xFFFF;
 
-    if (((a & 0x0FFF) + (b & 0x0FFF)) & 0x1000)
+    if (((a & 0x0FFF) + (b & 0x0FFF)) > 0x0FFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
     }
@@ -418,25 +418,23 @@ void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
         value  |= 1;
 
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
         value <<= 1;
 
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
 
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
+    /*if (value) ???
     {
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
+    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -488,25 +486,23 @@ void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
         value  |= 0x80;
 
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
         value >>= 1;
 
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
 
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
+    /*if (value) ???
     {
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
+    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -563,26 +559,24 @@ void GBC_CPU_RL_A()                     // 0x17 - Rotate A left
     if (value & 0x80)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
 
     value <<= 0x1;
     value  |= carry;
 
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
+    /*if (value) ???
     {
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
+    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -640,26 +634,24 @@ void GBC_CPU_RR_A()                     // 0x1F - Rotate A right
     if (value & 0x1)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
 
     value >>= 0x1;
     value  |= carry;
 
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
+    /*if (value) ???
     {
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
+    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -719,13 +711,18 @@ void GBC_CPU_LD_H_X(uint8_t operand)    // 0x26 - Load 8-bit immediate into H
 
 void GBC_CPU_DA_A()                     // 0x27 - Adjust A for BCD (Binary Coded Decimal) addition
 {
-    uint16_t value = GBC_CPU_Register.A;
+    int32_t value = GBC_CPU_Register.A;
 
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_SUBTRACTION))
     {
         if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_HALFCARRY))
         {
-            value = (value - 6) & 0xFF;
+            value -= 0x06;
+
+            if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+            {
+                value &= 0xFF;
+            }
         }
 
         if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
@@ -746,13 +743,13 @@ void GBC_CPU_DA_A()                     // 0x27 - Adjust A for BCD (Binary Coded
         }
     }
 
-    if ((value & 0x100) == 0x100)
+    if (value & 0x100)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
-    else
+    //else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        // Do not clear carry flag
     }
 
     GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
@@ -1933,7 +1930,7 @@ void GBC_CPU_LDH_A_XP(uint8_t operand)  // 0xF0 - Load A from address pointed to
 
 void GBC_CPU_POP_AF()                   // 0xF1 - Pop 16-bit value from stack into AF
 {
-    GBC_CPU_Register.AF = GBC_CPU_PopFromStack();
+    GBC_CPU_Register.AF = GBC_CPU_PopFromStack() & 0xFFF0;
 }
 
 void GBC_CPU_LDH_A_CP()                 // 0xF2 - Load A from address pointed to by (FF00h + C)
