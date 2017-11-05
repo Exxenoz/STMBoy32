@@ -1904,9 +1904,9 @@ void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to 
     GBC_CPU_Register.SP = result;
 }
 
-void GBC_CPU_JP_HLP()                   // 0xE9 - Jump to 16-bit value pointed by HL
+void GBC_CPU_JP_HL()                    // 0xE9 - Jump to HL
 {
-    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.HL);
+    GBC_CPU_Register.PC = GBC_CPU_Register.HL;
 }
 
 void GBC_CPU_LD_XXP_A(uint16_t operand) // 0xEA - Save A at given 16-bit address
@@ -2269,7 +2269,7 @@ const GBC_CPU_Instruction_t GBC_CPU_Instructions[256] =
     { GBC_CPU_AND_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xE6 - Logical AND 8-bit value immediate against A
     { GBC_CPU_RST_20H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE7 - Call routine at address 0020h
     { GBC_CPU_ADD_SP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xE8 - Add signed 8-bit immediate to SP
-    { GBC_CPU_JP_HLP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xE9 - Jump to 16-bit value pointed by HL
+    { GBC_CPU_JP_HL,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xE9 - Jump to HL
     { GBC_CPU_LD_XXP_A,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_8  }, // 0xEA - Save A at given 16-bit address
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEB - Operation removed in this CPU
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEC - Operation removed in this CPU
