@@ -402,9 +402,11 @@ void LCD_PrintKaro(uint16_t color, uint16_t offset)
 
 void LCD_DrawFrameBuffer(void)
 {
+    LCD_SetDrawArea(80, 48, 160, 144);
+
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
+    for (long i = 0; i < 144*160; i++)
     {
         LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
         LCD_RST_WR;
@@ -415,9 +417,11 @@ void LCD_DrawFrameBuffer(void)
 
 void LCD_DrawFrameBufferScaled(void)
 {
+    int linesDrawn = 0;
+    
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (int y = 0, i = 0; y < 240; y++)
+    for (int y = 1, i = 0; y <= 240; y++)
     {
         for (long x = 0; x < 160; x++)
         {
@@ -428,8 +432,10 @@ void LCD_DrawFrameBufferScaled(void)
             LCD_RST_WR;
             LCD_SET_WR;
         }
+        //linesDrawn++;
         
-        if (y < 24 || y > 215 || y % 2 != 0) i++;
+        if (y <= 24 || y >= 215 || y % 2 == 0) i++;                         // Draw all lines twice except first & last 24
+        //if (linesDrawn == 2 || y % 5 == 0) { i++; linesDrawn = 0; }       // Draw all lines twice except every third
     }
     LCD_SET_CS;
 }
