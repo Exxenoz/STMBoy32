@@ -63,6 +63,7 @@ int main(void)
     GPIO_Init(GPIOA, &GPIO_InitObject);
     GPIO_ResetBits(GPIOA, GPIO_Pin_5);
     
+    LCD_ClearColor(0x0000);
     CMOD_SaveResult_t result;
     GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
     if(loaded == GBC_LOAD_RESULT_OK)
