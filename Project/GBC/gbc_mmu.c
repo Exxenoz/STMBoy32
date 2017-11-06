@@ -82,17 +82,31 @@ void GBC_MMU_Initialize(void)
     // Initialize memory
     if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
     {
-        for (long i = 0; i < 256; i++)
+        for (long i = 0; i < 128; i++)
         {
             GBC_MMU_Memory.IO[i] = GBC_MMU_InitialValuesForColorFFXX[i];
         }
+
+        for (long i = 128, j = 0; i < 255; i++, j++)
+        {
+            GBC_MMU_Memory.HRAM[j] = GBC_MMU_InitialValuesForColorFFXX[i];
+        }
+
+        GBC_MMU_Memory.InterruptEnable = GBC_MMU_InitialValuesForColorFFXX[255];
     }
     else
     {
-        for (long i = 0; i < 256; i++)
+        for (long i = 0; i < 128; i++)
         {
             GBC_MMU_Memory.IO[i] = GBC_MMU_InitialValuesForFFXX[i];
         }
+
+        for (long i = 128, j = 0; i < 255; i++, j++)
+        {
+            GBC_MMU_Memory.HRAM[j] = GBC_MMU_InitialValuesForFFXX[i];
+        }
+
+        GBC_MMU_Memory.InterruptEnable = GBC_MMU_InitialValuesForFFXX[255];
     }
 }
 
