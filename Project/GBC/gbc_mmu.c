@@ -19,7 +19,6 @@ uint16_t GBC_MMU_CurrentROMBankAddress = 16384;                                 
                                                                                    
 bool GBC_MMU_ERAMEnabled = false;                                                  // External RAM Enabled State
 uint8_t GBC_MMU_CurrentERAMBankID = 0;                                             // Current ERAM Bank ID
-uint16_t GBC_MMU_CurrentERAMBankAddress = 0;                                       // Current ERAM Bank Start Address
                                                                                    
 bool GBC_MMU_RTC_Selected = false;                                                 // External RTC Selected State
 GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                       // External RTC Register
@@ -202,7 +201,6 @@ void GBC_MMU_Unload(void)
 
     GBC_MMU_ERAMEnabled = false;
     GBC_MMU_CurrentERAMBankID = 0;
-    GBC_MMU_CurrentERAMBankAddress = 0;
 
     GBC_MMU_RTC_Selected = false;
     memset(&GBC_MMU_RTC_Register, 0, sizeof(GBC_MMU_RTC_Register_t));
@@ -264,9 +262,16 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
             {
                 return GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID];
             }
-            else
+            else switch (GBC_MMU_CurrentERAMBankID)
             {
-                return GBC_MMU_Memory.ERAMBank0[GBC_MMU_CurrentERAMBankAddress + (address - 0xA000)];
+                case 0:
+                    return GBC_MMU_Memory.ERAMBank0[address - 0xA000];
+                case 1:
+                    return GBC_MMU_Memory.ERAMBank1[address - 0xA000];
+                case 2:
+                    return GBC_MMU_Memory.ERAMBank2[address - 0xA000];
+                case 3:
+                    return GBC_MMU_Memory.ERAMBank3[address - 0xA000];
             }
         }
     }
@@ -278,13 +283,23 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     // Work RAM Bank X
     else if (address <= 0xDFFF)
     {
-        if (GBC_MMU_Memory.WRAMBankID == 0)
+        switch (GBC_MMU_Memory.WRAMBankID)
         {
-            return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
-        }
-        else
-        {
-            return GBC_MMU_Memory.WRAMBank0[(4096 << (GBC_MMU_Memory.WRAMBankID - 1)) + (address - 0xD000)];
+            case 0:
+            case 1:
+                return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
+            case 2:
+                return GBC_MMU_Memory.WRAMBank2[address - 0xD000];
+            case 3:
+                return GBC_MMU_Memory.WRAMBank3[address - 0xD000];
+            case 4:
+                return GBC_MMU_Memory.WRAMBank4[address - 0xD000];
+            case 5:
+                return GBC_MMU_Memory.WRAMBank5[address - 0xD000];
+            case 6:
+                return GBC_MMU_Memory.WRAMBank6[address - 0xD000];
+            case 7:
+                return GBC_MMU_Memory.WRAMBank7[address - 0xD000];
         }
     }
     // Shadow RAM redirection to WRAM
@@ -307,10 +322,15 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     {
         return GBC_MMU_Memory.IO[address - 0xFF00];
     }
-    // High RAM and Interrupt Enable Register
-    else if (address <= 0xFFFF)
+    // High RAM
+    else if (address < 0xFFFF)
     {
         return GBC_MMU_Memory.HRAM[address - 0xFF80];
+    }
+    // Interrupt Enable Register
+    else if (address == 0xFFFF)
+    {
+        return GBC_MMU_Memory.InterruptEnable;
     }
 
     return 0xFF; // Return 0xFF for unused memory (!!!)
@@ -379,7 +399,6 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
                 if (value <= 0x3)
                 {
                     GBC_MMU_CurrentERAMBankID = value;
-                    GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
                 }
                 break;
         }
@@ -446,7 +465,6 @@ void GBC_MMU_MBC3_Write(uint16_t address, uint8_t value)
             GBC_MMU_RTC_Selected = false;
 
             GBC_MMU_CurrentERAMBankID = value;
-            GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
         }
         else if (value >= 0x8 && value <= 0xC)
         {
@@ -494,7 +512,6 @@ void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
         if (value <= 0xF)
         {
             GBC_MMU_CurrentERAMBankID = value;
-            GBC_MMU_CurrentERAMBankAddress = (GBC_MMU_CurrentERAMBankID == 0) ? 0 : 8192 << (GBC_MMU_CurrentERAMBankID - 1);
         }
     }
 }
@@ -550,9 +567,20 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
             {
                 GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID] = value;
             }
-            else
+            else switch (GBC_MMU_CurrentERAMBankID)
             {
-                GBC_MMU_Memory.ERAMBank0[GBC_MMU_CurrentERAMBankAddress + (address - 0xA000)] = value;
+                case 0:
+                    GBC_MMU_Memory.ERAMBank0[address - 0xA000] = value;
+                    break;
+                case 1:
+                    GBC_MMU_Memory.ERAMBank1[address - 0xA000] = value;
+                    break;
+                case 2:
+                    GBC_MMU_Memory.ERAMBank2[address - 0xA000] = value;
+                    break;
+                case 3:
+                    GBC_MMU_Memory.ERAMBank3[address - 0xA000] = value;
+                    break;
             }
         }
     }
@@ -564,13 +592,30 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Work RAM Bank X
     else if (address <= 0xDFFF)
     {
-        if (GBC_MMU_Memory.WRAMBankID == 0)
+        switch (GBC_MMU_Memory.WRAMBankID)
         {
-            GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
-        }
-        else
-        {
-            GBC_MMU_Memory.WRAMBank0[(4096 << (GBC_MMU_Memory.WRAMBankID - 1)) + (address - 0xD000)] = value;
+            case 0:
+            case 1:
+                GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
+                break;
+            case 2:
+                GBC_MMU_Memory.WRAMBank2[address - 0xD000] = value;
+                break;
+            case 3:
+                GBC_MMU_Memory.WRAMBank3[address - 0xD000] = value;
+                break;
+            case 4:
+                GBC_MMU_Memory.WRAMBank4[address - 0xD000] = value;
+                break;
+            case 5:
+                GBC_MMU_Memory.WRAMBank5[address - 0xD000] = value;
+                break;
+            case 6:
+                GBC_MMU_Memory.WRAMBank6[address - 0xD000] = value;
+                break;
+            case 7:
+                GBC_MMU_Memory.WRAMBank7[address - 0xD000] = value;
+                break;
         }
     }
     // Shadow RAM redirection to WRAM
@@ -616,10 +661,15 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 break;
         }
     }
-    // High RAM and Interrupt Enable Register
-    else if (address <= 0xFFFF)
+    // High RAM
+    else if (address < 0xFFFF)
     {
         GBC_MMU_Memory.HRAM[address - 0xFF80] = value;
+    }
+    // Interrupt Enable Register
+    else if (address == 0xFFFF)
+    {
+        GBC_MMU_Memory.InterruptEnable = value;
     }
 }
 
