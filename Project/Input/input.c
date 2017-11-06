@@ -71,6 +71,8 @@ void Input_InitializeTimer(void)
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitObject);
     NVIC_EnableIRQ(INPUT_TIM_NVIC_CHANNEL);
+    
+    NVIC_SetPriority(INPUT_TIM_NVIC_CHANNEL, 1);
 }
 
 void Input_Initialize() 
@@ -110,19 +112,19 @@ void Input_UpdateJoypadState(void)
 }
 
 void TIM3_IRQHandler(void)
-{       
+{
     for (int i = 0; i < 8; i++)
     {
         // If the Input pin is low button/fade is pressed
         Input_CurrentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
-        
+
         // If the input state didn't change since 1ms ago increase counter
         if (Input_CurrentState[i] == Input_LastState[i])
         {
             counter++;
         }
         // If the input state changed since 1ms ago reset counter
-        else                                
+        else
         {
             counter = 0;
         }
@@ -133,12 +135,12 @@ void TIM3_IRQHandler(void)
             // Set the corresponding Input Bit (not pressed) then set it according to the current state
             Input_Interrupt_Flags |= flagPositions[i];
             Input_Interrupt_Flags &= (~flagPositions[i] | Input_CurrentState[i]);
-        
+
             counter = 0;
         }
-        
+
         Input_LastState[i] = Input_CurrentState[i];
     }
-    
+
     TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }

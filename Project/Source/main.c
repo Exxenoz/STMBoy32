@@ -43,7 +43,10 @@ int main(void)
     // to debug clock frequency settings using GPIO
     // ClockDebug_Initialize();
 
-    int KaroOffset = 0;
+    // Change the priority grouping configuration back to standard 
+    // (all bits of interrupt priority register used for preempt priority)
+    // STM Library changes it to non-standard
+    NVIC_SetPriorityGrouping(0U);
 
     LED_Initialize();
     Audio_Initialize();
