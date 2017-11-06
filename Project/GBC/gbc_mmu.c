@@ -237,13 +237,13 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
     // Video RAM bank X
     else if (address <= 0x9FFF)
     {
-        if (GBC_MMU_Memory.VRAMBankID == 0)
+        if (GBC_MMU_Memory.VRAMBankID == 1)
         {
-            return GBC_MMU_Memory.VRAMBank0[address - 0x8000];
+            return GBC_MMU_Memory.VRAMBank1[address - 0x8000];
         }
         else
         {
-            return GBC_MMU_Memory.VRAMBank1[address - 0x8000];
+            return GBC_MMU_Memory.VRAMBank0[address - 0x8000];
         }
     }
     // External RAM bank X
@@ -544,13 +544,13 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Video RAM bank X
     else if (address <= 0x9FFF)
     {
-        if (GBC_MMU_Memory.VRAMBankID == 0)
+        if (GBC_MMU_Memory.VRAMBankID == 1)
         {
-            GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
+            GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
         }
         else
         {
-            GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
+            GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
         }
     }
     // External RAM bank X
