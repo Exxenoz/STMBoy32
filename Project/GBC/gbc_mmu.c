@@ -370,7 +370,7 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
                 break;
         }
 
-        GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+        GBC_MMU_CurrentROMBankAddress = 16384 * GBC_MMU_CurrentROMBankID;
     }
     // RAM Bank Number - or - Upper Bits of ROM Bank Number
     else if (address <= 0x5FFF)
@@ -392,7 +392,7 @@ void GBC_MMU_MBC1_Write(uint16_t address, uint8_t value)
                         break;
                 }
 
-                GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+                GBC_MMU_CurrentROMBankAddress = 16384 * GBC_MMU_CurrentROMBankID;
 
                 break;
             case GBC_MMU_MBC1_MODE_RAM: // Select a RAM Bank in range from 00-03h
@@ -433,7 +433,7 @@ void GBC_MMU_MBC2_Write(uint16_t address, uint8_t value)
                 GBC_MMU_CurrentROMBankID++;
             }
 
-            GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+            GBC_MMU_CurrentROMBankAddress = 16384 * GBC_MMU_CurrentROMBankID;
         }
     }
 }
@@ -455,7 +455,7 @@ void GBC_MMU_MBC3_Write(uint16_t address, uint8_t value)
             GBC_MMU_CurrentROMBankID++;
         }
 
-        GBC_MMU_CurrentROMBankAddress = 16384 << (GBC_MMU_CurrentROMBankID - 1);
+        GBC_MMU_CurrentROMBankAddress = 16384 * GBC_MMU_CurrentROMBankID;
     }
     // RAM Bank Number 
     else if (address <= 0x5FFF)
@@ -497,14 +497,14 @@ void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
     {
         GBC_MMU_CurrentROMBankID &= ~0xFF;        // Set first 8 bits to 0
         GBC_MMU_CurrentROMBankID |= value & 0xFF; // Set first 8 bits to value
-        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 << (GBC_MMU_CurrentROMBankID - 1);
+        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 * GBC_MMU_CurrentROMBankID;
     }
     // High bit of ROM Bank Number
     else if (address <= 0x3FFF)
     {
         GBC_MMU_CurrentROMBankID &= ~0x100;             // Set bit 9 to 0
         GBC_MMU_CurrentROMBankID |= (value & 0x1) << 8; // Set bit 9 to value
-        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 << (GBC_MMU_CurrentROMBankID - 1);
+        GBC_MMU_CurrentROMBankAddress = (GBC_MMU_CurrentROMBankID == 0) ? 0 : 16384 * GBC_MMU_CurrentROMBankID;
     }
     // RAM Bank Number
     else if (address <= 0x5FFF)
