@@ -364,6 +364,7 @@ void TIM4_IRQHandler(void)
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
           TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
           return;                                                // Needed?
+          return;
       }
       else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
       {
@@ -372,6 +373,7 @@ void TIM4_IRQHandler(void)
           CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
           TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
           return;                                                // Needed?
+          return;
       }
 
       if (CMOD_Action == CMOD_READ)                              // Do we want to read?
