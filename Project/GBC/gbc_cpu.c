@@ -7,6 +7,7 @@ GBC_CPU_Register_t GBC_CPU_Register;                // Register
 
 uint32_t GBC_CPU_Ticks = 0;                         // Ticks
 uint32_t GBC_CPU_StepTicks = 0;                     // Step ticks
+int32_t  GBC_CPU_UnhaltTicks = 0;                   // Unhalt ticks
 
 bool GBC_CPU_InterruptMasterEnable = true;          // Interrupt master
 
@@ -2314,6 +2315,7 @@ void GBC_CPU_Initialize()
 
     GBC_CPU_Ticks = 0;
     GBC_CPU_StepTicks = 0;
+    GBC_CPU_UnhaltTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
 }
@@ -2375,10 +2377,61 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
 
 void GBC_CPU_Step()
 {
+    uint8_t interrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
+
     GBC_CPU_StepTicks = 0;
 
-    if (!GBC_CPU_Halted)    // If not waiting for interrupt to happen
+    if (GBC_CPU_Halted)
     {
+        GBC_CPU_StepTicks += 4;
+
+        if (GBC_CPU_UnhaltTicks != 0)
+        {
+            GBC_CPU_UnhaltTicks -= 4;
+
+            if (GBC_CPU_UnhaltTicks <= 0)
+            {
+                GBC_CPU_UnhaltTicks = 0;
+                GBC_CPU_Halted = false;
+            }
+        }
+        else if (interrupts)
+        {
+            GBC_CPU_UnhaltTicks = 12;
+        }
+    }
+    else // not in HALT mode
+    {
+        // Interrupt handling
+        if (GBC_CPU_InterruptMasterEnable && interrupts)
+        {
+            if (interrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
+            {
+                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
+                GBC_CPU_RST_40H(); // Start VBlank Handler
+            }
+            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
+            {
+                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                GBC_CPU_RST_48H(); // Start LCD-Stat Handler
+            }
+            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
+            {
+                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
+                GBC_CPU_RST_50H(); // Start Timer Handler
+            }
+            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
+            {
+                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
+                GBC_CPU_RST_58H(); // Start Serial Handler
+            }
+            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
+            {
+                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
+                GBC_CPU_RST_60H(); // Start Joypad Handler
+            }
+        }
+
         GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(GBC_CPU_Register.PC++)];
 
         // Instruction handling
@@ -2413,46 +2466,6 @@ void GBC_CPU_Step()
         }
 
         GBC_CPU_StepTicks += instruction.Ticks;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 2; // NOP
-    }
-
-    // Interrupt handling
-    if (GBC_CPU_InterruptMasterEnable  &&   // Interrupt master must be enabled
-        GBC_MMU_Memory.InterruptEnable &&   // At least one interrupt can be triggered
-        GBC_MMU_Memory.InterruptFlags)      // At least one interrupt has happened
-    {
-        GBC_CPU_Halted = false;
-
-        uint8_t interrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
-
-        if (interrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
-        {
-            GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
-            GBC_CPU_RST_40H(); // Start VBlank Handler
-        }
-        else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
-        {
-            GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
-            GBC_CPU_RST_48H(); // Start LCD-Stat Handler
-        }
-        else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
-        {
-            GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
-            GBC_CPU_RST_50H(); // Start Timer Handler
-        }
-        else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
-        {
-            GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
-            GBC_CPU_RST_58H(); // Start Serial Handler
-        }
-        else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
-        {
-            GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
-            GBC_CPU_RST_60H(); // Start Joypad Handler
-        }
     }
 
     GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
