@@ -300,6 +300,8 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                 return GBC_MMU_Memory.WRAMBank6[address - 0xD000];
             case 7:
                 return GBC_MMU_Memory.WRAMBank7[address - 0xD000];
+            default:
+                return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
         }
     }
     // Shadow RAM redirection to WRAM
@@ -615,6 +617,9 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 break;
             case 7:
                 GBC_MMU_Memory.WRAMBank7[address - 0xD000] = value;
+                break;
+            default:
+                GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
                 break;
         }
     }
