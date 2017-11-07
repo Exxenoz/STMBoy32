@@ -20,6 +20,11 @@ CMOD_Status_t CMOD_GetStatus(void)
     return CMOD_Status; 
 }
 
+void CMOD_EnableInterrupt(void)
+{
+    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, ENABLE);
+}
+
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_Detect(void)
 {
@@ -30,6 +35,85 @@ bool CMOD_Detect(void)
 
     if (data == 0xCE) return true;
     else              return false;
+}
+
+void CMOD_ResetCartridge(void)
+{
+    CMOD_RST_RESET;                     // Reset Cartridge
+    for (int i = 0; i < 100; i++);      // Wait some ns
+    CMOD_SET_RESET;
+}
+
+void CMOD_ReadByte(uint16_t address, uint8_t *data)
+{
+    while (CMOD_Status == CMOD_PROCESSING);
+
+    CMOD_SET_WR;                        // WR rises before a read occurs 20ns before the CLK rises (in GB)
+    CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
+
+    CMOD_Action      = CMOD_READ;
+    CMOD_Address     = address;
+    CMOD_DataIn      = data;
+    CMOD_BytesToRead = 1;
+    CMOD_BytesRead   = 0;
+    CMOD_Status      = CMOD_PROCESSING;
+
+    CMOD_DATA_MODE_IN;  
+    CMOD_EnableInterrupt();
+}
+
+void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
+{
+    while (CMOD_Status == CMOD_PROCESSING);
+
+    CMOD_SET_WR;                        // WR rises before a read occurs 20ns before the CLK rises (in GB)
+    CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
+
+    CMOD_Action      = CMOD_READ;
+    CMOD_Address     = startingAddress;
+    CMOD_DataIn      = data;
+    CMOD_BytesToRead = bytes;
+    CMOD_BytesRead   = 0;
+    CMOD_Status      = CMOD_PROCESSING;
+
+    CMOD_DATA_MODE_IN;  
+    CMOD_EnableInterrupt();
+}
+
+void CMOD_WriteByte(uint16_t address, uint8_t *data)
+{
+    while (CMOD_Status == CMOD_PROCESSING);
+
+    CMOD_SET_RD;                        // RD rises before a write occurs at 140ns (in GB)
+    CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
+
+    CMOD_Action       = CMOD_WRITE;
+    CMOD_Address      = address;
+    CMOD_DataOut      = data;
+    CMOD_BytesToWrite = 1;
+    CMOD_BytesWritten = 0;
+    CMOD_Status       = CMOD_PROCESSING;
+
+    CMOD_DATA_MODE_OUT;  
+    CMOD_EnableInterrupt();
+}
+
+void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
+{
+    while (CMOD_Status == CMOD_PROCESSING);
+
+    CMOD_SET_RD;                        // RD rises before a write occurs at 140ns (in GB)
+    CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
+
+    CMOD_Action       = CMOD_WRITE;
+    CMOD_Address      = startingAddress;
+    CMOD_DataOut      = data;
+    CMOD_BytesToWrite = bytes;
+    CMOD_BytesWritten = 0;
+    CMOD_Status       = CMOD_PROCESSING;
+
+    CMOD_DATA_MODE_OUT;
+    CMOD_EnableInterrupt();
 }
 
 // Manually switch the currently active Memory Bank of the Cartridge (to be able to save it)
@@ -191,79 +275,6 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     }
 
     return CMOD_FAILED;
-}
-
-void CMOD_ResetCartridge(void)
-{
-    CMOD_RST_RESET;                     // Reset Cartridge
-    for (int i = 0; i < 100; i++);      // Wait some ns
-    CMOD_SET_RESET;
-}
-
-void CMOD_EnableInterrupt(void)
-{
-    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, ENABLE);
-}
-
-void CMOD_DisableInterrupt(void)
-{
-    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, DISABLE);
-}
-
-void CMOD_ReadByte(uint16_t address, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_Action      = CMOD_READ;
-    CMOD_Address     = address;
-    CMOD_DataIn      = data;
-    CMOD_BytesToRead = 1;
-    CMOD_BytesRead   = 0;
-
-    CMOD_Status      = CMOD_PROCESSING;
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_Action      = CMOD_READ;
-    CMOD_Address     = startingAddress;
-    CMOD_DataIn      = data;
-    CMOD_BytesToRead = bytes;
-    CMOD_BytesRead   = 0;
-
-    CMOD_Status      = CMOD_PROCESSING;
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_WriteByte(uint16_t address, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_Action       = CMOD_WRITE;
-    CMOD_Address      = address;
-    CMOD_DataOut      = data;
-    CMOD_BytesToWrite = 1;
-    CMOD_BytesWritten = 0;
-
-    CMOD_Status  = CMOD_PROCESSING;
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_Action       = CMOD_WRITE;
-    CMOD_Address      = startingAddress;
-    CMOD_DataOut      = data;
-    CMOD_BytesToWrite = bytes;
-    CMOD_BytesWritten = 0;
-
-    CMOD_Status       = CMOD_PROCESSING;
-    CMOD_EnableInterrupt();
 }
 
 void CMOD_Initialize_CLK(void)
