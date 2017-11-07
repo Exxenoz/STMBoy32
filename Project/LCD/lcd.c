@@ -432,10 +432,10 @@ void LCD_DrawFrameBufferScaled(void)
             LCD_RST_WR;
             LCD_SET_WR;
         }
-        //linesDrawn++;
+        linesDrawn++;
         
-        if (y <= 24 || y >= 215 || y % 2 == 0) i++;                         // Draw all lines twice except first & last 24
-        //if (linesDrawn == 2 || y % 5 == 0) { i++; linesDrawn = 0; }       // Draw all lines twice except every third
+        //if (y <= 24 || y >= 215 || y % 2 == 0) i++;                         // Draw all lines twice except first & last 24
+        if (linesDrawn == 2 || y % 5 == 0) { i++; linesDrawn = 0; }       // Draw all lines twice except every third
     }
     LCD_SET_CS;
 }

@@ -294,7 +294,7 @@ void GBC_GPU_Step(void)
                 {
                     GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
 
-                    LCD_DrawFrameBuffer();
+                    LCD_DrawFrameBufferScaled();
 
                     if (GBC_MMU_Memory.VBlankInterrupt)
                     {
