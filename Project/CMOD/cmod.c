@@ -345,56 +345,70 @@ void CMOD_Initialize(void)
     CMOD_Initialize_CLK();
 }
 
+void CMOD_HandleRead(void)
+{
+    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank) 
+
+    if (CMOD_BytesRead != 0)                                // If a Byte was read, store it
+    {                                                       // Gameboy stops driving Data Bus at 0ns -> Data ready
+        CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();   // Store the nt byte at CMOD_DataIn[n-1]
+    }
+
+    if (CMOD_BytesRead == CMOD_BytesToRead)                 // Read all Data?
+    {
+        CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
+        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
+        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
+        return;
+    }
+
+    CMOD_SET_ADDR(CMOD_Address + CMOD_BytesRead);           // Address changes at 140ns (in GB)
+    CMOD_RST_CS;                                            // CS goes low at 240ns (in GB)
+    CMOD_BytesRead++;                                       // Increase BytesRead in good faith
+}
+
+void CMOD_HandleWrite(void)
+{
+    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank) 
+
+    if (CMOD_BytesRead != 0)                                // If a Byte was read, store it
+    {                                                       // Gameboy stops driving Data Bus at 0ns -> Data ready
+      CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();     // Store the nt byte at CMOD_DataIn[n-1]
+    }
+
+    if (CMOD_BytesWritten == CMOD_BytesToWrite)             // All Bytes written?
+    {
+        CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
+        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
+        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
+        return;
+    }
+
+    CMOD_SET_ADDR(CMOD_Address + CMOD_BytesWritten);        // Address changes at 140ns (in GB)
+    CMOD_RST_CS;                                            // CS goes low at 240ns (in GB)
+    CMOD_BytesWritten++;                                    // Increase BytesWritten in good faith
+    CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);     // Data Bus is driven at 480ns (falling CLK) (in GB)
+}
+
+void CMOD_HandleNOP(void)
+{
+    return;
+}
+
+void (*CMOD_OperationTable[3])(void) =
+{
+    CMOD_HandleRead,
+    CMOD_HandleWrite,
+    CMOD_HandleNOP
+};
+
 void TIM4_IRQHandler(void)
 {
-  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
-  { // Set WR after a Write, if last operation was a read it is already set, GB does that 20ns before the CLK rises                                                          
-      CMOD_SET_WR;
-      CMOD_SET_CS;                                               // CS rises at 0ns (after CLK Flank) 
+  if (((CMOD_TIM->SR   & TIM_IT_Update) != (uint16_t)RESET) && 
+      ((CMOD_TIM->DIER & TIM_IT_Update) != (uint16_t)RESET))    // ITStatus == SET?
+  {
+      CMOD_OperationTable[CMOD_Action]();                       // Handle Read / Write / NOP
 
-      if (CMOD_Action == CMOD_READ && CMOD_BytesRead != 0)       // If a Byte was read, store it
-      {                                                          // Gameboy stops driving Data Bus at 0ns -> Data ready
-          CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();      // Store the nt byte at CMOD_DataIn[n-1]
-      }
-
-      if (CMOD_Action == CMOD_READ && CMOD_BytesRead == CMOD_BytesToRead)          // Read all Data?
-      {
-          CMOD_Status = CMOD_DATA_READY;                                           // -> Data Ready
-          CMOD_Action = CMOD_NOACTION;                                             // All actions finished
-          CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler 
-          return;                                                // Needed?
-          return;
-      }
-      else if (CMOD_Action == CMOD_WRITE && CMOD_BytesWritten == CMOD_BytesToWrite)// All Bytes written?
-      {
-          CMOD_Status = CMOD_WRITE_COMPLETE;                                       // -> Write complete
-          CMOD_Action = CMOD_NOACTION;                                             // All actions finished
-          CMOD_DisableInterrupt();                                                 // Disable Interrupt until needed again
-          TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                              // Leave Interrupt Handler
-          return;                                                // Needed?
-          return;
-      }
-
-      if (CMOD_Action == CMOD_READ)                              // Do we want to read?
-      {
-          CMOD_RST_RD;                                           // RD goes low for a read at 30ns (in GB)
-          CMOD_SET_ADDR(CMOD_Address + CMOD_BytesRead);          // Address changes at 140ns (in GB)
-          CMOD_RST_CS;                                           // CS goes low at 240ns (in GB)
-          CMOD_BytesRead++;                                      // Increase BytesRead in good faith
-          CMOD_DATA_MODE_IN;                                     // Set the DataPins to Input mode for a read
-      }
-      else if (CMOD_Action == CMOD_WRITE)
-      {
-          CMOD_SET_RD;                                           // RD rises before a write at 140ns (in GB)
-          CMOD_SET_ADDR(CMOD_Address + CMOD_BytesWritten);       // Address changes at 140ns (in GB)
-          CMOD_RST_CS;                                           // CS goes low at 240ns (in GB)
-          CMOD_BytesWritten++;                                   // Increase BytesWritten in good faith
-          CMOD_DATA_MODE_OUT;                                    // Set the DataPins to Output mode for a write
-          CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);    // Data Bus is driven at 480ns (falling CLK) (in GB)
-          CMOD_RST_WR;                                           // WR goes low for a write at 480ns (falling CLK) (in GB)
-      }
-
-      TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+      CMOD_TIM->SR = (uint16_t)~TIM_IT_Update;                  // ClearITPendingBit
   }
 }
