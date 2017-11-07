@@ -17,22 +17,22 @@
 #define INPUT_B_PORT                        GPIOB
 #define INPUT_B_PIN                         GPIO_Pin_2
 
-#define INPUT_START_PORT                    GPIOB
-#define INPUT_START_PIN                     GPIO_Pin_3
-
 #define INPUT_SELECT_PORT                   GPIOB
-#define INPUT_SELECT_PIN                    GPIO_Pin_4
+#define INPUT_SELECT_PIN                    GPIO_Pin_3
 
-#define INPUT_FADE_TOP_PORT                 GPIOB
-#define INPUT_FADE_TOP_PIN                  GPIO_Pin_5
+#define INPUT_START_PORT                    GPIOB
+#define INPUT_START_PIN                     GPIO_Pin_4
 
 #define INPUT_FADE_RIGHT_PORT               GPIOB
-#define INPUT_FADE_RIGHT_PIN                GPIO_Pin_6
-
-#define INPUT_FADE_BOTTOM_PORT              GPIOB
-#define INPUT_FADE_BOTTOM_PIN               GPIO_Pin_7
+#define INPUT_FADE_RIGHT_PIN                GPIO_Pin_5
 
 #define INPUT_FADE_LEFT_PORT                GPIOB
-#define INPUT_FADE_LEFT_PIN                 GPIO_Pin_8
+#define INPUT_FADE_LEFT_PIN                 GPIO_Pin_6
+
+#define INPUT_FADE_TOP_PORT                 GPIOB
+#define INPUT_FADE_TOP_PIN                  GPIO_Pin_7
+
+#define INPUT_FADE_BOTTOM_PORT              GPIOB
+#define INPUT_FADE_BOTTOM_PIN               GPIO_Pin_8
 
 #endif //INPUT_CONFIG_H

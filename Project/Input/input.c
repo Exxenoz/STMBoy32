@@ -2,12 +2,12 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
-uint16_t Input_Interrupt_Flags = 0xFF;
+uint16_t Input_Interrupt_Flags = 0xFFFF;
 
 Input_ButtonState_t Input_LastState[8]    = {INPUT_NOT_PRESSED};
 Input_ButtonState_t Input_CurrentState[8] = {INPUT_NOT_PRESSED};
 
-uint8_t counter = 0x00;
+uint8_t counter[8] = { 0x00 };
 
 Input_InterruptFlags_t flagPositions[8] =
 {
@@ -97,23 +97,27 @@ void Input_UpdateJoypadState(void)
     if (((Input_Interrupt_Flags >> 1) & 0xFF)!= 0xFF) GPIO_SetBits(GPIOB, GPIO_Pin_14);
     else GPIO_ResetBits(GPIOB, GPIO_Pin_14);
     //------------------------------
-    
-    if (GBC_MMU_Memory.JoypadInputSelectButtons)
+    uint16_t flags;
+
+    if (GBC_MMU_Memory.JoypadInputSelectButtons == 0)
     {
-        GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= (Input_Interrupt_Flags >> 1) | 0xF0;   // Set lower 4 bits of Joypad to button states
+        flags = ((Input_Interrupt_Flags >> 1) | 0xFFF0);
+        GBC_MMU_Memory.Joypad |= 0x0F;                              // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= flags;                             // Set lower 4 bits of Joypad to button states
     }
-    
-    if (GBC_MMU_Memory.JoypadInputSelectFade)
+
+    if (GBC_MMU_Memory.JoypadInputSelectFade == 0)
     {
-        GBC_MMU_Memory.Joypad |= 0x0F;                                  // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= (Input_Interrupt_Flags >> 5) | 0xF0;   // Set lower 4 bits of Joypad to fade states
+        flags = ((Input_Interrupt_Flags >> 5) | 0xFFF0);
+        GBC_MMU_Memory.Joypad |= 0x0F;                              // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= flags;                             // Set lower 4 bits of Joypad to fade states
     }
 }
 
 void TIM3_IRQHandler(void)
 {
-    for (int i = 0; i < 8; i++)
+    int i;
+    for ( i = 0; i < 8; i++)
     {
         // If the Input pin is low button/fade is pressed
         Input_CurrentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
@@ -121,22 +125,22 @@ void TIM3_IRQHandler(void)
         // If the input state didn't change since 1ms ago increase counter
         if (Input_CurrentState[i] == Input_LastState[i])
         {
-            counter++;
+            counter[i]++;
         }
         // If the input state changed since 1ms ago reset counter
         else
         {
-            counter = 0;
+            counter[i] = 0;
         }
 
         // If the input state didn't change since 10ms ago consider state as permanent
-        if (counter >= 10)
+        if (counter[i] >= 10)
         {
             // Set the corresponding Input Bit (not pressed) then set it according to the current state
             Input_Interrupt_Flags |= flagPositions[i];
             Input_Interrupt_Flags &= (~flagPositions[i] | Input_CurrentState[i]);
 
-            counter = 0;
+            counter[i] = 0;
         }
 
         Input_LastState[i] = Input_CurrentState[i];
