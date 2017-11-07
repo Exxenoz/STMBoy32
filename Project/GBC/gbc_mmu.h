@@ -159,7 +159,7 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int PaletteNumberClassic : 1; // 0 = OBP0, 1 = OBP1                                        - Non GBC mode only
                     unsigned int FlipX                : 1; // 0 = Normal, 1 = Vertically mirrored
                     unsigned int FlipY                : 1; // 0 = Normal, 1 = Horizontally mirrored
-                    unsigned int RenderPriority       : 1; // 0 = Object above BG, 1 = Object behing BG color 1-3, BG color 0 is always behind object
+                    unsigned int BGRenderPriority     : 1; // 0 = Object above BG, 1 = Object behind BG color 1-3, BG color 0 is always behind object
                 };
             };
         } SpriteAttributes[40];

@@ -42,6 +42,27 @@ typedef union GBC_GPU_Color_e
 }
 GBC_GPU_Color_t;
 
+#pragma pack(1)
+typedef struct GBC_GPU_PriorityPixel_e
+{
+    #pragma pack(1)
+    union
+    {
+        uint8_t PriorityFlags;
+
+        #pragma pack(1)
+        struct
+        {
+            //unsigned int BGPriority      : 1; // BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory)
+            unsigned int BGPixel           : 2; // Background pixel color value for sprite priority detection
+            unsigned int SpritePositionSet : 1; // True, when a valid sprite position for priority ordering is set
+        };
+    };
+
+    uint8_t SpritePositionX;
+}
+GBC_GPU_PriorityPixel_t;
+
 extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144]; // External declaration for LCD access
 
 void GBC_GPU_Initialize(void);

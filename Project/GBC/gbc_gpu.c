@@ -2,12 +2,14 @@
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
 #include "lcd.h"
+#include "string.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
+GBC_GPU_PriorityPixel_t GBC_GPU_PriorityPixelLine[160];
 
 GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
 {
@@ -40,6 +42,7 @@ void GBC_GPU_Initialize(void)
     GBC_GPU_CurrentFrameBufferStartIndex = 0;
     GBC_GPU_CurrentFrameBufferEndIndex = 160;
     // Frame buffer must not be initialized
+    // Priority pixel line must not be initialized
 }
 
 void GBC_GPU_RenderScanline(void)
@@ -57,6 +60,9 @@ void GBC_GPU_RenderScanline(void)
 
         return;
     }
+
+    // Reset priority pixel line
+    memset(GBC_GPU_PriorityPixelLine, 0, sizeof(GBC_GPU_PriorityPixelLine));
 
     // Which row in the tile map needs to be rendered
     uint16_t screenOffsetY = GBC_MMU_Memory.Scanline + GBC_MMU_Memory.ScrollY;
@@ -78,6 +84,9 @@ void GBC_GPU_RenderScanline(void)
     // Which start tile to use in tile map #1
     uint16_t tileIndex = (tileY << 5) + tileX;
 
+    // Which start tile in the tile set to render
+    uint16_t tileID = 0;
+
     // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
     if (GBC_MMU_Memory.BGDisplayEnable || (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
     {
@@ -87,10 +96,10 @@ void GBC_GPU_RenderScanline(void)
             tileIndex += 1024; // Use tile map #2
         }
 
-        for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
+        for (uint8_t lineX = 0; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
         {
-            // Read tile index from tile map
-            uint16_t tileID = GBC_MMU_Memory.TileMapData[tileIndex];
+            // Read tile id from tile map
+            tileID = GBC_MMU_Memory.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
             if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
@@ -104,9 +113,12 @@ void GBC_GPU_RenderScanline(void)
             // Move first pixel bits to bit 15 (low) and bit 7 (high)
             tilePixelLine <<= pixelX;
 
-            for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex && pixelX < 8; pixelX++)
+            for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex && pixelX < 8; pixelX++, lineX++)
             {
                 uint8_t pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
+
+                // Save background pixel value for sprite priority system
+                GBC_GPU_PriorityPixelLine[lineX].BGPixel = pixel;
 
                 switch (pixel)
                 {
@@ -178,10 +190,10 @@ void GBC_GPU_RenderScanline(void)
             tileIndex += 1024; // Use tile map #2
         }
 
-        for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
+        for (uint8_t lineX = 0; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
         {
-            // Read tile index from tile map
-            uint16_t tileID = GBC_MMU_Memory.TileMapData[tileIndex];
+            // Read tile id from tile map
+            tileID = GBC_MMU_Memory.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
             if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
@@ -195,9 +207,12 @@ void GBC_GPU_RenderScanline(void)
             // Move first pixel bits to bit 15 (low) and bit 7 (high)
             tilePixelLine <<= pixelX;
 
-            for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex && pixelX < 8; pixelX++)
+            for (; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex && pixelX < 8; pixelX++, lineX++)
             {
                 uint8_t pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
+
+                // Save window pixel value for sprite priority system
+                GBC_GPU_PriorityPixelLine[lineX].BGPixel = pixel;
 
                 switch (pixel)
                 {
@@ -231,20 +246,195 @@ void GBC_GPU_RenderScanline(void)
             spriteHeight = 16;
         }
 
-        for (long i = 0; i < 40; i++)
+        int32_t spritePositionX = 0;
+        int32_t spritePositionY = 0;
+
+        // Start from behind, because the first sprites
+        // have the highest render priority in GBC mode
+        for (int32_t i = 39; i >= 0; i--)
         {
             struct SpriteAttributes_s sprite = GBC_MMU_Memory.SpriteAttributes[i];
 
+            /* Sprite positioning:
+             *
+             *  <--  8px  -->
+             *  1 * * * * * * ^
+             *  * ~~~~~~~~~~* |
+             *  *  +++  +++ * | 8px
+             *  *  ===  === * |    /
+             *  *     ==    * |     16px
+             *  *  =      = * |
+             *  *   ======  * |
+             *  * * * * * * * v
+             *                0 ... Original  Pivot
+             *                1 ... Corrected Pivot
+             */
+
+            spritePositionX = sprite.PositionX -  8;
+            spritePositionY = sprite.PositionY - 16;
+
             // Check if sprite falls on this scanline
-            if (sprite.PositionY > GBC_MMU_Memory.Scanline ||
-               (sprite.PositionY + spriteHeight) <= GBC_MMU_Memory.Scanline ||
-                sprite.PositionX == 0 ||
-                sprite.PositionX >= 160)
+            if (spritePositionY > GBC_MMU_Memory.Scanline ||
+               (spritePositionY + spriteHeight) <= GBC_MMU_Memory.Scanline ||
+                spritePositionX <=  -8 ||
+                spritePositionX >= 160)
             {
                 continue;
             }
 
-            
+            if (spriteHeight == 16)
+            {
+                // In 8x16 mode, the lower bit of the tile number is ignored.
+                tileID = sprite.TileID & 0xFE;
+            }
+            else
+            {
+                tileID = sprite.TileID;
+            }
+
+            if (sprite.FlipY)
+            {
+                if (spriteHeight == 16)
+                {
+                    pixelY = 15 - (GBC_MMU_Memory.Scanline - spritePositionY);
+
+                    // Check if pixel line is in the second tile
+                    if (pixelY >= 8)
+                    {
+                        pixelY -= 8;
+
+                        // Use second tile
+                        tileID++;
+                    }
+                }
+                else
+                {
+                    pixelY = 7 - (GBC_MMU_Memory.Scanline - spritePositionY);
+                }
+            }
+            else
+            {
+                pixelY = GBC_MMU_Memory.Scanline - spritePositionY;
+            }
+
+            if (spritePositionX < 0)
+            {
+                // Start with the first visible pixel
+                pixelX = 0 - spritePositionX;
+                // Start with the first pixel in the line
+                frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex;
+            }
+            else
+            {
+                // Start with the first pixel
+                pixelX = 0;
+                // Start line drawing where the first sprite pixel is located
+                frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex + spritePositionX;
+            }
+
+            // Each tile uses 2 bytes per row or 2 bits per pixel
+            uint16_t tilePixelLine = GBC_MMU_Memory.TileSetData[(tileID << 3) + pixelY];
+
+            if (sprite.FlipX)
+            {
+                // Move first pixel bits to bit 8 (low) and bit 0 (high)
+                tilePixelLine >>= pixelX;
+            }
+            else
+            {
+                // Move first pixel bits to bit 15 (low) and bit 7 (high)
+                tilePixelLine <<= pixelX;
+            }
+
+            for (uint8_t lineX = frameBufferIndex - GBC_GPU_CurrentFrameBufferStartIndex; pixelX < 8 && frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; pixelX++, lineX++)
+            {
+                uint8_t pixel = 0;
+
+                if (sprite.FlipX)
+                {
+                    pixel = ((tilePixelLine & 0x100) >> 7) | (tilePixelLine & 0x1);
+
+                    // Move next two bits to bit 8 (low) and bit 0 (high)
+                    tilePixelLine >>= 1;
+                }
+                else
+                {
+                    pixel = ((tilePixelLine & 0x80) >> 6) | ((tilePixelLine & 0x8000) >> 15);
+
+                    // Move next two bits to bit 15 (low) and bit 7 (high)
+                    tilePixelLine <<= 1;
+                }
+
+                if (pixel == 0)
+                {
+                    // Skip pixel, because 0 means transparent
+                    continue;
+                }
+
+                GBC_GPU_PriorityPixel_t priorityPixel = GBC_GPU_PriorityPixelLine[lineX];
+
+                if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                {
+                    // GBC mode only
+
+                    // When sprites with the same x coordinate values overlap,
+                    // they have priority according to table ordering.
+                    // (i.e. $FE00 - highest, $FE04 - next highest, etc.)
+
+                    // When BGPriority is set, the corresponding BG tile will have priority
+                    // above all OBJs (regardless of the priority bits in OAM memory).
+                    //if (priorityPixel.BGPriority) // ToDo
+                    //{
+                    //    continue;
+                    //}
+                }
+                else if (priorityPixel.SpritePositionSet)
+                {
+                    // Non-GBC mode only
+
+                    // When sprites with different x coordinate values overlap,
+                    // the one with the smaller x coordinate (closer to the left)
+                    // will have priority and appear above any others.
+                    if (spritePositionX < priorityPixel.SpritePositionX)
+                    {
+                        priorityPixel.SpritePositionX = spritePositionX;
+                        GBC_GPU_PriorityPixelLine[lineX] = priorityPixel;
+                    }
+                    else // Skip this pixel
+                    {
+                        continue;
+                    }
+                }
+                else // Set new priority pixel
+                {
+                    priorityPixel.SpritePositionSet = 1;
+                    priorityPixel.SpritePositionX = spritePositionX;
+                    GBC_GPU_PriorityPixelLine[lineX] = priorityPixel;
+                }
+
+                // When background priority is activated, then the sprite is
+                // behind BG color 1-3, BG color 0 is always behind object.
+                if (sprite.BGRenderPriority && priorityPixel.BGPixel)
+                {
+                    continue;
+                }
+
+                switch (pixel)
+                {
+                    case 0:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        break;
+                    case 1:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        break;
+                    case 2:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        break;
+                    case 3:
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        break;
+                }
+            }
         }
     }
 }
