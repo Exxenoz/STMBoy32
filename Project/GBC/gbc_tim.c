@@ -64,7 +64,13 @@ void GBC_TIM_Step(void)
     }
 }
 
-void GBC_TIM_Reset(void)
+void GBC_TIM_ResetDivider(void)
+{
+    GBC_TIM_DividerTicks = 0;
+    GBC_MMU_Memory.TimerDivider = 0;
+}
+
+void GBC_TIM_ResetCounter(void)
 {
     GBC_TIM_CounterTicks = 0;
     GBC_MMU_Memory.TimerCounter = GBC_MMU_Memory.TimerModulo;

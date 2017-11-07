@@ -649,14 +649,14 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 Input_UpdateJoypadState();
                 break;
             case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
-                GBC_MMU_Memory.TimerDivider = 0;
+                GBC_TIM_ResetDivider();
                 break;
             case 0xFF07: // Timer Control
                 value &= 0x07;
 
                 if (GBC_MMU_Memory.TimerRunning != (value & 0x03))
                 {
-                    GBC_TIM_Reset();
+                    GBC_TIM_ResetCounter();
                 }
 
                 GBC_MMU_Memory.TimerControl = value;
