@@ -419,19 +419,40 @@ void GBC_GPU_RenderScanline(void)
                     continue;
                 }
 
-                switch (pixel)
+                // Classic GB mode only
+                if (sprite.PaletteNumberClassic)
                 {
+                    // Select color from object palette 1
+                    switch (pixel)
+                    {
+                        case 0:
+                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color0];
+                            break;
+                        case 1:
+                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color1];
+                            break;
+                        case 2:
+                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color2];
+                            break;
+                        case 3:
+                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color3];
+                            break;
+                    }
+                }
+                else switch (pixel)
+                {
+                    // Select color from object palette 0
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color3];
                         break;
                 }
             }
