@@ -346,7 +346,7 @@ void GBC_GPU_RenderScanline(void)
                 tilePixelLine <<= pixelX;
             }
 
-            for (uint8_t lineX = frameBufferIndex - GBC_GPU_CurrentFrameBufferStartIndex; pixelX < 8 && frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; pixelX++, lineX++)
+            for (uint8_t lineX = frameBufferIndex - GBC_GPU_CurrentFrameBufferStartIndex; pixelX < 8 && frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; pixelX++, lineX++, frameBufferIndex++)
             {
                 uint8_t pixel = 0;
 
@@ -426,16 +426,16 @@ void GBC_GPU_RenderScanline(void)
                     switch (pixel)
                     {
                         case 0:
-                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color0];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color0];
                             break;
                         case 1:
-                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color1];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color1];
                             break;
                         case 2:
-                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color2];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color2];
                             break;
                         case 3:
-                            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color3];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color3];
                             break;
                     }
                 }
@@ -443,16 +443,16 @@ void GBC_GPU_RenderScanline(void)
                 {
                     // Select color from object palette 0
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color3];
                         break;
                 }
             }
