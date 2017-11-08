@@ -1864,21 +1864,10 @@ void GBC_CPU_RST_20H()                  // 0xE7 - Call routine at address 0020h
 void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to SP
 {
     uint16_t sp = GBC_CPU_Register.SP;
-    int32_t result = sp;
+    int8_t value = operand;
+    int32_t result = sp + value;
 
-    if (operand & 0x80) // When negative
-    {
-        uint8_t subtrahend = (~operand) + 1; // Do not touch this
-        result -= subtrahend;
-    }
-    else
-    {
-        result += operand;
-    }
-
-    result &= 0xFFFF;
-
-    if (((sp ^ operand ^ result) & 0x100) == 0x100)
+    if ((sp & 0xFF) + (operand & 0xFF) > 0xFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
@@ -1887,7 +1876,7 @@ void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to 
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
 
-    if (((sp ^ operand ^ result) & 0x10) == 0x10)
+    if ((sp & 0x0F) + (value & 0x0F) > 0x0F)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
     }
@@ -1898,6 +1887,8 @@ void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to 
 
     // GBC_CPU_FLAGS_ZERO is cleared according to documentation
     GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+    result &= 0xFFFF;
 
     GBC_CPU_Register.SP = result;
 }
@@ -1964,21 +1955,10 @@ void GBC_CPU_RST_30H()                  // 0xF7 - Call routine at address 0030h
 void GBC_CPU_LDHL_SP_X(uint8_t operand) // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
 {
     uint16_t sp = GBC_CPU_Register.SP;
-    int32_t result = sp;
+    int8_t value = operand;
+    int32_t result = sp + value;
 
-    if (operand & 0x80) // When negative
-    {
-        uint8_t subtrahend = (~operand) + 1; // Do not touch this
-        result -= subtrahend;
-    }
-    else
-    {
-        result += operand;
-    }
-
-    result &= 0xFFFF;
-
-    if (((sp ^ operand ^ result) & 0x100) == 0x100)
+    if ((sp & 0xFF) + (operand & 0xFF) > 0xFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
@@ -1987,7 +1967,7 @@ void GBC_CPU_LDHL_SP_X(uint8_t operand) // 0xF8 - Add signed 8-bit immediate to 
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
 
-    if (((sp ^ operand ^ result) & 0x10) == 0x10)
+    if ((sp & 0x0F) + (value & 0x0F) > 0x0F)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
     }
@@ -1998,6 +1978,8 @@ void GBC_CPU_LDHL_SP_X(uint8_t operand) // 0xF8 - Add signed 8-bit immediate to 
 
     // GBC_CPU_FLAGS_ZERO is cleared according to documentation
     GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+    result &= 0xFFFF;
 
     GBC_CPU_Register.HL = result;
 }
