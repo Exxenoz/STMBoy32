@@ -31,6 +31,8 @@ void ClockDebug_Initialize()
     GPIO_Init(GPIOC, &GPIO_InitObject);
 }
 
+uint8_t test[4096] = { 0 };
+
 int main(void)
 {
     /*!< At this stage the microcontroller clock setting is already configured, 
@@ -68,6 +70,10 @@ int main(void)
     GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
     if(loaded == GBC_LOAD_RESULT_OK)
     {
+        uint8_t bank1 = 0x01;
+        
+        CMOD_WriteByte(0x4001, &bank1);
+        CMOD_WriteBytes(0xA000, 4096, test);
        /*result = CMOD_SaveCartridge(true);
        if(result == CMOD_SUCCESS)
        {
