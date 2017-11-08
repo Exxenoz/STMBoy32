@@ -382,11 +382,6 @@ void CMOD_HandleWrite(void)
 {
     CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank) 
 
-    if (CMOD_BytesRead != 0)                                // If a Byte was read, store it
-    {                                                       // Gameboy stops driving Data Bus at 0ns -> Data ready
-      CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();     // Store the nt byte at CMOD_DataIn[n-1]
-    }
-
     if (CMOD_BytesWritten == CMOD_BytesToWrite)             // All Bytes written?
     {
         CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
