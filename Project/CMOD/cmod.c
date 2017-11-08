@@ -48,7 +48,6 @@ void CMOD_ReadByte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
 
-    CMOD_SET_WR;                        // WR rises before a read occurs 20ns before the CLK rises (in GB)
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
 
     CMOD_Action      = CMOD_READ;
@@ -66,7 +65,6 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
 
-    CMOD_SET_WR;                        // WR rises before a read occurs 20ns before the CLK rises (in GB)
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
 
     CMOD_Action      = CMOD_READ;
@@ -84,7 +82,6 @@ void CMOD_WriteByte(uint16_t address, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
 
-    CMOD_SET_RD;                        // RD rises before a write occurs at 140ns (in GB)
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
 
     CMOD_Action       = CMOD_WRITE;
@@ -102,7 +99,6 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
     while (CMOD_Status == CMOD_PROCESSING);
 
-    CMOD_SET_RD;                        // RD rises before a write occurs at 140ns (in GB)
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
 
     CMOD_Action       = CMOD_WRITE;
@@ -358,7 +354,7 @@ void CMOD_Initialize(void)
 
 void CMOD_HandleRead(void)
 {
-    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank) 
+    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank)
 
     if (CMOD_BytesRead != 0)                                // If a Byte was read, store it
     {                                                       // Gameboy stops driving Data Bus at 0ns -> Data ready
@@ -367,6 +363,8 @@ void CMOD_HandleRead(void)
 
     if (CMOD_BytesRead == CMOD_BytesToRead)                 // Read all Data?
     {
+        CMOD_SET_RD;                                        // RD rises after a read at 140ns (in GB)
+
         CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
         CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
@@ -380,10 +378,12 @@ void CMOD_HandleRead(void)
 
 void CMOD_HandleWrite(void)
 {
-    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank) 
+    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank)
 
     if (CMOD_BytesWritten == CMOD_BytesToWrite)             // All Bytes written?
     {
+        CMOD_SET_WR;                                        // WR rises after a write 20ns before the CLK rises (in GB)
+
         CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
         CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
