@@ -352,7 +352,7 @@ void GBC_GPU_RenderScanline(void)
 
                 if (sprite.FlipX)
                 {
-                    pixel = ((tilePixelLine & 0x100) >> 7) | (tilePixelLine & 0x1);
+                    pixel = ((tilePixelLine & 0x1) << 1) | ((tilePixelLine & 0x100) >> 8);
 
                     // Move next two bits to bit 8 (low) and bit 0 (high)
                     tilePixelLine >>= 1;
