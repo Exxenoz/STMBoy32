@@ -208,6 +208,27 @@ void GBC_MMU_Unload(void)
     GBC_MMU_RTC_LatchClockDataHelper = 0;
 }
 
+void GBC_MMU_StartDMA(uint8_t value)
+{
+    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    {
+        // ToDo
+    }
+    else
+    {
+        // The written value specifies the transfer source address divided by 100h
+        uint16_t address = value << 8;
+
+        if (address >= 0x8000 && address < 0xE000)
+        {
+            for (uint32_t i = 0; i < 160; i++, address++)
+            {
+                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
+            }
+        }
+    }
+}
+
 uint8_t GBC_MMU_ReadByte(uint16_t address)
 {
     // Cartridge ROM bank 0
@@ -663,7 +684,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 break;
             case 0xFF46: // DMA Transfer and Start Address
                 GBC_MMU_Memory.OAMTransferStartAddress = value;
-                // ToDo
+                GBC_MMU_StartDMA(value);
                 break;
             default:
                 GBC_MMU_Memory.IO[address - 0xFF00] = value;
