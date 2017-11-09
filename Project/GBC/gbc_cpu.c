@@ -277,7 +277,7 @@ uint8_t GBC_CPU_OR(uint8_t a, uint8_t b)
 
     if (result)
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ALL);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
     else
     {
@@ -294,7 +294,7 @@ uint8_t GBC_CPU_XOR(uint8_t a, uint8_t b)
 
     if (result)
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ALL);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
     else
     {
@@ -397,23 +397,14 @@ void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
         value  |= 1;
 
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         value <<= 1;
 
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
-
-    /*if (value) ???
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -465,23 +456,14 @@ void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
         value  |= 0x80;
 
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
     }
     else
     {
         value >>= 1;
 
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
-
-    /*if (value) ???
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -538,24 +520,15 @@ void GBC_CPU_RL_A()                     // 0x17 - Rotate A left
     if (value & 0x80)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
 
-    value <<= 0x1;
+    value <<= 1;
     value  |= carry;
-
-    /*if (value) ???
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }*/
 
     GBC_CPU_Register.A = value;
 }
@@ -606,24 +579,15 @@ void GBC_CPU_RR_A()                     // 0x1F - Rotate A right
     if (value & 0x1)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+        GBC_CPU_FLAGS_CLEAR_ALL;
     }
 
     value >>= 0x1;
     value  |= carry;
-
-    /*if (value) ???
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }*/
 
     GBC_CPU_Register.A = value;
 }

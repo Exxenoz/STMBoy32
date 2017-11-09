@@ -101,6 +101,7 @@ enum GBC_CPU_Flags_e
 #define GBC_CPU_FLAGS_SET(FLAGS)   (GBC_CPU_Register.F |=  (FLAGS))
 #define GBC_CPU_FLAGS_CLEAR(FLAGS) (GBC_CPU_Register.F &= ~(FLAGS))
 #define GBC_CPU_FLAGS_HAS(FLAGS)   (GBC_CPU_Register.F & (FLAGS))
+#define GBC_CPU_FLAGS_CLEAR_ALL     GBC_CPU_Register.F = 0
 
 extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
 extern uint32_t GBC_CPU_Ticks;              // External declaration for GBC file
