@@ -3,14 +3,17 @@
 #include "gbc_mmu.h"
 #include "string.h"
 
-GBC_CPU_Register_t GBC_CPU_Register;                // Register
+GBC_CPU_Register_t GBC_CPU_Register;                  // Register
 
-uint32_t GBC_CPU_Ticks = 0;                         // Ticks
-uint32_t GBC_CPU_StepTicks = 0;                     // Step ticks
-int32_t  GBC_CPU_UnhaltTicks = 0;                   // Unhalt ticks
+uint32_t GBC_CPU_Ticks = 0;                           // Ticks
+uint32_t GBC_CPU_StepTicks = 0;                       // Step ticks
+int32_t  GBC_CPU_UnhaltTicks = 0;                     // Unhalt ticks
+int32_t  GBC_CPU_InterruptMasterEnableDelayTicks = 0; // IME will be enabled after this delay (if != 0)
 
-bool GBC_CPU_InterruptMasterEnable = true;          // Interrupt master
-bool GBC_CPU_Halted = false;                        // Halted state
+bool GBC_CPU_InterruptMasterEnable = true;            // Interrupt master
+bool GBC_CPU_Halted = false;                          // Halted state
+
+extern const GBC_CPU_Instruction_t GBC_CPU_Instructions[256];
 
 uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -1096,7 +1099,17 @@ void GBC_CPU_LD_HLP_L()                 // 0x75 - Copy L to address pointed by H
 
 void GBC_CPU_HALT()                     // 0x76 - Halt processor
 {
-    GBC_CPU_Halted = true;
+    if (GBC_CPU_InterruptMasterEnableDelayTicks)
+    {
+        // Serve pending interrupts before HALT
+        GBC_CPU_InterruptMasterEnableDelayTicks = 0;
+        GBC_CPU_InterruptMasterEnable = true;
+        GBC_CPU_Register.PC--;
+    }
+    else
+    {
+        GBC_CPU_Halted = true;
+    }
 }
 
 void GBC_CPU_LD_HLP_A()                 // 0x77 - Copy A to address pointed by HL
@@ -1768,6 +1781,7 @@ void GBC_CPU_LDH_A_CP()                 // 0xF2 - Load A from address pointed to
 
 void GBC_CPU_DI()                       // 0xF3 - Disable Interrupts
 {
+    GBC_CPU_InterruptMasterEnableDelayTicks = 0;
     GBC_CPU_InterruptMasterEnable = false;
 }
 
@@ -1831,7 +1845,7 @@ void GBC_CPU_LD_A_XXP(uint16_t operand) // 0xFA - Load A from given 16-bit addre
 
 void GBC_CPU_EI()                       // 0xFB - Enable Interrupts
 {
-    GBC_CPU_InterruptMasterEnable = true;
+    GBC_CPU_InterruptMasterEnableDelayTicks = GBC_CPU_Instructions[0xFB].Ticks + 1;
 }
 
 void GBC_CPU_CP_A_X(uint8_t operand)    // 0xFE - Compare 8-bit value immediate against A
@@ -2132,6 +2146,7 @@ void GBC_CPU_Initialize()
     GBC_CPU_Ticks = 0;
     GBC_CPU_StepTicks = 0;
     GBC_CPU_UnhaltTicks = 0;
+    GBC_CPU_InterruptMasterEnableDelayTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
 }
@@ -2277,6 +2292,17 @@ void GBC_CPU_Step()
         }
 
         GBC_CPU_StepTicks += instruction.Ticks;
+    }
+
+    if (GBC_CPU_InterruptMasterEnableDelayTicks)
+    {
+        GBC_CPU_InterruptMasterEnableDelayTicks -= GBC_CPU_StepTicks;
+
+        if (GBC_CPU_InterruptMasterEnableDelayTicks <= 0)
+        {
+            GBC_CPU_InterruptMasterEnableDelayTicks = 0;
+            GBC_CPU_InterruptMasterEnable = true;
+        }
     }
 
     GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
