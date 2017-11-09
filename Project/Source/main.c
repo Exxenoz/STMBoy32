@@ -31,7 +31,9 @@ void ClockDebug_Initialize()
     GPIO_Init(GPIOC, &GPIO_InitObject);
 }
 
-uint8_t test[4096] = { 0 };
+#include "string.h"
+uint8_t test[1024];
+uint8_t testResult[1024];
 
 int main(void)
 {
@@ -71,9 +73,13 @@ int main(void)
     if(loaded == GBC_LOAD_RESULT_OK)
     {
         uint8_t bank1 = 0x01;
-        
+        memset(test, 0xFF, 1024);
+        memset(testResult, 0x00, 1024);
         CMOD_WriteByte(0x4001, &bank1);
-        CMOD_WriteBytes(0xA000, 4096, test);
+        CMOD_WriteBytes(0xA000, 1024, test);
+        CMOD_ReadBytes(0xA000, 1024, testResult);
+        while (CMOD_GetStatus() == CMOD_PROCESSING);
+        NOP;
        /*result = CMOD_SaveCartridge(true);
        if(result == CMOD_SUCCESS)
        {
