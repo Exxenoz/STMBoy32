@@ -581,7 +581,16 @@ void GBC_CPU_EX_BIT_0_D()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.D);       
 void GBC_CPU_EX_BIT_0_E()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.E);                    } // 0x43 - Test bit 0 of E
 void GBC_CPU_EX_BIT_0_H()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.H);                    } // 0x44 - Test bit 0 of H
 void GBC_CPU_EX_BIT_0_L()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.L);                    } // 0x45 - Test bit 0 of L
-void GBC_CPU_EX_BIT_0_HLP() { GBC_CPU_EX_BIT(1 << 0, GBC_MMU_ReadByte(GBC_CPU_Register.HL)); } // 0x46 - Test bit 0 of value pointed by HL
+void GBC_CPU_EX_BIT_0_HLP()                                                                    // 0x46 - Test bit 0 of value pointed by HL
+{
+    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    {
+        GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+        return;
+    }
+
+    GBC_CPU_EX_BIT(1 << 0, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
 void GBC_CPU_EX_BIT_0_A()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.A);                    } // 0x47 - Test bit 0 of A
 
 void GBC_CPU_EX_BIT_1_B()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.B);                    } // 0x48 - Test bit 1 of B
@@ -590,7 +599,16 @@ void GBC_CPU_EX_BIT_1_D()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.D);       
 void GBC_CPU_EX_BIT_1_E()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.E);                    } // 0x4B - Test bit 1 of E
 void GBC_CPU_EX_BIT_1_H()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.H);                    } // 0x4C - Test bit 1 of H
 void GBC_CPU_EX_BIT_1_L()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.L);                    } // 0x4D - Test bit 1 of L
-void GBC_CPU_EX_BIT_1_HLP() { GBC_CPU_EX_BIT(1 << 1, GBC_MMU_ReadByte(GBC_CPU_Register.HL)); } // 0x4E - Test bit 1 of value pointed by HL
+void GBC_CPU_EX_BIT_1_HLP()                                                                    // 0x4E - Test bit 1 of value pointed by HL
+{
+    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    {
+        GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+        return;
+    }
+
+    GBC_CPU_EX_BIT(1 << 1, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+}
 void GBC_CPU_EX_BIT_1_A()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.A);                    } // 0x4F - Test bit 1 of A
 
 void GBC_CPU_EX_BIT_2_B()   { GBC_CPU_EX_BIT(1 << 2, GBC_CPU_Register.B);                    } // 0x50 - Test bit 2 of B
