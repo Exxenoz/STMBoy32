@@ -584,15 +584,8 @@ void GBC_CPU_RL_A()                     // 0x17 - Rotate A left
 
 void GBC_CPU_JR_X(uint8_t operand)      // 0x18 - Relative jump by signed immediate
 {
-    if (operand & 0x80) // When negative
-    {
-        operand = (~operand) + 1; // Do not touch this
-        GBC_CPU_Register.PC -= operand;
-    }
-    else
-    {
-        GBC_CPU_Register.PC += operand;
-    }
+    int8_t value = operand;
+    GBC_CPU_Register.PC += value;
 }
 
 void GBC_CPU_ADD_HL_DE()                // 0x19 - Add 16-bit DE to HL
@@ -665,15 +658,8 @@ void GBC_CPU_JR_NZ_X(uint8_t operand)   // 0x20 - Relative jump by signed immedi
     }
     else
     {
-        if (operand & 0x80) // When negative
-        {
-            operand = (~operand) + 1; // Do not touch this
-            GBC_CPU_Register.PC -= operand;
-        }
-        else
-        {
-            GBC_CPU_Register.PC += operand;
-        }
+        int8_t value = operand;
+        GBC_CPU_Register.PC += value;
         GBC_CPU_StepTicks += 12;
     }
 }
@@ -775,15 +761,8 @@ void GBC_CPU_JR_Z_X(uint8_t operand)    // 0x28 - Relative jump by signed immedi
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        if (operand & 0x80) // When negative
-        {
-            operand = (~operand) + 1; // Do not touch this
-            GBC_CPU_Register.PC -= operand;
-        }
-        else
-        {
-            GBC_CPU_Register.PC += operand;
-        }
+        int8_t value = operand;
+        GBC_CPU_Register.PC += value;
         GBC_CPU_StepTicks += 12;
     }
     else
@@ -842,15 +821,8 @@ void GBC_CPU_JR_NC_X(uint8_t operand)   // 0x30 - Relative jump by signed immedi
     }
     else
     {
-        if (operand & 0x80) // When negative
-        {
-            operand = (~operand) + 1; // Do not touch this
-            GBC_CPU_Register.PC -= operand;
-        }
-        else
-        {
-            GBC_CPU_Register.PC += operand;
-        }
+        int8_t value = operand;
+        GBC_CPU_Register.PC += value;
         GBC_CPU_StepTicks += 12;
     }
 }
@@ -899,15 +871,8 @@ void GBC_CPU_JR_C_X(uint8_t operand)    // 0x38 - Relative jump by signed immedi
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        if (operand & 0x80) // When negative
-        {
-            operand = (~operand) + 1; // Do not touch this
-            GBC_CPU_Register.PC -= operand;
-        }
-        else
-        {
-            GBC_CPU_Register.PC += operand;
-        }
+        int8_t value = operand;
+        GBC_CPU_Register.PC += value;
         GBC_CPU_StepTicks += 12;
     }
     else
