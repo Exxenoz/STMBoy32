@@ -76,6 +76,8 @@ enum
     GBC_CPU_TICKS_10 = 10,
     GBC_CPU_TICKS_12 = 12,
     GBC_CPU_TICKS_16 = 16,
+    GBC_CPU_TICKS_20 = 20,
+    GBC_CPU_TICKS_24 = 24,
 };
 
 typedef struct GBC_CPU_Instruction_s

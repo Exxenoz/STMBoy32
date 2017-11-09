@@ -594,15 +594,11 @@ void GBC_CPU_RR_A()                     // 0x1F - Rotate A right
 
 void GBC_CPU_JR_NZ_X(uint8_t operand)   // 0x20 - Relative jump by signed immediate if last result was not zero
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
-    {
-        GBC_CPU_StepTicks += 8;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         int8_t value = operand;
         GBC_CPU_Register.PC += value;
-        GBC_CPU_StepTicks += 12;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -705,11 +701,7 @@ void GBC_CPU_JR_Z_X(uint8_t operand)    // 0x28 - Relative jump by signed immedi
     {
         int8_t value = operand;
         GBC_CPU_Register.PC += value;
-        GBC_CPU_StepTicks += 12;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -757,15 +749,11 @@ void GBC_CPU_CPL()                      // 0x2F - Complement (logical NOT) on A 
 
 void GBC_CPU_JR_NC_X(uint8_t operand)   // 0x30 - Relative jump by signed immediate if last result caused no carry
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
-    {
-        GBC_CPU_StepTicks += 8;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         int8_t value = operand;
         GBC_CPU_Register.PC += value;
-        GBC_CPU_StepTicks += 12;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -815,11 +803,7 @@ void GBC_CPU_JR_C_X(uint8_t operand)    // 0x38 - Relative jump by signed immedi
     {
         int8_t value = operand;
         GBC_CPU_Register.PC += value;
-        GBC_CPU_StepTicks += 12;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -1477,14 +1461,10 @@ void GBC_CPU_CP_A_A()                   // 0xBF - Compare A against A
 
 void GBC_CPU_RET_NZ()                   // 0xC0 - Return if last result was not zero
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
-    {
-        GBC_CPU_StepTicks += 8;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_StepTicks += 20;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1495,14 +1475,10 @@ void GBC_CPU_POP_BC()                   // 0xC1 - Pop 16-bit value from stack in
 
 void GBC_CPU_JP_NZ_XX(uint16_t operand) // 0xC2 - Absolute jump to 16-bit location if last result was not zero
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
-    {
-        GBC_CPU_StepTicks += 12;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 16;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -1513,15 +1489,11 @@ void GBC_CPU_JP_XX(uint16_t operand)    // 0xC3 - Absolute jump to 16-bit locati
 
 void GBC_CPU_CALL_NZ_XX(uint16_t operand)   // 0xC4 - Call routine at 16-bit location if last result was not zero
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
-    {
-        GBC_CPU_StepTicks += 12;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 24;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1546,11 +1518,7 @@ void GBC_CPU_RET_Z()                    // 0xC8 - Return if last result was zero
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_StepTicks += 20;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1564,11 +1532,7 @@ void GBC_CPU_JP_Z_XX(uint16_t operand)  // 0xCA - Absolute jump to 16-bit locati
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 16;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 12;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -1587,10 +1551,6 @@ void GBC_CPU_CALL_Z_XX(uint16_t operand)// 0xCC - Call routine at 16-bit locatio
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 24;
-    }
-    else
-    {
         GBC_CPU_StepTicks += 12;
     }
 }
@@ -1614,14 +1574,10 @@ void GBC_CPU_RST_8H()                   // 0xCF - Call routine at address 0008h
 
 void GBC_CPU_RET_NC()                   // 0xD0 - Return if last result caused no carry
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
-    {
-        GBC_CPU_StepTicks += 8;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_StepTicks += 20;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1632,28 +1588,20 @@ void GBC_CPU_POP_DE()                   // 0xD1 - Pop 16-bit value from stack in
 
 void GBC_CPU_JP_NC_XX(uint16_t operand) // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
-    {
-        GBC_CPU_StepTicks += 12;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 16;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
 void GBC_CPU_CALL_NC_XX(uint16_t operand)// 0xD4 - Call routine at 16-bit location if last result caused no carry
 {
-    if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
-    {
-        GBC_CPU_StepTicks += 12;
-    }
-    else
+    if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 24;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1678,11 +1626,7 @@ void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused c
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
-        GBC_CPU_StepTicks += 20;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += 12;
     }
 }
 
@@ -1698,11 +1642,7 @@ void GBC_CPU_JP_C_XX(uint16_t operand)  // 0xDA - Absolute jump to 16-bit locati
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 16;
-    }
-    else
-    {
-        GBC_CPU_StepTicks += 12;
+        GBC_CPU_StepTicks += 4;
     }
 }
 
@@ -1712,10 +1652,6 @@ void GBC_CPU_CALL_C_XX(uint16_t operand)// 0xDC - Call routine at 16-bit locatio
     {
         GBC_CPU_PushToStack(GBC_CPU_Register.PC);
         GBC_CPU_Register.PC = operand;
-        GBC_CPU_StepTicks += 24;
-    }
-    else
-    {
         GBC_CPU_StepTicks += 12;
     }
 }
@@ -1914,262 +1850,262 @@ void GBC_CPU_RST_38H()                  // 0xFF - Call routine at address 0038h
 /*******************************************************************************/
 const GBC_CPU_Instruction_t GBC_CPU_Instructions[256] =
 {
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x00 - No operation
-    { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x01 - Load 16-bit immediate into BC
-    { GBC_CPU_LD_BCP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x02 - Save A to address pointed by BC
-    { GBC_CPU_INC_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x03 - Increment 16-bit BC
-    { GBC_CPU_INC_B,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x04 - Increment B
-    { GBC_CPU_DEC_B,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x05 - Decrement B
-    { GBC_CPU_LD_B_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x06 - Load 8-bit immediate into B
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x00 - No operation
+    { GBC_CPU_LD_BC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0x01 - Load 16-bit immediate into BC
+    { GBC_CPU_LD_BCP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x02 - Save A to address pointed by BC
+    { GBC_CPU_INC_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x03 - Increment 16-bit BC
+    { GBC_CPU_INC_B,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x04 - Increment B
+    { GBC_CPU_DEC_B,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x05 - Decrement B
+    { GBC_CPU_LD_B_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x06 - Load 8-bit immediate into B
     { GBC_CPU_RLC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x07 - Rotate A left with carry
-    { GBC_CPU_LD_XXP_SP, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_10 }, // 0x08 - Save SP to given address
-    { GBC_CPU_ADD_HL_BC, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x09 - Add 16-bit BC to HL
-    { GBC_CPU_LD_A_BCP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0A - Load A from address pointed to by BC
-    { GBC_CPU_DEC_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0B - Decrement 16-bit BC
-    { GBC_CPU_INC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x0C - Increment C
-    { GBC_CPU_DEC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x0D - Decrement C
-    { GBC_CPU_LD_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x0E - Load 8-bit immediate into C
+    { GBC_CPU_LD_XXP_SP, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_20 }, // 0x08 - Save SP to given address
+    { GBC_CPU_ADD_HL_BC, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x09 - Add 16-bit BC to HL
+    { GBC_CPU_LD_A_BCP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x0A - Load A from address pointed to by BC
+    { GBC_CPU_DEC_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x0B - Decrement 16-bit BC
+    { GBC_CPU_INC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0C - Increment C
+    { GBC_CPU_DEC_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0D - Decrement C
+    { GBC_CPU_LD_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x0E - Load 8-bit immediate into C
     { GBC_CPU_RRC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x0F - Rotate A right with carry
-    { GBC_CPU_STOP,      GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_2  }, // 0x10 - Stop processor
-    { GBC_CPU_LD_DE_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x11 - Load 16-bit immediate into DE
-    { GBC_CPU_LD_DEP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x12 - Save A to address pointed by DE
-    { GBC_CPU_INC_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x13 - Increment 16-bit DE
-    { GBC_CPU_INC_D,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x14 - Increment D
-    { GBC_CPU_DEC_D,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x15 - Decrement D
-    { GBC_CPU_LD_D_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x16 - Load 8-bit immediate into D
+    { GBC_CPU_STOP,      GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x10 - Stop processor
+    { GBC_CPU_LD_DE_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0x11 - Load 16-bit immediate into DE
+    { GBC_CPU_LD_DEP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x12 - Save A to address pointed by DE
+    { GBC_CPU_INC_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x13 - Increment 16-bit DE
+    { GBC_CPU_INC_D,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x14 - Increment D
+    { GBC_CPU_DEC_D,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x15 - Decrement D
+    { GBC_CPU_LD_D_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x16 - Load 8-bit immediate into D
     { GBC_CPU_RL_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x17 - Rotate A left
-    { GBC_CPU_JR_X,      GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x18 - Relative jump by signed immediate
-    { GBC_CPU_ADD_HL_DE, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x19 - Add 16-bit DE to HL
-    { GBC_CPU_LD_A_DEP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1A - Load A from address pointed to by DE
-    { GBC_CPU_DEC_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1B - Decrement 16-bit DE
-    { GBC_CPU_INC_E,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x1C - Increment E
-    { GBC_CPU_DEC_E,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x1D - Decrement E
-    { GBC_CPU_LD_E_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x1E - Load 8-bit immediate into E
+    { GBC_CPU_JR_X,      GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_12 }, // 0x18 - Relative jump by signed immediate
+    { GBC_CPU_ADD_HL_DE, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x19 - Add 16-bit DE to HL
+    { GBC_CPU_LD_A_DEP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x1A - Load A from address pointed to by DE
+    { GBC_CPU_DEC_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x1B - Decrement 16-bit DE
+    { GBC_CPU_INC_E,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1C - Increment E
+    { GBC_CPU_DEC_E,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1D - Decrement E
+    { GBC_CPU_LD_E_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x1E - Load 8-bit immediate into E
     { GBC_CPU_RR_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x1F - Rotate A right
-    { GBC_CPU_JR_NZ_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x20 - Relative jump by signed immediate if last result was not zero
-    { GBC_CPU_LD_HL_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x21 - Load 16-bit immediate into HL
-    { GBC_CPU_LDI_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x22 - Save A to address pointed by HL, and increment HL
-    { GBC_CPU_INC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x23 - Increment 16-bit HL
-    { GBC_CPU_INC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x24 - Increment H
-    { GBC_CPU_DEC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x25 - Decrement H
-    { GBC_CPU_LD_H_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x26 - Load 8-bit immediate into H
-    { GBC_CPU_DA_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x27 - Adjust A for BCD (Binary Coded Decimal) addition
-    { GBC_CPU_JR_Z_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x28 - Relative jump by signed immediate if last result was zero
-    { GBC_CPU_ADD_HL_HL, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x29 - Add 16-bit HL to HL
-    { GBC_CPU_LDI_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2A - Load A from address pointed to by HL, and increment HL
-    { GBC_CPU_DEC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2B - Decrement 16-bit HL
-    { GBC_CPU_INC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2C - Increment L
-    { GBC_CPU_DEC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2D - Decrement L
-    { GBC_CPU_LD_L_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x2E - Load 8-bit immediate into L
-    { GBC_CPU_CPL,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x2F - Complement (logical NOT) on A (flip all bits)
-    { GBC_CPU_JR_NC_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x30 - Relative jump by signed immediate if last result caused no carry
-    { GBC_CPU_LD_SP_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0x31 - Load 16-bit immediate into SP
-    { GBC_CPU_LDD_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x32 - Save A to address pointed by HL, and decrement HL
-    { GBC_CPU_INC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x33 - Increment 16-bit SP
-    { GBC_CPU_INC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0x34 - Increment value pointed by HL
-    { GBC_CPU_DEC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0x35 - Decrement value pointed by HL
-    { GBC_CPU_LD_HLP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0x36 - Load 8-bit immediate into address pointed by HL
-    { GBC_CPU_SCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x37 - Set carry flag
-    { GBC_CPU_JR_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0x38 - Relative jump by signed immediate if last result caused carry
-    { GBC_CPU_ADD_HL_SP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x39 - Add 16-bit SP to HL
-    { GBC_CPU_LDD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3A - Load A from address pointed to by HL, and decrement HL
-    { GBC_CPU_DEC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3B - Decrement 16-bit SP
-    { GBC_CPU_INC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3C - Increment A
-    { GBC_CPU_DEC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3D - Decrement A
-    { GBC_CPU_LD_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0x3E - Load 8-bit immediate into A
-    { GBC_CPU_CCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x3F - Complement carry flag
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x40 - Copy B to B
-    { GBC_CPU_LD_B_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x41 - Copy C to B
-    { GBC_CPU_LD_B_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x42 - Copy D to B
-    { GBC_CPU_LD_B_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x43 - Copy E to B
-    { GBC_CPU_LD_B_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x44 - Copy H to B
-    { GBC_CPU_LD_B_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x45 - Copy L to B
-    { GBC_CPU_LD_B_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x46 - Copy value pointed by HL to B
-    { GBC_CPU_LD_B_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x47 - Copy A to B
-    { GBC_CPU_LD_C_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x48 - Copy B to C
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x49 - Copy C to C
-    { GBC_CPU_LD_C_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x4A - Copy D to C
-    { GBC_CPU_LD_C_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x4B - Copy E to C
-    { GBC_CPU_LD_C_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x4C - Copy H to C
-    { GBC_CPU_LD_C_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x4D - Copy L to C
-    { GBC_CPU_LD_C_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4E - Copy value pointed by HL to C
-    { GBC_CPU_LD_C_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x4F - Copy A to C
-    { GBC_CPU_LD_D_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x50 - Copy B to D
-    { GBC_CPU_LD_D_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x51 - Copy C to D
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x52 - Copy D to D
-    { GBC_CPU_LD_D_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x53 - Copy E to D
-    { GBC_CPU_LD_D_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x54 - Copy H to D
-    { GBC_CPU_LD_D_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x55 - Copy L to D
-    { GBC_CPU_LD_D_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x56 - Copy value pointed by HL to D
-    { GBC_CPU_LD_D_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x57 - Copy A to D
-    { GBC_CPU_LD_E_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x58 - Copy B to E
-    { GBC_CPU_LD_E_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x59 - Copy C to E
-    { GBC_CPU_LD_E_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5A - Copy D to E
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5B - Copy E to E
-    { GBC_CPU_LD_E_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5C - Copy H to E
-    { GBC_CPU_LD_E_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5D - Copy L to E
-    { GBC_CPU_LD_E_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5E - Copy value pointed by HL to E
-    { GBC_CPU_LD_E_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x5F - Copy A to E
-    { GBC_CPU_LD_H_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x60 - Copy B to H
-    { GBC_CPU_LD_H_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x61 - Copy C to H
-    { GBC_CPU_LD_H_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x62 - Copy D to H
-    { GBC_CPU_LD_H_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x63 - Copy E to H
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x64 - Copy H to H
-    { GBC_CPU_LD_H_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x65 - Copy L to H
-    { GBC_CPU_LD_H_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x66 - Copy value pointed by HL to H
-    { GBC_CPU_LD_H_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x67 - Copy A to H
-    { GBC_CPU_LD_L_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x68 - Copy B to L
-    { GBC_CPU_LD_L_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x69 - Copy C to L
-    { GBC_CPU_LD_L_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6A - Copy D to L
-    { GBC_CPU_LD_L_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6B - Copy E to L
-    { GBC_CPU_LD_L_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6C - Copy H to L
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6D - Copy L to L
-    { GBC_CPU_LD_L_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6E - Copy value pointed by HL to L
-    { GBC_CPU_LD_L_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x6F - Copy A to L
-    { GBC_CPU_LD_HLP_B,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x70 - Copy B to address pointed by HL
-    { GBC_CPU_LD_HLP_C,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x71 - Copy C to address pointed by HL
-    { GBC_CPU_LD_HLP_D,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x72 - Copy D to address pointed by HL
-    { GBC_CPU_LD_HLP_E,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x73 - Copy E to address pointed by HL
-    { GBC_CPU_LD_HLP_H,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x74 - Copy H to address pointed by HL
-    { GBC_CPU_LD_HLP_L,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x75 - Copy L to address pointed by HL
-    { GBC_CPU_HALT,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x76 - Halt processor
-    { GBC_CPU_LD_HLP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x77 - Copy A to address pointed by HL
-    { GBC_CPU_LD_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x78 - Copy B to A
-    { GBC_CPU_LD_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x79 - Copy C to A
-    { GBC_CPU_LD_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7A - Copy D to A
-    { GBC_CPU_LD_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7B - Copy E to A
-    { GBC_CPU_LD_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7C - Copy H to A
-    { GBC_CPU_LD_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7D - Copy L to A
-    { GBC_CPU_LD_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7E - Copy value pointed by HL to A
-    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x7F - Copy A to A
-    { GBC_CPU_ADD_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x80 - Add B to A
-    { GBC_CPU_ADD_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x81 - Add C to A
-    { GBC_CPU_ADD_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x82 - Add D to A
-    { GBC_CPU_ADD_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x83 - Add E to A
-    { GBC_CPU_ADD_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x84 - Add H to A
-    { GBC_CPU_ADD_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x85 - Add L to A
-    { GBC_CPU_ADD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x86 - Add value pointed by HL to A
-    { GBC_CPU_ADD_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x87 - Add A to A
-    { GBC_CPU_ADC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x88 - Add B and carry flag to A
-    { GBC_CPU_ADC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x89 - Add C and carry flag to A
-    { GBC_CPU_ADC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8A - Add D and carry flag to A
-    { GBC_CPU_ADC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8B - Add E and carry flag to A
-    { GBC_CPU_ADC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8C - Add H and carry flag to A
-    { GBC_CPU_ADC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8D - Add L and carry flag to A
-    { GBC_CPU_ADC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8E - Add value pointed by HL and carry flag to A
-    { GBC_CPU_ADC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x8F - Add A and carry flag to A
-    { GBC_CPU_SUB_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x90 - Subtract B from A
-    { GBC_CPU_SUB_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x91 - Subtract C from A
-    { GBC_CPU_SUB_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x92 - Subtract D from A
-    { GBC_CPU_SUB_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x93 - Subtract E from A
-    { GBC_CPU_SUB_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x94 - Subtract H from A
-    { GBC_CPU_SUB_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x95 - Subtract L from A
-    { GBC_CPU_SUB_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x96 - Subtract value pointed by HL from A
-    { GBC_CPU_SUB_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x97 - Subtract A from A
-    { GBC_CPU_SBC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x98 - Subtract B and carry flag from A
-    { GBC_CPU_SBC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x99 - Subtract C and carry flag from A
-    { GBC_CPU_SBC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9A - Subtract D and carry flag from A
-    { GBC_CPU_SBC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9B - Subtract E and carry flag from A
-    { GBC_CPU_SBC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9C - Subtract H and carry flag from A
-    { GBC_CPU_SBC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9D - Subtract L and carry flag from A
-    { GBC_CPU_SBC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9E - Subtract value pointed by HL and carry flag from A
-    { GBC_CPU_SBC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0x9F - Subtract A and carry flag from A
-    { GBC_CPU_AND_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA0 - Logical AND B against A
-    { GBC_CPU_AND_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA1 - Logical AND C against A
-    { GBC_CPU_AND_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA2 - Logical AND D against A
-    { GBC_CPU_AND_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA3 - Logical AND E against A
-    { GBC_CPU_AND_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA4 - Logical AND H against A
-    { GBC_CPU_AND_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA5 - Logical AND L against A
-    { GBC_CPU_AND_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA6 - Logical AND value pointed by HL against A
-    { GBC_CPU_AND_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA7 - Logical AND A against A
-    { GBC_CPU_XOR_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA8 - Logical XOR B against A
-    { GBC_CPU_XOR_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xA9 - Logical XOR C against A
-    { GBC_CPU_XOR_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAA - Logical XOR D against A
-    { GBC_CPU_XOR_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAB - Logical XOR E against A
-    { GBC_CPU_XOR_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAC - Logical XOR H against A
-    { GBC_CPU_XOR_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAD - Logical XOR L against A
-    { GBC_CPU_XOR_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAE - Logical XOR value pointed by HL against A
-    { GBC_CPU_XOR_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xAF - Logical XOR A against A
-    { GBC_CPU_OR_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB0 - Logical OR B against A
-    { GBC_CPU_OR_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB1 - Logical OR C against A
-    { GBC_CPU_OR_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB2 - Logical OR D against A
-    { GBC_CPU_OR_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB3 - Logical OR E against A
-    { GBC_CPU_OR_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB4 - Logical OR H against A
-    { GBC_CPU_OR_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB5 - Logical OR L against A
-    { GBC_CPU_OR_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB6 - Logical OR value pointed by HL against A
-    { GBC_CPU_OR_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB7 - Logical OR A against A
-    { GBC_CPU_CP_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB8 - Compare B against A
-    { GBC_CPU_CP_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xB9 - Compare C against A
-    { GBC_CPU_CP_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBA - Compare D against A
-    { GBC_CPU_CP_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBB - Compare E against A
-    { GBC_CPU_CP_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBC - Compare H against A
-    { GBC_CPU_CP_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBD - Compare L against A
-    { GBC_CPU_CP_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBE - Compare value pointed by HL against A
-    { GBC_CPU_CP_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xBF - Compare A against A
-    { GBC_CPU_RET_NZ,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xC0 - Return if last result was not zero
-    { GBC_CPU_POP_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xC1 - Pop 16-bit value from stack into BC
-    { GBC_CPU_JP_NZ_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xC2 - Absolute jump to 16-bit location if last result was not zero
-    { GBC_CPU_JP_XX,     GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0xC3 - Absolute jump to 16-bit location
-    { GBC_CPU_CALL_NZ_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xC4 - Call routine at 16-bit location if last result was not zero
-    { GBC_CPU_PUSH_BC,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC5 - Push 16-bit BC onto stack
-    { GBC_CPU_ADD_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xC6 - Add 8-bit immediate to A
-    { GBC_CPU_RST_0H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC7 - Call routine at address 0000h
-    { GBC_CPU_RET_Z,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xC8 - Return if last result was zero
-    { GBC_CPU_RET,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xC9 - Return to calling routine
-    { GBC_CPU_JP_Z_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xCA - Absolute jump to 16-bit location if last result was zero
+    { GBC_CPU_JR_NZ_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x20 - Relative jump by signed immediate if last result was not zero
+    { GBC_CPU_LD_HL_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0x21 - Load 16-bit immediate into HL
+    { GBC_CPU_LDI_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x22 - Save A to address pointed by HL, and increment HL
+    { GBC_CPU_INC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x23 - Increment 16-bit HL
+    { GBC_CPU_INC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x24 - Increment H
+    { GBC_CPU_DEC_H,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x25 - Decrement H
+    { GBC_CPU_LD_H_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x26 - Load 8-bit immediate into H
+    { GBC_CPU_DA_A,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x27 - Adjust A for BCD (Binary Coded Decimal) addition
+    { GBC_CPU_JR_Z_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x28 - Relative jump by signed immediate if last result was zero
+    { GBC_CPU_ADD_HL_HL, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x29 - Add 16-bit HL to HL
+    { GBC_CPU_LDI_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x2A - Load A from address pointed to by HL, and increment HL
+    { GBC_CPU_DEC_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x2B - Decrement 16-bit HL
+    { GBC_CPU_INC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2C - Increment L
+    { GBC_CPU_DEC_L,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2D - Decrement L
+    { GBC_CPU_LD_L_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x2E - Load 8-bit immediate into L
+    { GBC_CPU_CPL,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x2F - Complement (logical NOT) on A (flip all bits)
+    { GBC_CPU_JR_NC_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x30 - Relative jump by signed immediate if last result caused no carry
+    { GBC_CPU_LD_SP_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0x31 - Load 16-bit immediate into SP
+    { GBC_CPU_LDD_HLP_A, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x32 - Save A to address pointed by HL, and decrement HL
+    { GBC_CPU_INC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x33 - Increment 16-bit SP
+    { GBC_CPU_INC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0x34 - Increment value pointed by HL
+    { GBC_CPU_DEC_HLP,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0x35 - Decrement value pointed by HL
+    { GBC_CPU_LD_HLP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_12 }, // 0x36 - Load 8-bit immediate into address pointed by HL
+    { GBC_CPU_SCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x37 - Set carry flag
+    { GBC_CPU_JR_C_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x38 - Relative jump by signed immediate if last result caused carry
+    { GBC_CPU_ADD_HL_SP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x39 - Add 16-bit SP to HL
+    { GBC_CPU_LDD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x3A - Load A from address pointed to by HL, and decrement HL
+    { GBC_CPU_DEC_SP,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x3B - Decrement 16-bit SP
+    { GBC_CPU_INC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3C - Increment A
+    { GBC_CPU_DEC_A,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3D - Decrement A
+    { GBC_CPU_LD_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0x3E - Load 8-bit immediate into A
+    { GBC_CPU_CCF,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x3F - Complement carry flag
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x40 - Copy B to B
+    { GBC_CPU_LD_B_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x41 - Copy C to B
+    { GBC_CPU_LD_B_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x42 - Copy D to B
+    { GBC_CPU_LD_B_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x43 - Copy E to B
+    { GBC_CPU_LD_B_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x44 - Copy H to B
+    { GBC_CPU_LD_B_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x45 - Copy L to B
+    { GBC_CPU_LD_B_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x46 - Copy value pointed by HL to B
+    { GBC_CPU_LD_B_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x47 - Copy A to B
+    { GBC_CPU_LD_C_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x48 - Copy B to C
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x49 - Copy C to C
+    { GBC_CPU_LD_C_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4A - Copy D to C
+    { GBC_CPU_LD_C_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4B - Copy E to C
+    { GBC_CPU_LD_C_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4C - Copy H to C
+    { GBC_CPU_LD_C_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4D - Copy L to C
+    { GBC_CPU_LD_C_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x4E - Copy value pointed by HL to C
+    { GBC_CPU_LD_C_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x4F - Copy A to C
+    { GBC_CPU_LD_D_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x50 - Copy B to D
+    { GBC_CPU_LD_D_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x51 - Copy C to D
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x52 - Copy D to D
+    { GBC_CPU_LD_D_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x53 - Copy E to D
+    { GBC_CPU_LD_D_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x54 - Copy H to D
+    { GBC_CPU_LD_D_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x55 - Copy L to D
+    { GBC_CPU_LD_D_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x56 - Copy value pointed by HL to D
+    { GBC_CPU_LD_D_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x57 - Copy A to D
+    { GBC_CPU_LD_E_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x58 - Copy B to E
+    { GBC_CPU_LD_E_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x59 - Copy C to E
+    { GBC_CPU_LD_E_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5A - Copy D to E
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5B - Copy E to E
+    { GBC_CPU_LD_E_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5C - Copy H to E
+    { GBC_CPU_LD_E_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5D - Copy L to E
+    { GBC_CPU_LD_E_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x5E - Copy value pointed by HL to E
+    { GBC_CPU_LD_E_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x5F - Copy A to E
+    { GBC_CPU_LD_H_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x60 - Copy B to H
+    { GBC_CPU_LD_H_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x61 - Copy C to H
+    { GBC_CPU_LD_H_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x62 - Copy D to H
+    { GBC_CPU_LD_H_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x63 - Copy E to H
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x64 - Copy H to H
+    { GBC_CPU_LD_H_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x65 - Copy L to H
+    { GBC_CPU_LD_H_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x66 - Copy value pointed by HL to H
+    { GBC_CPU_LD_H_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x67 - Copy A to H
+    { GBC_CPU_LD_L_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x68 - Copy B to L
+    { GBC_CPU_LD_L_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x69 - Copy C to L
+    { GBC_CPU_LD_L_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6A - Copy D to L
+    { GBC_CPU_LD_L_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6B - Copy E to L
+    { GBC_CPU_LD_L_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6C - Copy H to L
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6D - Copy L to L
+    { GBC_CPU_LD_L_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x6E - Copy value pointed by HL to L
+    { GBC_CPU_LD_L_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x6F - Copy A to L
+    { GBC_CPU_LD_HLP_B,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x70 - Copy B to address pointed by HL
+    { GBC_CPU_LD_HLP_C,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x71 - Copy C to address pointed by HL
+    { GBC_CPU_LD_HLP_D,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x72 - Copy D to address pointed by HL
+    { GBC_CPU_LD_HLP_E,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x73 - Copy E to address pointed by HL
+    { GBC_CPU_LD_HLP_H,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x74 - Copy H to address pointed by HL
+    { GBC_CPU_LD_HLP_L,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x75 - Copy L to address pointed by HL
+    { GBC_CPU_HALT,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0x76 - Halt processor
+    { GBC_CPU_LD_HLP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x77 - Copy A to address pointed by HL
+    { GBC_CPU_LD_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x78 - Copy B to A
+    { GBC_CPU_LD_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x79 - Copy C to A
+    { GBC_CPU_LD_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7A - Copy D to A
+    { GBC_CPU_LD_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7B - Copy E to A
+    { GBC_CPU_LD_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7C - Copy H to A
+    { GBC_CPU_LD_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7D - Copy L to A
+    { GBC_CPU_LD_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x7E - Copy value pointed by HL to A
+    { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x7F - Copy A to A
+    { GBC_CPU_ADD_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x80 - Add B to A
+    { GBC_CPU_ADD_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x81 - Add C to A
+    { GBC_CPU_ADD_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x82 - Add D to A
+    { GBC_CPU_ADD_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x83 - Add E to A
+    { GBC_CPU_ADD_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x84 - Add H to A
+    { GBC_CPU_ADD_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x85 - Add L to A
+    { GBC_CPU_ADD_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x86 - Add value pointed by HL to A
+    { GBC_CPU_ADD_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x87 - Add A to A
+    { GBC_CPU_ADC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x88 - Add B and carry flag to A
+    { GBC_CPU_ADC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x89 - Add C and carry flag to A
+    { GBC_CPU_ADC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8A - Add D and carry flag to A
+    { GBC_CPU_ADC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8B - Add E and carry flag to A
+    { GBC_CPU_ADC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8C - Add H and carry flag to A
+    { GBC_CPU_ADC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8D - Add L and carry flag to A
+    { GBC_CPU_ADC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x8E - Add value pointed by HL and carry flag to A
+    { GBC_CPU_ADC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x8F - Add A and carry flag to A
+    { GBC_CPU_SUB_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x90 - Subtract B from A
+    { GBC_CPU_SUB_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x91 - Subtract C from A
+    { GBC_CPU_SUB_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x92 - Subtract D from A
+    { GBC_CPU_SUB_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x93 - Subtract E from A
+    { GBC_CPU_SUB_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x94 - Subtract H from A
+    { GBC_CPU_SUB_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x95 - Subtract L from A
+    { GBC_CPU_SUB_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x96 - Subtract value pointed by HL from A
+    { GBC_CPU_SUB_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x97 - Subtract A from A
+    { GBC_CPU_SBC_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x98 - Subtract B and carry flag from A
+    { GBC_CPU_SBC_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x99 - Subtract C and carry flag from A
+    { GBC_CPU_SBC_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9A - Subtract D and carry flag from A
+    { GBC_CPU_SBC_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9B - Subtract E and carry flag from A
+    { GBC_CPU_SBC_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9C - Subtract H and carry flag from A
+    { GBC_CPU_SBC_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9D - Subtract L and carry flag from A
+    { GBC_CPU_SBC_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0x9E - Subtract value pointed by HL and carry flag from A
+    { GBC_CPU_SBC_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0x9F - Subtract A and carry flag from A
+    { GBC_CPU_AND_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA0 - Logical AND B against A
+    { GBC_CPU_AND_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA1 - Logical AND C against A
+    { GBC_CPU_AND_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA2 - Logical AND D against A
+    { GBC_CPU_AND_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA3 - Logical AND E against A
+    { GBC_CPU_AND_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA4 - Logical AND H against A
+    { GBC_CPU_AND_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA5 - Logical AND L against A
+    { GBC_CPU_AND_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xA6 - Logical AND value pointed by HL against A
+    { GBC_CPU_AND_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA7 - Logical AND A against A
+    { GBC_CPU_XOR_A_B,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA8 - Logical XOR B against A
+    { GBC_CPU_XOR_A_C,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xA9 - Logical XOR C against A
+    { GBC_CPU_XOR_A_D,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAA - Logical XOR D against A
+    { GBC_CPU_XOR_A_E,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAB - Logical XOR E against A
+    { GBC_CPU_XOR_A_H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAC - Logical XOR H against A
+    { GBC_CPU_XOR_A_L,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAD - Logical XOR L against A
+    { GBC_CPU_XOR_A_HLP, GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xAE - Logical XOR value pointed by HL against A
+    { GBC_CPU_XOR_A_A,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xAF - Logical XOR A against A
+    { GBC_CPU_OR_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB0 - Logical OR B against A
+    { GBC_CPU_OR_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB1 - Logical OR C against A
+    { GBC_CPU_OR_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB2 - Logical OR D against A
+    { GBC_CPU_OR_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB3 - Logical OR E against A
+    { GBC_CPU_OR_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB4 - Logical OR H against A
+    { GBC_CPU_OR_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB5 - Logical OR L against A
+    { GBC_CPU_OR_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xB6 - Logical OR value pointed by HL against A
+    { GBC_CPU_OR_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB7 - Logical OR A against A
+    { GBC_CPU_CP_A_B,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB8 - Compare B against A
+    { GBC_CPU_CP_A_C,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xB9 - Compare C against A
+    { GBC_CPU_CP_A_D,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBA - Compare D against A
+    { GBC_CPU_CP_A_E,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBB - Compare E against A
+    { GBC_CPU_CP_A_H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBC - Compare H against A
+    { GBC_CPU_CP_A_L,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBD - Compare L against A
+    { GBC_CPU_CP_A_HLP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xBE - Compare value pointed by HL against A
+    { GBC_CPU_CP_A_A,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xBF - Compare A against A
+    { GBC_CPU_RET_NZ,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC0 - Return if last result was not zero
+    { GBC_CPU_POP_BC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0xC1 - Pop 16-bit value from stack into BC
+    { GBC_CPU_JP_NZ_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xC2 - Absolute jump to 16-bit location if last result was not zero
+    { GBC_CPU_JP_XX,     GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_16 }, // 0xC3 - Absolute jump to 16-bit location
+    { GBC_CPU_CALL_NZ_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xC4 - Call routine at 16-bit location if last result was not zero
+    { GBC_CPU_PUSH_BC,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xC5 - Push 16-bit BC onto stack
+    { GBC_CPU_ADD_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xC6 - Add 8-bit immediate to A
+    { GBC_CPU_RST_0H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xC7 - Call routine at address 0000h
+    { GBC_CPU_RET_Z,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xC8 - Return if last result was zero
+    { GBC_CPU_RET,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xC9 - Return to calling routine
+    { GBC_CPU_JP_Z_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xCA - Absolute jump to 16-bit location if last result was zero
     { GBC_CPU_EXT_OPS,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_0  }, // 0xCB - Extended operations (two-byte instruction code)
-    { GBC_CPU_CALL_Z_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xCC - Call routine at 16-bit location if last result was zero
-    { GBC_CPU_CALL_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_6  }, // 0xCD - Call routine at 16-bit location
-    { GBC_CPU_ADC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xCE - Add 8-bit immediate and carry to A
-    { GBC_CPU_RST_8H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xCF - Call routine at address 0008h
-    { GBC_CPU_RET_NC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD0 - Return if last result caused no carry
-    { GBC_CPU_POP_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xD1 - Pop 16-bit value from stack into DE
-    { GBC_CPU_JP_NC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
+    { GBC_CPU_CALL_Z_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xCC - Call routine at 16-bit location if last result was zero
+    { GBC_CPU_CALL_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_24 }, // 0xCD - Call routine at 16-bit location
+    { GBC_CPU_ADC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xCE - Add 8-bit immediate and carry to A
+    { GBC_CPU_RST_8H,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xCF - Call routine at address 0008h
+    { GBC_CPU_RET_NC,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD0 - Return if last result caused no carry
+    { GBC_CPU_POP_DE,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0xD1 - Pop 16-bit value from stack into DE
+    { GBC_CPU_JP_NC_XX,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD3 - Operation removed in this CPU
-    { GBC_CPU_CALL_NC_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xD4 - Call routine at 16-bit location if last result caused no carry
-    { GBC_CPU_PUSH_DE,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD5 - Push 16-bit DE onto stack
-    { GBC_CPU_SUB_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xD6 - Subtract 8-bit immediate from A
-    { GBC_CPU_RST_10H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD7 - Call routine at address 0010h
-    { GBC_CPU_RET_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xD8 - Return if last result caused carry
-    { GBC_CPU_RETI,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD9 - Enable interrupts and return to calling routine
-    { GBC_CPU_JP_C_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xDA - Absolute jump to 16-bit location if last result caused carry
+    { GBC_CPU_CALL_NC_XX,GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xD4 - Call routine at 16-bit location if last result caused no carry
+    { GBC_CPU_PUSH_DE,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xD5 - Push 16-bit DE onto stack
+    { GBC_CPU_SUB_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xD6 - Subtract 8-bit immediate from A
+    { GBC_CPU_RST_10H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xD7 - Call routine at address 0010h
+    { GBC_CPU_RET_C,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xD8 - Return if last result caused carry
+    { GBC_CPU_RETI,      GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xD9 - Enable interrupts and return to calling routine
+    { GBC_CPU_JP_C_XX,   GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xDA - Absolute jump to 16-bit location if last result caused carry
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xDB - Operation removed in this CPU
-    { GBC_CPU_CALL_C_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_0  }, // 0xDC - Call routine at 16-bit location if last result caused carry
+    { GBC_CPU_CALL_C_XX, GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_12 }, // 0xDC - Call routine at 16-bit location if last result caused carry
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xDD - Operation removed in this CPU
-    { GBC_CPU_SBC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xDE - Subtract 8-bit immediate and carry from A
-    { GBC_CPU_RST_18H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xDF - Call routine at address 0018h
-    { GBC_CPU_LDH_XP_A,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xE0 - Save A at address pointed to by (FF00h + 8-bit immediate)
-    { GBC_CPU_POP_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xE1 - Pop 16-bit value from stack into HL
-    { GBC_CPU_LDH_CP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xE2 - Save A at address pointed to by (FF00h + C)
+    { GBC_CPU_SBC_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xDE - Subtract 8-bit immediate and carry from A
+    { GBC_CPU_RST_18H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xDF - Call routine at address 0018h
+    { GBC_CPU_LDH_XP_A,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_12 }, // 0xE0 - Save A at address pointed to by (FF00h + 8-bit immediate)
+    { GBC_CPU_POP_HL,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0xE1 - Pop 16-bit value from stack into HL
+    { GBC_CPU_LDH_CP_A,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE2 - Save A at address pointed to by (FF00h + C)
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xE3 - Operation removed in this CPU
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xE4 - Operation removed in this CPU
-    { GBC_CPU_PUSH_HL,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE5 - Push 16-bit HL onto stack
-    { GBC_CPU_AND_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xE6 - Logical AND 8-bit value immediate against A
-    { GBC_CPU_RST_20H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xE7 - Call routine at address 0020h
-    { GBC_CPU_ADD_SP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xE8 - Add signed 8-bit immediate to SP
-    { GBC_CPU_JP_HL,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xE9 - Jump to HL
-    { GBC_CPU_LD_XXP_A,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_8  }, // 0xEA - Save A at given 16-bit address
+    { GBC_CPU_PUSH_HL,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xE5 - Push 16-bit HL onto stack
+    { GBC_CPU_AND_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xE6 - Logical AND 8-bit value immediate against A
+    { GBC_CPU_RST_20H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xE7 - Call routine at address 0020h
+    { GBC_CPU_ADD_SP_X,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_16 }, // 0xE8 - Add signed 8-bit immediate to SP
+    { GBC_CPU_JP_HL,     GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xE9 - Jump to HL
+    { GBC_CPU_LD_XXP_A,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_16 }, // 0xEA - Save A at given 16-bit address
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEB - Operation removed in this CPU
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xEC - Operation removed in this CPU
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xED - Operation removed in this CPU
-    { GBC_CPU_XOR_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xEE - Logical XOR 8-bit value immediate against A
-    { GBC_CPU_RST_28H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xEF - Call routine at address 0028h
-    { GBC_CPU_LDH_A_XP,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xF0 - Load A from address pointed to by (FF00h + 8-bit immediate)
-    { GBC_CPU_POP_AF,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_6  }, // 0xF1 - Pop 16-bit value from stack into AF
-    { GBC_CPU_LDH_A_CP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xF2 - Load A from address pointed to by (FF00h + C)
-    { GBC_CPU_DI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xF3 - Disable Interrupts
+    { GBC_CPU_XOR_A_X,   GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xEE - Logical XOR 8-bit value immediate against A
+    { GBC_CPU_RST_28H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xEF - Call routine at address 0028h
+    { GBC_CPU_LDH_A_XP,  GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_12 }, // 0xF0 - Load A from address pointed to by (FF00h + 8-bit immediate)
+    { GBC_CPU_POP_AF,    GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_12 }, // 0xF1 - Pop 16-bit value from stack into AF
+    { GBC_CPU_LDH_A_CP,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF2 - Load A from address pointed to by (FF00h + C)
+    { GBC_CPU_DI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xF3 - Disable Interrupts
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xF4 - Operation removed in this CPU
-    { GBC_CPU_PUSH_AF,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF5 - Push 16-bit AF onto stack
-    { GBC_CPU_OR_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xF6 - Logical OR 8-bit value immediate against A
-    { GBC_CPU_RST_30H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF7 - Call routine at address 0030h
-    { GBC_CPU_LDHL_SP_X, GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_6  }, // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
-    { GBC_CPU_LD_SP_HL,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xF9 - Copy HL to SP
-    { GBC_CPU_LD_A_XXP,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_8  }, // 0xFA - Load A from given 16-bit address
-    { GBC_CPU_EI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_2  }, // 0xFB - Enable Interrupts
+    { GBC_CPU_PUSH_AF,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xF5 - Push 16-bit AF onto stack
+    { GBC_CPU_OR_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xF6 - Logical OR 8-bit value immediate against A
+    { GBC_CPU_RST_30H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xF7 - Call routine at address 0030h
+    { GBC_CPU_LDHL_SP_X, GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_12 }, // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
+    { GBC_CPU_LD_SP_HL,  GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xF9 - Copy HL to SP
+    { GBC_CPU_LD_A_XXP,  GBC_CPU_OPERAND_BYTES_2, GBC_CPU_TICKS_16 }, // 0xFA - Load A from given 16-bit address
+    { GBC_CPU_EI,        GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_4  }, // 0xFB - Enable Interrupts
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xFC - Operation removed in this CPU
     { GBC_CPU_NOP,       GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_0  }, // 0xFD - Operation removed in this CPU
-    { GBC_CPU_CP_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_4  }, // 0xFE - Compare 8-bit value immediate against A
-    { GBC_CPU_RST_38H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_8  }, // 0xFF - Call routine at address 0038h
+    { GBC_CPU_CP_A_X,    GBC_CPU_OPERAND_BYTES_1, GBC_CPU_TICKS_8  }, // 0xFE - Compare 8-bit value immediate against A
+    { GBC_CPU_RST_38H,   GBC_CPU_OPERAND_BYTES_0, GBC_CPU_TICKS_16 }, // 0xFF - Call routine at address 0038h
 };
 
 void GBC_CPU_Initialize()
@@ -2207,7 +2143,7 @@ void GBC_CPU_RST_40H()      // Start VBlank Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x40;
 
-    GBC_CPU_StepTicks += 12;
+    GBC_CPU_StepTicks += 20;
 }
 
 void GBC_CPU_RST_48H()      // Start LCD-Stat Handler
@@ -2217,7 +2153,7 @@ void GBC_CPU_RST_48H()      // Start LCD-Stat Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x48;
 
-    GBC_CPU_StepTicks += 12;
+    GBC_CPU_StepTicks += 20;
 }
 
 void GBC_CPU_RST_50H()      // Start Timer Handler
@@ -2227,7 +2163,7 @@ void GBC_CPU_RST_50H()      // Start Timer Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x50;
 
-    GBC_CPU_StepTicks += 12;
+    GBC_CPU_StepTicks += 20;
 }
 
 void GBC_CPU_RST_58H()      // Start Serial Handler
@@ -2237,7 +2173,7 @@ void GBC_CPU_RST_58H()      // Start Serial Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x58;
 
-    GBC_CPU_StepTicks += 12;
+    GBC_CPU_StepTicks += 20;
 }
 
 void GBC_CPU_RST_60H()      // Start Joypad Handler
@@ -2247,7 +2183,7 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
     GBC_CPU_PushToStack(GBC_CPU_Register.PC);
     GBC_CPU_Register.PC = 0x60;
 
-    GBC_CPU_StepTicks += 12;
+    GBC_CPU_StepTicks += 20;
 }
 
 void GBC_CPU_Step()
