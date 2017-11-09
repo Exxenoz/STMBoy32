@@ -88,6 +88,17 @@ typedef struct GBC_CPU_Instruction_s
 }
 GBC_CPU_Instruction_t;
 
+typedef enum GBC_CPU_MemoryAccessDelayState_e
+{
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE           = 0,
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT  = 1,
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT2 = 2,
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT  = 3,
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT2 = 4,
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT3 = 5,
+}
+GBC_CPU_MemoryAccessDelayState_t;
+
 enum GBC_CPU_Flags_e
 {
     // Bits 0-3 should always be zero

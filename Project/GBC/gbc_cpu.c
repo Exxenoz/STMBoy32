@@ -13,6 +13,9 @@ int32_t  GBC_CPU_InterruptMasterEnableDelayTicks = 0; // IME will be enabled aft
 bool GBC_CPU_InterruptMasterEnable = true;            // Interrupt master
 bool GBC_CPU_Halted = false;                          // Halted state
 
+GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState =
+    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE; // Memory access delay state for current instruction
+
 extern const GBC_CPU_Instruction_t GBC_CPU_Instructions[256];
 
 uint8_t GBC_CPU_INC(uint8_t value)
@@ -1766,6 +1769,12 @@ void GBC_CPU_RST_28H()                  // 0xEF - Call routine at address 0028h
 
 void GBC_CPU_LDH_A_XP(uint8_t operand)  // 0xF0 - Load A from address pointed to by (FF00h + 8-bit immediate)
 {
+    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    {
+        GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+        return;
+    }
+
     GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + operand);
 }
 
@@ -1840,6 +1849,12 @@ void GBC_CPU_LD_SP_HL()                 // 0xF9 - Copy HL to SP
 
 void GBC_CPU_LD_A_XXP(uint16_t operand) // 0xFA - Load A from given 16-bit address
 {
+    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    {
+        GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+        return;
+    }
+
     GBC_CPU_Register.A = GBC_MMU_ReadByte(operand);
 }
 
@@ -2149,6 +2164,7 @@ void GBC_CPU_Initialize()
     GBC_CPU_InterruptMasterEnableDelayTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
+    GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE;
 }
 
 void GBC_CPU_RST_40H()      // Start VBlank Handler
@@ -2229,7 +2245,7 @@ void GBC_CPU_Step()
     else // not in HALT mode
     {
         // Interrupt handling
-        if (GBC_CPU_InterruptMasterEnable && interrupts)
+        if (GBC_CPU_InterruptMasterEnable && interrupts && GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
         {
             if (interrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
             {
@@ -2258,7 +2274,14 @@ void GBC_CPU_Step()
             }
         }
 
-        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(GBC_CPU_Register.PC++)];
+        // Save start position of current instruction
+        uint16_t instructionStartPC = GBC_CPU_Register.PC;
+
+        // Get instruction information from instruction array
+        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(instructionStartPC)];
+
+        // Increment program counter
+        GBC_CPU_Register.PC++;
 
         // Instruction handling
         switch (instruction.OperandBytes)
@@ -2291,7 +2314,35 @@ void GBC_CPU_Step()
             }
         }
 
-        GBC_CPU_StepTicks += instruction.Ticks;
+        switch (GBC_CPU_MemoryAccessDelayState)
+        {
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE:
+                GBC_CPU_StepTicks += instruction.Ticks;
+                break;
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT:
+                GBC_CPU_StepTicks += instruction.Ticks - 8;
+                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT2;
+                break;
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT2:
+                GBC_CPU_StepTicks += 8;
+                GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE;
+                break;
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT:
+                GBC_CPU_StepTicks += instruction.Ticks - 12;
+                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT2;
+                break;
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT2:
+                GBC_CPU_StepTicks += 4;
+                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT3;
+                break;
+            case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT3:
+                GBC_CPU_StepTicks += 8;
+                GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE;
+                break;
+        }
     }
 
     if (GBC_CPU_InterruptMasterEnableDelayTicks)
