@@ -15,7 +15,7 @@ bool GBC_MMU_SDC_ROMFileStreamOpen = false;                                     
 GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN; // Current Memory Bank Controller
 GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;                       // ROM/RAM Mode Select
 uint16_t GBC_MMU_CurrentROMBankID = 1;                                             // Current ROM Bank ID
-uint16_t GBC_MMU_CurrentROMBankAddress = 16384;                                    // Current ROM Bank Start Address
+uint32_t GBC_MMU_CurrentROMBankAddress = 16384;                                    // Current ROM Bank Start Address
 
 bool GBC_MMU_ERAMEnabled = false;                                                  // External RAM Enabled State
 uint8_t GBC_MMU_CurrentERAMBankID = 0;                                             // Current ERAM Bank ID
