@@ -194,7 +194,13 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         return CMOD_NOCARD;
     }
 
+    // Get MBC, if it's mbc1 make sure Rom Mode is selected
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
+    if (mbc == GBC_MMU_MBC1)
+    {
+        uint8_t romMode = 0x00;
+        CMOD_WriteByte(0x6001, &romMode);
+    }
 
     FIL      file;
     BYTE     mode = FA_WRITE;
