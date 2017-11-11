@@ -28,9 +28,6 @@ typedef enum bool_e
 }
 bool;
 
-// Flags
-extern bool LCD_READY_FLAG;
-
 // Null pointer define
 #define NULL 0
 

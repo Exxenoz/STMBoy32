@@ -23,6 +23,8 @@
 #define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
 #define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
 
+extern bool LCD_READY_FLAG; // External declaration for main.c file
+
 bool LCD_Initialize(void);
 
 void LCD_DimBacklight(long percent);

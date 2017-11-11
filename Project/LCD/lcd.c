@@ -444,7 +444,15 @@ void EXTI0_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
     {
-        LCD_SET_READY_FLAG;
+        if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
+        {
+            LCD_SET_READY_FLAG;
+        }
+        else
+        {
+            LCD_RST_READY_FLAG;
+        }
+
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
 }
