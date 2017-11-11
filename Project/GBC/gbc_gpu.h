@@ -12,6 +12,15 @@ typedef enum GBC_GPU_Mode_e
 }
 GBC_GPU_Mode_t;
 
+typedef enum GBC_GPU_FrameRate_e
+{
+    GBC_GPU_FRAME_RATE_60HZ = 0,
+    GBC_GPU_FRAME_RATE_30HZ = 1,
+}
+GBC_GPU_FrameRate_t;
+
+#define GBC_GPU_FRAME_RATE GBC_GPU_FRAME_RATE_30HZ
+
 typedef union GBC_GPU_StatusInterruptRequestState_s
 {
     uint8_t RequestFlags;

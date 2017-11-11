@@ -11,6 +11,10 @@ uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
 GBC_GPU_PriorityPixel_t GBC_GPU_PriorityPixelLine[160];
 
+#if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
+bool GBC_GPU_SkipCurrentFrame = false;
+#endif
+
 GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
 {
     0xFFFF, // 0 - White
@@ -43,6 +47,9 @@ void GBC_GPU_Initialize(void)
     GBC_GPU_CurrentFrameBufferEndIndex = 160;
     // Frame buffer must not be initialized
     // Priority pixel line must not be initialized
+#if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
+    GBC_GPU_SkipCurrentFrame = false;
+#endif
 }
 
 void GBC_GPU_RenderScanline(void)
@@ -519,7 +526,19 @@ bool GBC_GPU_Step(void)
 
                     GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_1_DURING_VBLANK;
 
+#if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
+                    if (GBC_GPU_SkipCurrentFrame)
+                    {
+                        GBC_GPU_SkipCurrentFrame = false;
+                    }
+                    else
+                    {
+                        GBC_GPU_SkipCurrentFrame = true;
+                        return true;
+                    }
+#else
                     return true;
+#endif
                 }
                 else
                 {
@@ -594,7 +613,14 @@ bool GBC_GPU_Step(void)
             {
                 GBC_GPU_ModeTicks -= 172;
 
+#if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
+                if (!GBC_GPU_SkipCurrentFrame)
+                {
+                    GBC_GPU_RenderScanline();
+                }
+#else
                 GBC_GPU_RenderScanline();
+#endif
 
                 if (GBC_MMU_Memory.HBlankInterrupt)
                 {

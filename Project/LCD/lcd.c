@@ -193,7 +193,7 @@ bool LCD_Initialize(void)
     LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
 
     LCD_FrameRateControlData_t frameRateControlData = {0};
-    frameRateControlData.DivisionRatio              = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
+    frameRateControlData.DivisionRatio              = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_2;
     frameRateControlData.FrameRate                  = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
     LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
 
