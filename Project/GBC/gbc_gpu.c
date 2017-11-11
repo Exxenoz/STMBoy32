@@ -8,8 +8,8 @@ uint32_t GBC_GPU_ModeTicks = 0;
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
-GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144];
-GBC_GPU_PriorityPixel_t GBC_GPU_PriorityPixelLine[160];
+GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
+GBC_GPU_PriorityPixel_t GBC_GPU_PriorityPixelLine[GBC_GPU_FRAME_SIZE_X];
 
 #if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
 bool GBC_GPU_SkipCurrentFrame = false;

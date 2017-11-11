@@ -19,8 +19,6 @@ typedef enum GBC_GPU_FrameRate_e
 }
 GBC_GPU_FrameRate_t;
 
-#define GBC_GPU_FRAME_RATE GBC_GPU_FRAME_RATE_30HZ
-
 typedef union GBC_GPU_StatusInterruptRequestState_s
 {
     uint8_t RequestFlags;
@@ -72,7 +70,12 @@ typedef struct GBC_GPU_PriorityPixel_e
 }
 GBC_GPU_PriorityPixel_t;
 
-extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[160 * 144]; // External declaration for LCD access
+#define GBC_GPU_FRAME_SIZE_X 160
+#define GBC_GPU_FRAME_SIZE_Y 144
+#define GBC_GPU_FRAME_SIZE 23040 // GBC_GPU_FRAME_SIZE_X * GBC_GPU_FRAME_SIZE_Y
+#define GBC_GPU_FRAME_RATE GBC_GPU_FRAME_RATE_30HZ
+
+extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE]; // External declaration for LCD access
 
 void GBC_GPU_Initialize(void);
 bool GBC_GPU_Step(void);
