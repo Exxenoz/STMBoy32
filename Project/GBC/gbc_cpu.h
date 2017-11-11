@@ -117,7 +117,6 @@ enum GBC_CPU_Flags_e
 #define GBC_CPU_FLAGS_CLEAR_ALL     GBC_CPU_Register.F = 0
 
 extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
-extern uint32_t GBC_CPU_Ticks;              // External declaration for GBC file
 extern uint32_t GBC_CPU_StepTicks;          // External declaration for GPU file
 extern GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState; // External declaration for CPU Ex file
 

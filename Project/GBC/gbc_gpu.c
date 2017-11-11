@@ -483,7 +483,7 @@ void GBC_GPU_CompareScanline()
     }
 }
 
-void GBC_GPU_Step(void)
+bool GBC_GPU_Step(void)
 {
     GBC_GPU_ModeTicks += GBC_CPU_StepTicks;
 
@@ -505,8 +505,6 @@ void GBC_GPU_Step(void)
                 {
                     GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
 
-                    LCD_DrawFrameBufferScaled();
-
                     if (GBC_MMU_Memory.VBlankInterrupt)
                     {
                         if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
@@ -520,6 +518,8 @@ void GBC_GPU_Step(void)
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
                     GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_1_DURING_VBLANK;
+
+                    return true;
                 }
                 else
                 {
@@ -611,4 +611,6 @@ void GBC_GPU_Step(void)
             break;
         }
     }
+
+    return false;
 }

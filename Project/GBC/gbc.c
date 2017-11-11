@@ -80,16 +80,11 @@ bool GBC_IsLoadedFromSDC(void)
 
 void GBC_Update(void)
 {
-    // 70224 ticks correspond to exactly one frame
-    while (GBC_CPU_Ticks < 70224)
+    // Update until VBlank occurs
+    do
     {
         GBC_CPU_Step();
         GBC_TIM_Step();
-        GBC_GPU_Step();
     }
-
-    if (GBC_CPU_Ticks >= 70224)
-    {
-        GBC_CPU_Ticks -= 70224;
-    }
+    while (!GBC_GPU_Step());
 }

@@ -5,7 +5,6 @@
 
 GBC_CPU_Register_t GBC_CPU_Register;                  // Register
 
-uint32_t GBC_CPU_Ticks = 0;                           // Ticks
 uint32_t GBC_CPU_InstructionTicks = 0;                // Instruction ticks
 uint32_t GBC_CPU_StepTicks = 0;                       // Step ticks
 int32_t  GBC_CPU_UnhaltTicks = 0;                     // Unhalt ticks
@@ -2159,7 +2158,6 @@ void GBC_CPU_Initialize()
     GBC_CPU_Register.PC = 0x0100;
     GBC_CPU_Register.SP = 0xFFFE;
 
-    GBC_CPU_Ticks = 0;
     GBC_CPU_InstructionTicks = 0;
     GBC_CPU_StepTicks = 0;
     GBC_CPU_UnhaltTicks = 0;
@@ -2362,5 +2360,4 @@ void GBC_CPU_Step()
     }
 
     GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
-    GBC_CPU_Ticks += GBC_CPU_StepTicks;
 }
