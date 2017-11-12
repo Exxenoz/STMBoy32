@@ -211,7 +211,247 @@ typedef struct GBC_MMU_Memory_s
             };
             uint8_t IO_Unk1[7];
             uint8_t InterruptFlags;          // 0xFF0F
-            uint8_t IO_Unk2[48];
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel1Sweep;       // 0xFF10
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel1SweepShift : 3; // Number of sweep shift (n: 0-7)
+                    unsigned int Channel1SweepType  : 1; // 0: Addition (frequency increases), 1: Subtraction (frequency decreases)
+                    unsigned int Channel1SweepTime  : 3; /* 000: Sweep off - no freq change
+                                                            001:  7.8 ms (1/128Hz)
+                                                            010: 15.6 ms (2/128Hz)
+                                                            011: 23.4 ms (3/128Hz)
+                                                            100: 31.3 ms (4/128Hz)
+                                                            101: 39.1 ms (5/128Hz)
+                                                            110: 46.9 ms (6/128Hz)
+                                                            111: 54.7 ms (7/128Hz) */
+                    unsigned int                    : 1;
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel1SoundLengthAndWavePatternDuty; // 0xFF11
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel1SoundLengthData : 6; // Sound Length = (64-t1)*(1/256) seconds. The length value is used only if Bit 6 in 0xFF14 is set.
+                    unsigned int Channel1WavePatternDuty : 2; /* 00: 12.5% ( _-------_-------_------- )
+                                                                 01: 25%   ( __------__------__------ )
+                                                                 10: 50%   ( ____----____----____---- ) (normal)
+                                                                 11: 75%   ( ______--______--______-- ) */
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel1VolumeEnvelope; // 0xFF12
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel1EnvelopeSweepNumber   : 3; // Number of envelope sweep (n: 0-7) (If zero, stop envelope operation.) Length of 1 step = n*(1/64) seconds
+                    unsigned int Channel1EnvelopeDirection     : 1; // Envelope Direction (0 = Decrease, 1 = Increase)
+                    unsigned int Channel1InitialEnvelopeVolume : 4; // Initial volume of envelope (0-0Fh) (0 = No sound)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint16_t Channel1FrequencyData; // 0xFF13, 0xFF14
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel1Frequency        : 11; // Frequency X -> Frequency = 131072/(2048-X) Hz
+                    unsigned int                          :  3;
+                    unsigned int Channel1CounterSelection :  1; // (1 = Stop output when length in 0xFF11 expires)
+                    unsigned int Channel1InitialRestart   :  1; // Initial (1 = Restart Sound)
+                };
+            };
+            uint8_t IO_Unk14; // 0xFF15
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel2SoundLengthAndWavePatternDuty; // 0xFF16
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel2SoundLengthData : 6; // Sound Length = (64-t1)*(1/256) seconds. The length value is used only if Bit 6 in 0xFF19 is set.
+                    unsigned int Channel2WavePatternDuty : 2; /* 00: 12.5% ( _-------_-------_------- )
+                                                                 01: 25%   ( __------__------__------ )
+                                                                 10: 50%   ( ____----____----____---- ) (normal)
+                                                                 11: 75%   ( ______--______--______-- ) */
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel2VolumeEnvelope;     // 0xFF17
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel2EnvelopeSweepNumber   : 3; // Number of envelope sweep (n: 0-7) (If zero, stop envelope operation.) Length of 1 step = n*(1/64) seconds
+                    unsigned int Channel2EnvelopeDirection     : 1; // Envelope Direction (0 = Decrease, 1 = Increase)
+                    unsigned int Channel2InitialEnvelopeVolume : 4; // Initial volume of envelope (0-0Fh) (0 = No sound)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint16_t Channel2FrequencyData;     // 0xFF18, 0xFF19
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel2Frequency        : 11; // Frequency X -> Frequency = 131072/(2048-X) Hz
+                    unsigned int                          :  3;
+                    unsigned int Channel2CounterSelection :  1; // (1 = Stop output when length in 0xFF16 expires)
+                    unsigned int Channel2InitialRestart   :  1; // Initial (1 = Restart Sound)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel3SoundOnOffData;     // 0xFF1A
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int                      : 7;
+                    unsigned int Channel3SoundEnabled : 1; // Sound Channel 3 Off  (0 = Stop, 1 = Playback)
+                };
+            };
+            uint8_t Channel3SoundLength;    // 0xFF1B          Sound length (t1: 0 - 255), Sound Length = (256-t1)*(1/256) seconds. This value is used only if Bit 6 in 0xFF1E is set.
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel3SelectOutputLevelData; // 0xFF1C
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int                           : 5;
+                    unsigned int Channel3SelectOutputLevel : 2; /* Possible Output levels are:
+                                                                   0: Mute (No sound)
+                                                                   1: 100% Volume (Produce Wave Pattern RAM Data as it is)
+                                                                   2:  50% Volume (Produce Wave Pattern RAM data shifted once to the right)
+                                                                   3:  25% Volume (Produce Wave Pattern RAM data shifted twice to the right) */
+                    unsigned int                           : 1;
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint16_t Channel3FrequencyData; // 0xFF1D, 0xFF1E
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel3Frequency        : 11; // Frequency X -> Frequency = 4194304/(64*(2048-x)) Hz = 65536/(2048-x) Hz
+                    unsigned int                          :  3;
+                    unsigned int Channel3CounterSelection :  1; // (1 = Stop output when length in 0xFF1B expires)
+                    unsigned int Channel3InitialRestart   :  1; // Initial (1 = Restart Sound)
+                };
+            };
+            uint8_t IO_Unk16;                   // 0xFF1F
+            uint8_t Channel4SoundLengthData;    // 0xFF20          Sound Length = (64-t1)*(1/256) seconds. The Length value is used only if Bit 6 in 0xFF23 is set.
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel4VolumeEnvelope; // 0xFF21
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel4EnvelopeSweepNumber   : 3; // Number of envelope sweep (n: 0-7) (If zero, stop envelope operation.) Length of 1 step = n*(1/64) seconds
+                    unsigned int Channel4EnvelopeDirection     : 1; // Envelope Direction (0 = Decrease, 1 = Increase)
+                    unsigned int Channel4InitialEnvelopeVolume : 4; // Initial volume of envelope (0-0Fh) (0 = No sound)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel4PolynomialCounter; // 0xFF22                Frequency = 524288 Hz / r / 2^(s+1) ; For r = 0 assume r = 0.5 instead
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int Channel4PolynomialCounterFreqDivRatio   : 3; // Dividing Ratio of Frequencies (r)
+                    unsigned int Channel4PolynomialCounterStepWidth      : 1; // Counter Step/Width (0 = 15 bits, 1 = 7 bits). When set, the output will become more regular, and some frequencies will sound more like Tone than Noise.
+                    unsigned int Channel4PolynomialCounterShiftClockFreq : 4; // Shift Clock Frequency (s)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t Channel4InitialCounterSelectionAndInitialRestart; // 0xFF23
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int                          : 6;
+                    unsigned int Channel4CounterSelection : 1; // (1 = Stop output when length in 0xFF20 expires)
+                    unsigned int Channel4InitialRestart   : 1; // Initial (1 = Restart Sound)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t ChannelControlTerminal; // 0xFF24
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int ChannelControlOutputLevelSO1 : 3; // SO1 output level (volume)  (0-7)
+                    unsigned int ChannelControlOutputVinToSO1 : 1; // Output Vin to SO1 terminal (1 = Enable)
+                    unsigned int ChannelControlOutputLevelSO2 : 3; // SO2 output level (volume)  (0-7)
+                    unsigned int ChannelControlOutputVinToSO2 : 1; // Output Vin to SO2 terminal (1 = Enable)
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t SoundOutputTerminal; // 0xFF25
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int SoundOutputChannel1ToSO1 : 1; // Output sound 1 to SO1 terminal
+                    unsigned int SoundOutputChannel2ToSO1 : 1; // Output sound 2 to SO1 terminal
+                    unsigned int SoundOutputChannel3ToSO1 : 1; // Output sound 3 to SO1 terminal
+                    unsigned int SoundOutputChannel4ToSO1 : 1; // Output sound 4 to SO1 terminal
+                    unsigned int SoundOutputChannel1ToSO2 : 1; // Output sound 1 to SO2 terminal
+                    unsigned int SoundOutputChannel2ToSO2 : 1; // Output sound 2 to SO2 terminal
+                    unsigned int SoundOutputChannel3ToSO2 : 1; // Output sound 3 to SO2 terminal
+                    unsigned int SoundOutputChannel4ToSO2 : 1; // Output sound 4 to SO2 terminal
+                };
+            };
+            #pragma pack(1)
+            union
+            {
+                uint8_t ChannelSoundTerminal; // 0xFF26
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int ChannelSound1Enabled : 1; // Sound 1 ON flag
+                    unsigned int ChannelSound2Enabled : 1; // Sound 2 ON flag
+                    unsigned int ChannelSound3Enabled : 1; // Sound 3 ON flag
+                    unsigned int ChannelSound4Enabled : 1; // Sound 4 ON flag
+                    unsigned int                      : 3;
+                    unsigned int ChannelSoundsEnabled : 1; // All sound on/off  (0: stop all sound circuits)
+                };
+            };
+            uint8_t IO_Unk15[9];
+            uint8_t Channel3WavePatternRAM[16]; // 0xFF30-0xFF3F
             #pragma pack(1)
             union
             {
