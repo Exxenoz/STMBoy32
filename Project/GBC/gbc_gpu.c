@@ -12,7 +12,7 @@ GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
 GBC_GPU_PriorityPixel_t GBC_GPU_PriorityPixelLine[GBC_GPU_FRAME_SIZE_X];
 
 #if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
-bool GBC_GPU_SkipCurrentFrame = false;
+bool GBC_GPU_SkipCurrentFrame = true;
 #endif
 
 GBC_GPU_Color_t GBC_GPU_BackgroundPaletteClassic[4] =
@@ -48,7 +48,7 @@ void GBC_GPU_Initialize(void)
     // Frame buffer must not be initialized
     // Priority pixel line must not be initialized
 #if GBC_GPU_FRAME_RATE == GBC_GPU_FRAME_RATE_30HZ
-    GBC_GPU_SkipCurrentFrame = false;
+    GBC_GPU_SkipCurrentFrame = true;
 #endif
 }
 
