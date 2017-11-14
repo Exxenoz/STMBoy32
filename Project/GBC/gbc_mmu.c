@@ -231,129 +231,123 @@ void GBC_MMU_StartDMA(uint8_t value)
 
 uint8_t GBC_MMU_ReadByte(uint16_t address)
 {
-    // Cartridge ROM bank 0
-    if (address <= 0x3FFF)
+    switch (address & 0xF000)
     {
-        return GBC_MMU_Memory.CartridgeBank0[address];
-    }
-    // Cartridge ROM bank X
-    else if (address <= 0x7FFF)
-    {
-        uint8_t result = 0;
-
-        if (GBC_IsLoadedFromCartridge())
+        case 0x0000:
+        case 0x1000:
+        case 0x2000:
+        case 0x3000:
+            // Cartridge ROM bank 0
+            return GBC_MMU_Memory.CartridgeBank0[address];
+        case 0x4000:
+        case 0x5000:
+        case 0x6000:
+        case 0x7000:
         {
-            CMOD_ReadByte(address, &result);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
-            return result;
-        }
-        else
-        {
-            uint32_t bytesRead = 0;
-            f_lseek(&GBC_MMU_SDC_ROMFile, GBC_MMU_CurrentROMBankAddress + (address - 0x4000));
-            f_read(&GBC_MMU_SDC_ROMFile, &result, 1, &bytesRead);
-            return result;
-        }
-    }
-    // Video RAM bank X
-    else if (address <= 0x9FFF)
-    {
-        if (GBC_MMU_Memory.VRAMBankID == 1)
-        {
-            return GBC_MMU_Memory.VRAMBank1[address - 0x8000];
-        }
-        else
-        {
-            return GBC_MMU_Memory.VRAMBank0[address - 0x8000];
-        }
-    }
-    // External RAM bank X
-    else if (address <= 0xBFFF)
-    {
-        if (GBC_IsLoadedFromCartridge())
-        {
+            // Cartridge ROM bank X
             uint8_t result = 0;
-            CMOD_ReadByte(address, &result);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+            if (GBC_IsLoadedFromCartridge())
+            {
+                CMOD_ReadByte(address, &result);
+                while (CMOD_GetStatus() == CMOD_PROCESSING);
+            }
+            else
+            {
+                uint32_t bytesRead = 0;
+                f_lseek(&GBC_MMU_SDC_ROMFile, GBC_MMU_CurrentROMBankAddress + (address - 0x4000));
+                f_read(&GBC_MMU_SDC_ROMFile, &result, 1, &bytesRead);
+            }
+
             return result;
         }
-        else if (GBC_MMU_ERAMEnabled)
-        {
-            if (GBC_MMU_RTC_Selected)
+        case 0x8000:
+        case 0x9000:
+            // Video RAM bank X
+            return (GBC_MMU_Memory.VRAMBankID == 1) ? GBC_MMU_Memory.VRAMBank1[address - 0x8000] : GBC_MMU_Memory.VRAMBank0[address - 0x8000];
+        case 0xA000:
+        case 0xB000:
+            // External RAM bank X
+            if (GBC_IsLoadedFromCartridge())
             {
-                return GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID];
+                uint8_t result = 0;
+                CMOD_ReadByte(address, &result);
+                while (CMOD_GetStatus() == CMOD_PROCESSING);
+                return result;
             }
-            else switch (GBC_MMU_CurrentERAMBankID)
+            else if (GBC_MMU_ERAMEnabled)
+            {
+                if (GBC_MMU_RTC_Selected)
+                {
+                    return GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID];
+                }
+                else switch (GBC_MMU_CurrentERAMBankID)
+                {
+                    case 0:
+                        return GBC_MMU_Memory.ERAMBank0[address - 0xA000];
+                    case 1:
+                        return GBC_MMU_Memory.ERAMBank1[address - 0xA000];
+                    case 2:
+                        return GBC_MMU_Memory.ERAMBank2[address - 0xA000];
+                    case 3:
+                        return GBC_MMU_Memory.ERAMBank3[address - 0xA000];
+                }
+            }
+            break;
+        case 0xC000:
+            // Work RAM Bank 0
+            return GBC_MMU_Memory.WRAMBank0[address - 0xC000];
+        case 0xD000:
+            // Work RAM Bank X
+            switch (GBC_MMU_Memory.WRAMBankID)
             {
                 case 0:
-                    return GBC_MMU_Memory.ERAMBank0[address - 0xA000];
                 case 1:
-                    return GBC_MMU_Memory.ERAMBank1[address - 0xA000];
+                    return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
                 case 2:
-                    return GBC_MMU_Memory.ERAMBank2[address - 0xA000];
+                    return GBC_MMU_Memory.WRAMBank2[address - 0xD000];
                 case 3:
-                    return GBC_MMU_Memory.ERAMBank3[address - 0xA000];
+                    return GBC_MMU_Memory.WRAMBank3[address - 0xD000];
+                case 4:
+                    return GBC_MMU_Memory.WRAMBank4[address - 0xD000];
+                case 5:
+                    return GBC_MMU_Memory.WRAMBank5[address - 0xD000];
+                case 6:
+                    return GBC_MMU_Memory.WRAMBank6[address - 0xD000];
+                case 7:
+                    return GBC_MMU_Memory.WRAMBank7[address - 0xD000];
             }
-        }
-    }
-    // Work RAM Bank 0
-    else if (address <= 0xCFFF)
-    {
-        return GBC_MMU_Memory.WRAMBank0[address - 0xC000];
-    }
-    // Work RAM Bank X
-    else if (address <= 0xDFFF)
-    {
-        switch (GBC_MMU_Memory.WRAMBankID)
-        {
-            case 0:
-            case 1:
-                return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
-            case 2:
-                return GBC_MMU_Memory.WRAMBank2[address - 0xD000];
-            case 3:
-                return GBC_MMU_Memory.WRAMBank3[address - 0xD000];
-            case 4:
-                return GBC_MMU_Memory.WRAMBank4[address - 0xD000];
-            case 5:
-                return GBC_MMU_Memory.WRAMBank5[address - 0xD000];
-            case 6:
-                return GBC_MMU_Memory.WRAMBank6[address - 0xD000];
-            case 7:
-                return GBC_MMU_Memory.WRAMBank7[address - 0xD000];
-            default:
-                return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
-        }
-    }
-    // Shadow RAM redirection to WRAM
-    else if (address <= 0xFDFF)
-    {
-        return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
-    }
-    // Object Attribute Memory
-    else if (address <= 0xFE9F)
-    {
-        return GBC_MMU_Memory.OAM[address - 0xFE00];
-    }
-    // Unused
-    else if (address <= 0xFEFF)
-    {
-        // Do nothing
-    }
-    // Memory-mapped I/O
-    else if (address <= 0xFF7F)
-    {
-        return GBC_MMU_Memory.IO[address - 0xFF00];
-    }
-    // High RAM
-    else if (address < 0xFFFF)
-    {
-        return GBC_MMU_Memory.HRAM[address - 0xFF80];
-    }
-    // Interrupt Enable Register
-    else if (address == 0xFFFF)
-    {
-        return GBC_MMU_Memory.InterruptEnable;
+
+            return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
+        case 0xE000:
+            // Shadow RAM redirection to WRAM
+            return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+        case 0xF000:
+            switch (address & 0xFF00)
+            {
+                case 0xFE00:
+                    // Object Attribute Memory
+                    if (address <= 0xFE9F)
+                    {
+                        return GBC_MMU_Memory.OAM[address - 0xFE00];
+                    }
+                    // else unused memory
+                    break;
+                case 0xFF00:
+                    // Memory-mapped I/O
+                    if (address <= 0xFF7F)
+                    {
+                        return GBC_MMU_Memory.IO[address - 0xFF00];
+                    }
+                    else // High RAM and Interrupt Enable Register
+                    {
+                        return GBC_MMU_Memory.HRAM[address - 0xFF80];
+                    }
+                default:
+                    // Shadow RAM redirection to WRAM
+                    return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+            }
+            break;
     }
 
     return 0xFF; // Return 0xFF for unused memory (!!!)
