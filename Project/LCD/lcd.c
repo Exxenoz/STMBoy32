@@ -347,26 +347,29 @@ void LCD_DrawFrameBuffer(void)
 
 void LCD_DrawFrameBufferScaled(void)
 {
-    int linesDrawn = 0;
-    
+    //Make sure Draw Area is correct in case of switching to scaled after using the not-scaled method
+    //LCD_SetDrawArea(16, 0, LCD_DISPLAY_SIZE_Y - 16, LCD_DISPLAY_SIZE_X);
+    int timesRowDrawn = 0;
+
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (int y = 1, i = 0; y <= 240; y++)
+    for (int y = 0, i = 0, j = 1; y < 240; y++, j++)
     {
-        for (long x = 0; x < GBC_GPU_FRAME_SIZE_X; x++)
+        for (int x = 1; x <= GBC_GPU_FRAME_SIZE_X; x++)
         {
-            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[160 * i + x].Color; // ToDo: Use counter variable instead of (160 * i + x) -> Multiplications are slow
+            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i + x].Color;
             LCD_RST_WR;
             LCD_SET_WR;
-            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[160 * i + x].Color; // ToDo: This line is not needed, since ODR should not change ?
+
+            //if (x % 5 == 0) continue;                                            // Draw all colums twice except every fifth
             LCD_RST_WR;
             LCD_SET_WR;
         }
 
-        linesDrawn++;
+        timesRowDrawn++;
 
-        // ToDo: Do not use % operator, because it is slow. Use counter variable instead!
-        if (linesDrawn == 2 || y % 5 == 0) { i++; linesDrawn = 0; }       // Draw all lines twice except every third
+        if (timesRowDrawn == 2 || j == 5) { i += 160; timesRowDrawn = 0; }       // Draw all rows twice except every third
+        if (j == 5) j = 0;
     }
     LCD_SET_CS;
 }
