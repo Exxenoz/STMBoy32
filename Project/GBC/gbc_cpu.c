@@ -3,6 +3,12 @@
 #include "gbc_mmu.h"
 #include "string.h"
 
+#define DEBUG_PRINT_INSTRUCTION_CALLS false
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+#include <stdio.h>
+#endif
+
 GBC_CPU_Register_t GBC_CPU_Register;                  // Register
 
 uint32_t GBC_CPU_InstructionTicks = 0;                // Instruction ticks
@@ -17,6 +23,17 @@ GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState =
     GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE; // Memory access delay state for current instruction
 
 extern const GBC_CPU_Instruction_t GBC_CPU_Instructions[256];
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+typedef struct
+{
+    long instr_calls[512];
+}
+InstructionCalls_t;
+
+InstructionCalls_t GBC_CPU_InstructionCalls;
+bool GBC_CPU_DebugPrintEnabled = false;
+#endif
 
 uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -2278,8 +2295,14 @@ void GBC_CPU_Step()
         // Save start position of current instruction
         uint16_t instructionStartPC = GBC_CPU_Register.PC;
 
+        uint8_t instructionOpcode = GBC_MMU_ReadByte(instructionStartPC);
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+        GBC_CPU_InstructionCalls.instr_calls[instructionOpcode]++;
+#endif
+
         // Get instruction information from instruction array
-        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_MMU_ReadByte(instructionStartPC)];
+        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[instructionOpcode];
 
         // Increment program counter
         GBC_CPU_Register.PC++;
@@ -2296,6 +2319,13 @@ void GBC_CPU_Step()
             case GBC_CPU_OPERAND_BYTES_1:
             {
                 uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+                if (instructionOpcode == 0xCB)
+                {
+                    GBC_CPU_InstructionCalls.instr_calls[256 + operand]++;
+                }
+#endif
 
                 GBC_CPU_Register.PC++;
 
@@ -2358,6 +2388,19 @@ void GBC_CPU_Step()
             GBC_CPU_InterruptMasterEnable = true;
         }
     }
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+    if (GBC_CPU_DebugPrintEnabled)
+    {
+        for (long i = 0; i < 512; i++)
+        {
+            // PB3 is used for serial transfer
+            printf("%ld;%ld*", i, GBC_CPU_InstructionCalls.instr_calls[i]);
+        }
+
+        GBC_CPU_DebugPrintEnabled = false;
+    }
+#endif
 
     GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
 }
