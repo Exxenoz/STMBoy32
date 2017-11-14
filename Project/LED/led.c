@@ -30,8 +30,6 @@ void LED_EnableRed(bool enable)
     if (enable)
     {
         LED_RED_RESET;
-        LED_GREEN_SET;
-        LED_BLUE_SET;
     }
     else
     {
@@ -43,9 +41,7 @@ void LED_EnableGreen(bool enable)
 {
     if (enable)
     {
-        LED_RED_SET;
         LED_GREEN_RESET;
-        LED_BLUE_SET;
     }
     else
     {
@@ -57,8 +53,6 @@ void LED_EnableBlue(bool enable)
 {
     if (enable)
     {
-        LED_RED_SET;
-        LED_GREEN_SET;
         LED_BLUE_RESET;
     }
     else
