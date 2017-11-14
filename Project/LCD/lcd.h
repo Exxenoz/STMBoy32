@@ -44,8 +44,6 @@ void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow);
 void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void LCD_ClearColor(uint16_t color);
-void LCD_PrintKaro(uint16_t color, uint16_t offset); // Debug
-void LCD_DrawLines(uint16_t color1, uint16_t color2);// Debug
 void LCD_DrawFrameBuffer(void);
 void LCD_DrawFrameBufferScaled(void);
 
