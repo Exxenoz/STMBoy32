@@ -291,7 +291,7 @@ void CMOD_Initialize_CLK(void)
 
 
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitObject.GPIO_OType = GPIO_OType_OD;
     GPIO_InitObject.GPIO_Pin   = CMOD_CLK_PIN;
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
@@ -306,7 +306,7 @@ void CMOD_Initialize_CLK(void)
     TIM_TimeBaseInit(CMOD_TIM, &TIM_BaseObject);
 
     TIM_OCStructInit(&TIM_OCInitObject);
-    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
+    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM2;
 	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
 	TIM_OCInitObject.TIM_Pulse           = 42;
@@ -337,7 +337,7 @@ void CMOD_Initialize(void)
 
     #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
+    GPIO_InitObject.GPIO_OType = GPIO_OType_OD;     \
     GPIO_InitObject.GPIO_Pin   = PIN;               \
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
@@ -349,11 +349,6 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT,    CMOD_WR_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
-
-    CMOD_SET_CS;
-    CMOD_SET_RD;
-    CMOD_SET_WR;
-    CMOD_SET_RESET;
 
     CMOD_Initialize_CLK();
 }

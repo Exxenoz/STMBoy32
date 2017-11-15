@@ -72,14 +72,14 @@ int main(void)
     GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
     if(loaded == GBC_LOAD_RESULT_OK)
     {
-        uint8_t bank1 = 0x01;
+        /*uint8_t bank1 = 0x01;
         memset(test, 0xFF, 1024);
         memset(testResult, 0x00, 1024);
         CMOD_WriteByte(0x4001, &bank1);
         CMOD_WriteBytes(0xA000, 1024, test);
         CMOD_ReadBytes(0xA000, 1024, testResult);
         while (CMOD_GetStatus() == CMOD_PROCESSING);
-        NOP;
+        NOP;*/
        /*result = CMOD_SaveCartridge(true);
        if(result == CMOD_SUCCESS)
        {
@@ -102,7 +102,6 @@ int main(void)
         //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
         GBC_Update();
         //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-        Input_UpdateJoypadState();
 
         while (!LCD_READY_FLAG);
 
