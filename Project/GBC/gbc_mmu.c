@@ -265,7 +265,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
             {
                 return GBC_MMU_Memory.CartridgeBankX[address - 0x4000];
             }
-            else if (GBC_IsLoadedFromCartridge())
+            else if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
             {
                 CMOD_ReadByte(address, &result);
                 while (CMOD_GetStatus() == CMOD_PROCESSING);
@@ -286,7 +286,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         case 0xA000:
         case 0xB000:
             // External RAM bank X
-            if (GBC_IsLoadedFromCartridge())
+            if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
             {
                 uint8_t result = 0;
                 CMOD_ReadByte(address, &result);
@@ -566,7 +566,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // Memory Bank Switch
     if (address <= 0x7FFF)
     {
-        if (GBC_IsLoadedFromCartridge())
+        if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
         {
             CMOD_WriteByte(address, &value);
             while (CMOD_GetStatus() == CMOD_PROCESSING);
@@ -591,7 +591,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
     // External RAM bank X
     else if (address <= 0xBFFF)
     {
-        if (GBC_IsLoadedFromCartridge())
+        if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
         {
             CMOD_WriteByte(address, &value);
             while (CMOD_GetStatus() == CMOD_PROCESSING);

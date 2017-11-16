@@ -21,6 +21,8 @@ typedef enum GBC_LoadState_e
 }
 GBC_LoadState_t;
 
+extern GBC_LoadState_t GBC_LoadState; // External declaration for gbc_mmu.c file
+
 GBC_LoadResult_t GBC_LoadFromCartridge(void);
 GBC_LoadResult_t GBC_LoadFromSDC(char* romFile);
 void GBC_Unload(void);
