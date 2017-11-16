@@ -2307,54 +2307,128 @@ void GBC_CPU_Step()
 #endif
 
 #if DEBUG_COUNT_INSTRUCTIONS == true
-    GBC_CPU_InstructionsPerStep++;
+        GBC_CPU_InstructionsPerStep++;
 #endif
-
-        // Get instruction information from instruction array
-        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[instructionOpcode];
 
         // Increment program counter
         GBC_CPU_Register.PC++;
 
         // Instruction handling
-        switch (instruction.OperandBytes)
+        switch (instructionOpcode)
         {
-            case GBC_CPU_OPERAND_BYTES_0:
+            case 0x00: // NOP
             {
-                ((void (*)(void))instruction.Handler)();
+                // Do nothing
+
+                GBC_CPU_InstructionTicks += 4;
 
                 break;
             }
-            case GBC_CPU_OPERAND_BYTES_1:
+            case 0x20: // Relative jump by signed immediate if last result was not zero
             {
-                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+                int8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
-                if (instructionOpcode == 0xCB)
+                if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
                 {
-                    GBC_CPU_InstructionCalls.instr_calls[256 + operand]++;
+                    GBC_CPU_Register.PC += operand;
+                    GBC_CPU_InstructionTicks += 12;
                 }
-#endif
-
-                GBC_CPU_Register.PC++;
-
-                ((void (*)(uint8_t))instruction.Handler)(operand);
+                else
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
 
                 break;
             }
-            case GBC_CPU_OPERAND_BYTES_2:
+            case 0x7A: // 0x7A - Copy D to A
+            {
+                GBC_CPU_Register.A = GBC_CPU_Register.D;
+
+                GBC_CPU_InstructionTicks += 4;
+
+                break;
+            }
+            case 0xF0: // Load A from address pointed to by (FF00h + 8-bit immediate)
+            {
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_InstructionTicks += 12;
+
+                if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+                {
+                    GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+                    break;
+                }
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + operand);
+
+                break;
+            }
+            case 0xFA: // 0xFA - Load A from given 16-bit address
             {
                 uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
 
                 GBC_CPU_Register.PC += 2;
 
-                ((void (*)(uint16_t))instruction.Handler)(operand);
+                GBC_CPU_InstructionTicks += 16;
+
+                if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+                {
+                    GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
+                    break;
+                }
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(operand);
+
+                break;
+            }
+            default:
+            {
+                // Get instruction information from instruction array
+                GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[instructionOpcode];
+
+                switch (instruction.OperandBytes)
+                {
+                    case GBC_CPU_OPERAND_BYTES_0:
+                    {
+                        ((void (*)(void))instruction.Handler)();
+
+                        break;
+                    }
+                    case GBC_CPU_OPERAND_BYTES_1:
+                    {
+                        uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+                        if (instructionOpcode == 0xCB)
+                        {
+                            GBC_CPU_InstructionCalls.instr_calls[256 + operand]++;
+                        }
+#endif
+
+                        GBC_CPU_Register.PC++;
+
+                        ((void (*)(uint8_t))instruction.Handler)(operand);
+
+                        break;
+                    }
+                    case GBC_CPU_OPERAND_BYTES_2:
+                    {
+                        uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                        GBC_CPU_Register.PC += 2;
+
+                        ((void (*)(uint16_t))instruction.Handler)(operand);
+
+                        break;
+                    }
+                }
+
+                GBC_CPU_InstructionTicks += instruction.Ticks;
 
                 break;
             }
         }
-
-        GBC_CPU_InstructionTicks += instruction.Ticks;
 
         switch (GBC_CPU_MemoryAccessDelayState)
         {
