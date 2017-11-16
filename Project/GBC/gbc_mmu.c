@@ -135,6 +135,10 @@ bool GBC_MMU_LoadFromCartridge(void)
     CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
+    // Read ROM Bank 1
+    CMOD_ReadBytes(0x4000, 16384, GBC_MMU_Memory.CartridgeBankX);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
     // Check ROM Header
     if (!GBC_MMU_IsValidROMHeader())
     {
@@ -161,6 +165,16 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
 
         // Read ROM Bank 0
         if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesRead) != FR_OK || bytesRead != 16384)
+        {
+            f_close(&GBC_MMU_SDC_ROMFile);
+            return false;
+        }
+
+        // Move to ROM Bank 1
+        f_lseek(&GBC_MMU_SDC_ROMFile, 0x4000);
+
+        // Read ROM Bank 1
+        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBankX, 16384, &bytesRead) != FR_OK || bytesRead != 16384)
         {
             f_close(&GBC_MMU_SDC_ROMFile);
             return false;
@@ -247,7 +261,11 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
             // Cartridge ROM bank X
             uint8_t result = 0;
 
-            if (GBC_IsLoadedFromCartridge())
+            if (GBC_MMU_CurrentROMBankID == 1)
+            {
+                return GBC_MMU_Memory.CartridgeBankX[address - 0x4000];
+            }
+            else if (GBC_IsLoadedFromCartridge())
             {
                 CMOD_ReadByte(address, &result);
                 while (CMOD_GetStatus() == CMOD_PROCESSING);

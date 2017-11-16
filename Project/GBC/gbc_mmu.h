@@ -108,7 +108,7 @@ typedef struct GBC_MMU_Memory_s
             // Program Code               // 0150-3FFF
         };
     };
-    //------CartridgeBankX                   4000-7FFF: 16kB Cartridge ROM bank X
+    uint8_t CartridgeBankX[16384];        // 4000-7FFF: 16kB Cartridge ROM bank X
     #pragma pack(1)
     union
     {
