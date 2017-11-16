@@ -4,6 +4,7 @@
 #include "string.h"
 
 #define DEBUG_PRINT_INSTRUCTION_CALLS false
+#define DEBUG_COUNT_INSTRUCTIONS      true
 
 #if DEBUG_PRINT_INSTRUCTION_CALLS == true
 #include <stdio.h>
@@ -33,6 +34,10 @@ InstructionCalls_t;
 
 InstructionCalls_t GBC_CPU_InstructionCalls;
 bool GBC_CPU_DebugPrintEnabled = false;
+#endif
+
+#if DEBUG_COUNT_INSTRUCTIONS == true
+long GBC_CPU_InstructionsPerStep = 0;
 #endif
 
 uint8_t GBC_CPU_INC(uint8_t value)
@@ -2299,6 +2304,10 @@ void GBC_CPU_Step()
 
 #if DEBUG_PRINT_INSTRUCTION_CALLS == true
         GBC_CPU_InstructionCalls.instr_calls[instructionOpcode]++;
+#endif
+
+#if DEBUG_COUNT_INSTRUCTIONS == true
+    GBC_CPU_InstructionsPerStep++;
 #endif
 
         // Get instruction information from instruction array
