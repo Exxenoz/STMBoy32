@@ -4,7 +4,7 @@
 #include "string.h"
 
 #define DEBUG_PRINT_INSTRUCTION_CALLS false
-#define DEBUG_COUNT_INSTRUCTIONS      true
+#define DEBUG_COUNT_INSTRUCTIONS      false
 
 #if DEBUG_PRINT_INSTRUCTION_CALLS == true
 #include <stdio.h>
