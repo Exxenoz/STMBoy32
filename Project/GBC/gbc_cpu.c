@@ -40,7 +40,7 @@ bool GBC_CPU_DebugPrintEnabled = false;
 long GBC_CPU_InstructionsPerStep = 0;
 #endif
 
-uint8_t GBC_CPU_INC(uint8_t value)
+static inline uint8_t GBC_CPU_INC(uint8_t value)
 {
     value++;
 
@@ -69,7 +69,7 @@ uint8_t GBC_CPU_INC(uint8_t value)
     return value;
 }
 
-uint8_t GBC_CPU_DEC(uint8_t value)
+static inline uint8_t GBC_CPU_DEC(uint8_t value)
 {
     value--;
 
@@ -98,7 +98,7 @@ uint8_t GBC_CPU_DEC(uint8_t value)
     return value;
 }
 
-uint8_t GBC_CPU_ADD(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_ADD(uint8_t a, uint8_t b)
 {
     uint32_t result = a + b;
 
@@ -136,7 +136,7 @@ uint8_t GBC_CPU_ADD(uint8_t a, uint8_t b)
     return result;
 }
 
-uint8_t GBC_CPU_ADC(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_ADC(uint8_t a, uint8_t b)
 {
     uint8_t carry = (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
     uint32_t result = a + b + carry;
@@ -175,7 +175,7 @@ uint8_t GBC_CPU_ADC(uint8_t a, uint8_t b)
     return result;
 }
 
-uint8_t GBC_CPU_SUB(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_SUB(uint8_t a, uint8_t b)
 {
     uint8_t result = a - b;
 
@@ -211,7 +211,7 @@ uint8_t GBC_CPU_SUB(uint8_t a, uint8_t b)
     return result;
 }
 
-uint8_t GBC_CPU_SBC(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_SBC(uint8_t a, uint8_t b)
 {
     int8_t carry = (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
     int32_t result = a - b - carry;
@@ -250,7 +250,7 @@ uint8_t GBC_CPU_SBC(uint8_t a, uint8_t b)
     return result;
 }
 
-uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
+static inline uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
 {
     uint32_t result = a + b;
 
@@ -281,7 +281,7 @@ uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
     return result;
 }
 
-uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
 {
     uint8_t result = a & b;
 
@@ -299,7 +299,7 @@ uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
     return result;
 }
 
-uint8_t GBC_CPU_OR(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_OR(uint8_t a, uint8_t b)
 {
     uint8_t result = a | b;
 
@@ -316,7 +316,7 @@ uint8_t GBC_CPU_OR(uint8_t a, uint8_t b)
     return result;
 }
 
-uint8_t GBC_CPU_XOR(uint8_t a, uint8_t b)
+static inline uint8_t GBC_CPU_XOR(uint8_t a, uint8_t b)
 {
     uint8_t result = a ^ b;
 
@@ -333,7 +333,7 @@ uint8_t GBC_CPU_XOR(uint8_t a, uint8_t b)
     return result;
 }
 
-void GBC_CPU_COMPARE(uint8_t a, uint8_t b)
+static inline void GBC_CPU_COMPARE(uint8_t a, uint8_t b)
 {
     if (a < b)
     {
@@ -365,14 +365,14 @@ void GBC_CPU_COMPARE(uint8_t a, uint8_t b)
     }
 }
 
-uint16_t GBC_CPU_PopFromStack()
+static inline uint16_t GBC_CPU_PopFromStack()
 {
     uint16_t result = GBC_MMU_ReadShort(GBC_CPU_Register.SP);
     GBC_CPU_Register.SP += 2;
     return result;
 }
 
-void GBC_CPU_PushToStack(uint16_t value)
+static inline void GBC_CPU_PushToStack(uint16_t value)
 {
     GBC_CPU_Register.SP -= 2;
     GBC_MMU_WriteShort(GBC_CPU_Register.SP, value);
