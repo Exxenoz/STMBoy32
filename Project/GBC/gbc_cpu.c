@@ -2330,8 +2330,8 @@ void GBC_CPU_Step()
 
                 if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
                 {
-                    GBC_CPU_Register.PC += operand;
                     GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += operand;
                 }
                 else
                 {
@@ -2340,19 +2340,63 @@ void GBC_CPU_Step()
 
                 break;
             }
-            case 0x7A: // 0x7A - Copy D to A
+            case 0x23: // Increment 16-bit HL
             {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.HL++;
+
+                // Flags not affected
+
+                break;
+            }
+            case 0x7A: // Copy D to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
                 GBC_CPU_Register.A = GBC_CPU_Register.D;
 
+                break;
+            }
+            case 0xA7: // Logical AND A against A
+            {
                 GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xB3: // Logical OR E against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0xB6: // Logical OR value pointed by HL against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+
+                break;
+            }
+            case 0xE0: // Save A at address pointed to by (FF00h + 8-bit immediate)
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_MMU_WriteByte(0xFF00 + operand, GBC_CPU_Register.A);
 
                 break;
             }
             case 0xF0: // Load A from address pointed to by (FF00h + 8-bit immediate)
             {
-                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
-
                 GBC_CPU_InstructionTicks += 12;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
 
                 if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
                 {
@@ -2364,13 +2408,13 @@ void GBC_CPU_Step()
 
                 break;
             }
-            case 0xFA: // 0xFA - Load A from given 16-bit address
+            case 0xFA: // Load A from given 16-bit address
             {
+                GBC_CPU_InstructionTicks += 16;
+
                 uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
 
                 GBC_CPU_Register.PC += 2;
-
-                GBC_CPU_InstructionTicks += 16;
 
                 if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
                 {
