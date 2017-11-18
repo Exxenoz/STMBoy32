@@ -102,118 +102,6 @@ void LCD_InitializeInterrupt(void)
     NVIC_EnableIRQ(INPUT_FRAME_NVIC_CHANNEL);
 }
 
-bool LCD_Initialize(void)
-{
-    RCC_AHB1PeriphClockCmd(LCD_RESET_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_CS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RD_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_WR_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_BACKLIT_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_DATA_BUS,    ENABLE);
-
-    RCC_APB2PeriphClockCmd(LCD_TIM_BUS,     ENABLE);
-
-    LCD_InitializePins();
-    LCD_InitializeTimer();
-    LCD_InitializeInterrupt();
-
-    LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
-    // Wait ~120ms (ILI9341 Datasheet p. 90)
-    for (long i = 0; i < 2000000; i++);
-
-    LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
-
-    LCD_Write(LCD_REG_POWER_CONTROL_1, 0x09);
-    LCD_Write(LCD_REG_POWER_CONTROL_2, 0x13);
-
-    uint16_t data[16];
-    data[0] = 0x35; 
-    data[1] = 0x3E;
-    LCD_WriteBuffer(LCD_REG_VCOM_CONTROL_1, data, 2);
-    LCD_Write(LCD_REG_VCOM_CONTROL_2, 0xBE);
-
-    MemoryAccessControlData_t memoryAccessControlData = {0};
-    memoryAccessControlData.RowAddressOrder           = 1;
-    memoryAccessControlData.ColumnAddressOrder        = 1;
-    memoryAccessControlData.RowColumnExchange         = 1;
-    memoryAccessControlData.VerticalRefreshOrder      = 1;
-    memoryAccessControlData.RGBBGROrder               = 1;
-    memoryAccessControlData.HorizontalRefreshOrder    = 0;
-    LCD_Write(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
-
-    LCD_Write(LCD_REG_PIXEL_FORMAT_SET, 0x55);
-
-    LCD_Write(LCD_REG_GAMMA_SET, 0x01);
-
-    data[0]  = 0x1f;
-    data[1]  = 0x1a;
-    data[2]  = 0x18;
-    data[3]  = 0x0a;
-    data[4]  = 0x0f;
-    data[5]  = 0x06;
-    data[6]  = 0x45;
-    data[7]  = 0x87;
-    data[8]  = 0x32;
-    data[9]  = 0x0a;
-    data[10] = 0x07;
-    data[11] = 0x02;
-    data[12] = 0x07;
-    data[13] = 0x05;
-    data[14] = 0x00;
-    LCD_WriteBuffer(LCD_REG_POSITIVE_GAMMA_CORRECTION, data, 15);
-
-    data[0]  = 0x00;
-    data[1]  = 0x25;
-    data[2]  = 0x27;
-    data[3]  = 0x05;
-    data[4]  = 0x10;
-    data[5]  = 0x09;
-    data[6]  = 0x3A;
-    data[7]  = 0x78;
-    data[8]  = 0x4D;
-    data[9]  = 0x05;
-    data[10] = 0x18;
-    data[11] = 0x0D;
-    data[12] = 0x38;
-    data[13] = 0x3A;
-    data[14] = 0x1F;
-    LCD_WriteBuffer(LCD_REG_NEGATIVE_GAMMA_CORRECTION, data, 15);
-
-    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_Y, LCD_DISPLAY_SIZE_X);
-
-    LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
-
-    LCD_FrameRateControlData_t frameRateControlData = {0};
-    frameRateControlData.DivisionRatio              = LCD_FRAME_RATE_CONTROL_DATA_DIVISION_RATIO_1;
-    frameRateControlData.FrameRate                  = LCD_FRAME_RATE_CONTROL_DATA_FRAME_RATE_61HZ;
-    LCD_WriteBuffer(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
-
-    LCD_Write(LCD_REG_ENTRY_MODE_SET, 0x07);
-
-    data[0] = 0x0A;
-    data[1] = 0x82;
-    data[2] = 0x27;
-    data[3] = 0x00;
-    LCD_WriteBuffer(LCD_REG_DISPLAY_FUNCTION_CONTROL, data, 4);
-
-    // Setting of porching is needed, because it increases the
-    // available time to write from RAM to GRAM without tearing.
-    /*data[0] = 0x5F; // Front Porching
-    data[1] = 0x5F; // Back  Porching
-    data[2] = 0x0A; // Default
-    data[3] = 0x14; // Default
-    LCD_WriteBuffer(LCD_REG_BLANKING_PORCH_CONTROL, data, 4);*/
-
-    LCD_WriteCommand(LCD_REG_SLEEP_OUT);
-    LCD_WriteCommand(LCD_REG_DISPLAY_ON);
-
-    // ToDo: Move to somewhere else
-    LCD_DimBacklight(0);
-
-    return false; 
-}
-
 void LCD_DimBacklight(long percent)
 {
     if (percent < 0)
@@ -326,6 +214,67 @@ void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
     LCD_SetDrawAreaHorizontal(x, x + width - 1);
     LCD_SetDrawAreaVertical(y, y + height - 1);
+}
+
+// Remove this function along with LCD_FrameRateControlData_t if frame rate doesn't need to be changed during runtime
+void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t frameRate)
+{
+    LCD_FrameRateControlData_t frameRateControlData = {0};
+    frameRateControlData.DivisionRatio              = divRatio;
+    frameRateControlData.FrameRate                  = frameRate;
+    LCD_WriteCommandWithParameters(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
+}
+
+// ToDo: Test if rowColExchange completly inverts Row-Col-Logic
+void LCD_SetDrawBehaviour(bool writeBotToTop, bool writeRightToLeft, bool rowColExchange, bool refreshBotToTop, bool refreshRightToLeft, bool bgr)
+{
+    MemoryAccessControlData_t memoryAccessControlData = {0};
+    memoryAccessControlData.RowAddressOrder           = writeBotToTop;
+    memoryAccessControlData.ColumnAddressOrder        = writeRightToLeft;
+    memoryAccessControlData.RowColumnExchange         = rowColExchange;
+    memoryAccessControlData.VerticalRefreshOrder      = refreshBotToTop;
+    memoryAccessControlData.HorizontalRefreshOrder    = refreshRightToLeft;
+    memoryAccessControlData.RGBBGROrder               = bgr;
+
+    LCD_WriteCommandWithData(LCD_REG_MEMORY_ACCESS_CONTROL, memoryAccessControlData.Data);
+}
+
+void LCD_Initialize(void)
+{
+// Reminder: Porching increases available time to write from RAM to GRAM
+    LCD_InitializePins();
+    LCD_InitializeTimer();
+    LCD_InitializeInterrupt();
+    
+
+    LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
+    for (long i = 0; i < 2000000; i++);         // Wait ~120ms (ILI9341 Datasheet p. 90)
+    LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
+
+
+    LCD_WriteCommandWithData(LCD_REG_POWER_CONTROL_1, LCD_REG_POWER_CONTROL1_DATA);
+    LCD_WriteCommandWithData(LCD_REG_POWER_CONTROL_2, LCD_REG_POWER_CONTROL2_DATA);
+
+    LCD_WriteCommandWithParameters(LCD_REG_VCOM_CONTROL_1, LCD_REG_VCOM_CONTROL_DATA, 2);
+    LCD_WriteCommandWithData(LCD_REG_VCOM_CONTROL_2, LCD_REG_VCOM_CONTROL2_DATA);
+
+    LCD_WriteCommandWithParameters(LCD_REG_DISPLAY_FUNCTION_CONTROL, LCD_REG_DISPLAY_FUNCTION_CONTROL_DATA, 4);
+    LCD_WriteCommandWithData(LCD_REG_PIXEL_FORMAT_SET, LCD_REG_PIXEL_FORMAT_DATA);
+    LCD_WriteCommandWithData(LCD_REG_ENTRY_MODE_SET, LCD_REG_ENTRY_MODE_DATA);
+
+    LCD_WriteCommandWithParameters(LCD_REG_POSITIVE_GAMMA_CORRECTION, LCD_REG_POSITIVE_GAMMA_CORRECTION_DATA, 15);
+    LCD_WriteCommandWithParameters(LCD_REG_NEGATIVE_GAMMA_CORRECTION, LCD_REG_NEGATIVE_GAMMA_CORRECTION_DATA, 15);
+
+    LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO1, LCD_FRAME_RATE_61HZ);
+    LCD_SetDrawBehaviour(true, true, true, true, false, true);
+
+
+    LCD_WriteCommand(LCD_REG_SLEEP_OUT);
+    LCD_WriteCommand(LCD_REG_DISPLAY_ON);
+
+    //LCD_Write(LCD_REG_GAMMA_SET, 0x01);                            // Default value, why even bother?
+    //LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);                  // Default value, why even bother?
+    //LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y); // necessary?
 }
 
 void LCD_ClearColor(uint16_t color)
