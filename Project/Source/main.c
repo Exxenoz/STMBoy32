@@ -18,6 +18,14 @@
 #include "gbc.h"
 #include "gbc_mmu.h"
 
+OS_STATE_t currState = OS_MAIN_PAGE;
+OS_STATE_t lastState = OS_MAIN_PAGE;
+
+//----------DEBUG----------
+#include "string.h"
+uint8_t test[1024];
+uint8_t testResult[1024];
+
 void ClockDebug_Initialize()
 {
     RCC->CFGR |= RCC_CFGR_MCO2PRE_2;
@@ -30,10 +38,7 @@ void ClockDebug_Initialize()
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOC, &GPIO_InitObject);
 }
-
-#include "string.h"
-uint8_t test[1024];
-uint8_t testResult[1024];
+//-------------------------
 
 int main(void)
 {
@@ -47,11 +52,10 @@ int main(void)
     // to debug clock frequency settings using GPIO
     // ClockDebug_Initialize();
 
-    // Change the priority grouping configuration back to standard 
-    // (all bits of interrupt priority register used for preempt priority)
-    // STM Library changes it to non-standard
+    // Use all bits of interrupt priority register for preempt priority
     NVIC_SetPriorityGrouping(0U);
 
+    // Initialize drivers
     LED_Initialize();
     Audio_Initialize();
     Input_Initialize();
@@ -59,6 +63,10 @@ int main(void)
     CMOD_Initialize();
     SDC_Initialize();
     
+    // Turn on Display
+    LCD_DimBacklight(0);
+
+//----------DEBUG----------
     GPIO_InitTypeDef GPIO_InitObject;
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
     GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
@@ -66,8 +74,7 @@ int main(void)
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOA, &GPIO_InitObject);
     GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-    
-    LCD_ClearColor(0x0000);
+
     CMOD_SaveResult_t result;
     GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
     if(loaded == GBC_LOAD_RESULT_OK)
@@ -95,20 +102,57 @@ int main(void)
         LED_EnableRed(true);
         return 0;
     }
+    
+    currState = OS_INGAME;
+//--------------------------
 
     /* Infinite loop */
     while (1)
     {
-        //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-        GBC_Update();
-        //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+        switch (currState)
+        {
+            case OS_MAIN_PAGE:
+                while (1)
+                {
+                    
+                }
+                break;
+            
+            case OS_SHOW_ALL:
+                while (1)
+                {
+                    
+                }
+                break;
+            
+            case OS_SHOW_FAV:
+                while (1)
+                {
+                    
+                }
+                break;
+            
+            case OS_OPTIONS:
+                while (1)
+                {
+                    
+                }
+                break;
+            
+            case OS_INGAME:
+                while (1)
+                {
+                    //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+                    GBC_Update();
+                    //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
 
-        while (!LCD_READY_FLAG);
-
-        LCD_DrawFrameBufferScaled();
-        //LCD_ClearColor(0x0000);
-        //LCD_DrawLines(0xFFFF, 0x0000);
-        //LCD_PrintKaro(0, KaroOffset++);
-        //if (KaroOffset == 2400) KaroOffset = 0;
+                    while (!LCD_READY_FLAG);
+                    LCD_DrawFrameBufferScaled();
+                }
+                break;
+                
+            default:
+                return 0;
+        }
     }
 }
