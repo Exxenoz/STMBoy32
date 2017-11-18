@@ -113,25 +113,28 @@ void LCD_DimBacklight(long percent)
         percent = 100;
     }
 
-    TIM_SetCompare4(TIM1, 2.81f * percent);
+    TIM_SetCompare4(LCD_TIM, 2.81f * percent);
 }
 
+// Write register address
 void LCD_WriteAddr(uint16_t addr)
 {
     LCD_DATA_PORT->ODR = addr;
-    LCD_RST_RS; // Set to command
-    LCD_RST_WR; // Set to write
+    LCD_RST_RS;
+    LCD_RST_WR;
     LCD_SET_WR;
-    LCD_SET_RS; // Set to data
+    LCD_SET_RS;
 }
 
+// Write data
 void LCD_WriteData(uint16_t data)
 {
     LCD_DATA_PORT->ODR = data;
-    LCD_RST_WR; // Set to write
+    LCD_RST_WR;
     LCD_SET_WR;
 }
 
+// Write Command without data
 void LCD_WriteCommand(uint16_t addr)
 {
     LCD_RST_CS;
@@ -139,7 +142,8 @@ void LCD_WriteCommand(uint16_t addr)
     LCD_SET_CS;
 }
 
-void LCD_Write(uint16_t addr, uint16_t data)
+// Write Command with single byte data
+void LCD_WriteCommandWithData(uint16_t addr, uint16_t data)
 {
     LCD_RST_CS;
     LCD_WriteAddr(addr);
@@ -147,13 +151,14 @@ void LCD_Write(uint16_t addr, uint16_t data)
     LCD_SET_CS;
 }
 
-void LCD_WriteBuffer(uint16_t addr, uint16_t buffer[], long length)
+// Write Command with data consisting of multiply parameters
+void LCD_WriteCommandWithParameters(uint16_t addr, uint16_t parameters[], long length)
 {
     LCD_RST_CS;
     LCD_WriteAddr(addr);
     for (long i = 0; i < length; i++)
     {
-        LCD_WriteData(buffer[i]);
+        LCD_WriteData(parameters[i]);
     }
     LCD_SET_CS;
 }
@@ -197,7 +202,7 @@ void LCD_SetDrawAreaHorizontal(uint16_t startColumn, uint16_t endColumn)
     columnAddressSetData.StartColumnLow  = startColumn & 0xFF;
     columnAddressSetData.EndColumnHigh   = endColumn >> 8;
     columnAddressSetData.EndColumnLow    = endColumn & 0xFF;
-    LCD_WriteBuffer(LCD_REG_COLUMN_ADDRESS_SET, columnAddressSetData.Data, 4);
+    LCD_WriteCommandWithParameters(LCD_REG_COLUMN_ADDRESS_SET, columnAddressSetData.Data, 4);
 }
 
 void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow)
@@ -207,7 +212,7 @@ void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow)
     pageAddressSetData.StartPageLow  = startRow & 0xFF;
     pageAddressSetData.EndPageHigh   = endRow >> 8;
     pageAddressSetData.EndPageLow    = endRow & 0xFF;
-    LCD_WriteBuffer(LCD_REG_PAGE_ADDRESS_SET, pageAddressSetData.Data, 4);
+    LCD_WriteCommandWithParameters(LCD_REG_PAGE_ADDRESS_SET, pageAddressSetData.Data, 4);
 }
 
 void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
@@ -284,7 +289,7 @@ void LCD_ClearColor(uint16_t color)
     for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
     {
         LCD_DATA_PORT->ODR = color;
-        LCD_RST_WR; // Set to write
+        LCD_RST_WR;
         LCD_SET_WR;
     }
     LCD_SET_CS;
