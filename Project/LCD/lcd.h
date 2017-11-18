@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "lcd_config.h"
-#include "lcd_regdef.h"
 
 #define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
 #define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
