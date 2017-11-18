@@ -22,29 +22,36 @@
 #define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
 #define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
 
+typedef enum
+{
+    LCD_FRAME_RATE_DIVISION_RATIO1 = 0x00,
+    LCD_FRAME_RATE_DIVISION_RATIO2 = 0x01,
+}LCD_FRAME_RATE_DIVISION_RATIO_t;
+
+typedef enum
+{
+    LCD_FRAME_RATE_61HZ  = 0x1F,
+    LCD_FRAME_RATE_83HZ  = 0x17,
+    LCD_FRAME_RATE_95HZ  = 0x14,
+    LCD_FRAME_RATE_100HZ = 0x13,
+    LCD_FRAME_RATE_106HZ = 0x12,
+    LCD_FRAME_RATE_112HZ = 0x11,
+    LCD_FRAME_RATE_119HZ = 0x10,
+}LCD_FRAME_RATE_t;
+
 extern bool LCD_READY_FLAG; // External declaration for main.c file
 
-bool LCD_Initialize(void);
+
+void LCD_Initialize(void);
 
 void LCD_DimBacklight(long percent);
-
-void LCD_WriteAddr(uint16_t addr);
-void LCD_WriteData(uint16_t data);
-void LCD_WriteCommand(uint16_t addr);
-void LCD_Write(uint16_t addr, uint16_t data);
-void LCD_WriteBuffer(uint16_t addr, uint16_t buffer[], long length);
-
-uint16_t LCD_ReadData(void);
-uint16_t LCD_Read(uint16_t addr);
-void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length);
-
-void LCD_SetDrawAreaHorizontal(uint16_t startColumn, uint16_t endColumn);
-void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow);
-void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void LCD_ClearColor(uint16_t color);
 void LCD_DrawFrameBuffer(void);
 void LCD_DrawFrameBufferScaled(void);
+
+void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t frameRate);
+void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
 void EXTI0_IRQHandler(void);
 
