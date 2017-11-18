@@ -1,11 +1,21 @@
 #include "lcd.h"
+#include "lcd_regdef.h"
 #include "gbc_gpu.h"
 
 bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
 {
+    RCC_AHB1PeriphClockCmd(LCD_RESET_BUS,   ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_RS_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_CS_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_RD_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_WR_BUS,      ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_DATA_BUS,    ENABLE);
+    RCC_AHB1PeriphClockCmd(LCD_BACKLIT_BUS, ENABLE);
+
     GPIO_InitTypeDef GPIO_InitObject;
+
 
     #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
@@ -40,6 +50,8 @@ void LCD_InitializePins(void)
 
 void LCD_InitializeTimer()
 {
+    RCC_APB2PeriphClockCmd(LCD_TIM_BUS, ENABLE);
+
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
     TIM_OCInitTypeDef       TIM_OCInitObject;
 
@@ -67,8 +79,7 @@ void LCD_InitializeTimer()
 
 void LCD_InitializeInterrupt(void)
 {
-    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
-    // registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx registers
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
     EXTI_InitTypeDef EXTI_InitObject;
