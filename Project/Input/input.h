@@ -4,25 +4,31 @@
 #include "common.h"
 #include "input_config.h"
 
-typedef enum INPUT_InterruptFlags_e
-{
-    INPUT_INTERRUPT_FLAG_A           = 0x0002,
-    INPUT_INTERRUPT_FLAG_B           = 0x0004,
-    INPUT_INTERRUPT_FLAG_SELECT      = 0x0008,
-    INPUT_INTERRUPT_FLAG_START       = 0x0010,
-    INPUT_INTERRUPT_FLAG_FADE_RIGHT  = 0x0020,
-    INPUT_INTERRUPT_FLAG_FADE_LEFT   = 0x0040,
-    INPUT_INTERRUPT_FLAG_FADE_TOP    = 0x0080,
-    INPUT_INTERRUPT_FLAG_FADE_BOT    = 0x0100
-} Input_InterruptFlags_t;
-
-typedef enum INPUT_ButtonState_e
+typedef enum
 {
     INPUT_NOT_PRESSED = 0xFFFF,
     INPUT_PRESSED     = 0x0000
 } Input_ButtonState_t;
 
-extern uint16_t Input_Interrupt_Flags;
+typedef union
+{
+    struct
+    {
+        unsigned int ButtonA      : 1;
+        unsigned int ButtonB      : 1;
+        unsigned int ButtonStart  : 1;
+        unsigned int ButtonSelect : 1;
+        unsigned int FadeRight    : 1;
+        unsigned int FadeLeft     : 1;
+        unsigned int FadeTop      : 1;
+        unsigned int FadeBot      : 1;
+    };
+
+    uint8_t allFlags;
+}
+Input_Interrupt_Flags_t;
+
+extern Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
 void Input_Initialize(void);
 void Input_UpdateJoypadState(void);

@@ -2,23 +2,22 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
-uint16_t Input_Interrupt_Flags = 0xFFFF;
+Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
-Input_ButtonState_t Input_LastState[8]    = {INPUT_NOT_PRESSED};
-Input_ButtonState_t Input_CurrentState[8] = {INPUT_NOT_PRESSED};
+Input_ButtonState_t Input_LastState[8];
+Input_ButtonState_t Input_CurrState[8];
+uint8_t             counter[8];
 
-uint8_t counter[8] = { 0x00 };
-
-Input_InterruptFlags_t flagPositions[8] =
+const uint16_t flagPositions[8] =
 {
-    INPUT_INTERRUPT_FLAG_A,
-    INPUT_INTERRUPT_FLAG_B,
-    INPUT_INTERRUPT_FLAG_SELECT,
-    INPUT_INTERRUPT_FLAG_START,
-    INPUT_INTERRUPT_FLAG_FADE_RIGHT,
-    INPUT_INTERRUPT_FLAG_FADE_LEFT,
-    INPUT_INTERRUPT_FLAG_FADE_TOP,
-    INPUT_INTERRUPT_FLAG_FADE_BOT,
+    INPUT_A_PIN,
+    INPUT_B_PIN,
+    INPUT_SELECT_PIN,
+    INPUT_START_PIN,
+    INPUT_FADE_RIGHT_PIN,
+    INPUT_FADE_LEFT_PIN,
+    INPUT_FADE_TOP_PIN,
+    INPUT_FADE_BOTTOM_PIN,
 };
 
 
@@ -80,6 +79,14 @@ void Input_Initialize()
     Input_InitializePins();
     Input_InitializeTimer();
 
+    Input_Interrupt_Flags.allFlags = 0xFF;
+    for (int i = 0; i < 8; i++)
+    {
+        Input_CurrState[i] = INPUT_NOT_PRESSED;
+        Input_LastState[i] = INPUT_NOT_PRESSED;
+        counter[i] = 0;
+    }
+
     //-----------DEBUG LED----------
     GPIO_InitTypeDef GPIO_InitObject;
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
@@ -94,36 +101,36 @@ void Input_Initialize()
 void Input_UpdateJoypadState(void)
 {
     //-----------DEBUG LED----------
-    if (((Input_Interrupt_Flags >> 1) & 0xFF)!= 0xFF) GPIO_SetBits(GPIOB, GPIO_Pin_14);
+    if ((Input_Interrupt_Flags.allFlags & 0xFF) != 0xFF) GPIO_SetBits(GPIOB, GPIO_Pin_14);
     else GPIO_ResetBits(GPIOB, GPIO_Pin_14);
     //------------------------------
-    uint16_t flags;
-
-    if (GBC_MMU_Memory.JoypadInputSelectButtons == 0)
-    {
-        flags = ((Input_Interrupt_Flags >> 1) | 0xFFF0);
-        GBC_MMU_Memory.Joypad |= 0x0F;                              // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= flags;                             // Set lower 4 bits of Joypad to button states
-    }
 
     if (GBC_MMU_Memory.JoypadInputSelectFade == 0)
     {
-        flags = ((Input_Interrupt_Flags >> 5) | 0xFFF0);
-        GBC_MMU_Memory.Joypad |= 0x0F;                              // Set lower 4 bits of Joypad to 1 (not pressed)
-        GBC_MMU_Memory.Joypad &= flags;                             // Set lower 4 bits of Joypad to fade states
+        uint8_t flags = ((Input_Interrupt_Flags.allFlags >> 4) | 0xF0);
+        GBC_MMU_Memory.Joypad |= 0x0F;                                      // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= flags;                                     // Set lower 4 bits of Joypad to fade states
+    }
+
+    if (GBC_MMU_Memory.JoypadInputSelectButtons == 0)
+    {
+        GBC_MMU_Memory.Joypad |= 0x0F;                                      // Set lower 4 bits of Joypad to 1 (not pressed)
+        GBC_MMU_Memory.Joypad &= (Input_Interrupt_Flags.allFlags | 0xF0);   // Set lower 4 bits of Joypad to button states
     }
 }
 
 void TIM3_IRQHandler(void)
 {
+    // What about the if?
+
     int i;
     for ( i = 0; i < 8; i++)
     {
         // If the Input pin is low button/fade is pressed
-        Input_CurrentState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
+        Input_CurrState[i] = ((INPUT_PORT_ALL->IDR & flagPositions[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
 
         // If the input state didn't change since 1ms ago increase counter
-        if (Input_CurrentState[i] == Input_LastState[i])
+        if (Input_CurrState[i] == Input_LastState[i])
         {
             counter[i]++;
         }
@@ -137,14 +144,14 @@ void TIM3_IRQHandler(void)
         if (counter[i] >= 10)
         {
             // Set the corresponding Input Bit (not pressed) then set it according to the current state
-            Input_Interrupt_Flags |= flagPositions[i];
-            Input_Interrupt_Flags &= (~flagPositions[i] | Input_CurrentState[i]);
+            Input_Interrupt_Flags.allFlags |= (flagPositions[i] >> 1);
+            Input_Interrupt_Flags.allFlags &= ((~flagPositions[i] | Input_CurrState[i]) >> 1);
 
             counter[i] = 0;
         }
 
-        Input_LastState[i] = Input_CurrentState[i];
+        Input_LastState[i] = Input_CurrState[i];
     }
 
-    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    TIM_ClearITPendingBit(INPUT_TIM, TIM_IT_Update);
 }
