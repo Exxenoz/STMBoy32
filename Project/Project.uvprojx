@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\tm;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\tm;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -786,6 +786,36 @@
               <FileName>gbc_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1616,6 +1646,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2437,6 +2497,36 @@
               <FileName>gbc_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3264,6 +3354,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4087,6 +4207,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4906,6 +5056,36 @@
               <FileName>gbc_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5735,6 +5915,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -6554,6 +6764,36 @@
               <FileName>gbc_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7383,6 +7623,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -8205,6 +8475,36 @@
               <FileName>gbc_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GBC\gbc_tim.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\UI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\UI.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Fonts</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Fonts\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Fonts\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
