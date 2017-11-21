@@ -101,6 +101,7 @@ GBC_CPU_MemoryAccessDelayState_t;
 
 enum GBC_CPU_Flags_e
 {
+    GBC_CPU_FLAGS_NONE        = 0,
     // Bits 0-3 should always be zero
     GBC_CPU_FLAGS_CARRY       = 1 << 4,
     GBC_CPU_FLAGS_HALFCARRY   = 1 << 5,

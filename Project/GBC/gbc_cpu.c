@@ -48,22 +48,18 @@ static inline uint8_t GBC_CPU_INC(uint8_t value)
 
     if ((value & 0x0F) == 0x00)
     {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+        if (value)
+        {
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_HALFCARRY;
+        }
+        else
+        {
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO);
+        }
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F &= ~(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
     }
 
     return value;
@@ -77,22 +73,18 @@ static inline uint8_t GBC_CPU_DEC(uint8_t value)
 
     if ((value & 0x0F) == 0x0F)
     {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+        GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-
-    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (value)
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
+        if (value)
+        {
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_SUBTRACTION;
+        }
+        else
+        {
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        }
     }
 
     return value;
@@ -287,13 +279,11 @@ static inline uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
 
     if (result)
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY;
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_SUBTRACTION);
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO;
     }
 
     return result;
@@ -2321,6 +2311,32 @@ void GBC_CPU_Step()
                 // Do nothing
 
                 GBC_CPU_InstructionTicks += 4;
+
+                break;
+            }
+            case 0x05: // Decrement B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B--;
+
+                // Carry flag not affected
+
+                if ((GBC_CPU_Register.B & 0x0F) == 0x0F)
+                {
+                    GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+                }
+                else
+                {
+                    if (GBC_CPU_Register.B)
+                    {
+                        GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_SUBTRACTION;
+                    }
+                    else
+                    {
+                        GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+                    }
+                }
 
                 break;
             }
