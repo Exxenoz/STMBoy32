@@ -44,23 +44,30 @@ LCD_FRAME_RATE_t;
 
 typedef struct
 {
-    int  spacingLeft;
-    int  spacingRight;
-    int  spacingTop;
-    int  spacingBot;
-    int  textSpacing;
-    int  textHeight;
-    char *textString;
-    uint16_t textColor;
+    uint16_t Width;
+    uint16_t Color;
 }
-LCD_Text_t;
+LCD_Border_t;
 
 typedef struct
 {
-    int width;
-    uint16_t color;
+    int Upper;
+    int Right;
+    int Lower;
+    int Left;
 }
-LCD_Border_t;
+LCD_Padding_t;
+
+typedef struct
+{
+    char *Characters;
+    uint16_t Spacing;
+    uint16_t Height;
+    uint16_t Color;
+    LCD_Padding_t Padding;
+    LCD_Border_t  Border;
+}
+LCD_Text_t;
 
 extern bool LCD_READY_FLAG; // External declaration for main.c file
 
@@ -69,9 +76,10 @@ void LCD_Initialize(void);
 
 void LCD_DimBacklight(long percent);
 
-void LCD_DrawBox(uint16_t x, uint16_t y, int length, int heigth, uint16_t color);
+void LCD_DrawBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color);
+void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t color);
 void LCD_ClearColor(uint16_t color);
-void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Border_t *border, LCD_Text_t *text, Fonts_FontDef_t *font);
+void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font);
 void LCD_DrawFrameBuffer(void);
 void LCD_DrawFrameBufferScaled(void);
 

@@ -217,6 +217,8 @@ void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow)
 
 void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
+    if (width == 0 || height == 0) return;
+
     LCD_SetDrawAreaHorizontal(x, x + width - 1);
     LCD_SetDrawAreaVertical(y, y + height - 1);
 }
@@ -298,14 +300,23 @@ void LCD_ClearColor(uint16_t color)
     LCD_SET_CS;
 }
 
-// Draw a colored box at (x/y)
-void LCD_DrawBox(uint16_t x, uint16_t y, int length, int heigth, uint16_t color)
+void LCD_DrawBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color)
+{   
+    // Draw vertical lines
+    LCD_DrawFilledBox(x, y, length, width, color);
+    LCD_DrawFilledBox(x, y + height - width, length, width, color);
+    // Draw horizontal lines
+    LCD_DrawFilledBox(x, y + width, width, height - 2 * width, color);
+    LCD_DrawFilledBox(x + length - width, y + width, width, height - 2 * width, color);
+}
+
+void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t color)
 {
-    LCD_SetDrawArea(x, y, length, heigth);
+    LCD_SetDrawArea(x, y, length, height);
 
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (long i = 0; i < length * heigth; i++)
+    for (long i = 0; i < length * height; i++)
     {
         LCD_DATA_PORT->ODR = color;
         LCD_RST_WR;
@@ -315,28 +326,21 @@ void LCD_DrawBox(uint16_t x, uint16_t y, int length, int heigth, uint16_t color)
 }
 
 // Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
-void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Border_t *border, LCD_Text_t *text, Fonts_FontDef_t *font)
+void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font)
 {
     //ToDo: Check width of first and last letter and heigth of the highest
     // Calculate number of characters to draw and replace unknown chars with '?'
     int chars = 0;
-    for (char *s = text->textString; *s != '\0'; s++)
+    for (char *s = text->Characters; *s != '\0'; s++)
     {
         if (*s < 32 || *s > 126) *s = '?';
         chars ++;
     }
 
-    // Convert spacing sizes to pixels (rounded down)
-    int  spacingLeft  = text->spacingLeft  ;
-    int  spacingRight = text->spacingRight ;
-    int  spacingTop   = text->spacingTop   ;
-    int  spacingBot   = text->spacingBot   ;
-    int  textSpacing  = text->textSpacing  ;
-
     // Calculate needed size
-    int length = spacingLeft + chars * (font->FontWidth + textSpacing) + spacingRight;
-    int heigth = spacingTop + font->FontHeight + spacingBot;
-    int size   = length * heigth;
+    int length = text->Padding.Left + chars * (font->FontWidth + text->Spacing) + text->Padding.Right;
+    int height = text->Padding.Upper + font->FontHeight + text->Padding.Lower;
+    int size   = length * height;
 
     // Initialize FrameBuffer with background color
     for (int i = 0; i < size; i++)
@@ -352,42 +356,34 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Border_t *bord
             for (int xChar = 0; xChar < font->FontWidth; xChar++)
             {
                 // Calculate the current buffer coordinates
-                int xBuffer = spacingLeft + c * (font->FontWidth + textSpacing) + xChar;
-                int yBuffer = spacingTop + yChar;
+                int xBuffer = text->Padding.Left + c * (font->FontWidth + text->Spacing) + xChar;
+                int yBuffer = text->Padding.Upper + yChar;
 
                 // Each byte of fontData represents a line of a char where a set bit means a pixel must be drawn
                 // All lines of a char are stored sequentially in fontData, same goes for all chars
                 // The first char is space (ASCII 32), afterwards all chars are stored in ASCII order
-                uint16_t currentCharLine = font->FontData[(text->textString[c] - 32) * font->FontHeight + yChar];
+                uint16_t currentCharLine = font->FontData[(text->Characters[c] - 32) * font->FontHeight + yChar];
 
                 // If FontData is mirrored check lines from right to left
                 if ((font->LettersMirrored && ((currentCharLine >> xChar) & 0x0001)) ||
                    (!font->LettersMirrored && ((currentCharLine << xChar) & 0x8000)))
                 {
                     // If a bit is set write textColor to the current Buffer position
-                    // Spacing Right and Bot is accomplished because buffer is actually
-                    // spacingLeft + c(MAX) * (FontWidth + textSpacing) + xFont(MAX) !+spacingRight! long
-                    // and spacingTop + yFont(MAX) !+spacingBot! high
-                    GBC_GPU_FrameBuffer[length * yBuffer + xBuffer].Color = text->textColor;
+                    // Padding Right and Bot is accomplished because buffer is actually
+                    // Left Padding + c(MAX) * (FontWidth + textSpacing) + xFont(MAX) !+ Right Padding! long
+                    // and Upper Padding + yFont(MAX) !+Lower Padding! high
+                    GBC_GPU_FrameBuffer[length * yBuffer + xBuffer].Color = text->Color;
                 }
             }
         }
     }
 
-    // Set starting point, check if it's valid, correct it if necessary and set the draw area accordingly
-    uint16_t x = x0;
-    uint16_t y = y0;
-    if (border != 0)
-    {
-        x += border->width;
-        y += border->width;
-    }
+    // Draw the text border (if border width is 0 no border will be drawn)
+    uint16_t borderWidth = text->Border.Width;
+    LCD_DrawBox(x, y, length + 2 * borderWidth, height + 2 * borderWidth, borderWidth, text->Border.Color);
 
-    if (x > LCD_DISPLAY_SIZE_X - length) x = LCD_DISPLAY_SIZE_X - length;
-    if (y > LCD_DISPLAY_SIZE_Y - heigth) y = LCD_DISPLAY_SIZE_Y - heigth;
-    LCD_SetDrawArea(x, y, length, heigth);
-
-    // Draw the Text and its background
+    // Draw the Text and its background from the now initialized buffer
+    LCD_SetDrawArea(x + text->Border.Width, y + text->Border.Width, length, height);
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < size; i++)
@@ -397,15 +393,6 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Border_t *bord
         LCD_SET_WR;
     }
     LCD_SET_CS;
-
-    // Draw the border
-    if (border != 0)
-    {
-        LCD_DrawBox(x0, y0, length + 2 * border->width, border->width, border->color);
-        LCD_DrawBox(x0, y, border->width, heigth, border->color);
-        LCD_DrawBox(x0, y + heigth, length + 2 * border->width, border->width, border->color);
-        LCD_DrawBox(x + length, y, border->width, heigth, border->color);
-    }
 }
 
 void LCD_DrawFrameBuffer(void)
