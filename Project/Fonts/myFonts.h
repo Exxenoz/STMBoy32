@@ -5,15 +5,16 @@
 
 typedef struct
 {
-    int FontHeight;             // Height of all characters from the font (in pixel)
-    const int      *CharWidth;  // Pointer to width of each character (in pixel)
-    const uint16_t *FontData;   // Pointer to the font data
+    uint16_t FontHeight;        // Height the font (in pixel)
+    uint16_t FontWidth;         // Width the font (in pixel)
+    const uint16_t *fontData;   // Pointer to the font data
 }
 Fonts_FontDef_t;
 
-extern Fonts_FontDef_t Fonts_MyFont; 
+extern Fonts_FontDef_t Fonts_STMFont_16x24;
+extern Fonts_FontDef_t Fonts_STMFont_12x12;
 
-// Returns the length of a given string represented by a certain font (in pixel)
-int GetStringLength(char *s, Fonts_FontDef_t *font);
+
+void Fonts_InitializeSTMFonts(void);
 
 #endif

@@ -722,6 +722,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -808,14 +818,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1578,6 +1588,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1664,14 +1684,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2433,6 +2453,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2519,14 +2549,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3286,6 +3316,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3372,14 +3412,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4139,6 +4179,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4225,14 +4275,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4992,6 +5042,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5078,14 +5138,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5847,6 +5907,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5933,14 +6003,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6700,6 +6770,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6786,14 +6866,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7555,6 +7635,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7641,14 +7731,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8411,6 +8501,16 @@
               <FileType>5</FileType>
               <FilePath>..\Utilities\STM32_EVAL\Common\stm32_eval_legacy.h</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>fonts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Utilities\STM32_EVAL\Common\fonts.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8497,14 +8597,14 @@
           <GroupName>Fonts</GroupName>
           <Files>
             <File>
-              <FileName>fonts.c</FileName>
+              <FileName>myFonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\fonts.c</FilePath>
+              <FilePath>.\Fonts\myFonts.c</FilePath>
             </File>
             <File>
-              <FileName>fonts.h</FileName>
+              <FileName>myFonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\fonts.h</FilePath>
+              <FilePath>.\Fonts\myFonts.h</FilePath>
             </File>
           </Files>
         </Group>
