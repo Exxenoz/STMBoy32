@@ -3,29 +3,33 @@
 #include "gbc_mmu.h"
 #include "string.h"
 
-#define DEBUG_PRINT_INSTRUCTION_CALLS false
-#define DEBUG_COUNT_INSTRUCTIONS      false
+// Uncomment the following debug lines to enable debug functionality
+//#define DEBUG_PRINT_INSTRUCTION_CALLS
+//#define DEBUG_COUNT_INSTRUCTIONS
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
 #include <stdio.h>
 #endif
 
 GBC_CPU_Register_t GBC_CPU_Register;                  // Register
 
-uint32_t GBC_CPU_InstructionTicks = 0;                // Instruction ticks
+uint32_t GBC_CPU_PendingInterrupts = 0;               // Current pending interrupts
+uint16_t GBC_CPU_InstructionAddress = 0;              // Current instruction address
+uint32_t GBC_CPU_InstructionOpcode = 0;               // Current instruction opcode
+uint32_t GBC_CPU_InstructionTicks = 0;                // Current instruction ticks
 uint32_t GBC_CPU_StepTicks = 0;                       // Step ticks
 int32_t  GBC_CPU_UnhaltTicks = 0;                     // Unhalt ticks
 int32_t  GBC_CPU_InterruptMasterEnableDelayTicks = 0; // IME will be enabled after this delay (if != 0)
 
-bool GBC_CPU_InterruptMasterEnable = true;            // Interrupt master
-bool GBC_CPU_Halted = false;                          // Halted state
+uint32_t GBC_CPU_InterruptMasterEnable = true;        // Interrupt master
+uint32_t GBC_CPU_Halted = false;                      // Halted state
 
 GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState =
     GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE; // Memory access delay state for current instruction
 
 extern const GBC_CPU_Instruction_t GBC_CPU_Instructions[256];
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
 typedef struct
 {
     long instr_calls[512];
@@ -36,7 +40,7 @@ InstructionCalls_t GBC_CPU_InstructionCalls;
 bool GBC_CPU_DebugPrintEnabled = false;
 #endif
 
-#if DEBUG_COUNT_INSTRUCTIONS == true
+#ifdef DEBUG_COUNT_INSTRUCTIONS
 long GBC_CPU_InstructionsPerStep = 0;
 #endif
 
@@ -2170,6 +2174,9 @@ void GBC_CPU_Initialize()
     GBC_CPU_Register.PC = 0x0100;
     GBC_CPU_Register.SP = 0xFFFE;
 
+    GBC_CPU_PendingInterrupts = 0;
+    GBC_CPU_InstructionAddress = 0;
+    GBC_CPU_InstructionOpcode = 0;
     GBC_CPU_InstructionTicks = 0;
     GBC_CPU_StepTicks = 0;
     GBC_CPU_UnhaltTicks = 0;
@@ -2231,8 +2238,7 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
 
 void GBC_CPU_Step()
 {
-    uint8_t interrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
-
+    GBC_CPU_PendingInterrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
     GBC_CPU_InstructionTicks = 0;
     GBC_CPU_StepTicks = 0;
 
@@ -2250,7 +2256,7 @@ void GBC_CPU_Step()
                 GBC_CPU_Halted = false;
             }
         }
-        else if (interrupts)
+        else if (GBC_CPU_PendingInterrupts)
         {
             GBC_CPU_UnhaltTicks = 12;
         }
@@ -2258,29 +2264,29 @@ void GBC_CPU_Step()
     else // not in HALT mode
     {
         // Interrupt handling
-        if (GBC_CPU_InterruptMasterEnable && interrupts && GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+        if (GBC_CPU_InterruptMasterEnable && GBC_CPU_PendingInterrupts && GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
         {
-            if (interrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
+            if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
                 GBC_CPU_RST_40H(); // Start VBlank Handler
             }
-            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
+            else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
                 GBC_CPU_RST_48H(); // Start LCD-Stat Handler
             }
-            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
+            else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
                 GBC_CPU_RST_50H(); // Start Timer Handler
             }
-            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
+            else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
                 GBC_CPU_RST_58H(); // Start Serial Handler
             }
-            else if (interrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
+            else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
                 GBC_CPU_RST_60H(); // Start Joypad Handler
@@ -2288,15 +2294,15 @@ void GBC_CPU_Step()
         }
 
         // Save start position of current instruction
-        uint16_t instructionStartPC = GBC_CPU_Register.PC;
+        GBC_CPU_InstructionAddress = GBC_CPU_Register.PC;
 
-        uint8_t instructionOpcode = GBC_MMU_ReadByte(instructionStartPC);
+        GBC_CPU_InstructionOpcode  = GBC_MMU_ReadByte(GBC_CPU_InstructionAddress);
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
-        GBC_CPU_InstructionCalls.instr_calls[instructionOpcode]++;
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
+        GBC_CPU_InstructionCalls.instr_calls[GBC_CPU_InstructionOpcode]++;
 #endif
 
-#if DEBUG_COUNT_INSTRUCTIONS == true
+#ifdef DEBUG_COUNT_INSTRUCTIONS
         GBC_CPU_InstructionsPerStep++;
 #endif
 
@@ -2304,7 +2310,7 @@ void GBC_CPU_Step()
         GBC_CPU_Register.PC++;
 
         // Instruction handling
-        switch (instructionOpcode)
+        switch (GBC_CPU_InstructionOpcode)
         {
             case 0x00: // NOP
             {
@@ -2445,7 +2451,7 @@ void GBC_CPU_Step()
             default:
             {
                 // Get instruction information from instruction array
-                GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[instructionOpcode];
+                GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_CPU_InstructionOpcode];
 
                 switch (instruction.OperandBytes)
                 {
@@ -2457,10 +2463,11 @@ void GBC_CPU_Step()
                     }
                     case GBC_CPU_OPERAND_BYTES_1:
                     {
+
                         uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
-                        if (instructionOpcode == 0xCB)
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
+                        if (GBC_CPU_InstructionOpcode == 0xCB)
                         {
                             GBC_CPU_InstructionCalls.instr_calls[256 + operand]++;
                         }
@@ -2497,7 +2504,7 @@ void GBC_CPU_Step()
                 break;
             case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT:
                 GBC_CPU_StepTicks += GBC_CPU_InstructionTicks - 8;
-                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_Register.PC = GBC_CPU_InstructionAddress;
                 GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT2;
                 break;
             case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT2:
@@ -2506,12 +2513,12 @@ void GBC_CPU_Step()
                 break;
             case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT:
                 GBC_CPU_StepTicks += GBC_CPU_InstructionTicks - 12;
-                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_Register.PC = GBC_CPU_InstructionAddress;
                 GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT2;
                 break;
             case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT2:
                 GBC_CPU_StepTicks += 4;
-                GBC_CPU_Register.PC = instructionStartPC;
+                GBC_CPU_Register.PC = GBC_CPU_InstructionAddress;
                 GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT3;
                 break;
             case GBC_CPU_MEMORY_ACCESS_DELAY_STATE_12_TICKS_LEFT3:
@@ -2532,7 +2539,7 @@ void GBC_CPU_Step()
         }
     }
 
-#if DEBUG_PRINT_INSTRUCTION_CALLS == true
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
     if (GBC_CPU_DebugPrintEnabled)
     {
         for (long i = 0; i < 512; i++)
