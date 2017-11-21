@@ -17,6 +17,7 @@
 #include "cmod.h"
 #include "gbc.h"
 #include "gbc_mmu.h"
+#include "ui.h"
 
 OS_STATE_t currState = OS_MAIN_PAGE;
 OS_STATE_t lastState = OS_MAIN_PAGE;
@@ -102,8 +103,9 @@ int main(void)
         LED_EnableRed(true);
         return 0;
     }
-    
-    currState = OS_INGAME;
+
+    Fonts_InitializeSTMFonts();
+    currState = OS_MAIN_PAGE;
 //--------------------------
 
     /* Infinite loop */
@@ -112,6 +114,9 @@ int main(void)
         switch (currState)
         {
             case OS_MAIN_PAGE:
+
+                UI_DrawMainPage();
+
                 while (1)
                 {
                     
