@@ -326,7 +326,7 @@ void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height,
 }
 
 // Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
-void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font)
+void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font)
 {
     //ToDo: Check width of first and last letter and heigth of the highest
     // Calculate number of characters to draw and replace unknown chars with '?'

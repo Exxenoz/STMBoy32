@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "lcd_config.h"
-#include "myFonts.h"
+#include "ui_fonts.h"
 
 #define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
 #define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
@@ -67,7 +67,7 @@ typedef struct
     LCD_Padding_t Padding;
     LCD_Border_t  Border;
 }
-LCD_Text_t;
+LCD_TextDef_t;
 
 extern bool LCD_READY_FLAG; // External declaration for main.c file
 
@@ -79,7 +79,7 @@ void LCD_DimBacklight(long percent);
 void LCD_DrawBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color);
 void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t color);
 void LCD_ClearColor(uint16_t color);
-void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font);
+void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font);
 void LCD_DrawFrameBuffer(void);
 void LCD_DrawFrameBufferScaled(void);
 
