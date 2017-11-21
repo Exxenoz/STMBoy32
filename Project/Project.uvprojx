@@ -803,14 +803,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1669,14 +1669,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2534,14 +2534,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3397,14 +3397,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4260,14 +4260,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5123,14 +5123,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5988,14 +5988,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6851,14 +6851,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7716,14 +7716,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8582,14 +8582,14 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>UI.c</FileName>
+              <FileName>ui.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\UI\UI.c</FilePath>
+              <FilePath>.\UI\ui.c</FilePath>
             </File>
             <File>
-              <FileName>UI.h</FileName>
+              <FileName>ui.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\UI\UI.h</FilePath>
+              <FilePath>.\UI\ui.h</FilePath>
             </File>
           </Files>
         </Group>
