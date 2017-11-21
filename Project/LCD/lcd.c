@@ -274,12 +274,84 @@ void LCD_Initialize(void)
     LCD_SetDrawBehaviour(true, true, true, true, false, true);
 
 
+    //LCD_WriteCommandWithData(LCD_REG_GAMMA_SET, 0x01);             // Default value, why even bother?
+    LCD_WriteCommandWithData(LCD_REG_TEARING_EFFECT_LINE_ON, 0);   // Default value, why even bother?
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y); // necessary?
+
     LCD_WriteCommand(LCD_REG_SLEEP_OUT);
     LCD_WriteCommand(LCD_REG_DISPLAY_ON);
+}
 
-    //LCD_Write(LCD_REG_GAMMA_SET, 0x01);                            // Default value, why even bother?
-    //LCD_Write(LCD_REG_TEARING_EFFECT_LINE_ON, 0);                  // Default value, why even bother?
-    //LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y); // necessary?
+// Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
+void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font)
+{
+    // Calculate number of characters to draw and replace unknown chars with '?'
+    int chars = 0;
+    for (char *s = text->textString; *s != '\0'; s++)
+    {
+        if (*s < 32 || *s > 126) *s = '?';
+        chars ++;
+    }
+
+    // Convert spacing sizes to pixels (rounded down)
+    int  spacingLeft  = text->spacingLeft  / PIXEL_SIDE_LENGTH;
+    int  spacingRight = text->spacingRight / PIXEL_SIDE_LENGTH;
+    int  spacingTop   = text->spacingTop   / PIXEL_SIDE_LENGTH;
+    int  spacingBot   = text->spacingBot   / PIXEL_SIDE_LENGTH;
+    int  textSpacing  = text->textSpacing  / PIXEL_SIDE_LENGTH;
+
+    // Calculate needed size
+    int length = spacingLeft + chars * (font->FontWidth + textSpacing) + spacingRight;
+    int heigth = spacingTop + font->FontHeight + spacingBot;
+    int size   = length * heigth;
+
+    // Initialize FrameBuffer with background color
+    for (int i = 0; i < size; i++)
+    {
+        GBC_GPU_FrameBuffer[i].Color = bgColor;
+    }
+
+    // Draw first line of all chars, then second one, ...
+    for (int yFont = 0; yFont < font->FontHeight; yFont++)
+    {
+        for (int c = 0; c < chars; c++)
+        {
+            for (int xFont = 0; xFont < font->FontWidth; xFont++)
+            {
+                // Calculate the current buffer coordinates
+                int xBuffer = spacingLeft + c * (font->FontWidth + textSpacing) + xFont;
+                int yBuffer = spacingTop + yFont;
+                
+                // Each byte of fontData represents a line of a char where a set bit means a pixel must be drawn
+                // All lines of a char are stored sequentially in fontData, same goes for all chars
+                // The first char is space (ASCII 32), afterwards all chars are stored in ASCII order
+                if ((font->fontData[(text->textString[c] - 32) * font->FontHeight + yFont] << xFont) & 0x8000) 
+                {
+                    // If a bit is set write textColor to the current Buffer position
+                    // Spacing Right and Bot is accomplished because buffer is actually
+                    // spacingLeft + c(MAX) * (FontWidth + textSpacing) + xFont(MAX) !+spacingRight! long
+                    // and spacingTop + (yBuffer(MAX) + 1) !+spacingBot! high
+                    GBC_GPU_FrameBuffer[length * (spacingTop + yBuffer) + xBuffer].Color = text->textColor;
+                }
+            }
+        }
+    }
+
+    // Check Parameters, correct them if necessary and set the draw area accordingly
+    if (x0 > LCD_DISPLAY_SIZE_X - length) x0 = LCD_DISPLAY_SIZE_X - length;
+    if (y0 > LCD_DISPLAY_SIZE_Y - heigth) y0 = LCD_DISPLAY_SIZE_Y - heigth;
+    LCD_SetDrawArea(x0, y0, length, heigth);
+
+    // Draw the Text and its background
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+    for (long i = 0; i < size; i++)
+    {
+        LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
+        LCD_RST_WR;
+        LCD_SET_WR;
+    }
+    LCD_SET_CS;
 }
 
 void LCD_ClearColor(uint16_t color)

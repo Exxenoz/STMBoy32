@@ -3,6 +3,9 @@
 
 #include "common.h"
 #include "lcd_config.h"
+#include "myFonts.h"
+
+#define PIXEL_SIDE_LENGTH   0.153f
 
 #define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
 #define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
@@ -26,7 +29,8 @@ typedef enum
 {
     LCD_FRAME_RATE_DIVISION_RATIO1 = 0x00,
     LCD_FRAME_RATE_DIVISION_RATIO2 = 0x01,
-}LCD_FRAME_RATE_DIVISION_RATIO_t;
+}
+LCD_FRAME_RATE_DIVISION_RATIO_t;
 
 typedef enum
 {
@@ -37,7 +41,21 @@ typedef enum
     LCD_FRAME_RATE_106HZ = 0x12,
     LCD_FRAME_RATE_112HZ = 0x11,
     LCD_FRAME_RATE_119HZ = 0x10,
-}LCD_FRAME_RATE_t;
+}
+LCD_FRAME_RATE_t;
+
+typedef struct
+{
+    int  spacingLeft;
+    int  spacingRight;
+    int  spacingTop;
+    int  spacingBot;
+    int  textSpacing;
+    int  textHeight;
+    char *textString;
+    uint16_t textColor;
+}
+LCD_Text_t;
 
 extern bool LCD_READY_FLAG; // External declaration for main.c file
 
@@ -46,6 +64,7 @@ void LCD_Initialize(void);
 
 void LCD_DimBacklight(long percent);
 
+void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_Text_t *text, Fonts_FontDef_t *font);
 void LCD_ClearColor(uint16_t color);
 void LCD_DrawFrameBuffer(void);
 void LCD_DrawFrameBufferScaled(void);

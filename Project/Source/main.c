@@ -97,7 +97,7 @@ int main(void)
             LED_EnableRed(true);
        }*/
     }
-    else if (GBC_LoadFromSDC("cpu.gb") != GBC_LOAD_RESULT_OK)
+    else if (GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return 0;
