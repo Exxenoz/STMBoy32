@@ -30,10 +30,10 @@ bool CMOD_Detect(void)
 {
     uint8_t data = 0x00;
 
-    CMOD_ReadByte(0x0150, &data);
+    CMOD_ReadByte(0x0104, &data);
     while (CMOD_Status == CMOD_PROCESSING);
 
-    if (data != 0x00) return true;
+    if (data == 0xCE) return true;
     else              return false;
 }
 
