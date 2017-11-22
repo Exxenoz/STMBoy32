@@ -14,29 +14,43 @@
 #define UI_MENU_POINT_LENGTH            261        // Length of a menu point in pixel
 #define UI_MENU_POINT_HEIGHT            32         // Length of a menu point in pixel
 
-#define UI_MENU_POINT_DISABLED_BACKGROUND_COLOR    0xC618
-#define UI_MENU_POINT_DISABLED_TEXT_COLOR          0x7BD0
+#define UI_DISABLED_MENU_POINT_BACKGROUND_COLOR    0xC618
+#define UI_DISABLED_MENU_POINT_TEXT_COLOR          0x7BD0
 
-#define UI_MENU_POINT_HIGHLIGHTED_BACKGROUND_COLOR 0x0000 // ToDo: Implement
-#define UI_MENU_POINT_HIGHLIGHTED_TEXT_COLOR       0x0000 // ToDo: Implement
+#define UI_HIGHLIGHTED_MENU_POINT_BACKGROUND_COLOR 0x0000  // ToDo: Implement
+#define UI_HIGHLIGHTED_MENU_POINT_BORDER_COLOR     0x0000  // ToDo: Implement
+#define UI_HIGHLIGHTED_MENU_POINT_TEXT_COLOR       0x0000  // ToDo: Implement
 
-#define UI_MENU_POINT_1_STRING "BOOT CARTRIDGE"
-#define UI_MENU_POINT_2_STRING "SHOW ALL GAMES"
-#define UI_MENU_POINT_3_STRING "SHOW FAVORITES"
-#define UI_MENU_POINT_4_STRING "OPTIONS"
+#define UI_MAINPAGE_MENU_POINT_1_STRING  "BOOT CARTRIDGE"
+#define UI_MAINPAGE_MENU_POINT_2_STRING  "SHOW ALL GAMES"
+#define UI_MAINPAGE_MENU_POINT_3_STRING  "SHOW FAVORITES"
+#define UI_MAINPAGE_MENU_POINT_4_STRING  "OPTIONS"
+
+// Menu Point Coordinates
+#define UI_MAINPAGE_MENU_POINTS_X   29
+#define UI_MAINPAGE_MENU_POINT_1_Y  35
+#define UI_MAINPAGE_MENU_POINT_2_Y  81
+#define UI_MAINPAGE_MENU_POINT_3_Y  127
+#define UI_MAINPAGE_MENU_POINT_4_Y  173
 
 #define UI_MENU_POINT_FONT  Fonts_STMFont_16x24
 
 typedef struct
 {
-    int ID;      // ToDo: Change to MenuPoint text
-    uint16_t x;  // MenuPoint upperLeftCorner x coordinate
-    uint16_t y;  // MenuPoint upperLeftCorner y coordinate
+    LCD_TextDef_t menuPointDef;  // MenuPoint content
+    uint16_t x;                  // MenuPoint upperLeftCorner x coordinate
+    uint16_t y;                  // MenuPoint upperLeftCorner y coordinate
 }
 UI_MenuPoint_t;
 
-void UI_HightlightMenuPoint(UI_MenuPoint_t menuPoint);
+extern UI_MenuPoint_t UI_MainPage_MenuPoints[4];
 
+
+void UI_DrawMenuPoint(UI_MenuPoint_t *menuPoint);
+void UI_DrawDisabledMenuPoint(UI_MenuPoint_t *menuPoint);
+void UI_HightlightMenuPoint(UI_MenuPoint_t *menuPoint);
+
+void UI_Initialize(void);
 void UI_DrawMainPage(void);
 void UI_DrawShowAll(void);
 void UI_DrawShowFav(void);
