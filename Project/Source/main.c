@@ -19,8 +19,8 @@
 #include "gbc_mmu.h"
 #include "ui.h"
 
-OS_STATE_t currState = OS_MAIN_PAGE;
-OS_STATE_t lastState = OS_MAIN_PAGE;
+OS_State_t currState = OS_MAIN_PAGE;
+OS_State_t lastState = OS_MAIN_PAGE;
 
 //----------DEBUG----------
 #include "string.h"
@@ -40,6 +40,120 @@ void ClockDebug_Initialize()
     GPIO_Init(GPIOC, &GPIO_InitObject);
 }
 //-------------------------
+
+void HandleMainPage(void)
+{
+    // If no cartridge is detected first valid menu point is SHOW ALL GAMES
+    int firstMenuPointID   = CMOD_Detect() ? 0 : 1;
+    int currentMenuPointID = firstMenuPointID;
+
+    // Draw MainPage and highlight first valid menu point
+    UI_DrawMainPage();
+    UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+
+    // MainPage loop
+    while (1)
+    {
+        // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa
+        if (!CMOD_Detect() && firstMenuPointID == 0)
+        {
+            UI_DrawDisabledMenuPoint(&(UI_MainPage_MenuPoints[0]));
+            firstMenuPointID = 1;
+        }
+        else if (CMOD_Detect() && firstMenuPointID == 1)
+        {
+            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]));
+            firstMenuPointID = 0;
+        }
+
+        // If Fade-Top is pressed and we don't have the first valid menu point already selected
+        // highlight the menu point above and reset highlighting of current menu point
+        if (Input_Interrupt_Flags.FadeTop == INPUT_PRESSED && currentMenuPointID > firstMenuPointID)
+        {
+            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+            currentMenuPointID--;
+            UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+        }
+
+        // If Fade-Bot is pressed and we don't have the last valid menu point already selected
+        // highlight the menu point below and reset highlighting of current menu point
+        if (Input_Interrupt_Flags.FadeBot == INPUT_PRESSED && currentMenuPointID < 4)
+        {
+            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+            currentMenuPointID++;
+            UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+        }
+        
+        // If A-Button is pressed change the current and last states accordingly and leave main menu
+        if (Input_Interrupt_Flags.ButtonA == INPUT_PRESSED)
+        {
+            lastState = currState;
+            currState = UI_MainPage_MenuPoints[currentMenuPointID].newStateOnPress;
+            break;
+        }
+    }
+}
+
+void HandleShowAllGamesPage(void)
+{
+    // YTBI
+    while (1)
+    {
+        
+    }
+}
+
+void HandleShowFavoritesPage(void)
+{
+    // YTBI
+    while (1)
+    {
+        
+    }
+}
+
+void HandleOptionPage(void)
+{
+    // YTBI
+    while (1)
+    {
+        
+    }
+}
+
+bool HandleSDCIngame(void)
+{
+    if(GBC_LoadFromCartridge() != GBC_LOAD_RESULT_OK)
+    {
+        LED_EnableRed(true);
+        return false;
+    }
+
+    while (1)
+    {
+        GBC_Update();
+
+        while (!LCD_READY_FLAG);
+        LCD_DrawFrameBufferScaled();
+    }
+}
+
+bool HandleCartridgeIngame(void)
+{
+    if(GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
+    {
+        LED_EnableRed(true);
+        return false;
+    }
+
+    while (1)
+    {
+        GBC_Update();
+
+        while (!LCD_READY_FLAG);
+        LCD_DrawFrameBufferScaled();
+    }
+}
 
 int main(void)
 {
@@ -63,9 +177,16 @@ int main(void)
     LCD_Initialize();
     CMOD_Initialize();
     SDC_Initialize();
-    
+
     // Turn on Display
     LCD_DimBacklight(0);
+
+    // Initialize UI
+    UI_Initialize();
+    Fonts_InitializeSTMFonts();
+
+    currState = OS_MAIN_PAGE;
+
 
 //----------DEBUG----------
     GPIO_InitTypeDef GPIO_InitObject;
@@ -75,87 +196,34 @@ int main(void)
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOA, &GPIO_InitObject);
     GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-
-    CMOD_SaveResult_t result;
-    GBC_LoadResult_t loaded = GBC_LoadFromCartridge();
-    if(loaded == GBC_LOAD_RESULT_OK)
-    {
-        /*uint8_t bank1 = 0x01;
-        memset(test, 0xFF, 1024);
-        memset(testResult, 0x00, 1024);
-        CMOD_WriteByte(0x4001, &bank1);
-        CMOD_WriteBytes(0xA000, 1024, test);
-        CMOD_ReadBytes(0xA000, 1024, testResult);
-        while (CMOD_GetStatus() == CMOD_PROCESSING);
-        NOP;*/
-       /*result = CMOD_SaveCartridge(true);
-       if(result == CMOD_SUCCESS)
-       {
-            LED_EnableBlue(true);
-       }
-       else
-       {
-            LED_EnableRed(true);
-       }*/
-    }
-    else if (GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
-    {
-        LED_EnableRed(true);
-        return 0;
-    }
-
-    Fonts_InitializeSTMFonts();
-    currState = OS_MAIN_PAGE;
 //--------------------------
 
     /* Infinite loop */
     while (1)
     {
+        // Switch current state
+        // All Handle-Functions contain an infinite loop and will only exit when the page is left
+        // or an error occurs
         switch (currState)
         {
             case OS_MAIN_PAGE:
-
-                UI_DrawMainPage();
-
-                while (1)
-                {
-                    
-                }
+                HandleMainPage();
                 break;
-            
             case OS_SHOW_ALL:
-                while (1)
-                {
-                    
-                }
+                HandleShowAllGamesPage();
                 break;
-            
             case OS_SHOW_FAV:
-                while (1)
-                {
-                    
-                }
+                HandleShowFavoritesPage();
                 break;
-            
             case OS_OPTIONS:
-                while (1)
-                {
-                    
-                }
+                HandleOptionPage();
                 break;
-            
-            case OS_INGAME:
-                while (1)
-                {
-                    //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-                    GBC_Update();
-                    //GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-
-                    while (!LCD_READY_FLAG);
-                    LCD_DrawFrameBufferScaled();
-                }
+            case OS_INGAME_FROM_SDC:
+                if (HandleSDCIngame() == false) return 0;
                 break;
-                
+            case OS_INGAME_FROM_CARTRIDGE:
+                if (HandleCartridgeIngame() == false) return 0;
+                break;
             default:
                 return 0;
         }

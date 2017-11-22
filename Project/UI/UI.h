@@ -37,9 +37,10 @@
 
 typedef struct
 {
-    LCD_TextDef_t menuPointDef;  // MenuPoint content
     uint16_t x;                  // MenuPoint upperLeftCorner x coordinate
     uint16_t y;                  // MenuPoint upperLeftCorner y coordinate
+    LCD_TextDef_t menuPointDef;  // MenuPoint content
+    OS_State_t newStateOnPress;  // New state after pressing menu point
 }
 UI_MenuPoint_t;
 

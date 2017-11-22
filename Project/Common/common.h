@@ -36,8 +36,9 @@ typedef enum
     OS_SHOW_ALL,
     OS_SHOW_FAV,
     OS_OPTIONS,
-    OS_INGAME,
-}OS_STATE_t;
+    OS_INGAME_FROM_SDC,
+    OS_INGAME_FROM_CARTRIDGE,
+}OS_State_t;
 
 // Null pointer define
 #define NULL 0

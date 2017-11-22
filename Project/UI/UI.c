@@ -27,27 +27,31 @@ void UI_Initialize(void)
     // Initialize UI_MainPage_MenuPoints
     menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_1_STRING;
     UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[0].menuPointDef = menuPointDef;
     UI_MainPage_MenuPoints[0].x = UI_MAINPAGE_MENU_POINTS_X;
     UI_MainPage_MenuPoints[0].y = UI_MAINPAGE_MENU_POINT_1_Y;
+    UI_MainPage_MenuPoints[0].menuPointDef = menuPointDef;
+    UI_MainPage_MenuPoints[0].newStateOnPress = OS_INGAME_FROM_CARTRIDGE;
 
     menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_2_STRING;
     UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[1].menuPointDef = menuPointDef;
     UI_MainPage_MenuPoints[1].x = UI_MAINPAGE_MENU_POINTS_X;
     UI_MainPage_MenuPoints[1].y = UI_MAINPAGE_MENU_POINT_2_Y;
+    UI_MainPage_MenuPoints[1].menuPointDef = menuPointDef;
+    UI_MainPage_MenuPoints[1].newStateOnPress = OS_SHOW_ALL;
 
     menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_3_STRING;
     UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[2].menuPointDef = menuPointDef;
     UI_MainPage_MenuPoints[2].x = UI_MAINPAGE_MENU_POINTS_X;
     UI_MainPage_MenuPoints[2].y = UI_MAINPAGE_MENU_POINT_3_Y;
+    UI_MainPage_MenuPoints[2].menuPointDef = menuPointDef;
+    UI_MainPage_MenuPoints[2].newStateOnPress = OS_SHOW_FAV;
 
     menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_4_STRING;
     UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[3].menuPointDef = menuPointDef;
     UI_MainPage_MenuPoints[3].x = UI_MAINPAGE_MENU_POINTS_X;
     UI_MainPage_MenuPoints[3].y = UI_MAINPAGE_MENU_POINT_4_Y;
+    UI_MainPage_MenuPoints[3].menuPointDef = menuPointDef;
+    UI_MainPage_MenuPoints[3].newStateOnPress = OS_OPTIONS;
 }
 
 void UI_DrawMenuPoint(UI_MenuPoint_t *menuPoint)
@@ -78,10 +82,8 @@ void UI_DrawMainPage(void)
     // Print the Page background color
     LCD_ClearColor(UI_MAINPAGE_BACKGROUND_COLOR);
 
-    // Draw the menu points, if no cartridge is detected draw BOOT CARTRIDGE in Disabled-Colors
-    if (CMOD_Detect()) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]));
-    else               UI_DrawDisabledMenuPoint(&(UI_MainPage_MenuPoints[0]));
-
+    // Draw the menu points
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]));
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]));
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[2]));
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[3]));
@@ -89,15 +91,15 @@ void UI_DrawMainPage(void)
 
 void UI_DrawShowAll(void)
 {
-    
+    // YTBI
 }
 
 void UI_DrawShowFav(void)
 {
-    
+    // YTBI
 }
 
 void UI_DrawOptions(void)
 {
-    
+    // YTBI
 }

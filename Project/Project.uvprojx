@@ -812,20 +812,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1678,20 +1673,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2543,20 +2533,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3406,20 +3391,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4269,20 +4249,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5132,20 +5107,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5997,20 +5967,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6860,20 +6825,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7725,20 +7685,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8591,20 +8546,15 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui.h</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Fonts</GroupName>
-          <Files>
             <File>
-              <FileName>myFonts.c</FileName>
+              <FileName>ui_fonts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Fonts\myFonts.c</FilePath>
+              <FilePath>.\UI\ui_fonts.c</FilePath>
             </File>
             <File>
-              <FileName>myFonts.h</FileName>
+              <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Fonts\myFonts.h</FilePath>
+              <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
           </Files>
         </Group>
