@@ -23,10 +23,6 @@ OS_State_t currState = OS_MAIN_PAGE;
 OS_State_t lastState = OS_MAIN_PAGE;
 
 //----------DEBUG----------
-#include "string.h"
-uint8_t test[1024];
-uint8_t testResult[1024];
-
 void ClockDebug_Initialize()
 {
     RCC->CFGR |= RCC_CFGR_MCO2PRE_2;
@@ -134,7 +130,7 @@ bool HandleSDCIngame(void)
         GBC_Update();
 
         while (!LCD_READY_FLAG);
-        LCD_DrawFrameBufferScaled();
+        LCD_DrawGBCFrameBuffer();
     }
 }
 
@@ -151,7 +147,7 @@ bool HandleCartridgeIngame(void)
         GBC_Update();
 
         while (!LCD_READY_FLAG);
-        LCD_DrawFrameBufferScaled();
+        LCD_DrawGBCFrameBufferScaled();
     }
 }
 

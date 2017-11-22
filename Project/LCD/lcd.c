@@ -300,14 +300,23 @@ void LCD_ClearColor(uint16_t color)
     LCD_SET_CS;
 }
 
-void LCD_DrawBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color)
+// This function is used to increase readability
+// However if speed is important rather use DrawFilledBox
+void LCD_DrawLine(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t color, LCD_Orientation_t o)
+{
+    if (o == LCD_VERTICAL) LCD_DrawFilledBox(x, y, width, length, color);
+    else                   LCD_DrawFilledBox(x, y, length, width, color);
+}
+
+// Again his function is used to increase readability, for more speed use DrawFilledBox directly or use a buffer
+void LCD_DrawEmptyBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color)
 {   
-    // Draw vertical lines
-    LCD_DrawFilledBox(x, y, length, width, color);
-    LCD_DrawFilledBox(x, y + height - width, length, width, color);
-    // Draw horizontal lines
-    LCD_DrawFilledBox(x, y + width, width, height - 2 * width, color);
-    LCD_DrawFilledBox(x + length - width, y + width, width, height - 2 * width, color);
+    // Draw horizontal lines of the box
+    LCD_DrawLine(x, y, length, width, color, LCD_HORIZONTAL);
+    LCD_DrawLine(x, y + height - width, length, width, color, LCD_HORIZONTAL);
+    // Draw vertical lines of the box
+    LCD_DrawLine(x, y + width, height - 2 * width, width, color, LCD_VERTICAL);
+    LCD_DrawLine(x + length - width, y + width, height - 2 * width, width, color, LCD_VERTICAL);
 }
 
 void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t color)
@@ -380,7 +389,7 @@ void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text,
 
     // Draw the text border (if border width is 0 no border will be drawn)
     uint16_t borderWidth = text->Border.Width;
-    LCD_DrawBox(x, y, length + 2 * borderWidth, height + 2 * borderWidth, borderWidth, text->Border.Color);
+    LCD_DrawEmptyBox(x, y, length + 2 * borderWidth, height + 2 * borderWidth, borderWidth, text->Border.Color);
 
     // Draw the Text and its background from the now initialized buffer
     LCD_SetDrawArea(x + text->Border.Width, y + text->Border.Width, length, height);
@@ -395,7 +404,7 @@ void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text,
     LCD_SET_CS;
 }
 
-void LCD_DrawFrameBuffer(void)
+void LCD_DrawGBCFrameBuffer(void)
 {
     // ToDo: Move to menu so it's only called on change
     // Set Draw Area to the middle 160x144px for non scaled display
@@ -412,7 +421,7 @@ void LCD_DrawFrameBuffer(void)
     LCD_SET_CS;
 }
 
-void LCD_DrawFrameBufferScaled(void)
+void LCD_DrawGBCFrameBufferScaled(void)
 {
     // ToDo: Move to menu so it's only called on change
     // Make sure Draw Area is correct in case of switching to scaled after using the not-scaled method
@@ -442,6 +451,7 @@ void LCD_DrawFrameBufferScaled(void)
     LCD_SET_CS;
 }
 
+// ToDo: Disable when not needed
 void EXTI0_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
