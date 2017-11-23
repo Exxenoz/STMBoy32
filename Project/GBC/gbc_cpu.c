@@ -2266,31 +2266,333 @@ void GBC_CPU_Step()
         // Interrupt handling
         if (GBC_CPU_InterruptMasterEnable && GBC_CPU_PendingInterrupts && GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
         {
+            GPIOA->ODR ^= GPIO_Pin_5;
             if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
-                GBC_CPU_RST_40H(); // Start VBlank Handler
+
+                GBC_CPU_InterruptMasterEnable = false;
+
+                // Backup SP
+                switch (GBC_CPU_Register.SP & 0xF000)
+                {
+                    case 0xC000: // WRAM Bank 0
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 1 - 0xC000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 2 - 0xC000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    case 0xD000: // WRAM Bank X
+                        switch (GBC_MMU_Memory.WRAMBankID)
+                        {
+                            case 0:
+                            case 1:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 2:
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 3:
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 4:
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 5:
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 6:
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 7:
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            default:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                        }
+                        break;
+                    case 0xF000: // HRAM
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 1 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 2 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    default:
+                        GBC_MMU_WriteShort(GBC_CPU_Register.SP - 2, GBC_CPU_Register.SP);
+                        break;
+                }
+                GBC_CPU_Register.SP -= 2;
+
+                GBC_CPU_Register.PC = 0x40;
+
+                GBC_CPU_InstructionTicks += 20;
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
-                GBC_CPU_RST_48H(); // Start LCD-Stat Handler
+
+                GBC_CPU_InterruptMasterEnable = false;
+
+                // Backup SP
+                switch (GBC_CPU_Register.SP & 0xF000)
+                {
+                    case 0xC000: // WRAM Bank 0
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 1 - 0xC000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 2 - 0xC000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    case 0xD000: // WRAM Bank X
+                        switch (GBC_MMU_Memory.WRAMBankID)
+                        {
+                            case 0:
+                            case 1:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 2:
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 3:
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 4:
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 5:
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 6:
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 7:
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            default:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                        }
+                        break;
+                    case 0xF000: // HRAM
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 1 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 2 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    default:
+                        GBC_MMU_WriteShort(GBC_CPU_Register.SP - 2, GBC_CPU_Register.SP);
+                        break;
+                }
+                GBC_CPU_Register.SP -= 2;
+
+                GBC_CPU_Register.PC = 0x48;
+
+                GBC_CPU_InstructionTicks += 20;
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
-                GBC_CPU_RST_50H(); // Start Timer Handler
+
+                GBC_CPU_InterruptMasterEnable = false;
+
+                // Backup SP
+                switch (GBC_CPU_Register.SP & 0xF000)
+                {
+                    case 0xC000: // WRAM Bank 0
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 1 - 0xC000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 2 - 0xC000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    case 0xD000: // WRAM Bank X
+                        switch (GBC_MMU_Memory.WRAMBankID)
+                        {
+                            case 0:
+                            case 1:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 2:
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 3:
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 4:
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 5:
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 6:
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 7:
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            default:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                        }
+                        break;
+                    case 0xF000: // HRAM
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 1 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 2 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    default:
+                        GBC_MMU_WriteShort(GBC_CPU_Register.SP - 2, GBC_CPU_Register.SP);
+                        break;
+                }
+                GBC_CPU_Register.SP -= 2;
+
+                GBC_CPU_Register.PC = 0x50;
+
+                GBC_CPU_InstructionTicks += 20;
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
-                GBC_CPU_RST_58H(); // Start Serial Handler
+
+                GBC_CPU_InterruptMasterEnable = false;
+
+                // Backup SP
+                switch (GBC_CPU_Register.SP & 0xF000)
+                {
+                    case 0xC000: // WRAM Bank 0
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 1 - 0xC000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 2 - 0xC000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    case 0xD000: // WRAM Bank X
+                        switch (GBC_MMU_Memory.WRAMBankID)
+                        {
+                            case 0:
+                            case 1:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 2:
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 3:
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 4:
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 5:
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 6:
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 7:
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            default:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                        }
+                        break;
+                    case 0xF000: // HRAM
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 1 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 2 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    default:
+                        GBC_MMU_WriteShort(GBC_CPU_Register.SP - 2, GBC_CPU_Register.SP);
+                        break;
+                }
+                GBC_CPU_Register.SP -= 2;
+
+                GBC_CPU_Register.PC = 0x58;
+
+                GBC_CPU_InstructionTicks += 20;
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
             {
                 GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
-                GBC_CPU_RST_60H(); // Start Joypad Handler
+
+                GBC_CPU_InterruptMasterEnable = false;
+
+                // Backup SP
+                switch (GBC_CPU_Register.SP & 0xF000)
+                {
+                    case 0xC000: // WRAM Bank 0
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 1 - 0xC000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 2 - 0xC000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    case 0xD000: // WRAM Bank X
+                        switch (GBC_MMU_Memory.WRAMBankID)
+                        {
+                            case 0:
+                            case 1:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 2:
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 3:
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 4:
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 5:
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 6:
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            case 7:
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                            default:
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 1 - 0xD000] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                                GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 2 - 0xD000] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                                break;
+                        }
+                        break;
+                    case 0xF000: // HRAM
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 1 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF00) >> 8; // High
+                        GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 2 - 0xFF80] = (GBC_CPU_Register.SP & 0xFF);        // Low
+                        break;
+                    default:
+                        GBC_MMU_WriteShort(GBC_CPU_Register.SP - 2, GBC_CPU_Register.SP);
+                        break;
+                }
+                GBC_CPU_Register.SP -= 2;
+
+                GBC_CPU_Register.PC = 0x60;
+
+                GBC_CPU_InstructionTicks += 20;
             }
+            GPIOA->ODR ^= GPIO_Pin_5;
         }
 
         // Save start position of current instruction
