@@ -222,27 +222,6 @@ void GBC_MMU_Unload(void)
     GBC_MMU_RTC_LatchClockDataHelper = 0;
 }
 
-void GBC_MMU_StartDMA(uint8_t value)
-{
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
-    {
-        // ToDo
-    }
-    else
-    {
-        // The written value specifies the transfer source address divided by 100h
-        uint16_t address = value << 8;
-
-        if (address >= 0x8000 && address < 0xE000)
-        {
-            for (uint32_t i = 0; i < 160; i++, address++)
-            {
-                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
-            }
-        }
-    }
-}
-
 uint8_t GBC_MMU_ReadByte(uint16_t address)
 {
     switch (address & 0xF000)
@@ -551,7 +530,7 @@ void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
     }
 }
 
-void (*GBC_MMU_MBC_Table[6])(uint16_t, uint8_t) =
+GBC_MMU_MBC GBC_MMU_MBC_Table[6] =
 {
     GBC_MMU_MBC_None,
     GBC_MMU_MBC_None,
@@ -813,7 +792,24 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     break;
                 case 0xFF46: // DMA Transfer and Start Address
                     GBC_MMU_Memory.OAMTransferStartAddress = value;
-                    GBC_MMU_StartDMA(value);
+
+                    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                    {
+                        // ToDo
+                    }
+                    else
+                    {
+                        // The written value specifies the transfer source address divided by 100h
+                        uint16_t address = value << 8;
+
+                        if (address >= 0x8000 && address < 0xE000)
+                        {
+                            for (uint32_t i = 0; i < 160; i++, address++)
+                            {
+                                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
+                            }
+                        }
+                    }
                     break;
                 case 0xFF47:
                 case 0xFF48:

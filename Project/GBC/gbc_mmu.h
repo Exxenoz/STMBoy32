@@ -592,7 +592,9 @@ typedef union GBC_MMU_RTC_Register_s
 }
 GBC_MMU_RTC_Register_t;
 
-extern GBC_MMU_Memory_t GBC_MMU_Memory; // External GBC Memory definition for direct CPU access
+typedef void (*GBC_MMU_MBC)(uint16_t, uint8_t);
+
+extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory definition for direct CPU access
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);
