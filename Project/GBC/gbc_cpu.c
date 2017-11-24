@@ -2273,10 +2273,9 @@ void GBC_CPU_Step()
 
                 GBC_CPU_InterruptMasterEnable = false;
 
-                GBC_CPU_PushToStack(GBC_CPU_Register.SP);
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 2, (GBC_CPU_Register.SP & 0xFF));
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 1, (GBC_CPU_Register.SP & 0xFF00) >> 8);
-                //GBC_CPU_Register.SP -= 2;
+                GBC_CPU_Register.SP -= 2;
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 0, (GBC_CPU_Register.PC & 0xFF));
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 1, (GBC_CPU_Register.PC & 0xFF00) >> 8);
 
                 GBC_CPU_Register.PC = 0x40;
 
@@ -2288,10 +2287,9 @@ void GBC_CPU_Step()
 
                 GBC_CPU_InterruptMasterEnable = false;
 
-                GBC_CPU_PushToStack(GBC_CPU_Register.SP);
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 2, (GBC_CPU_Register.SP & 0xFF));
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 1, (GBC_CPU_Register.SP & 0xFF00) >> 8);
-                //GBC_CPU_Register.SP -= 2;
+                GBC_CPU_Register.SP -= 2;
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 0, (GBC_CPU_Register.PC & 0xFF));
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 1, (GBC_CPU_Register.PC & 0xFF00) >> 8);
 
                 GBC_CPU_Register.PC = 0x48;
 
@@ -2303,10 +2301,9 @@ void GBC_CPU_Step()
 
                 GBC_CPU_InterruptMasterEnable = false;
 
-                GBC_CPU_PushToStack(GBC_CPU_Register.SP);
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 2, (GBC_CPU_Register.SP & 0xFF));
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 1, (GBC_CPU_Register.SP & 0xFF00) >> 8);
-                //GBC_CPU_Register.SP -= 2;
+                GBC_CPU_Register.SP -= 2;
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 0, (GBC_CPU_Register.PC & 0xFF));
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 1, (GBC_CPU_Register.PC & 0xFF00) >> 8);
 
                 GBC_CPU_Register.PC = 0x50;
 
@@ -2318,10 +2315,9 @@ void GBC_CPU_Step()
 
                 GBC_CPU_InterruptMasterEnable = false;
 
-                GBC_CPU_PushToStack(GBC_CPU_Register.SP);
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 2, (GBC_CPU_Register.SP & 0xFF));
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 1, (GBC_CPU_Register.SP & 0xFF00) >> 8);
-                //GBC_CPU_Register.SP -= 2;
+                GBC_CPU_Register.SP -= 2;
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 0, (GBC_CPU_Register.PC & 0xFF));
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 1, (GBC_CPU_Register.PC & 0xFF00) >> 8);
 
                 GBC_CPU_Register.PC = 0x58;
 
@@ -2333,10 +2329,9 @@ void GBC_CPU_Step()
 
                 GBC_CPU_InterruptMasterEnable = false;
 
-                GBC_CPU_PushToStack(GBC_CPU_Register.SP);
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 2, (GBC_CPU_Register.SP & 0xFF));
-                //GBC_MMU_WriteByte(GBC_CPU_Register.SP - 1, (GBC_CPU_Register.SP & 0xFF00) >> 8);
-                //GBC_CPU_Register.SP -= 2;
+                GBC_CPU_Register.SP -= 2;
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 0, (GBC_CPU_Register.PC & 0xFF));
+                GBC_MMU_WriteByte(GBC_CPU_Register.SP + 1, (GBC_CPU_Register.PC & 0xFF00) >> 8);
 
                 GBC_CPU_Register.PC = 0x60;
 
