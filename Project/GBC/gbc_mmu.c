@@ -317,8 +317,8 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
 
             return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
         case 0xE000:
-            // Shadow RAM redirection to WRAM
-            return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+            // Shadow RAM redirection to WRAM Bank 0
+            return GBC_MMU_Memory.WRAMBank0[address - 0xE000];
         case 0xF000:
             switch (address & 0xFF00)
             {
@@ -341,8 +341,27 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                         return GBC_MMU_Memory.HRAM[address - 0xFF80];
                     }
                 default:
-                    // Shadow RAM redirection to WRAM
-                    return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+                    // Shadow RAM redirection to WRAM Bank X
+                    switch (GBC_MMU_Memory.WRAMBankID)
+                    {
+                        case 0:
+                        case 1:
+                            return GBC_MMU_Memory.WRAMBank1[address - 0xF000];
+                        case 2:
+                            return GBC_MMU_Memory.WRAMBank2[address - 0xF000];
+                        case 3:
+                            return GBC_MMU_Memory.WRAMBank3[address - 0xF000];
+                        case 4:
+                            return GBC_MMU_Memory.WRAMBank4[address - 0xF000];
+                        case 5:
+                            return GBC_MMU_Memory.WRAMBank5[address - 0xF000];
+                        case 6:
+                            return GBC_MMU_Memory.WRAMBank6[address - 0xF000];
+                        case 7:
+                            return GBC_MMU_Memory.WRAMBank7[address - 0xF000];
+                    }
+
+                    return GBC_MMU_Memory.WRAMBank1[address - 0xF000];
             }
             break;
     }
@@ -653,8 +672,8 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         }
         case 0xE000:
         {
-            // Shadow RAM redirection to WRAM
-            GBC_MMU_WriteByte(0xC000 + (address - 0xE000), value);
+            // Shadow RAM redirection to WRAM Bank 0
+            GBC_MMU_Memory.WRAMBank0[address - 0xE000] = value;
             break;
         }
         case 0xF000:
@@ -894,8 +913,35 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     GBC_MMU_Memory.InterruptEnable = value;
                     break;
                 default:
-                    // Shadow RAM redirection to WRAM
-                    GBC_MMU_WriteByte(0xC000 + (address - 0xE000), value);
+                    // Shadow RAM redirection to WRAM Bank X
+                    switch (GBC_MMU_Memory.WRAMBankID)
+                    {
+                        case 0:
+                        case 1:
+                            GBC_MMU_Memory.WRAMBank1[address - 0xF000] = value;
+                            break;
+                        case 2:
+                            GBC_MMU_Memory.WRAMBank2[address - 0xF000] = value;
+                            break;
+                        case 3:
+                            GBC_MMU_Memory.WRAMBank3[address - 0xF000] = value;
+                            break;
+                        case 4:
+                            GBC_MMU_Memory.WRAMBank4[address - 0xF000] = value;
+                            break;
+                        case 5:
+                            GBC_MMU_Memory.WRAMBank5[address - 0xF000] = value;
+                            break;
+                        case 6:
+                            GBC_MMU_Memory.WRAMBank6[address - 0xF000] = value;
+                            break;
+                        case 7:
+                            GBC_MMU_Memory.WRAMBank7[address - 0xF000] = value;
+                            break;
+                        default:
+                            GBC_MMU_Memory.WRAMBank1[address - 0xF000] = value;
+                            break;
+                    }
                     break;
             }
             break;
