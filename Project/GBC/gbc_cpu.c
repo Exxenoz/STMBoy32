@@ -3005,6 +3005,182 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0x30: // Relative jump by signed immediate if last result caused no carry
+            {
+                if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+
+                    int8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+                    GBC_CPU_Register.PC += value;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+
+                GBC_CPU_Register.PC++;
+
+                break;
+            }
+            case 0x31: // Load 16-bit immediate into SP
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_CPU_Register.SP = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                break;
+            }
+            case 0x32: // Save A to address pointed by HL, and decrement HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL--, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x33: // Increment 16-bit SP
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.SP++;
+
+                // Flags not affected
+
+                break;
+            }
+            case 0x34: // Increment value pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_INC(value)
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, value);
+                
+                break;
+            }
+            case 0x35: // Decrement value pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_DEC(value);
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, value);
+
+                break;
+            }
+            case 0x36: // Load 8-bit immediate into address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_MMU_ReadByte(GBC_CPU_Register.PC++));
+
+                break;
+            }
+            case 0x37: // Set carry flag
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+                GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+                // Zero flag not affected
+
+                break;
+            }
+            case 0x38: // Relative jump by signed immediate if last result caused carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+
+                    int8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+                    GBC_CPU_Register.PC += value;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+
+                GBC_CPU_Register.PC++;
+
+                break;
+            }
+            case 0x39: // Add 16-bit SP to HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.SP);
+
+                break;
+            }
+            case 0x3A: // Load A from address pointed to by HL, and decrement HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.HL--);
+
+                break;
+            }
+            case 0x3B: // Decrement 16-bit SP
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.SP--;
+
+                // No flags affected
+
+                break;
+            }
+            case 0x3C: // Increment A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_INC(GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x3D: // Decrement A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_DEC(GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x3E: // Load 8-bit immediate into A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                break;
+            }
+            case 0x3F: // Complement carry flag
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+                }
+                else
+                {
+                    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
+                }
+
+                // Zero flag not affected
+
+                break;
+            }
             case 0x7A: // Copy D to A
             {
                 GBC_CPU_InstructionTicks += 4;
