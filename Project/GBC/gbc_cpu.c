@@ -159,30 +159,28 @@ long GBC_CPU_InstructionsPerStep = 0;
     GBC_CPU_Register.SP += 2;                                                                                                                      \
 }                                                                                                                                                  \
 
-static inline uint8_t GBC_CPU_INC(uint8_t value)
-{
-    value++;
-
-    // Carry flag not affected
-
-    if ((value & 0x0F) == 0x00)
-    {
-        if (value)
-        {
-            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_HALFCARRY;
-        }
-        else
-        {
-            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO);
-        }
-    }
-    else
-    {
-        GBC_CPU_Register.F &= ~(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
-    }
-
-    return value;
-}
+#define GBC_CPU_INC(VALUE)                                                                                                                         \
+{                                                                                                                                                  \
+    VALUE++;                                                                                                                                       \
+                                                                                                                                                   \
+    /* Carry flag not affected */                                                                                                                  \
+                                                                                                                                                   \
+    if ((VALUE & 0x0F) == 0x00)                                                                                                                    \
+    {                                                                                                                                              \
+        if (VALUE)                                                                                                                                 \
+        {                                                                                                                                          \
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_HALFCARRY;                                             \
+        }                                                                                                                                          \
+        else                                                                                                                                       \
+        {                                                                                                                                          \
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO);                      \
+        }                                                                                                                                          \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F &= ~(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);                                         \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
 static inline uint8_t GBC_CPU_DEC(uint8_t value)
 {
@@ -498,7 +496,7 @@ void GBC_CPU_INC_BC()                   // 0x03 - Increment 16-bit BC
 
 void GBC_CPU_INC_B()                    // 0x04 - Increment B
 {
-    GBC_CPU_Register.B = GBC_CPU_INC(GBC_CPU_Register.B);
+    GBC_CPU_INC(GBC_CPU_Register.B);
 }
 
 void GBC_CPU_DEC_B()                    // 0x05 - Decrement B
@@ -557,7 +555,7 @@ void GBC_CPU_DEC_BC()                   // 0x0B - Decrement 16-bit BC
 
 void GBC_CPU_INC_C()                    // 0x0C - Increment C
 {
-    GBC_CPU_Register.C = GBC_CPU_INC(GBC_CPU_Register.C);
+    GBC_CPU_INC(GBC_CPU_Register.C);
 }
 
 void GBC_CPU_DEC_C()                    // 0x0D - Decrement C
@@ -623,7 +621,7 @@ void GBC_CPU_INC_DE()                   // 0x13 - Increment 16-bit DE
 
 void GBC_CPU_INC_D()                    // 0x14 - Increment D
 {
-    GBC_CPU_Register.D = GBC_CPU_INC(GBC_CPU_Register.D);
+    GBC_CPU_INC(GBC_CPU_Register.D);
 }
 
 void GBC_CPU_DEC_D()                    // 0x15 - Decrement D
@@ -682,7 +680,7 @@ void GBC_CPU_DEC_DE()                   // 0x1B - Decrement 16-bit DE
 
 void GBC_CPU_INC_E()                    // 0x1C - Increment E
 {
-    GBC_CPU_Register.E = GBC_CPU_INC(GBC_CPU_Register.E);
+    GBC_CPU_INC(GBC_CPU_Register.E);
 }
 
 void GBC_CPU_DEC_E()                    // 0x1D - Decrement E
@@ -745,7 +743,7 @@ void GBC_CPU_INC_HL()                   // 0x23 - Increment 16-bit HL
 
 void GBC_CPU_INC_H()                    // 0x24 - Increment H
 {
-    GBC_CPU_Register.H = GBC_CPU_INC(GBC_CPU_Register.H);
+    GBC_CPU_INC(GBC_CPU_Register.H);
 }
 
 void GBC_CPU_DEC_H()                    // 0x25 - Decrement H
@@ -848,7 +846,7 @@ void GBC_CPU_DEC_HL()                   // 0x2B - Decrement 16-bit HL
 
 void GBC_CPU_INC_L()                    // 0x2C - Increment L
 {
-    GBC_CPU_Register.L = GBC_CPU_INC(GBC_CPU_Register.L);
+    GBC_CPU_INC(GBC_CPU_Register.L);
 }
 
 void GBC_CPU_DEC_L()                    // 0x2D - Decrement L
@@ -900,7 +898,11 @@ void GBC_CPU_INC_SP()                   // 0x33 - Increment 16-bit SP
 
 void GBC_CPU_INC_HLP()                  // 0x34 - Increment value pointed by HL
 {
-    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_INC(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_INC(value)
+
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, value);
 }
 
 void GBC_CPU_DEC_HLP()                  // 0x35 - Decrement value pointed by HL
@@ -950,7 +952,7 @@ void GBC_CPU_DEC_SP()                   // 0x3B - Decrement 16-bit SP
 
 void GBC_CPU_INC_A()                    // 0x3C - Increment A
 {
-    GBC_CPU_Register.A = GBC_CPU_INC(GBC_CPU_Register.A);
+    GBC_CPU_INC(GBC_CPU_Register.A);
 }
 
 void GBC_CPU_DEC_A()                    // 0x3D - Decrement A
@@ -2440,6 +2442,44 @@ void GBC_CPU_Step()
                 // Do nothing
 
                 GBC_CPU_InstructionTicks += 4;
+
+                break;
+            }
+            case 0x01: // Load 16-bit immediate into BC
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                GBC_CPU_Register.BC = operand;
+
+                break;
+            }
+            case 0x02: // Save A to address pointed by BC
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.BC, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x03: // Increment 16-bit BC
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.BC++;
+
+                // Flags not affected
+
+                break;
+            }
+            case 0x04: // Increment B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_INC(GBC_CPU_Register.B);
 
                 break;
             }
