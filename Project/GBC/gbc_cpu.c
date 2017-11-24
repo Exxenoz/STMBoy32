@@ -182,30 +182,28 @@ long GBC_CPU_InstructionsPerStep = 0;
     }                                                                                                                                              \
 }                                                                                                                                                  \
 
-static inline uint8_t GBC_CPU_DEC(uint8_t value)
-{
-    value--;
-
-    // Carry flag not affected
-
-    if ((value & 0x0F) == 0x0F)
-    {
-        GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
-    }
-    else
-    {
-        if (value)
-        {
-            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_SUBTRACTION;
-        }
-        else
-        {
-            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
-        }
-    }
-
-    return value;
-}
+#define GBC_CPU_DEC(VALUE)                                                                                                                         \
+{                                                                                                                                                  \
+    VALUE--;                                                                                                                                       \
+                                                                                                                                                   \
+    /* Carry flag not affected */                                                                                                                  \
+                                                                                                                                                   \
+    if ((VALUE & 0x0F) == 0x0F)                                                                                                                    \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);                   \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        if (VALUE)                                                                                                                                 \
+        {                                                                                                                                          \
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | GBC_CPU_FLAGS_SUBTRACTION;                                           \
+        }                                                                                                                                          \
+        else                                                                                                                                       \
+        {                                                                                                                                          \
+            GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);                    \
+        }                                                                                                                                          \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
 static inline uint8_t GBC_CPU_ADD(uint8_t a, uint8_t b)
 {
@@ -359,36 +357,36 @@ static inline uint8_t GBC_CPU_SBC(uint8_t a, uint8_t b)
     return result;
 }
 
-static inline uint16_t GBC_CPU_ADD2(uint16_t a, uint16_t b)
-{
-    uint32_t result = a + b;
-
-    if (result > 0xFFFF)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
-    }
-
-    result &= 0xFFFF;
-
-    if (((a & 0x0FFF) + (b & 0x0FFF)) > 0x0FFF)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-    
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    // Zero flag not affected
-
-    return result;
-}
+#define GBC_CPU_ADD2(A, B)                                    \
+{                                                             \
+    uint32_t result = A + B;                                  \
+                                                              \
+    if (result > 0xFFFF)                                      \
+    {                                                         \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);               \
+    }                                                         \
+    else                                                      \
+    {                                                         \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);             \
+    }                                                         \
+                                                              \
+    result &= 0xFFFF;                                         \
+                                                              \
+    if (((A & 0x0FFF) + (B & 0x0FFF)) > 0x0FFF)               \
+    {                                                         \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);           \
+    }                                                         \
+    else                                                      \
+    {                                                         \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);         \
+    }                                                         \
+                                                              \
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);           \
+                                                              \
+    /* Zero flag not affected */                              \
+                                                              \
+    A = result;                                               \
+}                                                             \
 
 static inline uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
 {
@@ -501,7 +499,7 @@ void GBC_CPU_INC_B()                    // 0x04 - Increment B
 
 void GBC_CPU_DEC_B()                    // 0x05 - Decrement B
 {
-    GBC_CPU_Register.B = GBC_CPU_DEC(GBC_CPU_Register.B);
+    GBC_CPU_DEC(GBC_CPU_Register.B);
 }
 
 void GBC_CPU_LD_B_X(uint8_t operand)    // 0x06 - Load 8-bit immediate into B
@@ -538,7 +536,7 @@ void GBC_CPU_LD_XXP_SP(uint16_t operand)// 0x08 - Save SP to given address
 
 void GBC_CPU_ADD_HL_BC()                // 0x09 - Add 16-bit BC to HL
 {
-    GBC_CPU_Register.HL = GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.BC);
+    GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.BC);
 }
 
 void GBC_CPU_LD_A_BCP()                 // 0x0A - Load A from address pointed to by BC
@@ -560,7 +558,7 @@ void GBC_CPU_INC_C()                    // 0x0C - Increment C
 
 void GBC_CPU_DEC_C()                    // 0x0D - Decrement C
 {
-    GBC_CPU_Register.C = GBC_CPU_DEC(GBC_CPU_Register.C);
+    GBC_CPU_DEC(GBC_CPU_Register.C);
 }
 
 void GBC_CPU_LD_C_X(uint8_t operand)    // 0x0E - Load 8-bit immediate into C
@@ -626,7 +624,7 @@ void GBC_CPU_INC_D()                    // 0x14 - Increment D
 
 void GBC_CPU_DEC_D()                    // 0x15 - Decrement D
 {
-    GBC_CPU_Register.D = GBC_CPU_DEC(GBC_CPU_Register.D);
+    GBC_CPU_DEC(GBC_CPU_Register.D);
 }
 
 void GBC_CPU_LD_D_X(uint8_t operand)    // 0x16 - Load 8-bit immediate into D
@@ -663,7 +661,7 @@ void GBC_CPU_JR_X(uint8_t operand)      // 0x18 - Relative jump by signed immedi
 
 void GBC_CPU_ADD_HL_DE()                // 0x19 - Add 16-bit DE to HL
 {
-    GBC_CPU_Register.HL = GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.DE);
+    GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.DE);
 }
 
 void GBC_CPU_LD_A_DEP()                 // 0x1A - Load A from address pointed to by DE
@@ -685,7 +683,7 @@ void GBC_CPU_INC_E()                    // 0x1C - Increment E
 
 void GBC_CPU_DEC_E()                    // 0x1D - Decrement E
 {
-    GBC_CPU_Register.E = GBC_CPU_DEC(GBC_CPU_Register.E);
+    GBC_CPU_DEC(GBC_CPU_Register.E);
 }
 
 void GBC_CPU_LD_E_X(uint8_t operand)    // 0x1E - Load 8-bit immediate into E
@@ -748,7 +746,7 @@ void GBC_CPU_INC_H()                    // 0x24 - Increment H
 
 void GBC_CPU_DEC_H()                    // 0x25 - Decrement H
 {
-    GBC_CPU_Register.H = GBC_CPU_DEC(GBC_CPU_Register.H);
+    GBC_CPU_DEC(GBC_CPU_Register.H);
 }
 
 void GBC_CPU_LD_H_X(uint8_t operand)    // 0x26 - Load 8-bit immediate into H
@@ -829,7 +827,7 @@ void GBC_CPU_JR_Z_X(uint8_t operand)    // 0x28 - Relative jump by signed immedi
 
 void GBC_CPU_ADD_HL_HL()                // 0x29 - Add 16-bit HL to HL
 {
-    GBC_CPU_Register.HL = GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.HL);
+    GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.HL);
 }
 
 void GBC_CPU_LDI_A_HLP()                // 0x2A - Load A from address pointed to by HL, and increment HL
@@ -851,7 +849,7 @@ void GBC_CPU_INC_L()                    // 0x2C - Increment L
 
 void GBC_CPU_DEC_L()                    // 0x2D - Decrement L
 {
-    GBC_CPU_Register.L = GBC_CPU_DEC(GBC_CPU_Register.L);
+    GBC_CPU_DEC(GBC_CPU_Register.L);
 }
 
 void GBC_CPU_LD_L_X(uint8_t operand)    // 0x2E - Load 8-bit immediate into L
@@ -907,7 +905,11 @@ void GBC_CPU_INC_HLP()                  // 0x34 - Increment value pointed by HL
 
 void GBC_CPU_DEC_HLP()                  // 0x35 - Decrement value pointed by HL
 {
-    GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_DEC(GBC_MMU_ReadByte(GBC_CPU_Register.HL)));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_DEC(value);
+
+    GBC_MMU_WriteByte(GBC_CPU_Register.HL, value);
 }
 
 void GBC_CPU_LD_HLP_X(uint8_t operand)  // 0x36 - Load 8-bit immediate into address pointed by HL
@@ -935,7 +937,7 @@ void GBC_CPU_JR_C_X(uint8_t operand)    // 0x38 - Relative jump by signed immedi
 
 void GBC_CPU_ADD_HL_SP()                // 0x39 - Add 16-bit SP to HL
 {
-    GBC_CPU_Register.HL = GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.SP);
+    GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.SP);
 }
 
 void GBC_CPU_LDD_A_HLP()                // 0x3A - Load A from address pointed to by HL, and decrement HL
@@ -957,7 +959,7 @@ void GBC_CPU_INC_A()                    // 0x3C - Increment A
 
 void GBC_CPU_DEC_A()                    // 0x3D - Decrement A
 {
-    GBC_CPU_Register.A = GBC_CPU_DEC(GBC_CPU_Register.A);
+    GBC_CPU_DEC(GBC_CPU_Register.A);
 }
 
 void GBC_CPU_LD_A_X(uint8_t operand)    // 0x3E - Load 8-bit immediate into A
@@ -2505,6 +2507,116 @@ void GBC_CPU_Step()
                     {
                         GBC_CPU_Register.F = (GBC_CPU_Register.F & GBC_CPU_FLAGS_CARRY) | (GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
                     }
+                }
+
+                break;
+            }
+            case 0x06: // Load 8-bit immediate into B
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.B = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                break;
+            }
+            case 0x07: // Rotate A left with carry
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                if (GBC_CPU_Register.A & 0x80)
+                {
+                    GBC_CPU_Register.A <<= 1;
+                    GBC_CPU_Register.A  |= 1;
+
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
+                }
+                else
+                {
+                    GBC_CPU_Register.A <<= 1;
+
+                    GBC_CPU_Register.F = 0;
+                }
+
+                break;
+            }
+            case 0x08: // Save SP to given address
+            {
+                GBC_CPU_InstructionTicks += 20;
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                GBC_MMU_WriteShort(operand, GBC_CPU_Register.SP);
+
+                break;
+            }
+            case 0x09: // Add 16-bit BC to HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.BC);
+
+                break;
+            }
+            case 0x0A: // Load A from address pointed to by BC
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.BC);
+
+                break;
+            }
+            case 0x0B: // Decrement 16-bit BC
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.BC--;
+
+                // No flags affected
+
+                break;
+            }
+            case 0x0C: // Increment C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_INC(GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0x0D: // Decrement C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_DEC(GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0x0E: // Load 8-bit immediate into C
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.C = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                break;
+            }
+            case 0x0F: // Rotate A right with carry
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                if (GBC_CPU_Register.A & 0x1)
+                {
+                    GBC_CPU_Register.A >>= 1;
+                    GBC_CPU_Register.A  |= 0x80;
+
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
+                }
+                else
+                {
+                    GBC_CPU_Register.A >>= 1;
+
+                    GBC_CPU_Register.F = 0;
                 }
 
                 break;
