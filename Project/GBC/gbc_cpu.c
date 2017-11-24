@@ -44,63 +44,120 @@ bool GBC_CPU_DebugPrintEnabled = false;
 long GBC_CPU_InstructionsPerStep = 0;
 #endif
 
-#define GBC_CPU_PUSH_TO_STACK(VALUE)                                                                                                          \
-{                                                                                                                                             \
-    GBC_CPU_Register.SP -= 2;                                                                                                                 \
-                                                                                                                                              \
-    switch (GBC_CPU_Register.SP & 0xF000)                                                                                                     \
-    {                                                                                                                                         \
-        case 0xC000: /* WRAM Bank 0 */                                                                                                        \
-            GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 0 - 0xC000] = ((VALUE) & 0xFF);        /* Low  */                                  \
-            GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 1 - 0xC000] = ((VALUE) & 0xFF00) >> 8; /* High */                                  \
-            break;                                                                                                                            \
-        case 0xD000: /* WRAM Bank X */                                                                                                        \
-            switch (GBC_MMU_Memory.WRAMBankID)                                                                                                \
-            {                                                                                                                                 \
-                case 0:                                                                                                                       \
-                case 1:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 2:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 3:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 4:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 5:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 6:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                case 7:                                                                                                                       \
-                    GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-                default:                                                                                                                      \
-                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                          \
-                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                          \
-                    break;                                                                                                                    \
-            }                                                                                                                                 \
-            break;                                                                                                                            \
-        case 0xF000: /* HRAM */                                                                                                               \
-            GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP + 0 - 0xFF80] = ((VALUE) & 0xFF);        /* Low  */                                       \
-            GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP + 1 - 0xFF80] = ((VALUE) & 0xFF00) >> 8; /* High */                                       \
-            break;                                                                                                                            \
-        default:                                                                                                                              \
-            GBC_MMU_WriteShort(GBC_CPU_Register.SP, (VALUE));                                                                                 \
-            break;                                                                                                                            \
-    }                                                                                                                                         \
-}                                                                                                                                             \
+#define GBC_CPU_PUSH_TO_STACK(VALUE)                                                                                                               \
+{                                                                                                                                                  \
+    GBC_CPU_Register.SP -= 2;                                                                                                                      \
+                                                                                                                                                   \
+    switch (GBC_CPU_Register.SP & 0xF000)                                                                                                          \
+    {                                                                                                                                              \
+        case 0xC000: /* WRAM Bank 0 */                                                                                                             \
+            GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 0 - 0xC000] = ((VALUE) & 0xFF);        /* Low  */                                       \
+            GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 1 - 0xC000] = ((VALUE) & 0xFF00) >> 8; /* High */                                       \
+            break;                                                                                                                                 \
+        case 0xD000: /* WRAM Bank X */                                                                                                             \
+            switch (GBC_MMU_Memory.WRAMBankID)                                                                                                     \
+            {                                                                                                                                      \
+                case 0:                                                                                                                            \
+                case 1:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 2:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 3:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 4:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 5:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 6:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                case 7:                                                                                                                            \
+                    GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+                default:                                                                                                                           \
+                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 0 - 0xD000] = ((VALUE) & 0xFF);        /* Low  */                               \
+                    GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000] = ((VALUE) & 0xFF00) >> 8; /* High */                               \
+                    break;                                                                                                                         \
+            }                                                                                                                                      \
+            break;                                                                                                                                 \
+        case 0xF000: /* HRAM */                                                                                                                    \
+            GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP + 0 - 0xFF80] = ((VALUE) & 0xFF);        /* Low  */                                            \
+            GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP + 1 - 0xFF80] = ((VALUE) & 0xFF00) >> 8; /* High */                                            \
+            break;                                                                                                                                 \
+        default:                                                                                                                                   \
+            GBC_MMU_WriteShort(GBC_CPU_Register.SP, (VALUE));                                                                                      \
+            break;                                                                                                                                 \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
+
+#define GBC_CPU_POP_FROM_STACK(VALUE)                                                                                                              \
+{                                                                                                                                                  \
+    switch (GBC_CPU_Register.SP & 0xF000)                                                                                                          \
+    {                                                                                                                                              \
+        case 0xC000: /* WRAM Bank 0 */                                                                                                             \
+            VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 1 - 0xC000]) << 8) |                                                \
+                GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 0xC000];                                                                            \
+            break;                                                                                                                                 \
+        case 0xD000: /* WRAM Bank X */                                                                                                             \
+            switch (GBC_MMU_Memory.WRAMBankID)                                                                                                     \
+            {                                                                                                                                      \
+                case 0:                                                                                                                            \
+                case 1:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 2:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank2[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 3:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank3[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 4:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank4[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 5:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank5[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 6:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank6[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                case 7:                                                                                                                            \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank7[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+                default:                                                                                                                           \
+                    VALUE = (((uint16_t)GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP + 1 - 0xD000]) << 8) |                                        \
+                        GBC_MMU_Memory.WRAMBank1[GBC_CPU_Register.SP - 0xD000];                                                                    \
+                    break;                                                                                                                         \
+            }                                                                                                                                      \
+            break;                                                                                                                                 \
+        case 0xF000: /* HRAM */                                                                                                                    \
+            VALUE = (((uint16_t)GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP + 1 - 0xFF80]) << 8) | GBC_MMU_Memory.HRAM[GBC_CPU_Register.SP - 0xFF80];  \
+            break;                                                                                                                                 \
+        default:                                                                                                                                   \
+            VALUE = GBC_MMU_ReadShort(GBC_CPU_Register.SP);                                                                                        \
+            break;                                                                                                                                 \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    GBC_CPU_Register.SP += 2;                                                                                                                      \
+}                                                                                                                                                  \
 
 static inline uint8_t GBC_CPU_INC(uint8_t value)
 {
@@ -415,13 +472,6 @@ static inline void GBC_CPU_COMPARE(uint8_t a, uint8_t b)
     {
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
     }
-}
-
-static inline uint16_t GBC_CPU_PopFromStack()
-{
-    uint16_t result = GBC_MMU_ReadShort(GBC_CPU_Register.SP);
-    GBC_CPU_Register.SP += 2;
-    return result;
 }
 
 void GBC_CPU_NOP()                      // 0x00 - No operation
@@ -1547,14 +1597,14 @@ void GBC_CPU_RET_NZ()                   // 0xC0 - Return if last result was not 
 {
     if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
         GBC_CPU_InstructionTicks += 12;
     }
 }
 
 void GBC_CPU_POP_BC()                   // 0xC1 - Pop 16-bit value from stack into BC
 {
-    GBC_CPU_Register.BC = GBC_CPU_PopFromStack();
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.BC);
 }
 
 void GBC_CPU_JP_NZ_XX(uint16_t operand) // 0xC2 - Absolute jump to 16-bit location if last result was not zero
@@ -1601,14 +1651,14 @@ void GBC_CPU_RET_Z()                    // 0xC8 - Return if last result was zero
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
     {
-        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
         GBC_CPU_InstructionTicks += 12;
     }
 }
 
 void GBC_CPU_RET()                      // 0xC9 - Return to calling routine
 {
-    GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
 }
 
 void GBC_CPU_JP_Z_XX(uint16_t operand)  // 0xCA - Absolute jump to 16-bit location if last result was zero
@@ -1660,14 +1710,14 @@ void GBC_CPU_RET_NC()                   // 0xD0 - Return if last result caused n
 {
     if (!GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
         GBC_CPU_InstructionTicks += 12;
     }
 }
 
 void GBC_CPU_POP_DE()                   // 0xD1 - Pop 16-bit value from stack into DE
 {
-    GBC_CPU_Register.DE = GBC_CPU_PopFromStack();
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.DE);
 }
 
 void GBC_CPU_JP_NC_XX(uint16_t operand) // 0xD2 - Absolute jump to 16-bit location if last result caused no carry
@@ -1709,7 +1759,7 @@ void GBC_CPU_RET_C()                    // 0xD8 - Return if last result caused c
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+        GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
         GBC_CPU_InstructionTicks += 12;
     }
 }
@@ -1718,7 +1768,7 @@ void GBC_CPU_RETI()                     // 0xD9 - Enable interrupts and return t
 {
     GBC_CPU_InterruptMasterEnable = true;
 
-    GBC_CPU_Register.PC = GBC_CPU_PopFromStack();
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
 }
 
 void GBC_CPU_JP_C_XX(uint16_t operand)  // 0xDA - Absolute jump to 16-bit location if last result caused carry
@@ -1758,7 +1808,7 @@ void GBC_CPU_LDH_XP_A(uint8_t operand)  // 0xE0 - Save A at address pointed to b
 
 void GBC_CPU_POP_HL()                   // 0xE1 - Pop 16-bit value from stack into HL
 {
-    GBC_CPU_Register.HL = GBC_CPU_PopFromStack();
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.HL);
 }
 
 void GBC_CPU_LDH_CP_A()                 // 0xE2 - Save A at address pointed to by (FF00h + C)
@@ -1848,7 +1898,8 @@ void GBC_CPU_LDH_A_XP(uint8_t operand)  // 0xF0 - Load A from address pointed to
 
 void GBC_CPU_POP_AF()                   // 0xF1 - Pop 16-bit value from stack into AF
 {
-    GBC_CPU_Register.AF = GBC_CPU_PopFromStack() & 0xFFF0;
+    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.AF);
+    GBC_CPU_Register.AF = GBC_CPU_Register.AF & 0xFFF0;
 }
 
 void GBC_CPU_LDH_A_CP()                 // 0xF2 - Load A from address pointed to by (FF00h + C)
