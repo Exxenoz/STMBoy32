@@ -2621,6 +2621,175 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0x10: // Stop processor
+            {
+                // No instruction ticks
+
+                if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                {
+                    if (GBC_MMU_Memory.PrepareSpeedSwitch)
+                    {
+                        GBC_MMU_Memory.PrepareSpeedSwitch = 0;
+                        GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
+                    }
+                }
+
+                break;
+            }
+            case 0x11: // Load 16-bit immediate into DE
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                GBC_CPU_Register.DE = operand;
+
+                break;
+            }
+            case 0x12: // Save A to address pointed by DE
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.DE, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x13: // Increment 16-bit DE
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.DE++;
+
+                // Flags not affected
+
+                break;
+            }
+            case 0x14: // Increment D
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_INC(GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0x15: // Decrement D
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_DEC(GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0x16: // Load 8-bit immediate into D
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.D = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                break;
+            }
+            case 0x17: // Rotate A left
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                uint8_t carry = GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0;
+
+                if (GBC_CPU_Register.A & 0x80)
+                {
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
+                }
+                else
+                {
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
+                }
+
+                GBC_CPU_Register.A <<= 1;
+                GBC_CPU_Register.A  |= carry;
+
+                break;
+            }
+            case 0x18: // Relative jump by signed immediate
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                int8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_Register.PC += operand;
+
+                break;
+            }
+            case 0x19: // Add 16-bit DE to HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_ADD2(GBC_CPU_Register.HL, GBC_CPU_Register.DE);
+
+                break;
+            }
+            case 0x1A: // Load A from address pointed to by DE
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.DE);
+
+                break;
+            }
+            case 0x1B: // Decrement 16-bit DE
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.DE--;
+
+                // No flags affected
+
+                break;
+            }
+            case 0x1C: // Increment E
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_INC(GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0x1D: // Decrement E
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_DEC(GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0x1E: // Load 8-bit immediate into E
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.E = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                break;
+            }
+            case 0x1F: // Rotate A right
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                uint8_t carry = GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 0x80 : 0;
+
+                if (GBC_CPU_Register.A & 0x1)
+                {
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
+                }
+                else
+                {
+                    GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
+                }
+
+                GBC_CPU_Register.A >>= 0x1;
+                GBC_CPU_Register.A  |= carry;
+
+                break;
+            }
             case 0x20: // Relative jump by signed immediate if last result was not zero
             {
                 int8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
