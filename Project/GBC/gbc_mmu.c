@@ -679,7 +679,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
             case 0xFF00: // Joypad
                 GBC_MMU_Memory.Joypad = value;
 
-                Input_UpdateJoypadState();
+                Input_UpdateGBCJoypad();
                 break;
             case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
                 GBC_TIM_ResetDivider();
