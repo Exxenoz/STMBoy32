@@ -3,13 +3,15 @@
 
 #include "stm32f4xx_conf.h"
 
-// All Input Pins currently have the same Port (necessary for debouncing)
+#define INPUT_LOCK_TIM                      TIM4
+#define INPUT_LOCK_TIM_BUS                  RCC_APB1Periph_TIM4
+
+#define INPUT_POLLING_TIM                   TIM3
+#define INPUT_POLLING_TIM_BUS               RCC_APB1Periph_TIM3
+#define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM3_IRQn
+
 #define INPUT_BUS_ALL                       RCC_AHB1Periph_GPIOB
 #define INPUT_PORT_ALL                      GPIOB
-
-#define INPUT_TIM                           TIM3
-#define INPUT_TIM_BUS                       RCC_APB1Periph_TIM3
-#define INPUT_TIM_NVIC_CHANNEL              TIM3_IRQn
 
 #define INPUT_A_PORT                        GPIOB
 #define INPUT_A_PIN                         GPIO_Pin_1

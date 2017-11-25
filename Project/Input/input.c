@@ -8,6 +8,8 @@ Input_ButtonState_t Input_LastState[8];
 Input_ButtonState_t Input_CurrState[8];
 uint8_t             Input_Counter[8];
 
+Input_Lock_t        Input_Locks[8];
+
 const uint32_t Input_Pins[8] =
 {
     INPUT_A_PIN,
@@ -46,38 +48,50 @@ void Input_InitializePins(void)
     INITIALIZE_GPIO_PIN(INPUT_FRAME_PORT,       INPUT_FRAME_PIN);
 }
 
-void Input_InitializeTimer(void)
+void Input_InitializeTimers(void)
 {
-    RCC_APB1PeriphClockCmd(INPUT_TIM_BUS, ENABLE);
+    RCC_APB1PeriphClockCmd(INPUT_POLLING_TIM_BUS, ENABLE);
+    RCC_APB1PeriphClockCmd(INPUT_LOCK_TIM_BUS, ENABLE);
 
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
     NVIC_InitTypeDef        NVIC_InitObject;
 
 
-    TIM_BaseObject.TIM_Prescaler            = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz
+    // Initialize lock timer
+    TIM_BaseObject.TIM_Prescaler            = 44999;               // Tim4 runs with 90MHz -> scale it to 2kHz
     TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period               = 14;                  // Count 'til 14 (starting at 0) -> 1000 overflows/s
+    TIM_BaseObject.TIM_Period               = 65534;               // Count 'til max even value -> min overflows/s
     TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter    = 0;
-    TIM_TimeBaseInit(INPUT_TIM, &TIM_BaseObject);
+    TIM_TimeBaseInit(INPUT_LOCK_TIM, &TIM_BaseObject);
 
-    TIM_ITConfig(INPUT_TIM, TIM_IT_Update, ENABLE);
-    TIM_Cmd(INPUT_TIM, ENABLE);
+    TIM_Cmd(INPUT_LOCK_TIM, ENABLE);
 
-    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_TIM_NVIC_CHANNEL;
+    // Initialise polling timer
+    TIM_BaseObject.TIM_Prescaler            = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz
+    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
+    TIM_BaseObject.TIM_Period               = 14;                  // Count 'til 14 (+1) -> 1000 overflows/s
+    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
+    TIM_BaseObject.TIM_RepetitionCounter    = 0;
+    TIM_TimeBaseInit(INPUT_POLLING_TIM, &TIM_BaseObject);
+
+    TIM_ITConfig(INPUT_POLLING_TIM, TIM_IT_Update, ENABLE);
+    TIM_Cmd(INPUT_POLLING_TIM, ENABLE);
+
+    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_POLLING_TIM_NVIC_CHANNEL;
     NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitObject);
-    NVIC_EnableIRQ(INPUT_TIM_NVIC_CHANNEL);
+    NVIC_EnableIRQ(INPUT_POLLING_TIM_NVIC_CHANNEL);
     
-    NVIC_SetPriority(INPUT_TIM_NVIC_CHANNEL, 1);
+    NVIC_SetPriority(INPUT_POLLING_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2);
 }
 
 void Input_Initialize() 
 {
     Input_InitializePins();
-    Input_InitializeTimer();
+    Input_InitializeTimers();
 
     Input_Interrupt_Flags.allFlags = 0x00;
     for (int i = 0; i < 8; i++)
@@ -85,6 +99,9 @@ void Input_Initialize()
         Input_CurrState[i] = INPUT_NOT_PRESSED;
         Input_LastState[i] = INPUT_NOT_PRESSED;
         Input_Counter[i]   = 0;
+
+        Input_Locks[i].ID        = i;
+        Input_Locks[i].IsEnabled = false;
     }
 
     //-----------DEBUG LED----------
@@ -118,6 +135,46 @@ void Input_UpdateGBCJoypad(void)
         GBC_MMU_Memory.Joypad &= ((~Input_Interrupt_Flags.allFlags) | 0xF0);
     }
 }
+
+void Input_UpdateLocks(void)
+{
+    for (int i = 0; i < 8; i ++)
+    {
+        if (Input_Locks[i].IsEnabled)
+        {
+            // If lock is enabled calculate for how long it has been locked 
+            long timeLocked = INPUT_LOCK_TIM->CNT - Input_Locks[i].LockedSince;
+
+            // If timeLocked is negative timer has overflowed -> add max timer value to correct it
+            if (timeLocked < 0) timeLocked += 0xFFFF;
+
+            // Disable the lock if button was released or enough time has passed
+            if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID] >> 1)) || timeLocked > Input_Locks[i].LockedFor)
+            {
+                Input_Locks[i].IsEnabled = false;
+            }
+        }
+    }
+}
+
+bool Input_IsLocked(Input_Button_ID_t id)
+{
+    return Input_Locks[id].IsEnabled;
+}
+
+// Lock button for lockTime in ms (multiply lockTime by two because timer runs with minimal 2kH)
+void Input_Lock(Input_Button_ID_t id, time_t lockTime)
+{
+    Input_Locks[id].IsEnabled   = true;
+    Input_Locks[id].LockedFor   = 2 * lockTime;
+    Input_Locks[id].LockedSince = INPUT_LOCK_TIM->CNT;
+}
+
+void Input_LockAll(time_t lockTime)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        Input_Lock(i, lockTime);
     }
 }
 
@@ -155,5 +212,5 @@ void TIM3_IRQHandler(void)
         Input_LastState[i] = Input_CurrState[i];
     }
 
-    TIM_ClearITPendingBit(INPUT_TIM, TIM_IT_Update);
+    TIM_ClearITPendingBit(INPUT_POLLING_TIM, TIM_IT_Update);
 }

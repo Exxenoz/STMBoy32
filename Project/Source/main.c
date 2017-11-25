@@ -51,6 +51,10 @@ void HandleMainPage(void)
     // MainPage loop
     while (1)
     {
+        // Update the lockState of all buttons 
+        // Locks are needed because otherwise a short press would trigger multiple scroll downs
+        Input_UpdateLocks();
+
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa
         if (!CMOD_Detect() && firstMenuPointID == 0)
         {
@@ -70,6 +74,8 @@ void HandleMainPage(void)
             UI_MainPage_DrawMenuPoint(currMenuPointID);
             currMenuPointID--;
             UI_MainPage_HightlightMenuPoint(currMenuPointID);
+
+            Input_Lock(INPUT_FADE_TOP_ID, INPUT_LOCK_UNTIL_RELEASED);
         }
 
         // If Fade-Bot is pressed and we don't have the last valid menu point already selected,
@@ -79,6 +85,8 @@ void HandleMainPage(void)
             UI_MainPage_DrawMenuPoint(currMenuPointID);
             currMenuPointID++;
             UI_MainPage_HightlightMenuPoint(currMenuPointID);
+
+            Input_Lock(INPUT_FADE_BOT_ID, INPUT_LOCK_UNTIL_RELEASED);
         }
         
         // If A-Button is pressed confirm the current selection by changing states and ending the infinite loop
@@ -86,6 +94,11 @@ void HandleMainPage(void)
         {
             lastState = currState;
             currState = UI_MainPage_MenuPoints[currMenuPointID].NewStateOnPress;
+
+            // Lock all buttons until they are released so next page opens without anything pressed
+            // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
+            Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
+
             break;
         }
     }
