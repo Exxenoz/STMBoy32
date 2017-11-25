@@ -178,7 +178,7 @@ void Input_LockAll(time_t lockTime)
     }
 }
 
-void TIM3_IRQHandler(void)
+void IRQ_HANDLER(INPUT_POLLING_TIM)(void)
 {
     // What about the if?
 
