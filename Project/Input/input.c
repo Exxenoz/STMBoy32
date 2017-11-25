@@ -8,7 +8,7 @@ Input_ButtonState_t Input_LastState[8];
 Input_ButtonState_t Input_CurrState[8];
 uint8_t             Input_Counter[8];
 
-const uint16_t flagPositions[8] =
+const uint32_t Input_Pins[8] =
 {
     INPUT_A_PIN,
     INPUT_B_PIN,
