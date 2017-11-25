@@ -4,9 +4,10 @@
 #include "common.h"
 #include "input_config.h"
 
-// Max timer value is 65534 so this time can never be reached
-// This effectivly locks the button until it's released (second unlock condition)
-#define INPUT_LOCK_UNTIL_RELEASED 65535
+// Max even timer period (65534) => 32 767 ms (timer runs with 2kHz)
+#define INPUT_MAX_LOCK_TIME       (MAX_16BIT_TIMER_PERIOD - 1)
+// Locks button until it's released because (second unlock condition)
+#define INPUT_LOCK_UNTIL_RELEASED (INPUT_MAX_LOCK_TIME + 1)
 
 typedef long time_t;
 

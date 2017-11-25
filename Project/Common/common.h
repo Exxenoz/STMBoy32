@@ -17,7 +17,8 @@
 
 #define NOP __ASM("nop")
 
-#define INTERRUPT_PRIORITY_2    1   // 0 is the highest priority, 16 the lowest
+#define INTERRUPT_PRIORITY_2    1                   // 0 is the highest priority, 16 the lowest
+#define MAX_16BIT_TIMER_PERIOD  65535
 
 // GPIO Modes
 #define GPIO_INPUT_MODE  0x00000000

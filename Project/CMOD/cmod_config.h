@@ -6,9 +6,9 @@
 #define CMOD_BUS(NAME)            RCC_AHB1Periph_##NAME
 
 // If necessary, Timer Channel can be changed inside the Initialize-Function
-#define CMOD_TIM                  TIM4
-#define CMOD_TIM_BUS              RCC_APB1Periph_TIM4
-#define CMOD_TIM_NVIC_CHANNEL     TIM4_IRQn
+#define CMOD_TIM                  TIM5
+#define CMOD_TIM_BUS              RCC_APB1Periph_TIM5
+#define CMOD_TIM_NVIC_CHANNEL     TIM5_IRQn
 
 #define CMOD_RESET_PORT           GPIOD
 #define CMOD_RESET_PIN            GPIO_Pin_15

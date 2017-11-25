@@ -291,22 +291,22 @@ void CMOD_Initialize_CLK(void)
 
 
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_OD;
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
     GPIO_InitObject.GPIO_Pin   = CMOD_CLK_PIN;
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
     GPIO_PinAFConfig(CMOD_CLK_PORT, CMOD_CLK_PINSOURCE, CMOD_CLK_AF);
 
-    TIM_BaseObject.TIM_Prescaler         = 0;
+    TIM_BaseObject.TIM_Prescaler         = 0;                         // Tim5 runs with 90Mhz(?) -> keep this rate
     TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period            = 85;
+    TIM_BaseObject.TIM_Period            = 85;                        // Count 'til 85 (+1) -> 1,05Mhz PWM
     TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(CMOD_TIM, &TIM_BaseObject);
 
     TIM_OCStructInit(&TIM_OCInitObject);
-    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM2;
+    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
 	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
 	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
 	TIM_OCInitObject.TIM_Pulse           = 42;
@@ -337,7 +337,7 @@ void CMOD_Initialize(void)
 
     #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
     GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_OD;     \
+    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
     GPIO_InitObject.GPIO_Pin   = PIN;               \
     GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
     GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
@@ -409,7 +409,7 @@ void (*CMOD_OperationTable[3])(void) =
     CMOD_HandleNOP
 };
 
-void TIM4_IRQHandler(void)
+void IRQ_HANDLER(CMOD_TIM)(void)
 {
   if (((CMOD_TIM->SR   & TIM_IT_Update) != (uint16_t)RESET) && 
       ((CMOD_TIM->DIER & TIM_IT_Update) != (uint16_t)RESET))    // ITStatus == SET?

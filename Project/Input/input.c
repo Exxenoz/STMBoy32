@@ -60,7 +60,7 @@ void Input_InitializeTimers(void)
     // Initialize lock timer
     TIM_BaseObject.TIM_Prescaler            = 44999;               // Tim4 runs with 90MHz -> scale it to 2kHz
     TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period               = 65534;               // Count 'til max even value -> min overflows/s
+    TIM_BaseObject.TIM_Period               = INPUT_MAX_LOCK_TIME; // Count 'til max even value -> min overflows/s
     TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
     TIM_BaseObject.TIM_RepetitionCounter    = 0;
     TIM_TimeBaseInit(INPUT_LOCK_TIM, &TIM_BaseObject);
@@ -146,7 +146,7 @@ void Input_UpdateLocks(void)
             long timeLocked = INPUT_LOCK_TIM->CNT - Input_Locks[i].LockedSince;
 
             // If timeLocked is negative timer has overflowed -> add max timer value to correct it
-            if (timeLocked < 0) timeLocked += 0xFFFF;
+            if (timeLocked < 0) timeLocked += INPUT_MAX_LOCK_TIME;
 
             // Disable the lock if button was released or enough time has passed
             if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID] >> 1)) || timeLocked > Input_Locks[i].LockedFor)
