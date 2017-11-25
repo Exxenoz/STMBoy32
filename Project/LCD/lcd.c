@@ -215,12 +215,12 @@ void LCD_SetDrawAreaVertical(uint16_t startRow, uint16_t endRow)
     LCD_WriteCommandWithParameters(LCD_REG_PAGE_ADDRESS_SET, pageAddressSetData.Data, 4);
 }
 
-void LCD_SetDrawArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height)
 {
     if (width == 0 || height == 0) return;
 
-    LCD_SetDrawAreaHorizontal(x, x + width - 1);
-    LCD_SetDrawAreaVertical(y, y + height - 1);
+    LCD_SetDrawAreaHorizontal(x0, x0 + width - 1);
+    LCD_SetDrawAreaVertical(y0, y0 + height - 1);
 }
 
 // Remove this function along with LCD_FrameRateControlData_t if frame rate doesn't need to be changed during runtime
@@ -302,26 +302,26 @@ void LCD_ClearColor(uint16_t color)
 
 // This function is used to increase readability
 // However if speed is important rather use DrawFilledBox
-void LCD_DrawLine(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t color, LCD_Orientation_t o)
+void LCD_DrawLine(uint16_t x0, uint16_t y0, uint16_t length, uint16_t width, uint16_t color, LCD_Orientation_t o)
 {
-    if (o == LCD_VERTICAL) LCD_DrawFilledBox(x, y, width, length, color);
-    else                   LCD_DrawFilledBox(x, y, length, width, color);
+    if (o == LCD_VERTICAL) LCD_DrawFilledBox(x0, y0, width, length, color);
+    else                   LCD_DrawFilledBox(x0, y0, length, width, color);
 }
 
 // Again his function is used to increase readability, for more speed use DrawFilledBox directly or use a buffer
-void LCD_DrawEmptyBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t width, uint16_t color)
+void LCD_DrawEmptyBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t width, uint16_t color)
 {   
     // Draw horizontal lines of the box
-    LCD_DrawLine(x, y, length, width, color, LCD_HORIZONTAL);
-    LCD_DrawLine(x, y + height - width, length, width, color, LCD_HORIZONTAL);
+    LCD_DrawLine(x0, y0, length, width, color, LCD_HORIZONTAL);
+    LCD_DrawLine(x0, y0 + height - width, length, width, color, LCD_HORIZONTAL);
     // Draw vertical lines of the box
-    LCD_DrawLine(x, y + width, height - 2 * width, width, color, LCD_VERTICAL);
-    LCD_DrawLine(x + length - width, y + width, height - 2 * width, width, color, LCD_VERTICAL);
+    LCD_DrawLine(x0, y0 + width, height - 2 * width, width, color, LCD_VERTICAL);
+    LCD_DrawLine(x0 + length - width, y0 + width, height - 2 * width, width, color, LCD_VERTICAL);
 }
 
-void LCD_DrawFilledBox(uint16_t x, uint16_t y, uint16_t length, uint16_t height, uint16_t color)
+void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t color)
 {
-    LCD_SetDrawArea(x, y, length, height);
+    LCD_SetDrawArea(x0, y0, length, height);
 
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
@@ -389,10 +389,10 @@ void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text,
 
     // Draw the text border (if border width is 0 no border will be drawn)
     uint16_t borderWidth = text->Border.Width;
-    LCD_DrawEmptyBox(x, y, length + 2 * borderWidth, height + 2 * borderWidth, borderWidth, text->Border.Color);
+    LCD_DrawEmptyBox(x0, y0, length + 2 * borderWidth, height + 2 * borderWidth, borderWidth, text->Border.Color);
 
     // Draw the Text and its background from the now initialized buffer
-    LCD_SetDrawArea(x + text->Border.Width, y + text->Border.Width, length, height);
+    LCD_SetDrawArea(x0 + text->Border.Width, y0 + text->Border.Width, length, height);
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < size; i++)
