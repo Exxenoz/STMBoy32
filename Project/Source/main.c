@@ -44,8 +44,8 @@ void HandleMainPage(void)
     int currentMenuPointID = firstMenuPointID;
 
     // Draw MainPage and highlight first valid menu point
-    UI_DrawMainPage();
-    UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+    UI_DrawMainPage(firstMenuPointID);
+    UI_MainPage_HightlightMenuPoint(currMenuPointID);
 
     // MainPage loop
     while (1)
@@ -53,12 +53,12 @@ void HandleMainPage(void)
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa
         if (!CMOD_Detect() && firstMenuPointID == 0)
         {
-            UI_DrawDisabledMenuPoint(&(UI_MainPage_MenuPoints[0]));
+            UI_MainPage_DrawDisabledMenuPoint(0);
             firstMenuPointID = 1;
         }
         else if (CMOD_Detect() && firstMenuPointID == 1)
         {
-            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]));
+            UI_MainPage_DrawMenuPoint(0);
             firstMenuPointID = 0;
         }
 
@@ -66,25 +66,25 @@ void HandleMainPage(void)
         // highlight the menu point above and reset highlighting of current menu point
         if (Input_Interrupt_Flags.FadeTop == INPUT_PRESSED && currentMenuPointID > firstMenuPointID)
         {
-            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
-            currentMenuPointID--;
-            UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+            UI_MainPage_DrawMenuPoint(currMenuPointID);
+            currMenuPointID--;
+            UI_MainPage_HightlightMenuPoint(currMenuPointID);
         }
 
         // If Fade-Bot is pressed and we don't have the last valid menu point already selected
         // highlight the menu point below and reset highlighting of current menu point
         if (Input_Interrupt_Flags.FadeBot == INPUT_PRESSED && currentMenuPointID < 4)
         {
-            UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
-            currentMenuPointID++;
-            UI_HightlightMenuPoint(&(UI_MainPage_MenuPoints[currentMenuPointID]));
+            UI_MainPage_DrawMenuPoint(currMenuPointID);
+            currMenuPointID++;
+            UI_MainPage_HightlightMenuPoint(currMenuPointID);
         }
         
         // If A-Button is pressed change the current and last states accordingly and leave main menu
         if (Input_Interrupt_Flags.ButtonA == INPUT_PRESSED)
         {
             lastState = currState;
-            currState = UI_MainPage_MenuPoints[currentMenuPointID].newStateOnPress;
+            currState = UI_MainPage_MenuPoints[currMenuPointID].NewStateOnPress;
             break;
         }
     }
@@ -179,7 +179,6 @@ int main(void)
 
     // Initialize UI
     UI_Initialize();
-    Fonts_InitializeSTMFonts();
 
     currState = OS_MAIN_PAGE;
 
