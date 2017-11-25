@@ -39,9 +39,10 @@ void ClockDebug_Initialize()
 
 void HandleMainPage(void)
 {
-    // If no cartridge is detected first valid menu point is SHOW ALL GAMES
-    int firstMenuPointID   = CMOD_Detect() ? 0 : 1;
-    int currentMenuPointID = firstMenuPointID;
+    // If no cartridge is detected first valid menu point is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
+    int firstMenuPointID = CMOD_Detect() ? 0 : 1;
+    int lastMenuPointID  = 3;
+    int currMenuPointID  = firstMenuPointID;    
 
     // Draw MainPage and highlight first valid menu point
     UI_DrawMainPage(firstMenuPointID);
@@ -62,26 +63,26 @@ void HandleMainPage(void)
             firstMenuPointID = 0;
         }
 
-        // If Fade-Top is pressed and we don't have the first valid menu point already selected
-        // highlight the menu point above and reset highlighting of current menu point
-        if (Input_Interrupt_Flags.FadeTop == INPUT_PRESSED && currentMenuPointID > firstMenuPointID)
+        // If Fade-Top is pressed and we don't have the first valid menu point already selected,
+        // reset highlighting of current menu point and highlight the menu point above
+        if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currMenuPointID > firstMenuPointID)
         {
             UI_MainPage_DrawMenuPoint(currMenuPointID);
             currMenuPointID--;
             UI_MainPage_HightlightMenuPoint(currMenuPointID);
         }
 
-        // If Fade-Bot is pressed and we don't have the last valid menu point already selected
-        // highlight the menu point below and reset highlighting of current menu point
-        if (Input_Interrupt_Flags.FadeBot == INPUT_PRESSED && currentMenuPointID < 4)
+        // If Fade-Bot is pressed and we don't have the last valid menu point already selected,
+        // reset highlighting of current menu point and highlight the menu point below
+        if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currMenuPointID < lastMenuPointID)
         {
             UI_MainPage_DrawMenuPoint(currMenuPointID);
             currMenuPointID++;
             UI_MainPage_HightlightMenuPoint(currMenuPointID);
         }
         
-        // If A-Button is pressed change the current and last states accordingly and leave main menu
-        if (Input_Interrupt_Flags.ButtonA == INPUT_PRESSED)
+        // If A-Button is pressed confirm the current selection by changing states and ending the infinite loop
+        if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
         {
             lastState = currState;
             currState = UI_MainPage_MenuPoints[currMenuPointID].NewStateOnPress;

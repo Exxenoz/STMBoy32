@@ -6,9 +6,12 @@
 
 typedef enum
 {
-    INPUT_NOT_PRESSED = 0xFFFF,
-    INPUT_PRESSED     = 0x0000
-} Input_ButtonState_t;
+typedef enum
+{
+    INPUT_NOT_PRESSED = 0x0000,
+    INPUT_PRESSED     = 0xFFFF
+}
+Input_ButtonState_t;
 
 typedef union
 {
@@ -31,7 +34,7 @@ Input_Interrupt_Flags_t;
 extern Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
 void Input_Initialize(void);
-void Input_UpdateJoypadState(void);
+void Input_UpdateGBCJoypad(void);
 
 void TIM3_IRQHandler(void);
 
