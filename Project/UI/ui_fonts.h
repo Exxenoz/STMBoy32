@@ -17,6 +17,6 @@ extern Fonts_FontDef_t Fonts_STMFont_12x12;
 
 
 void Fonts_InitializeSTMFonts(void);
-int  Fonts_GetStringLength(char *s, uint16_t textSpacing, Fonts_FontDef_t *font);
+int  Fonts_GetStringLength(char s[], uint16_t textSpacing, Fonts_FontDef_t *font);
 
 #endif

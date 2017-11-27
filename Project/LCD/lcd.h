@@ -5,6 +5,8 @@
 #include "lcd_config.h"
 #include "ui_fonts.h"
 
+#define LCD_MAX_TEXT_LENGTH 20
+
 #define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
 #define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
                             
@@ -67,7 +69,7 @@ LCD_Padding_t;
 
 typedef struct
 {
-    char         *Characters;
+    char          Characters[LCD_MAX_TEXT_LENGTH];
     uint16_t      Spacing;
     uint16_t      Height;
     uint16_t      Color;

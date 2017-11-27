@@ -18,11 +18,11 @@ void Fonts_InitializeSTMFonts(void)
 }
 
 // Returns the length of a given text represented by a certain font (in pixel)
-int  Fonts_GetStringLength(char *text, uint16_t textSpacing, Fonts_FontDef_t *font)
+int  Fonts_GetStringLength(char text[], uint16_t textSpacing, Fonts_FontDef_t *font)
 {
     int length = 0;
 
-    for (; *text != '\0'; text++)
+    for (int i = 0; text[i] != '\0'; i++)
     {
         length += font->FontWidth + textSpacing;
     }
