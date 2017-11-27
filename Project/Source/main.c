@@ -44,7 +44,7 @@ void HandleMainPage(void)
 
     // Draw MainPage and highlight first valid menu point
     UI_DrawMainPage(firstMenuPointID);
-    UI_MainPage_HightlightMenuPoint(currMenuPointID);
+    UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
     // MainPage loop
     while (1)
@@ -56,12 +56,12 @@ void HandleMainPage(void)
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa
         if (!CMOD_Detect() && firstMenuPointID == 0)
         {
-            UI_MainPage_DrawDisabledMenuPoint(0);
+            UI_DrawMainPageMenuPoint(0, UI_DISABLED);
             firstMenuPointID = 1;
         }
         else if (CMOD_Detect() && firstMenuPointID == 1)
         {
-            UI_MainPage_DrawMenuPoint(0);
+            UI_DrawMainPageMenuPoint(0, UI_ENABLED);
             firstMenuPointID = 0;
         }
 
@@ -69,22 +69,22 @@ void HandleMainPage(void)
         // reset highlighting of current menu point and highlight the menu point above
         if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currMenuPointID > firstMenuPointID)
         {
-            UI_MainPage_DrawMenuPoint(currMenuPointID);
-            currMenuPointID--;
-            UI_MainPage_HightlightMenuPoint(currMenuPointID);
+            UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
+            --currMenuPointID;
+            UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
-            Input_Lock(INPUT_FADE_TOP_ID, INPUT_LOCK_UNTIL_RELEASED);
+            Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
         }
 
         // If Fade-Bot is pressed and we don't have the last valid menu point already selected,
         // reset highlighting of current menu point and highlight the menu point below
         if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currMenuPointID < lastMenuPointID)
         {
-            UI_MainPage_DrawMenuPoint(currMenuPointID);
-            currMenuPointID++;
-            UI_MainPage_HightlightMenuPoint(currMenuPointID);
+            UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
+            ++currMenuPointID;
+            UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
-            Input_Lock(INPUT_FADE_BOT_ID, INPUT_LOCK_UNTIL_RELEASED);
+            Input_Lock(INPUT_FADE_BOT_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
         }
         
         // If A-Button is pressed confirm the current selection and end the infinite loop
@@ -125,7 +125,8 @@ void HandleOptionPage(void)
     // YTBI
     while (1)
     {
-        
+        OS_CurrState = OS_MAIN_PAGE;
+        break;
     }
 }
 

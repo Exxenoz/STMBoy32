@@ -75,7 +75,9 @@ void UI_DrawOptionsPage(void)
     // YTBI
 }
 
+void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option)
 {
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[id]), option);
 }
 
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
