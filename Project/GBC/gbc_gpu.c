@@ -467,28 +467,28 @@ void GBC_GPU_RenderScanline(void)
     }
 }
 
-void GBC_GPU_CompareScanline()
-{
-    if (GBC_MMU_Memory.Scanline == GBC_MMU_Memory.ScanlineCompare)
-    {
-        GBC_MMU_Memory.Coincidence = 1;
-
-        if (GBC_MMU_Memory.CoincidenceInterrupt)
-        {
-            if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
-            {
-                GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
-            }
-
-            GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 1;
-        }
-    }
-    else
-    {
-        GBC_MMU_Memory.Coincidence = 0;
-        GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 0;
-    }
-}
+#define GBC_GPU_COMPARE_SCANLINE()                                                                                                         \
+{                                                                                                                                          \
+    if (GBC_MMU_Memory.Scanline == GBC_MMU_Memory.ScanlineCompare)                                                                         \
+    {                                                                                                                                      \
+        GBC_MMU_Memory.Coincidence = 1;                                                                                                    \
+                                                                                                                                           \
+        if (GBC_MMU_Memory.CoincidenceInterrupt)                                                                                           \
+        {                                                                                                                                  \
+            if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)                                                                     \
+            {                                                                                                                              \
+                GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;                                                         \
+            }                                                                                                                              \
+                                                                                                                                           \
+            GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 1;                                                           \
+        }                                                                                                                                  \
+    }                                                                                                                                      \
+    else                                                                                                                                   \
+    {                                                                                                                                      \
+        GBC_MMU_Memory.Coincidence = 0;                                                                                                    \
+        GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 0;                                                               \
+    }                                                                                                                                      \
+}                                                                                                                                          \
 
 bool GBC_GPU_Step(void)
 {
@@ -503,7 +503,7 @@ bool GBC_GPU_Step(void)
                 GBC_GPU_ModeTicks -= 204;
 
                 GBC_MMU_Memory.Scanline++;
-                GBC_GPU_CompareScanline();
+                GBC_GPU_COMPARE_SCANLINE();
 
                 GBC_GPU_CurrentFrameBufferStartIndex += 160;
                 GBC_GPU_CurrentFrameBufferEndIndex += 160;
@@ -568,7 +568,7 @@ bool GBC_GPU_Step(void)
                 if (GBC_MMU_Memory.Scanline >= 153)
                 {
                     GBC_MMU_Memory.Scanline = 0;
-                    GBC_GPU_CompareScanline();
+                    GBC_GPU_COMPARE_SCANLINE();
 
                     GBC_GPU_CurrentFrameBufferStartIndex = 0;
                     GBC_GPU_CurrentFrameBufferEndIndex = 160;
@@ -590,7 +590,7 @@ bool GBC_GPU_Step(void)
                 else
                 {
                     GBC_MMU_Memory.Scanline++;
-                    GBC_GPU_CompareScanline();
+                    GBC_GPU_COMPARE_SCANLINE();
                 }
             }
             break;
