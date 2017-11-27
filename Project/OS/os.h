@@ -1,6 +1,8 @@
 #ifndef OS_H
 #define OS_H
 
+#define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
+
 typedef enum
 {
     OS_MAIN_PAGE,
