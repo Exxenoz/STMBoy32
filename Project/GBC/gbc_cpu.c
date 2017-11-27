@@ -205,82 +205,82 @@ long GBC_CPU_InstructionsPerStep = 0;
     }                                                                                                                                              \
 }                                                                                                                                                  \
 
-static inline uint8_t GBC_CPU_ADD(uint8_t a, uint8_t b)
-{
-    uint32_t result = a + b;
+#define GBC_CPU_ADD(A, B)                                                                                                                          \
+{                                                                                                                                                  \
+    uint32_t result = (A) + (B);                                                                                                                   \
+                                                                                                                                                   \
+    if (result & 0x100)                                                                                                                            \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);                                                                                                    \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);                                                                                                  \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    if ((((A) & 0x0F) + ((B) & 0x0F)) & 0x10)                                                                                                      \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);                                                                                                \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);                                                                                              \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);                                                                                                \
+                                                                                                                                                   \
+    result &= 0xFF;                                                                                                                                \
+                                                                                                                                                   \
+    if (result)                                                                                                                                    \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);                                                                                                   \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);                                                                                                     \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    A = result;                                                                                                                                    \
+}                                                                                                                                                  \
 
-    if (result & 0x100)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
-    }
-
-    if (((a & 0x0F) + (b & 0x0F)) & 0x10)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    result &= 0xFF;
-
-    if (result)
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
-
-    return result;
-}
-
-static inline uint8_t GBC_CPU_ADC(uint8_t a, uint8_t b)
-{
-    uint8_t carry = (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);
-    uint32_t result = a + b + carry;
-
-    if (result & 0x100)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
-    }
-
-    if (((a & 0x0F) + (b & 0x0F) + carry) & 0x10)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
-
-    result &= 0xFF;
-
-    if (result)
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
-
-    return result;
-}
+#define GBC_CPU_ADC(A, B)                                                                                                                          \
+{                                                                                                                                                  \
+    uint8_t carry = (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0);                                                                              \
+    uint32_t result = (A) + (B) + carry;                                                                                                           \
+                                                                                                                                                   \
+    if (result & 0x100)                                                                                                                            \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);                                                                                                    \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);                                                                                                  \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    if ((((A) & 0x0F) + ((B) & 0x0F) + carry) & 0x10)                                                                                              \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);                                                                                                \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);                                                                                              \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);                                                                                                \
+                                                                                                                                                   \
+    result &= 0xFF;                                                                                                                                \
+                                                                                                                                                   \
+    if (result)                                                                                                                                    \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);                                                                                                   \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);                                                                                                     \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    A = result;                                                                                                                                    \
+}                                                                                                                                                  \
 
 static inline uint8_t GBC_CPU_SUB(uint8_t a, uint8_t b)
 {
@@ -1279,82 +1279,82 @@ void GBC_CPU_LD_A_HLP()                 // 0x7E - Copy value pointed by HL to A
 
 void GBC_CPU_ADD_A_B()                  // 0x80 - Add B to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.B);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
 void GBC_CPU_ADD_A_C()                  // 0x81 - Add C to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.C);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
 void GBC_CPU_ADD_A_D()                  // 0x82 - Add D to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.D);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
 void GBC_CPU_ADD_A_E()                  // 0x83 - Add E to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.E);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
 void GBC_CPU_ADD_A_H()                  // 0x84 - Add H to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.H);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
 void GBC_CPU_ADD_A_L()                  // 0x85 - Add L to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.L);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
 void GBC_CPU_ADD_A_HLP()                // 0x86 - Add value pointed by HL to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
 
 void GBC_CPU_ADD_A_A()                  // 0x87 - Add A to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.A);
+    GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
 void GBC_CPU_ADC_A_B()                  // 0x88 - Add B and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.B);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
 void GBC_CPU_ADC_A_C()                  // 0x89 - Add C and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.C);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
 void GBC_CPU_ADC_A_D()                  // 0x8A - Add D and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.D);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
 void GBC_CPU_ADC_A_E()                  // 0x8B - Add E and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.E);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
 void GBC_CPU_ADC_A_H()                  // 0x8C - Add H and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.H);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
 void GBC_CPU_ADC_A_L()                  // 0x8D - Add L and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.L);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
 void GBC_CPU_ADC_A_HLP()                // 0x8E - Add value pointed by HL and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
 
 void GBC_CPU_ADC_A_A()                  // 0x8F - Add A and carry flag to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.A);
+    GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
 void GBC_CPU_SUB_A_B()                  // 0x90 - Subtract B from A
@@ -1642,7 +1642,7 @@ void GBC_CPU_PUSH_BC()                  // 0xC5 - Push 16-bit BC onto stack
 
 void GBC_CPU_ADD_A_X(uint8_t operand)   // 0xC6 - Add 8-bit immediate to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADD(GBC_CPU_Register.A, operand);
+    GBC_CPU_ADD(GBC_CPU_Register.A, operand);
 }
 
 void GBC_CPU_RST_0H()                   // 0xC7 - Call routine at address 0000h
@@ -1701,7 +1701,7 @@ void GBC_CPU_CALL_XX(uint16_t operand)  // 0xCD - Call routine at 16-bit locatio
 
 void GBC_CPU_ADC_A_X(uint8_t operand)   // 0xCE - Add 8-bit immediate and carry to A
 {
-    GBC_CPU_Register.A = GBC_CPU_ADC(GBC_CPU_Register.A, operand);
+    GBC_CPU_ADC(GBC_CPU_Register.A, operand);
 }
 
 void GBC_CPU_RST_8H()                   // 0xCF - Call routine at address 0008h
@@ -3700,6 +3700,138 @@ void GBC_CPU_Step()
                 GBC_CPU_InstructionTicks += 4;
 
                 // Do nothing
+
+                break;
+            }
+            case 0x80: // Add B to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0x81: // Add C to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0x82: // Add D to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0x83: // Add E to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0x84: // Add H to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0x85: // Add L to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0x86: // Add value pointed by HL to A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, value);
+
+                break;
+            }
+            case 0x87: // Add A to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x88: // Add B and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0x89: // Add C and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0x8A: // Add D and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0x8B: // Add E and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0x8C: // Add H and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0x8D: // Add L and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0x8E: // Add value pointed by HL and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, value);
+
+                break;
+            }
+            case 0x8F: // Add A and carry flag to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, GBC_CPU_Register.A);
 
                 break;
             }
