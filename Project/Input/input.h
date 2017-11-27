@@ -6,10 +6,10 @@
 
 // Max even timer period (65534) => 32 767 ms (timer runs with 2kHz)
 #define INPUT_MAX_LOCK_TIME       (MAX_16BIT_TIMER_PERIOD - 1)
-// Locks button until it's released because (second unlock condition)
+// Locks button until it's released (second unlock condition) because value can never be reached
 #define INPUT_LOCK_UNTIL_RELEASED (INPUT_MAX_LOCK_TIME + 1)
 
-typedef long time_t;
+typedef uint16_t time_t;
 
 typedef enum
 {
@@ -36,7 +36,8 @@ typedef struct
     Input_Button_ID_t ID;       // ID of the button the lock is associated with
     time_t LockedSince;         // LockTimer value at the time lock got activated
     time_t LockedFor;           // Time the button should remain locked if not released in ms
-    bool IsEnabled;             // State of the lock
+    bool IsLocked;              // State of the lock
+    bool WasUnlockedByTimeout;  // Indicates if last unlock was triggered by release or timeout
 }
 Input_Lock_t;
 

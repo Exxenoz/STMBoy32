@@ -100,8 +100,11 @@ void Input_Initialize()
         Input_LastState[i] = INPUT_NOT_PRESSED;
         Input_Counter[i]   = 0;
 
-        Input_Locks[i].ID        = i;
-        Input_Locks[i].IsEnabled = false;
+        Input_Locks[i].ID                   = i;
+        Input_Locks[i].LockedFor            = false;
+        Input_Locks[i].LockedSince          = false;
+        Input_Locks[i].IsLocked             = false;
+        Input_Locks[i].WasUnlockedByTimeout = false;
     }
 
     //-----------DEBUG LED----------
@@ -140,7 +143,7 @@ void Input_UpdateLocks(void)
 {
     for (int i = 0; i < 8; i ++)
     {
-        if (Input_Locks[i].IsEnabled)
+        if (Input_Locks[i].IsLocked)
         {
             // If lock is enabled calculate for how long it has been locked 
             long timeLocked = INPUT_LOCK_TIM->CNT - Input_Locks[i].LockedSince;
@@ -148,10 +151,18 @@ void Input_UpdateLocks(void)
             // If timeLocked is negative timer has overflowed -> add max timer value to correct it
             if (timeLocked < 0) timeLocked += INPUT_MAX_LOCK_TIME;
 
-            // Disable the lock if button was released or enough time has passed
-            if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID] >> 1)) || timeLocked > Input_Locks[i].LockedFor)
+            // Disable the lock if button was released
+            if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID] >> 1)))
             {
-                Input_Locks[i].IsEnabled = false;
+                Input_Locks[i].IsLocked             = false;
+                Input_Locks[i].WasUnlockedByTimeout = false;
+            }
+
+            // Disable the lock if enough time has passed
+            if (timeLocked > Input_Locks[i].LockedFor)
+            {
+                Input_Locks[i].IsLocked             = false;
+                Input_Locks[i].WasUnlockedByTimeout = true;
             }
         }
     }
@@ -159,13 +170,13 @@ void Input_UpdateLocks(void)
 
 bool Input_IsLocked(Input_Button_ID_t id)
 {
-    return Input_Locks[id].IsEnabled;
+    return Input_Locks[id].IsLocked;
 }
 
 // Lock button for lockTime in ms (multiply lockTime by two because timer runs with minimal 2kH)
 void Input_Lock(Input_Button_ID_t id, time_t lockTime)
 {
-    Input_Locks[id].IsEnabled   = true;
+    Input_Locks[id].IsLocked    = true;
     Input_Locks[id].LockedFor   = 2 * lockTime;
     Input_Locks[id].LockedSince = INPUT_LOCK_TIM->CNT;
 }
@@ -189,17 +200,17 @@ void TIM3_IRQHandler(void)
         Input_CurrState[i] = ((INPUT_PORT_ALL->IDR & Input_Pins[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
 
         // If the input state didn't change since 1ms ago increase counter
+        // If the input state changed since 1ms ago reset counter
         if (Input_CurrState[i] == Input_LastState[i])
         {
             Input_Counter[i]++;
         }
-        // If the input state changed since 1ms ago reset counter
         else
         {
             Input_Counter[i] = 0;
         }
 
-        // If the input state didn't change since 10ms ago consider state as permanent
+        // If the input state didn't change for 10 cycles (10ms) consider state as permanent
         if (Input_Counter[i] >= 10)
         {
             // Reset the corresponding Input Bit (not pressed) then set it according to the current state
