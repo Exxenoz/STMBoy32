@@ -3565,11 +3565,141 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0x70: // Copy B to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0x71: // Copy C to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0x72: // Copy D to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0x73: // Copy E to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0x74: // Copy H to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0x75: // Copy L to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0x76: // Halt processor
+            {
+                // No instruction ticks
+
+                if (GBC_CPU_InterruptMasterEnableDelayTicks)
+                {
+                    // Serve pending interrupts before HALT
+                    GBC_CPU_InterruptMasterEnableDelayTicks = 0;
+                    GBC_CPU_InterruptMasterEnable = true;
+                    GBC_CPU_Register.PC--;
+                }
+                else
+                {
+                    GBC_CPU_Halted = true;
+                }
+
+                break;
+            }
+            case 0x77: // Copy A to address pointed by HL
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(GBC_CPU_Register.HL, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0x78: // Copy B to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_Register.B;
+
+                break;
+            }
+            case 0x79: // Copy C to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_Register.C;
+
+                break;
+            }
             case 0x7A: // Copy D to A
             {
                 GBC_CPU_InstructionTicks += 4;
 
                 GBC_CPU_Register.A = GBC_CPU_Register.D;
+
+                break;
+            }
+            case 0x7B: // Copy E to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_Register.E;
+
+                break;
+            }
+            case 0x7C: // Copy H to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_Register.H;
+
+                break;
+            }
+            case 0x7D: // Copy L to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.A = GBC_CPU_Register.L;
+
+                break;
+            }
+            case 0x7E: // Copy value pointed by HL to A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                break;
+            }
+            case 0x7F: // Copy A to A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                // Do nothing
 
                 break;
             }
