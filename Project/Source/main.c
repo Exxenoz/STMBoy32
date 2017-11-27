@@ -162,7 +162,7 @@ bool HandleSDCIngame(void)
 
 bool HandleCartridgeIngame(void)
 {
-    if(GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
+    if (GBC_LoadFromCartridge() != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return false;
