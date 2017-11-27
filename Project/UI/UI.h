@@ -90,7 +90,10 @@ void UI_DrawShowAllPage(void);
 void UI_DrawShowFavPage(void);
 void UI_DrawOptionsPage(void);
 
-void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option);
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option);
+
+// Compiler workaround functions
+void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option);
+void UI_PerformMainPageAction(int id);
 
 #endif // UI_H

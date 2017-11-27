@@ -75,11 +75,6 @@ void UI_DrawOptionsPage(void)
     // YTBI
 }
 
-void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option)
-{
-    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[id]), option);
-}
-
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
 {
     LCD_TextDef_t menuPointDef;
@@ -114,4 +109,16 @@ void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
         default:
             break;
     }
+}
+
+// Compiler workaround functions
+
+void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option)
+{
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[id]), option);
+}
+
+void UI_PerformMainPageAction(int id)
+{
+    OS_DoAction(UI_MainPage_MenuPoints[id].Action);
 }

@@ -91,7 +91,7 @@ void HandleMainPage(void)
         if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
         {
             // Perform the action linked to the selected menupoint
-            OS_DoAction(UI_MainPage_MenuPoints[currMenuPointID].Action);
+            UI_PerformMainPageAction(currMenuPointID);
 
             // Lock all buttons until they are released so next page opens without anything pressed
             // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
