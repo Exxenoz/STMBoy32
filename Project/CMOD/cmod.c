@@ -409,7 +409,7 @@ void (*CMOD_OperationTable[3])(void) =
     CMOD_HandleNOP
 };
 
-void TIM4_IRQHandler(void)
+void TIM5_IRQHandler(void)
 {
   if (((CMOD_TIM->SR   & TIM_IT_Update) != (uint16_t)RESET) && 
       ((CMOD_TIM->DIER & TIM_IT_Update) != (uint16_t)RESET))    // ITStatus == SET?

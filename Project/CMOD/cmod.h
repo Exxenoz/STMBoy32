@@ -61,6 +61,6 @@ void              CMOD_ResetCartridge(void);
 
 void CMOD_Initialize(void); 
 
-void IRQ_HANDLER(CMOD_TIM)(void);
+void TIM5_IRQHandler(void);
 
 #endif

@@ -17,8 +17,6 @@
 
 #define NOP __ASM("nop")
 
-#define IRQ_HANDLER(NAME)       NAME##_IRQHandler
-
 #define INTERRUPT_PRIORITY_2    1                   // 0 is the highest priority, 16 the lowest
 #define MAX_16BIT_TIMER_PERIOD  65535
 
