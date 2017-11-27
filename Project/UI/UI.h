@@ -6,49 +6,81 @@
 #include "lcd.h"
 #include "os.h"
 
-#define UI_MAX_NUMBER_OF_GAMES          2000
+#define UI_MAX_NUMBER_OF_GAMES    2000
+#define UI_NUMBER_OF_MAINPAGE_MPS 4       // Total number of MainPage menupoints
 
-#define UI_MAINPAGE_BACKGROUND_COLOR    0xFFC0
-#define UI_MENU_POINT_BACKGROUND_COLOR  0xFFFF
-#define UI_MENU_POINT_TEXT_COLOR        0x0000
-#define UI_MENU_POINT_SPACING           0x0000
-#define UI_MENU_POINT_BORDER_COLOR      0x0000
-#define UI_MENU_POINT_BORDER_WIDTH      0x0002
-#define UI_MENU_POINT_LENGTH            261        // Length of a menu point in pixel
-#define UI_MENU_POINT_HEIGHT            32         // Length of a menu point in pixel
+#define UI_MAX_MP_LENGTH          15
+#define UI_MAX_GAME_TITLE_LENGTH  10
 
-#define UI_DISABLED_MENU_POINT_BACKGROUND_COLOR    0xC618
-#define UI_DISABLED_MENU_POINT_TEXT_COLOR          0x7BD0
+// Page Backgrounds
+#define UI_MAINPAGE_BG_COLOR      0xFFC0
+#define UI_SHOWALL_BG_COLOR       0x0000   // YTBI
+#define UI_FAVORITES_BG_COLOR     0x0000   // YTBI
+#define UI_OPTIONS_BG_COLOR       0x0000   // YTBI
 
-#define UI_HIGHLIGHTED_MENU_POINT_BACKGROUND_COLOR 0x0000  // ToDo: Implement
-#define UI_HIGHLIGHTED_MENU_POINT_BORDER_COLOR     0xFFFF  // ToDo: Implement
-#define UI_HIGHLIGHTED_MENU_POINT_TEXT_COLOR       0xFFFF  // ToDo: Implement
+// Menupoint Measurements
+#define UI_MAINPAGE_MP_LENGTH     261      // Length of a Mainpage menupoint in pixel
+#define UI_MAINPAGE_MP_HEIGHT     32       // Length of a Mainpage menupoint in pixel
+#define UI_GAME_ENTRY_LENGTH      0        // YTBI
+#define UI_GAME_ENTRY_HEIGHT      0        // YTBI
+#define UI_OPTIONS_MP_LENGTH      0        // YTBI
+#define UI_OPTIONS_MP_HEIGHT      0        // YTBI
 
-#define UI_MAINPAGE_MENU_POINT_1_STRING  "BOOT CARTRIDGE"
-#define UI_MAINPAGE_MENU_POINT_2_STRING  "SHOW ALL GAMES"
-#define UI_MAINPAGE_MENU_POINT_3_STRING  "SHOW FAVORITES"
-#define UI_MAINPAGE_MENU_POINT_4_STRING  "OPTIONS"
+// Menupoint Texts
+#define UI_MAINPAGE_MP_1_STRING   "BOOT CARTRIDGE"
+#define UI_MAINPAGE_MP_2_STRING   "SHOW ALL GAMES"
+#define UI_MAINPAGE_MP_3_STRING   "SHOW FAVORITES"
+#define UI_MAINPAGE_MP_4_STRING   "OPTIONS"
 
-// Menu Point Coordinates
-#define UI_MAINPAGE_MENU_POINTS_X   29
-#define UI_MAINPAGE_MENU_POINT_1_Y  35
-#define UI_MAINPAGE_MENU_POINT_2_Y  81
-#define UI_MAINPAGE_MENU_POINT_3_Y  127
-#define UI_MAINPAGE_MENU_POINT_4_Y  173
+// Menupoint Coordinates
+#define UI_MAINPAGE_MPS_X   29
+#define UI_MAINPAGE_MP_1_Y  35
+#define UI_MAINPAGE_MP_2_Y  81
+#define UI_MAINPAGE_MP_3_Y  127
+#define UI_MAINPAGE_MP_4_Y  173
 
-#define UI_MENU_POINT_FONT  Fonts_STMFont_16x24
+// MenuPoint Colors
+#define UI_MP_BG_COLOR      0xFFFF
+#define UI_MP_TEXT_COLOR    0x0000
+#define UI_MP_BORDER_COLOR  0x0000
+#define UI_MP_BORDER_WIDTH  0x0002
+#define UI_MP_SPACING       0x0000
+
+#define UI_DISABLED_MP_BG_COLOR         0xC618
+#define UI_DISABLED_MP_TEXT_COLOR       0x7BD0
+#define UI_HIGHLIGHTED_MP_BG_COLOR      0x0000  // YTBI
+#define UI_HIGHLIGHTED_MP_TEXT_COLOR    0xFFFF  // YTBI
+#define UI_HIGHLIGHTED_MP_BORDER_COLOR  0xFFFF  // YTBI
+
+// Fonts
+#define UI_MP_FONT Fonts_STMFont_16x24
+
+typedef enum
+{
+    UI_ENABLED,
+    UI_DISABLED,
+    UI_HIGHLIGHTED
+}
+UI_MP_Option_t;
 
 typedef struct
 {
-    uint16_t X;                    // MenuPoint upperLeftCorner x coordinate
-    uint16_t Y;                    // MenuPoint upperLeftCorner y coordinate
-    LCD_TextDef_t MenuPointDef;    // MenuPoint content
-    OS_State_t    NewStateOnPress; // New state after pressing menu point
+    char        Text[UI_MAX_MP_LENGTH];  // MenuPoint Text
+    uint16_t    X;                       // MenuPoint upperLeftCorner x coordinate
+    uint16_t    Y;                       // MenuPoint upperLeftCorner y coordinate
+    OS_Action_t Action;                  // Action to be performed when selection is confirmed
 }
 UI_MenuPoint_t;
 
-extern UI_MenuPoint_t UI_MainPage_MenuPoints[4];
-extern char* UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
+typedef struct
+{
+    char Name[UI_MAX_GAME_TITLE_LENGTH]; // Name of the Game
+    bool IsFavorite;                     // Indicates whether game is a favorite or not
+}
+UI_GameEntry_t;
+
+extern const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS];
+extern UI_GameEntry_t UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
 
 
 void UI_Initialize(void);
@@ -58,8 +90,6 @@ void UI_DrawShowAllPage(void);
 void UI_DrawShowFavPage(void);
 void UI_DrawOptionsPage(void);
 
-void UI_MainPage_DrawMenuPoint(uint16_t id);
-void UI_MainPage_DrawDisabledMenuPoint(uint16_t id);
-void UI_MainPage_HightlightMenuPoint(uint16_t id);
+void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option);
 
 #endif // UI_H

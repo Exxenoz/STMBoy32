@@ -2,60 +2,24 @@
 #include "cmod.h"
 #include "sdc.h"
 #include "ff.h"
+#include "string.h"
 
-UI_MenuPoint_t UI_MainPage_MenuPoints[4];
+const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
+    {UI_MAINPAGE_MP_1_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_1_Y, OS_SWITCH_TO_STATE_INGAME_FC},
+    {UI_MAINPAGE_MP_2_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_2_Y, OS_SWITCH_TO_STATE_SHOWALL},
+    {UI_MAINPAGE_MP_3_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_3_Y, OS_SWITCH_TO_STATE_SHOWFAV},
+    {UI_MAINPAGE_MP_4_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_4_Y, OS_SWITCH_TO_STATE_OPTIONS},
+};
 
-char* UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
+UI_GameEntry_t UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
 
 
 void UI_InitializeMenuPointPadding(LCD_TextDef_t *menuPointDef)
 {
-    int stringLength = Fonts_GetStringLength(menuPointDef->Characters, menuPointDef->Spacing, &UI_MENU_POINT_FONT);
+    int stringLength = Fonts_GetStringLength(menuPointDef->Characters, menuPointDef->Spacing, &UI_MP_FONT);
 
-    menuPointDef->Padding.Left  = (UI_MENU_POINT_LENGTH - stringLength) / 2;
-    menuPointDef->Padding.Right = (UI_MENU_POINT_LENGTH - stringLength) / 2;
-}
-
-void UI_InitializeMainPage(void)
-{
-    LCD_TextDef_t menuPointDef;
-
-    // Initialize common attributes of all menu points
-    menuPointDef.Color          = UI_MENU_POINT_TEXT_COLOR;
-    menuPointDef.Spacing        = UI_MENU_POINT_SPACING;
-    menuPointDef.Border.Width   = UI_MENU_POINT_BORDER_WIDTH;
-    menuPointDef.Border.Color   = UI_MENU_POINT_BORDER_COLOR;
-    menuPointDef.Padding.Upper  = ((UI_MENU_POINT_HEIGHT - UI_MENU_POINT_FONT.FontHeight) / 2);
-    menuPointDef.Padding.Lower  = ((UI_MENU_POINT_HEIGHT - UI_MENU_POINT_FONT.FontHeight) / 2) - 6;
-
-    // Initialize UI_MainPage_MenuPoints
-    menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_1_STRING;
-    UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[0].X               = UI_MAINPAGE_MENU_POINTS_X;
-    UI_MainPage_MenuPoints[0].Y               = UI_MAINPAGE_MENU_POINT_1_Y;
-    UI_MainPage_MenuPoints[0].MenuPointDef    = menuPointDef;
-    UI_MainPage_MenuPoints[0].NewStateOnPress = OS_INGAME_FROM_CARTRIDGE;
-
-    menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_2_STRING;
-    UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[1].X               = UI_MAINPAGE_MENU_POINTS_X;
-    UI_MainPage_MenuPoints[1].Y               = UI_MAINPAGE_MENU_POINT_2_Y;
-    UI_MainPage_MenuPoints[1].MenuPointDef    = menuPointDef;
-    UI_MainPage_MenuPoints[1].NewStateOnPress = OS_SHOW_ALL;
-
-    menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_3_STRING;
-    UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[2].X               = UI_MAINPAGE_MENU_POINTS_X;
-    UI_MainPage_MenuPoints[2].Y               = UI_MAINPAGE_MENU_POINT_3_Y;
-    UI_MainPage_MenuPoints[2].MenuPointDef    = menuPointDef;
-    UI_MainPage_MenuPoints[2].NewStateOnPress = OS_SHOW_FAV;
-
-    menuPointDef.Characters = UI_MAINPAGE_MENU_POINT_4_STRING;
-    UI_InitializeMenuPointPadding(&menuPointDef);
-    UI_MainPage_MenuPoints[3].X               = UI_MAINPAGE_MENU_POINTS_X;
-    UI_MainPage_MenuPoints[3].Y               = UI_MAINPAGE_MENU_POINT_4_Y;
-    UI_MainPage_MenuPoints[3].MenuPointDef    = menuPointDef;
-    UI_MainPage_MenuPoints[3].NewStateOnPress = OS_OPTIONS;
+    menuPointDef->Padding.Left  = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
+    menuPointDef->Padding.Right = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
 }
 
 void UI_InitializeShowAll(void)
@@ -68,7 +32,7 @@ void UI_InitializeShowAll(void)
         f_readdir(&test, &fileInfo);                        // Get the info of the first file in current directory
         for (int i = 0; fileInfo.fname[0] != NULL; i++)     // Continue reading until all files are read
         {
-            UI_GameEntrys[i] = fileInfo.fname;              // Store the file names (equals names of the games)
+            //UI_GameEntrys[i].Name = fileInfo.fname;         // Store the file names (equals names of the games)
             f_readdir(&test, &fileInfo);                    // Get next file info (if there is none fname is set 0)
         }
     }
@@ -78,23 +42,22 @@ void UI_Initialize(void)
 {
     Fonts_InitializeSTMFonts();
 
-    UI_InitializeMainPage();
     UI_InitializeShowAll();
 }
 
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
     // Print the Page background color
-    LCD_ClearColor(UI_MAINPAGE_BACKGROUND_COLOR);
+    LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
 
     // Draw BOOT CARTRIDGE (either en- or disabled)
-    if (firstValidMenuPoint == 0) UI_MainPage_DrawMenuPoint(0);
-    else                          UI_MainPage_DrawDisabledMenuPoint(0);
+    if (firstValidMenuPoint == 0) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
+    else                          UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
 
     // Draw the other menu points (enabled)
-    UI_MainPage_DrawMenuPoint(1);
-    UI_MainPage_DrawMenuPoint(2);
-    UI_MainPage_DrawMenuPoint(3);
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]), UI_ENABLED);
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[2]), UI_ENABLED);
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[3]), UI_ENABLED);
 }
 
 void UI_DrawShowAllPage(void)
@@ -112,34 +75,41 @@ void UI_DrawOptionsPage(void)
     // YTBI
 }
 
-void UI_MainPage_DrawMenuPoint(uint16_t id)
 {
-    uint16_t color = UI_MENU_POINT_BACKGROUND_COLOR;
-    LCD_DrawText(UI_MainPage_MenuPoints[id].X, UI_MainPage_MenuPoints[id].Y, color, &(UI_MainPage_MenuPoints[id].MenuPointDef), &UI_MENU_POINT_FONT);
 }
 
-void UI_MainPage_DrawDisabledMenuPoint(uint16_t id)
+void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
 {
-    uint16_t color = UI_DISABLED_MENU_POINT_BACKGROUND_COLOR;
+    LCD_TextDef_t menuPointDef;
 
-    // Set the menu point color to disabled color, draw it and then restore default value of color
-    UI_MainPage_MenuPoints[id].MenuPointDef.Color = UI_DISABLED_MENU_POINT_TEXT_COLOR;
+    // Initialize common attributes of all menupoints
+    strcpy(menuPointDef.Characters, menuPoint->Text);
+    menuPointDef.Spacing       = UI_MP_SPACING;
+    menuPointDef.Border.Width  = UI_MP_BORDER_WIDTH;
+    menuPointDef.Padding.Upper = ((UI_MAINPAGE_MP_HEIGHT - UI_MP_FONT.FontHeight) / 2);
+    menuPointDef.Padding.Lower = ((UI_MAINPAGE_MP_HEIGHT - UI_MP_FONT.FontHeight) / 2) - 4;
 
-    LCD_DrawText(UI_MainPage_MenuPoints[id].X, UI_MainPage_MenuPoints[id].Y, color, &(UI_MainPage_MenuPoints[id].MenuPointDef), &UI_MENU_POINT_FONT);
+    // Initialize UI_MainPage_MenuPoints
+    UI_InitializeMenuPointPadding(&menuPointDef);
 
-    UI_MainPage_MenuPoints[id].MenuPointDef.Color = UI_MENU_POINT_TEXT_COLOR;
-}
-
-void UI_MainPage_HightlightMenuPoint(uint16_t id)
-{
-    uint16_t bgColor = UI_HIGHLIGHTED_MENU_POINT_BACKGROUND_COLOR;
-
-    // Set the menu point color to disabled color, draw it and then restore default value of color
-    UI_MainPage_MenuPoints[id].MenuPointDef.Color = UI_HIGHLIGHTED_MENU_POINT_TEXT_COLOR;
-    UI_MainPage_MenuPoints[id].MenuPointDef.Border.Color = UI_HIGHLIGHTED_MENU_POINT_BORDER_COLOR;
-
-    LCD_DrawText(UI_MainPage_MenuPoints[id].X, UI_MainPage_MenuPoints[id].Y, bgColor, &(UI_MainPage_MenuPoints[id].MenuPointDef), &UI_MENU_POINT_FONT); 
-
-    UI_MainPage_MenuPoints[id].MenuPointDef.Color = UI_MENU_POINT_TEXT_COLOR;
-    UI_MainPage_MenuPoints[id].MenuPointDef.Border.Color = UI_MENU_POINT_BORDER_COLOR;
+    switch(option)
+    {
+        case UI_ENABLED:
+            menuPointDef.Color = UI_MP_TEXT_COLOR;
+            menuPointDef.Border.Color = UI_MP_BORDER_COLOR;
+            LCD_DrawText(menuPoint->X, menuPoint->Y, UI_MP_BG_COLOR, &menuPointDef, &UI_MP_FONT);
+            break;
+        case UI_DISABLED:
+            menuPointDef.Color = UI_DISABLED_MP_TEXT_COLOR;
+            menuPointDef.Border.Color = UI_MP_BORDER_COLOR;
+            LCD_DrawText(menuPoint->X, menuPoint->Y, UI_DISABLED_MP_BG_COLOR, &menuPointDef, &UI_MP_FONT);
+            break;
+        case UI_HIGHLIGHTED:
+            menuPointDef.Color = UI_HIGHLIGHTED_MP_TEXT_COLOR;
+            menuPointDef.Border.Color = UI_HIGHLIGHTED_MP_BORDER_COLOR;
+            LCD_DrawText(menuPoint->X, menuPoint->Y, UI_HIGHLIGHTED_MP_BG_COLOR, &menuPointDef, &UI_MP_FONT);
+            break;
+        default:
+            break;
+    }
 }
