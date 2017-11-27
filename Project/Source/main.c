@@ -18,9 +18,7 @@
 #include "gbc.h"
 #include "gbc_mmu.h"
 #include "ui.h"
-
-OS_State_t currState = OS_MAIN_PAGE;
-OS_State_t lastState = OS_MAIN_PAGE;
+#include "os.h"
 
 //----------DEBUG----------
 void ClockDebug_Initialize()
@@ -89,11 +87,11 @@ void HandleMainPage(void)
             Input_Lock(INPUT_FADE_BOT_ID, INPUT_LOCK_UNTIL_RELEASED);
         }
         
-        // If A-Button is pressed confirm the current selection by changing states and ending the infinite loop
+        // If A-Button is pressed confirm the current selection and end the infinite loop
         if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
         {
-            lastState = currState;
-            currState = UI_MainPage_MenuPoints[currMenuPointID].NewStateOnPress;
+            // Perform the action linked to the selected menupoint
+            OS_DoAction(UI_MainPage_MenuPoints[currMenuPointID].Action);
 
             // Lock all buttons until they are released so next page opens without anything pressed
             // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
@@ -141,6 +139,20 @@ bool HandleSDCIngame(void)
 
     while (1)
     {
+        // If select and start are pressed simultaneously in game pause it and go to options page
+        if (Input_Interrupt_Flags.ButtonSelect && Input_Interrupt_Flags.ButtonStart)
+        {
+             //ToDo: Pause?
+
+            OS_DoAction(OS_SWITCH_TO_STATE_OPTIONS);
+
+            // Lock all buttons until they are released so next page opens without anything pressed
+            // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
+            Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
+
+            return true;
+        }
+
         GBC_Update();
 
         while (!LCD_READY_FLAG);
@@ -158,6 +170,20 @@ bool HandleCartridgeIngame(void)
 
     while (1)
     {
+        // If select and start are pressed simultaneously in game pause it and go to options page
+        if (Input_Interrupt_Flags.ButtonSelect && Input_Interrupt_Flags.ButtonStart)
+        {
+            //ToDo: Pause?
+
+            OS_DoAction(OS_SWITCH_TO_STATE_OPTIONS);
+
+            // Lock all buttons until they are released so next page opens without anything pressed
+            // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
+            Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
+
+            return true;
+        }
+
         GBC_Update();
 
         while (!LCD_READY_FLAG);
@@ -194,8 +220,6 @@ int main(void)
     // Initialize UI
     UI_Initialize();
 
-    currState = OS_MAIN_PAGE;
-
 
 //----------DEBUG----------
     GPIO_InitTypeDef GPIO_InitObject;
@@ -213,7 +237,7 @@ int main(void)
         // Switch current state
         // All Handle-Functions contain an infinite loop and will only exit when the page is left
         // or an error occurs
-        switch (currState)
+        switch (OS_CurrState)
         {
             case OS_MAIN_PAGE:
                 HandleMainPage();

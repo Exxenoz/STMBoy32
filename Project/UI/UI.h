@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ui_fonts.h"
 #include "lcd.h"
+#include "os.h"
 
 #define UI_MAX_NUMBER_OF_GAMES          2000
 
