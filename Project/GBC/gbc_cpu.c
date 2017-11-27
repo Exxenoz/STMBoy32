@@ -931,7 +931,7 @@ void GBC_CPU_JR_C_X(uint8_t operand)    // 0x38 - Relative jump by signed immedi
     {
         int8_t value = operand;
         GBC_CPU_Register.PC += value;
-        GBC_CPU_StepTicks += 4;
+        GBC_CPU_InstructionTicks += 4;
     }
 }
 
