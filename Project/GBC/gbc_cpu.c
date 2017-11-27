@@ -3181,6 +3181,134 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0x40: // Copy B to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                // Do nothing
+
+                break;
+            }
+            case 0x41: // Copy C to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.C;
+
+                break;
+            }
+            case 0x42: // Copy D to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.D;
+
+                break;
+            }
+            case 0x43: // Copy E to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.E;
+
+                break;
+            }
+            case 0x44: // Copy H to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.H;
+
+                break;
+            }
+            case 0x45: // Copy L to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.L;
+
+                break;
+            }
+            case 0x46: // Copy value pointed by HL to B
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.B = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                break;
+            }
+            case 0x47: // Copy A to B
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.B = GBC_CPU_Register.A;
+
+                break;
+            }
+            case 0x48: // Copy B to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.B;
+
+                break;
+            }
+            case 0x49: // Copy C to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                // Do nothing
+
+                break;
+            }
+            case 0x4A: // Copy D to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.D;
+
+                break;
+            }
+            case 0x4B: // Copy E to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.E;
+
+                break;
+            }
+            case 0x4C: // Copy H to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.H;
+
+                break;
+            }
+            case 0x4D: // Copy L to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.L;
+
+                break;
+            }
+            case 0x4E: // Copy value pointed by HL to C
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.C = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                break;
+            }
+            case 0x4F: // Copy A to C
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.C = GBC_CPU_Register.A;
+
+                break;
+            }
             case 0x7A: // Copy D to A
             {
                 GBC_CPU_InstructionTicks += 4;
