@@ -3,6 +3,10 @@
 
 #include "common.h"
 #include "sdc_config.h"
+#include "ff.h"
+
+extern DIR SDC_CurrDir;
+
 
 void SDC_Initialize(void);
 bool SDC_Mount(void);

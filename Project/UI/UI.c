@@ -11,8 +11,6 @@ const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
     {UI_MAINPAGE_MP_4_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_4_Y, OS_SWITCH_TO_STATE_OPTIONS},
 };
 
-UI_GameEntry_t UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
-
 
 void UI_InitializeMenuPointPadding(LCD_TextDef_t *menuPointDef)
 {
@@ -22,21 +20,6 @@ void UI_InitializeMenuPointPadding(LCD_TextDef_t *menuPointDef)
     menuPointDef->Padding.Right = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
 }
 
-void UI_InitializeShowAll(void)
-{
-    DIR test; //ToDo: Implement and move
-    if (SDC_IsMounted())
-    {
-        FILINFO fileInfo;                                   // File information structure
-
-        f_readdir(&test, &fileInfo);                        // Get the info of the first file in current directory
-        for (int i = 0; fileInfo.fname[0] != NULL; i++)     // Continue reading until all files are read
-        {
-            //UI_GameEntrys[i].Name = fileInfo.fname;         // Store the file names (equals names of the games)
-            f_readdir(&test, &fileInfo);                    // Get next file info (if there is none fname is set 0)
-        }
-    }
-}
 
 void UI_Initialize(void)
 {

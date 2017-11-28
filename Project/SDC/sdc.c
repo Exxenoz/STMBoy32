@@ -1,10 +1,10 @@
+#include "stm324x9i_eval_sdio_sd.h"
 #include "sdc.h"
 #include "led.h"
-#include "ff.h"
-#include "stm324x9i_eval_sdio_sd.h"
 
 FATFS SDC_FatFS;                    // Global FatFS object
-bool SDC_Mounted = false;           // Global mounted state
+DIR   SDC_CurrDir;                  // Structure representing the currently opened directory
+bool  SDC_Mounted = false;          // Global mounted state
 
 void SDC_InitializeInterrupts(void)
 {

@@ -6,11 +6,8 @@
 #include "lcd.h"
 #include "os.h"
 
-#define UI_MAX_NUMBER_OF_GAMES    2000
 #define UI_NUMBER_OF_MAINPAGE_MPS 4       // Total number of MainPage menupoints
-
-#define UI_MAX_MP_LENGTH          15
-#define UI_MAX_GAME_TITLE_LENGTH  10
+#define UI_MAX_MP_LENGTH          15      // Max char length of a menupoint
 
 // Page Backgrounds
 #define UI_MAINPAGE_BG_COLOR      0xFFC0
@@ -72,16 +69,7 @@ typedef struct
 }
 UI_MenuPoint_t;
 
-typedef struct
-{
-    char Name[UI_MAX_GAME_TITLE_LENGTH]; // Name of the Game
-    bool IsFavorite;                     // Indicates whether game is a favorite or not
-}
-UI_GameEntry_t;
-
 extern const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS];
-extern UI_GameEntry_t UI_GameEntrys[UI_MAX_NUMBER_OF_GAMES];
-
 
 void UI_Initialize(void);
 
