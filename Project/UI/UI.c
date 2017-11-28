@@ -20,14 +20,6 @@ void UI_InitializeMenuPointPadding(LCD_TextDef_t *menuPointDef)
     menuPointDef->Padding.Right = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
 }
 
-
-void UI_Initialize(void)
-{
-    Fonts_InitializeSTMFonts();
-
-    UI_InitializeShowAll();
-}
-
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
     // Print the Page background color

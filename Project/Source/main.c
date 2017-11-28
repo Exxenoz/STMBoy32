@@ -37,6 +37,9 @@ void ClockDebug_Initialize()
 
 void HandleMainPage(void)
 {
+    // Initialize Fonts needed for this Page
+    Fonts_InitializeSTMFonts();
+
     // If no cartridge is detected first valid menu point is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
     int firstMenuPointID = CMOD_Detect() ? 0 : 1;
     int lastMenuPointID  = 3;
@@ -104,6 +107,8 @@ void HandleMainPage(void)
 
 void HandleShowAllGamesPage(void)
 {
+    Fonts_InitializeSTMFonts();         // Initialize Fonts needed for this Page
+
     // YTBI
     while (1)
     {
@@ -113,6 +118,9 @@ void HandleShowAllGamesPage(void)
 
 void HandleShowFavoritesPage(void)
 {
+    // Initialize Fonts needed for this Page
+    Fonts_InitializeSTMFonts();
+
     // YTBI
     while (1)
     {
@@ -122,6 +130,9 @@ void HandleShowFavoritesPage(void)
 
 void HandleOptionPage(void)
 {
+    // Initialize Fonts needed for this Page
+    Fonts_InitializeSTMFonts();
+
     // YTBI
     while (1)
     {
@@ -132,7 +143,7 @@ void HandleOptionPage(void)
 
 bool HandleSDCIngame(void)
 {
-    if(GBC_LoadFromCartridge() != GBC_LOAD_RESULT_OK)
+    if(GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return false;
@@ -217,9 +228,6 @@ int main(void)
 
     // Turn on Display
     LCD_DimBacklight(0);
-
-    // Initialize UI
-    UI_Initialize();
 
 
 //----------DEBUG----------
