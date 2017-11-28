@@ -402,6 +402,9 @@ void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text,
         LCD_SET_WR;
     }
     LCD_SET_CS;
+
+    // Set drawarea back to full size
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
 void LCD_DrawGBCFrameBuffer(void)
