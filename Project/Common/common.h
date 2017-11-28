@@ -17,6 +17,9 @@
 
 #define NOP __ASM("nop")
 
+// Null pointer define
+#define NULL 0
+
 #define INTERRUPT_PRIORITY_2    1                   // 0 is the highest priority, 16 the lowest
 #define MAX_16BIT_TIMER_PERIOD  65535
 
@@ -32,7 +35,7 @@ typedef enum bool_e
 }
 bool;
 
-// Null pointer define
-#define NULL 0
+// Custom strcpy function to ensure null termination
+void copyString(char *dest, const char *src, int destSize);
 
 #endif //COMMON_H

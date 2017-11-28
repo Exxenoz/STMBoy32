@@ -80,7 +80,7 @@ void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
     LCD_TextDef_t menuPointDef;
 
     // Initialize common attributes of all menupoints
-    strcpy(menuPointDef.Characters, menuPoint->Text);
+    copyString(menuPointDef.Characters, menuPoint->Text, UI_MAX_MP_LENGTH);
     menuPointDef.Spacing       = UI_MP_SPACING;
     menuPointDef.Border.Width  = UI_MP_BORDER_WIDTH;
     menuPointDef.Padding.Upper = ((UI_MAINPAGE_MP_HEIGHT - UI_MP_FONT.FontHeight) / 2);
