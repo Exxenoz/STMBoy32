@@ -58,13 +58,15 @@ typedef enum
     UI_DISABLED,
     UI_HIGHLIGHTED
 }
-UI_MP_Option_t;
+UI_Option_t;
 
 typedef struct
 {
     char        Text[UI_MAX_MP_LENGTH];  // MenuPoint Text
     uint16_t    X;                       // MenuPoint upperLeftCorner x coordinate
     uint16_t    Y;                       // MenuPoint upperLeftCorner y coordinate
+    uint16_t    Height;                  // MenuPoint height
+    uint16_t    Length;                  // MenuPoint length
     OS_Action_t Action;                  // Action to be performed when selection is confirmed
 }
 UI_MenuPoint_t;
@@ -77,10 +79,10 @@ void UI_DrawShowAllPage(void);
 void UI_DrawShowFavPage(void);
 void UI_DrawOptionsPage(void);
 
-void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option);
+void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_Option_t option);
 
 // Compiler workaround functions
-void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option);
+void UI_DrawMainPageMenuPoint(int id, UI_Option_t option);
 void UI_PerformMainPageAction(int id);
 
 #endif // UI_H

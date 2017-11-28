@@ -5,20 +5,19 @@
 #include "string.h"
 
 const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
-    {UI_MAINPAGE_MP_1_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_1_Y, OS_SWITCH_TO_STATE_INGAME_FC},
-    {UI_MAINPAGE_MP_2_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_2_Y, OS_SWITCH_TO_STATE_SHOWALL},
-    {UI_MAINPAGE_MP_3_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_3_Y, OS_SWITCH_TO_STATE_SHOWFAV},
-    {UI_MAINPAGE_MP_4_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_4_Y, OS_SWITCH_TO_STATE_OPTIONS},
+    {UI_MAINPAGE_MP_1_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_1_Y,
+     UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_INGAME_FC},
+
+    {UI_MAINPAGE_MP_2_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_2_Y,
+     UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_SHOWALL},
+
+    {UI_MAINPAGE_MP_3_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_3_Y,
+     UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_SHOWFAV},
+
+    {UI_MAINPAGE_MP_4_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_4_Y,
+     UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_OPTIONS},
 };
 
-
-void UI_InitializeMenuPointPadding(LCD_TextDef_t *menuPointDef)
-{
-    int stringLength = Fonts_GetStringLength(menuPointDef->Characters, menuPointDef->Spacing, &UI_MP_FONT);
-
-    menuPointDef->Padding.Left  = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
-    menuPointDef->Padding.Right = (UI_MAINPAGE_MP_LENGTH - stringLength) / 2;
-}
 
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
@@ -50,19 +49,20 @@ void UI_DrawOptionsPage(void)
     // YTBI
 }
 
-void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
+void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_Option_t option)
 {
     LCD_TextDef_t menuPointDef;
 
-    // Initialize common attributes of all menupoints
-    copyString(menuPointDef.Characters, menuPoint->Text, UI_MAX_MP_LENGTH);
+    // Initialize UI_MainPage_MenuPoints
+    int stringLength = Fonts_GetStringLength(menuPoint->Text, UI_MP_SPACING, &UI_MP_FONT);
+
+    copyString(menuPointDef.Characters, menuPoint->Text, LCD_MAX_TEXT_LENGTH);
     menuPointDef.Spacing       = UI_MP_SPACING;
     menuPointDef.Border.Width  = UI_MP_BORDER_WIDTH;
-    menuPointDef.Padding.Upper = ((UI_MAINPAGE_MP_HEIGHT - UI_MP_FONT.FontHeight) / 2);
-    menuPointDef.Padding.Lower = ((UI_MAINPAGE_MP_HEIGHT - UI_MP_FONT.FontHeight) / 2) - 4;
-
-    // Initialize UI_MainPage_MenuPoints
-    UI_InitializeMenuPointPadding(&menuPointDef);
+    menuPointDef.Padding.Upper = ((menuPoint->Height - UI_MP_FONT.FontHeight) / 2);
+    menuPointDef.Padding.Lower = ((menuPoint->Height - UI_MP_FONT.FontHeight) / 2) - 4;
+    menuPointDef.Padding.Left  = (menuPoint->Length - stringLength) / 2;
+    menuPointDef.Padding.Right = (menuPoint->Length - stringLength) / 2;
 
     switch(option)
     {
@@ -88,7 +88,7 @@ void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_MP_Option_t option)
 
 // Compiler workaround functions
 
-void UI_DrawMainPageMenuPoint(int id, UI_MP_Option_t option)
+void UI_DrawMainPageMenuPoint(int id, UI_Option_t option)
 {
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[id]), option);
 }
