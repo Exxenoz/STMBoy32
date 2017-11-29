@@ -42,6 +42,7 @@ OS_GameEntry_t;
 
 typedef enum
 {
+    OS_SWITCH_TO_PREVIOUS_STATE,   // Switch to previous state
     OS_SWITCH_TO_STATE_INGAME_FC,  // Switch current state to OS_INGAME_FROM_CARTRIDGE
     OS_SWITCH_TO_STATE_INGAME_FSD, // Switch current state to OS_INGAME_FROM_SDC
     OS_SWITCH_TO_STATE_SHOWALL,    // Switch current state to OS_SHOW_ALL

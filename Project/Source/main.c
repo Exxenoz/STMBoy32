@@ -170,6 +170,16 @@ void HandleShowAllGamesPage(void)
             break;
         }
 
+        // If B-Button is pressed switch to previous state and end the infinite loop
+        if (Input_Interrupt_Flags.ButtonB && !Input_IsLocked(INPUT_B_ID))
+        {
+            // Switch to previous state
+            OS_DoAction(OS_SWITCH_TO_PREVIOUS_STATE);
+
+            Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
+
+            break;
+        }
     }
 }
 

@@ -170,24 +170,35 @@ OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
 
 void OS_DoAction(OS_Action_t action)
 {
+    OS_State_t temp = OS_CurrState;
+
     switch (action)
     {
+        case OS_SWITCH_TO_PREVIOUS_STATE:
+            OS_CurrState = OS_LastState;
+            OS_LastState = temp;
+            break;
+
         case OS_SWITCH_TO_STATE_SHOWALL:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_SHOW_ALL;
             break;
+
         case OS_SWITCH_TO_STATE_SHOWFAV:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_SHOW_FAV;
             break;
+
         case OS_SWITCH_TO_STATE_OPTIONS:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_OPTIONS;
             break;
+
         case OS_SWITCH_TO_STATE_INGAME_FC:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_INGAME_FROM_CARTRIDGE;
             break;
+
         case OS_SWITCH_TO_STATE_INGAME_FSD:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_INGAME_FROM_SDC;
