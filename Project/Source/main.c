@@ -40,14 +40,13 @@ void HandleMainPage(void)
     // Initialize Fonts needed for this Page
     Fonts_InitializeSTMFonts();
 
-    // If no cartridge is detected first valid menu point is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
+    // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
     int firstMenuPointID = CMOD_Detect() ? 0 : 1;
     int lastMenuPointID  = 3;
-    int currMenuPointID  = firstMenuPointID;    
+    int currMenuPointID  = firstMenuPointID;
 
-    // Draw MainPage and highlight first valid menu point
+    // Draw MainPage
     UI_DrawMainPage(firstMenuPointID);
-    UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
     // MainPage loop
     while (1)
@@ -73,7 +72,7 @@ void HandleMainPage(void)
         if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currMenuPointID > firstMenuPointID)
         {
             UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
-            --currMenuPointID;
+            currMenuPointID--;
             UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
             Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
@@ -84,7 +83,7 @@ void HandleMainPage(void)
         if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currMenuPointID < lastMenuPointID)
         {
             UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
-            ++currMenuPointID;
+            currMenuPointID++;
             UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
 
             Input_Lock(INPUT_FADE_BOT_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
@@ -107,12 +106,70 @@ void HandleMainPage(void)
 
 void HandleShowAllGamesPage(void)
 {
-    Fonts_InitializeSTMFonts();         // Initialize Fonts needed for this Page
+    // Initialize Fonts needed for this Page
+    Fonts_InitializeSTMFonts();
 
-    // YTBI
+    // If lastPlayedGame isn't valid (UI_DrawShowAllPage returns false) it's not selectable (firstGameEntryID = 0)
+    int firstGameEntryID = UI_DrawShowAllPage() ? -1 : 0;
+    int currGameEntryID  = firstGameEntryID;
+    int lastGameEntryID  = OS_GamesLoaded;
+    int firstDisplayedID = 0;
+
     while (1)
     {
-        
+        // Update the lockState of all buttons 
+        // Locks are needed because otherwise a short press would trigger multiple scroll downs
+        Input_UpdateLocks();
+
+        // If Fade-Top is pressed and we don't have the first valid entry already selected, scroll up
+        if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currGameEntryID > firstGameEntryID)
+        {
+            // If ScrollGames returns true the displayed gameentries changed (scrolled up)
+            if (UI_ScrollGames(currGameEntryID, firstDisplayedID, UI_SCROLLUP))
+            {
+                firstDisplayedID--;
+            }
+
+            // Even if the displayed gameentries didn't change the selection changed
+            currGameEntryID--;
+
+            Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
+        }
+
+        // If Fade-Bot is pressed and we don't have the last valid gameentry already selected, scroll down
+        if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currGameEntryID < lastGameEntryID)
+        {
+            // If ScrollGames returns true the displayed gameentries changed (scrolled down)
+            if (UI_ScrollGames(currGameEntryID, firstDisplayedID, UI_SCROLLDOWN))
+            {
+                firstDisplayedID++;
+            }
+
+            // Even if the displayed gameentries didn't change the selection changed
+            currGameEntryID++;
+
+            Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
+        }
+
+        // If A-Button is pressed confirm the current selection and end the infinite loop
+        if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
+        {
+            // Set the game which is to be started
+            if (currGameEntryID == -1)
+            {
+                copyString(OS_CurrentGame, OS_InitOptions.lastPlayed, OS_MAX_GAME_TITLE_LENGTH + 1);
+            }
+            else
+            {
+                copyString(OS_CurrentGame, OS_GameEntries[currGameEntryID].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            }
+
+            // Switch to Ingame from SDCard
+            OS_DoAction(OS_SWITCH_TO_STATE_INGAME_FSD);
+
+            break;
+        }
+
     }
 }
 
@@ -143,7 +200,7 @@ void HandleOptionPage(void)
 
 bool HandleSDCIngame(void)
 {
-    if(GBC_LoadFromSDC("tetris.gb") != GBC_LOAD_RESULT_OK)
+    if(GBC_LoadFromSDC(OS_CurrentGame) != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return false;
@@ -158,7 +215,7 @@ bool HandleSDCIngame(void)
 
             OS_DoAction(OS_SWITCH_TO_STATE_OPTIONS);
 
-            // Lock all buttons until they are released so next page opens without anything pressed
+            // Lock all buttons until they are released so options opens without anything pressed
             // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again
             Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
 
