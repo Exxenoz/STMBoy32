@@ -3,6 +3,7 @@
 #include "ff.h"
 #include "sdc.h"
 
+OS_Options_t OS_InitOptions;                           // Inititial Options
 OS_State_t OS_CurrState = OS_MAIN_PAGE;                // Current Operatingsystem state
 OS_State_t OS_LastState = OS_MAIN_PAGE;                // Last Operatingsystem state
 

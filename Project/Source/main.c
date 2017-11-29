@@ -225,6 +225,9 @@ int main(void)
     LCD_Initialize();
     CMOD_Initialize();
     SDC_Initialize();
+    
+    // Load initial options
+    OS_LoadInitialOptions();
 
     // Turn on Display
     LCD_DimBacklight(0);
