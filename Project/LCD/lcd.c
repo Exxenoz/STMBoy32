@@ -334,15 +334,80 @@ void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
     LCD_SET_CS;
 }
 
-// Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
-void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font)
+//Draw a line that is alternately colored
+void LCD_DrawLine2C(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t w1, uint16_t w2, uint16_t color1, uint16_t color2)
 {
-    //ToDo: Check width of first and last letter and heigth of the highest
+    int x;
+
+    // Draw as many boxes alteratingly as fully fit into the  specified line
+    for (x = x0; x <= (x0 + length - w1 - w2);)
+    {
+        LCD_DrawFilledBox(x, y0, w1, height, color1);
+        x += w1;
+        LCD_DrawFilledBox(x, y0, w2, height, color2);
+        x += w2;
+    }
+
+    // Draw as much of last box as possible
+    LCD_DrawFilledBox(x, y0, height, x0 + length - x, color1);
+}
+
+// Draw a line of bricks, use height to truncate the line
+void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool offset, LCD_Brick_t *brick)
+{
+    uint16_t x;
+
+    // Draw either a full or an half brick at the beginning of every brick line, depending on offset
+    LCD_DrawFilledBox(x0, y0, (brick->Length / (offset + 1)) - brick->Border.Width, height, brick->Color);
+
+    // Draw as many bricks as fully fit into the line
+    for (x = (x0 + brick->Length / (offset + 1)); x < (x0 + length - brick->Length - 2 * brick->Border.Width);)
+    {
+        LCD_DrawLine(x, y0, height, brick->Border.Width, brick->Border.Color, LCD_VERTICAL);
+        x += brick->Border.Width;
+        LCD_DrawFilledBox(x, y0, brick->Length, height, brick->Color);
+        x += brick->Length;
+    }
+
+    // Draw as much of last brick as possible
+    LCD_DrawLine(x, y0, height, brick->Border.Width, brick->Border.Color, LCD_VERTICAL);
+    x += brick->Border.Width;
+    LCD_DrawFilledBox(x, y0, x0 + length - x, height, brick->Color);
+
+    // Draw the horizontal brick border if line is not truncated
+    if (height >= brick->Height)
+    {
+        LCD_DrawLine(x0, y0 + height, length, brick->Border.Width, brick->Border.Color, LCD_HORIZONTAL);
+    }
+}
+
+void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, LCD_Brick_t *brick)
+{
+    uint16_t y = y0;
+    bool offset = false;
+
+    // Draw as many brick lines as fully fit into wall height
+    for (; y < (y0 + height - brick->Height - brick->Border.Width); y += (brick->Height + brick->Border.Width))
+    {
+        LCD_DrawBrickline(x0, y, length, brick->Height, offset, brick);
+        
+        // Shift every second line to get the wall pattern 
+        if (offset) offset = false;
+        else        offset = true;
+    }
+
+    // Draw as much of the last line as possible
+    LCD_DrawBrickline(x0, y, length, y0 + height - y, offset, brick);
+}
+
+// Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
+void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font)
+{
     // Calculate number of characters to draw and replace unknown chars with '?'
     int chars = 0;
-    for (char *s = text->Characters; *s != '\0'; s++)
+    for (int i = 0; text->Characters[i] != '\0'; i++)
     {
-        if (*s < 32 || *s > 126) *s = '?';
+        if (text->Characters[i] < 32 || text->Characters[i] > 126) text->Characters[i] = '?';
         chars ++;
     }
 
@@ -405,6 +470,11 @@ void LCD_DrawText(uint16_t x, uint16_t y, uint16_t bgColor, LCD_TextDef_t *text,
 
     // Set drawarea back to full size
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
+}
+
+void LCD_DrawStar(uint16_t x0, uint16_t y0, uint16_t color)
+{
+        //YTBI
 }
 
 void LCD_DrawGBCFrameBuffer(void)

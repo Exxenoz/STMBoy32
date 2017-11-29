@@ -60,6 +60,15 @@ LCD_Border_t;
 
 typedef struct
 {
+    uint16_t     Length;
+    uint16_t     Height;
+    uint16_t     Color;
+    LCD_Border_t Border;
+}
+LCD_Brick_t;
+
+typedef struct
+{
     int Upper;
     int Right;
     int Lower;
@@ -87,12 +96,13 @@ void LCD_DimBacklight(long percent);
 void LCD_ClearColor(uint16_t color);
 
 void LCD_DrawLine(uint16_t x0, uint16_t y0, uint16_t length, uint16_t width, uint16_t color, LCD_Orientation_t o);
+void LCD_DrawLine2C(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t w1, uint16_t w2, uint16_t color1, uint16_t color2);
 void LCD_DrawEmptyBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t width, uint16_t color);
 void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t color);
 void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool offset, LCD_Brick_t *brick);
 void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, LCD_Brick_t *brick);
 void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font);
-
+void LCD_DrawStar(uint16_t x0, uint16_t y0, uint16_t color);
 void LCD_DrawGBCFrameBuffer(void);
 void LCD_DrawGBCFrameBufferScaled(void);
 
