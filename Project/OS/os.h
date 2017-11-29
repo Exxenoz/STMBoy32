@@ -7,8 +7,8 @@
 #define OS_GAME_DIRECTORY         "Games"
 #define OS_FAVS_DIRECTORY         "Favorites"
 
-#define OS_MAX_GAME_TITLE_LENGTH  10
-#define OS_MAX_NUMBER_OF_GAMES    2000
+#define OS_MAX_GAME_TITLE_LENGTH  15
+#define OS_MAX_NUMBER_OF_GAMES    1500
 
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
 
@@ -35,8 +35,8 @@ OS_State_t;
 
 typedef struct
 {
-    char Name[OS_MAX_GAME_TITLE_LENGTH]; // Name of the Game
-    bool IsFavorite;                     // Indicates whether game is a favorite or not
+    char Name[OS_MAX_GAME_TITLE_LENGTH + 1]; // Name of the Game
+    bool IsFavorite;                         // Indicates whether game is a favorite or not
 }
 OS_GameEntry_t;
 
@@ -53,6 +53,8 @@ OS_Action_t;
 
 extern OS_Options_t OS_InitOptions;
 
+extern char OS_CurrentGame[OS_MAX_GAME_TITLE_LENGTH + 1];
+
 extern OS_State_t OS_CurrState;
 extern OS_State_t OS_LastState;
 
@@ -61,9 +63,9 @@ extern int OS_GamesLoaded;
 
 void OS_LoadInitialOptions(void);
 bool OS_StoreOptions(void);
+bool OS_InitializeGameEntries(void);
 
-bool OS_GetAllGameEntries(void);
-
+OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1]);
 void OS_DoAction(OS_Action_t action);
 
 #endif

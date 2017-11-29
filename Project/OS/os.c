@@ -4,6 +4,9 @@
 #include "sdc.h"
 
 OS_Options_t OS_InitOptions;                           // Inititial Options
+
+char OS_CurrentGame[OS_MAX_GAME_TITLE_LENGTH + 1];     // Path of the currenty/last played game      
+
 OS_State_t OS_CurrState = OS_MAIN_PAGE;                // Current Operatingsystem state
 OS_State_t OS_LastState = OS_MAIN_PAGE;                // Last Operatingsystem state
 
@@ -95,13 +98,16 @@ int OS_CmpFunc(const void *a, const void *b)
     return (letter1 - letter2);
 }
 
-bool OS_GetAllGameEntries(void)
+bool OS_InitializeGameEntries(void)
 {
+    if (!SDC_Mount()) return false;
+
     int i = 0;
     FILINFO fileInfo;
 
+
     // If game-directory couldn't be opened or reading the first file info failed something went wrong
-    if (f_opendir(&SDC_CurrDir, OS_GAME_DIRECTORY) == FR_OK && f_readdir(&SDC_CurrDir, &fileInfo) == FR_OK)
+    if (f_opendir(&SDC_CurrDir, OS_GAME_DIRECTORY) != FR_OK || f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK)
     {
         return false;
     }
@@ -111,13 +117,13 @@ bool OS_GetAllGameEntries(void)
     {
         if (f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK) return false;
 
-        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH);
+        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
         OS_GameEntries[i].IsFavorite = false;
         OS_GamesLoaded++;
     }
 
     // Repeat for favorites (dont close game directory since Favorite directory should be located inside it)
-    if (f_opendir(&SDC_CurrDir, OS_FAVS_DIRECTORY) == FR_OK && f_readdir(&SDC_CurrDir, &fileInfo) == FR_OK)
+    if (f_opendir(&SDC_CurrDir, OS_FAVS_DIRECTORY) != FR_OK || f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK)
     {
         return false;
     }
@@ -127,15 +133,39 @@ bool OS_GetAllGameEntries(void)
     {
         if (f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK) return false;
 
-        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH);
+        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
         OS_GameEntries[i].IsFavorite = true;
         OS_GamesLoaded++;
     }
 
-    // Sort the list alphabetically (case insensitive)
+    // Sort the list alphabetically (case insensitive) and close directories
     qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
+    f_closedir(&SDC_CurrDir);
 
     return true;
+}
+
+OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
+{
+    int c;
+
+    for (int i = 0; i < OS_GamesLoaded; i++)
+    {
+        for (c = 0; c < OS_MAX_GAME_TITLE_LENGTH; c++)
+        {
+            if (OS_GameEntries[i].Name[c] != name[c]) break;
+        }
+
+        // If the previous loop didn't break the names match
+        if (c == OS_MAX_GAME_TITLE_LENGTH) return OS_GameEntries[i];
+    }
+
+    // If no match was found return empty object
+    OS_GameEntry_t noMatch;
+    noMatch.Name[0]    = '\0';
+    noMatch.IsFavorite = false;
+
+    return noMatch;
 }
 
 void OS_DoAction(OS_Action_t action)
