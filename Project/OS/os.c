@@ -10,6 +10,70 @@ OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES]; // Array containing all g
 int OS_GamesLoaded = 0;                                // Number of successfully loaded Games
 
 
+void OS_LoadInitialOptions(void)
+{
+    // OS_INIT_OPTIONS_FILE contains (OS_MAX_GAME_TITLE_LENGTH + 1) byte for the name of the last game and
+    // 1 addidtional byte for every other information stored in OS_InitOptions
+    uint16_t initOptionsBufferSize = (OS_MAX_GAME_TITLE_LENGTH + 1) + 4;
+    char     initOptionsBuffer[initOptionsBufferSize];
+    uint32_t bytesRead;
+    FIL      file;
+
+    // If no SDC can be mounted, file can't be opened/created or (fully) read initialize with default values
+    if (!SDC_Mount() || f_open(&file, OS_INIT_OPTIONS_FILE, FA_CREATE_ALWAYS) != FR_OK ||
+        f_read(&file, initOptionsBuffer, initOptionsBufferSize, &bytesRead) != FR_OK ||
+        bytesRead != initOptionsBufferSize)
+    {
+        OS_InitOptions.AutoBootCartridge = false;
+        OS_InitOptions.AutoBootSDC       = false;
+        OS_InitOptions.DrawScaled        = true;
+        OS_InitOptions.Brightness        = 100;
+        OS_InitOptions.lastPlayed[0]     = '\0';
+
+        return;
+    }
+
+    // If everything is ok, load the initial Options values
+    OS_InitOptions.AutoBootCartridge = initOptionsBuffer[0] == 0 ? false : true;
+    OS_InitOptions.AutoBootSDC       = initOptionsBuffer[1] == 0 ? false : true;
+    OS_InitOptions.DrawScaled        = initOptionsBuffer[2] == 0 ? false : true;
+    OS_InitOptions.Brightness        = initOptionsBuffer[3] <= 0100 ? initOptionsBuffer[3] : 100;
+    copyString(OS_InitOptions.lastPlayed, &(initOptionsBuffer[4]), OS_MAX_GAME_TITLE_LENGTH + 1);
+
+    // Close OS_INIT_OPTIONS_FILE
+    f_close(&file);
+}
+
+bool OS_StoreOptions(void)
+{
+    // OS_INIT_OPTIONS_FILE contains (OS_MAX_GAME_TITLE_LENGTH + 1) byte for the name of the last game and
+    // 1 addidtional byte for every other information stored in OS_InitOptions
+    uint16_t initOptionsBufferSize = (OS_MAX_GAME_TITLE_LENGTH + 1) + 4;
+    char     initOptionsBuffer[initOptionsBufferSize];
+    uint32_t bytesWritten;
+    FIL      file;
+
+    // Convert OS_InitOptions to a storable string (Brightness is increased so it can't be interpreted as '\0'
+    initOptionsBuffer[0] = OS_InitOptions.AutoBootCartridge == true ? 1 : 0;
+    initOptionsBuffer[1] = OS_InitOptions.AutoBootSDC       == true ? 1 : 0;
+    initOptionsBuffer[2] = OS_InitOptions.DrawScaled        == true ? 1 : 0;
+    initOptionsBuffer[3] = OS_InitOptions.Brightness;
+    copyString(&(initOptionsBuffer[4]), OS_InitOptions.lastPlayed, OS_MAX_GAME_TITLE_LENGTH + 1);
+    
+    // If no SDC can be mounted, initOptionsFile can't be opened/created or (everything) written to exit
+    if (!SDC_Mount() || f_open(&file, OS_INIT_OPTIONS_FILE, FA_CREATE_ALWAYS) != FR_OK ||
+        f_write(&file, initOptionsBuffer, initOptionsBufferSize, &bytesWritten) != FR_OK ||
+        bytesWritten != initOptionsBufferSize)
+    {
+        return false;
+    }
+
+    // Close OS_INIT_OPTIONS_FILE
+    f_close(&file);
+
+    return true;
+}
+
 // Compare Function used to sort all game entries
 int OS_CmpFunc(const void *a, const void *b)
 {

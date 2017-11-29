@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+#define OS_INIT_OPTIONS_FILE      "init.txt"
 #define OS_GAME_DIRECTORY         "Games"
 #define OS_FAVS_DIRECTORY         "Favorites"
 
@@ -10,6 +11,16 @@
 #define OS_MAX_NUMBER_OF_GAMES    2000
 
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
+
+typedef struct
+{
+    bool AutoBootCartridge; 
+    bool AutoBootSDC;
+    bool DrawScaled;
+    int  Brightness;
+    char lastPlayed[OS_MAX_GAME_TITLE_LENGTH + 1];
+}
+OS_Options_t;
 
 typedef enum
 {
@@ -40,12 +51,16 @@ typedef enum
 }
 OS_Action_t;
 
+extern OS_Options_t OS_InitOptions;
+
 extern OS_State_t OS_CurrState;
 extern OS_State_t OS_LastState;
 
 extern OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];
 extern int OS_GamesLoaded;
 
+void OS_LoadInitialOptions(void);
+bool OS_StoreOptions(void);
 
 bool OS_GetAllGameEntries(void);
 
