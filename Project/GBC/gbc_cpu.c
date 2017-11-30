@@ -388,87 +388,79 @@ long GBC_CPU_InstructionsPerStep = 0;
     A = result;                                                                                                                                    \
 }                                                                                                                                                  \
 
-static inline uint8_t GBC_CPU_AND(uint8_t a, uint8_t b)
-{
-    uint8_t result = a & b;
+#define GBC_CPU_AND(A, B)                                                                                                                          \
+{                                                                                                                                                  \
+    A = (A) & (B);                                                                                                                                 \
+                                                                                                                                                   \
+    if (A)                                                                                                                                         \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY;                                                                                              \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO;                                                                         \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
-    if (result)
-    {
-        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY;
-    }
-    else
-    {
-        GBC_CPU_Register.F = GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_ZERO;
-    }
+#define GBC_CPU_OR(A, B)                                                                                                                           \
+{                                                                                                                                                  \
+    A = (A) | (B);                                                                                                                                 \
+                                                                                                                                                   \
+    if (A)                                                                                                                                         \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;                                                                                                   \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_ZERO;                                                                                                   \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
-    return result;
-}
+#define GBC_CPU_XOR(A, B)                                                                                                                          \
+{                                                                                                                                                  \
+    A = (A) ^ (B);                                                                                                                                 \
+                                                                                                                                                   \
+    if (A)                                                                                                                                         \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;                                                                                                   \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_ZERO;                                                                                                   \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
-static inline uint8_t GBC_CPU_OR(uint8_t a, uint8_t b)
-{
-    uint8_t result = a | b;
-
-    if (result)
-    {
-        GBC_CPU_FLAGS_CLEAR_ALL;
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
-
-    return result;
-}
-
-static inline uint8_t GBC_CPU_XOR(uint8_t a, uint8_t b)
-{
-    uint8_t result = a ^ b;
-
-    if (result)
-    {
-        GBC_CPU_FLAGS_CLEAR_ALL;
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
-
-    return result;
-}
-
-static inline void GBC_CPU_COMPARE(uint8_t a, uint8_t b)
-{
-    if (a < b)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
-    }
-
-    if ((a & 0xF) < (b & 0xF))
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    }
-
-    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
-
-    if (a == b)
-    {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);
-    }
-    else
-    {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);
-    }
-}
+#define GBC_CPU_COMPARE(A, B)                                                                                                                      \
+{                                                                                                                                                  \
+    if ((A) < (B))                                                                                                                                 \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);                                                                                                    \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);                                                                                                  \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    if (((A) & 0xF) < ((B) & 0xF))                                                                                                                 \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);                                                                                                \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);                                                                                              \
+    }                                                                                                                                              \
+                                                                                                                                                   \
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);                                                                                                  \
+                                                                                                                                                   \
+    if ((A) == (B))                                                                                                                                \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_ZERO);                                                                                                     \
+    }                                                                                                                                              \
+    else                                                                                                                                           \
+    {                                                                                                                                              \
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_ZERO);                                                                                                   \
+    }                                                                                                                                              \
+}                                                                                                                                                  \
 
 void GBC_CPU_NOP()                      // 0x00 - No operation
 {
@@ -1445,122 +1437,128 @@ void GBC_CPU_SBC_A_A()                  // 0x9F - Subtract A and carry flag from
 
 void GBC_CPU_AND_A_B()                  // 0xA0 - Logical AND B against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.B);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
 void GBC_CPU_AND_A_C()                  // 0xA1 - Logical AND C against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.C);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
 void GBC_CPU_AND_A_D()                  // 0xA2 - Logical AND D against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.D);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
 void GBC_CPU_AND_A_E()                  // 0xA3 - Logical AND E against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.E);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
 void GBC_CPU_AND_A_H()                  // 0xA4 - Logical AND H against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.H);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
 void GBC_CPU_AND_A_L()                  // 0xA5 - Logical AND L against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.L);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
 void GBC_CPU_AND_A_HLP()                // 0xA6 - Logical AND value pointed by HL against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_AND(GBC_CPU_Register.A, value);
 }
 
 void GBC_CPU_AND_A_A()                  // 0xA7 - Logical AND A against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.A);
+    GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
 void GBC_CPU_XOR_A_B()                  // 0xA8 - Logical XOR B against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.B);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
 void GBC_CPU_XOR_A_C()                  // 0xA9 - Logical XOR C against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.C);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
 void GBC_CPU_XOR_A_D()                  // 0xAA - Logical XOR D against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.D);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
 void GBC_CPU_XOR_A_E()                  // 0xAB - Logical XOR E against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
 void GBC_CPU_XOR_A_H()                  // 0xAD - Logical XOR H against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.H);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
 void GBC_CPU_XOR_A_L()                  // 0xAD - Logical XOR L against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.L);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
 void GBC_CPU_XOR_A_HLP()                // 0xAE - Logical XOR value pointed by HL against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_XOR(GBC_CPU_Register.A, value);
 }
 
 void GBC_CPU_XOR_A_A()                  // 0xAF - Logical XOR A against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.A);
+    GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
 void GBC_CPU_OR_A_B()                   // 0xB0 - Logical OR B against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.B);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.B);
 }
 
 void GBC_CPU_OR_A_C()                   // 0xB1 - Logical OR C against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.C);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.C);
 }
 
 void GBC_CPU_OR_A_D()                   // 0xB2 - Logical OR D against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.D);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.D);
 }
 
 void GBC_CPU_OR_A_E()                   // 0xB3 - Logical OR E against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.E);
 }
 
 void GBC_CPU_OR_A_H()                   // 0xB4 - Logical OR H against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.H);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.H);
 }
 
 void GBC_CPU_OR_A_L()                   // 0xB5 - Logical OR L against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.L);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.L);
 }
 
 void GBC_CPU_OR_A_HLP()                 // 0xB6 - Logical OR value pointed by HL against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_OR(GBC_CPU_Register.A, value);
 }
 
 void GBC_CPU_OR_A_A()                   // 0xB7 - Logical OR A against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.A);
+    GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.A);
 }
 
 void GBC_CPU_CP_A_B()                   // 0xB8 - Compare B against A
@@ -1595,7 +1593,9 @@ void GBC_CPU_CP_A_L()                   // 0xBD - Compare L against A
 
 void GBC_CPU_CP_A_HLP()                 // 0xBE - Compare value pointed by HL against A
 {
-    GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+    uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+    GBC_CPU_COMPARE(GBC_CPU_Register.A, value);
 }
 
 void GBC_CPU_CP_A_A()                   // 0xBF - Compare A against A
@@ -1833,7 +1833,7 @@ void GBC_CPU_PUSH_HL()                  // 0xE5 - Push 16-bit HL onto stack
 
 void GBC_CPU_AND_A_X(uint8_t operand)   // 0xE6 - Logical AND 8-bit value immediate against A
 {
-    GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, operand);
+    GBC_CPU_AND(GBC_CPU_Register.A, operand);
 }
 
 void GBC_CPU_RST_20H()                  // 0xE7 - Call routine at address 0020h
@@ -1886,7 +1886,7 @@ void GBC_CPU_LD_XXP_A(uint16_t operand) // 0xEA - Save A at given 16-bit address
 
 void GBC_CPU_XOR_A_X(uint8_t operand)   // 0xEE - Logical XOR 8-bit value immediate against A
 {
-    GBC_CPU_Register.A = GBC_CPU_XOR(GBC_CPU_Register.A, operand);
+    GBC_CPU_XOR(GBC_CPU_Register.A, operand);
 }
 
 void GBC_CPU_RST_28H()                  // 0xEF - Call routine at address 0028h
@@ -1930,7 +1930,7 @@ void GBC_CPU_PUSH_AF()                  // 0xF5 - Push 16-bit AF onto stack
 
 void GBC_CPU_OR_A_X(uint8_t operand)    // 0xF6 - Logical OR 8-bit value immediate against A
 {
-    GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, operand);
+    GBC_CPU_OR(GBC_CPU_Register.A, operand);
 }
 
 void GBC_CPU_RST_30H()                  // 0xF7 - Call routine at address 0030h
@@ -3973,11 +3973,159 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0xA0: // Logical AND B against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0xA1: // Logical AND C against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0xA2: // Logical AND D against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0xA3: // Logical AND E against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0xA4: // Logical AND H against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0xA5: // Logical AND L against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0xA6: // Logical AND value pointed by HL against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_AND(GBC_CPU_Register.A, value);
+
+                break;
+            }
             case 0xA7: // Logical AND A against A
             {
                 GBC_CPU_InstructionTicks += 4;
 
-                GBC_CPU_Register.A = GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.A);
+                GBC_CPU_AND(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xA8: // Logical XOR B against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0xA9: // Logical XOR C against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0xAA: // Logical XOR D against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0xAB: // Logical XOR E against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0xAC: // Logical XOR H against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0xAD: // Logical XOR L against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0xAE: // Logical XOR value pointed by HL against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, value);
+
+                break;
+            }
+            case 0xAF: // Logical XOR A against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xB0: // Logical OR B against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0xB1: // Logical OR C against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0xB2: // Logical OR D against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.D);
 
                 break;
             }
@@ -3985,7 +4133,23 @@ void GBC_CPU_Step()
             {
                 GBC_CPU_InstructionTicks += 4;
 
-                GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0xB4: // Logical OR H against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0xB5: // Logical OR L against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.L);
 
                 break;
             }
@@ -3993,7 +4157,455 @@ void GBC_CPU_Step()
             {
                 GBC_CPU_InstructionTicks += 8;
 
-                GBC_CPU_Register.A = GBC_CPU_OR(GBC_CPU_Register.A, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_OR(GBC_CPU_Register.A, value);
+
+                break;
+            }
+            case 0xB7: // Logical OR A against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_OR(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xB8: // Compare B against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.B);
+
+                break;
+            }
+            case 0xB9: // Compare C against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0xBA: // Compare D against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.D);
+
+                break;
+            }
+            case 0xBB: // Compare E against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.E);
+
+                break;
+            }
+            case 0xBC: // Compare H against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.H);
+
+                break;
+            }
+            case 0xBD: // Compare L against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.L);
+
+                break;
+            }
+            case 0xBE: // Compare value pointed by HL against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t value = GBC_MMU_ReadByte(GBC_CPU_Register.HL);
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, value);
+
+                break;
+            }
+            case 0xBF: // Compare A against A
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xC0: // Return if last result was not zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 20;
+                    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+                }
+
+                break;
+            }
+            case 0xC1: // Pop 16-bit value from stack into BC
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.BC);
+
+                break;
+            }
+            case 0xC2: // Absolute jump to 16-bit location if last result was not zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 16;
+                    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                }
+
+                break;
+            }
+            case 0xC3: // Absolute jump to 16-bit location
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                break;
+            }
+            case 0xC4: // Call routine at 16-bit location if last result was not zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 24;
+
+                    uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC += 2;
+
+                    GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC = operand;
+                }
+
+                break;
+            }
+            case 0xC5: // Push 16-bit BC onto stack
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.BC);
+
+                break;
+            }
+            case 0xC6: // Add 8-bit immediate to A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_ADD(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xC7: // Call routine at address 0000h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0;
+
+                break;
+            }
+            case 0xC8: // Return if last result was zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 20;
+                    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+
+                break;
+            }
+            case 0xC9: // Return to calling routine
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+
+                break;
+            }
+            case 0xCA: // Absolute jump to 16-bit location if last result was zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 16;
+                    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+
+                break;
+            }
+            case 0xCB: // Extended operations (two-byte instruction code)
+            {
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_EX_Instruction_t instruction = GBC_CPU_EX_Instructions[operand];    // Get extended instruction
+
+                ((void (*)(void))instruction.Handler)();                                    // Execute extended instruction
+
+                GBC_CPU_InstructionTicks += instruction.Ticks;                              // Add extended instruction ticks
+
+                break;
+            }
+            case 0xCC: // Call routine at 16-bit location if last result was zero
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_ZERO))
+                {
+                    GBC_CPU_InstructionTicks += 24;
+
+                    uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC += 2;
+
+                    GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC = operand;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+
+                break;
+            }
+            case 0xCD: // Call routine at 16-bit location
+            {
+                GBC_CPU_InstructionTicks += 24;
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC += 2;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = operand;
+
+                break;
+            }
+            case 0xCE: // Add 8-bit immediate and carry to A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_ADC(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xCF: // Call routine at address 0008h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x8;
+
+                break;
+            }
+            case 0xD0: // Return if last result caused no carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 20;
+                    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+                }
+
+                break;
+            }
+            case 0xD1: // Pop 16-bit value from stack into DE
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.DE);
+
+                break;
+            }
+            case 0xD2: // Absolute jump to 16-bit location if last result caused no carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 16;
+                    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                }
+
+                break;
+            }
+            case 0xD3: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xD4: // Call routine at 16-bit location if last result caused no carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 24;
+
+                    uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC += 2;
+
+                    GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC = operand;
+                }
+
+                break;
+            }
+            case 0xD5: // Push 16-bit DE onto stack
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.DE);
+
+                break;
+            }
+            case 0xD6: // Subtract 8-bit immediate from A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_SUB(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xD7: // Call routine at address 0010h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x10;
+
+                break;
+            }
+            case 0xD8: // Return if last result caused carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 20;
+                    GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 8;
+                }
+
+                break;
+            }
+            case 0xD9: // Enable interrupts and return to calling routine
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_InterruptMasterEnable = true;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.PC);
+
+                break;
+            }
+            case 0xDA: // Absolute jump to 16-bit location if last result caused carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 16;
+                    GBC_CPU_Register.PC = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC++;
+                }
+
+                break;
+            }
+            case 0xDB: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xDC: // Call routine at 16-bit location if last result caused carry
+            {
+                if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
+                {
+                    GBC_CPU_InstructionTicks += 24;
+
+                    uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC += 2;
+
+                    GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                    GBC_CPU_Register.PC = operand;
+                }
+                else
+                {
+                    GBC_CPU_InstructionTicks += 12;
+                    GBC_CPU_Register.PC += 2;
+                }
+
+                break;
+            }
+            case 0xDD: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xDE: // Subtract 8-bit immediate and carry from A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_SBC(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xDF: // Call routine at address 0018h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x18;
 
                 break;
             }
@@ -4007,17 +4619,149 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0xE1: // Pop 16-bit value from stack into HL
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.HL);
+
+                break;
+            }
+            case 0xE2: // Save A at address pointed to by (FF00h + C)
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_MMU_WriteByte(0xFF00 + GBC_CPU_Register.C, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xE3: // Operation removed in this CPU
+            case 0xE4: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xE5: // Push 16-bit HL onto stack
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.HL);
+
+                break;
+            }
+            case 0xE6: // Logical AND 8-bit value immediate against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_AND(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xE7: // Call routine at address 0020h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x20;
+
+                break;
+            }
+            case 0xE8: // Add signed 8-bit immediate to SP
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                int8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+                int32_t result = GBC_CPU_Register.SP + operand;
+
+                if ((GBC_CPU_Register.SP & 0xFF) + (operand & 0xFF) > 0xFF)
+                {
+                    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+                }
+                else
+                {
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+                }
+
+                if ((GBC_CPU_Register.SP & 0x0F) + (operand & 0x0F) > 0x0F)
+                {
+                    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+                }
+                else
+                {
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+                }
+
+                // GBC_CPU_FLAGS_ZERO is cleared according to documentation
+                GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+                result &= 0xFFFF;
+
+                GBC_CPU_Register.SP = result;
+
+                break;
+            }
+            case 0xE9: // Jump to HL
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_Register.PC = GBC_CPU_Register.HL;
+
+                break;
+            }
+            case 0xEA: // Save A at given 16-bit address
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC += 2;
+
+                GBC_MMU_WriteByte(operand, GBC_CPU_Register.A);
+
+                break;
+            }
+            case 0xEB: // Operation removed in this CPU
+            case 0xEC: // Operation removed in this CPU
+            case 0xED: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xEE: // Logical XOR 8-bit value immediate against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_XOR(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xEF: // Call routine at address 0028h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x28;
+
+                break;
+            }
             case 0xF0: // Load A from address pointed to by (FF00h + 8-bit immediate)
             {
                 GBC_CPU_InstructionTicks += 12;
 
-                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
-
                 if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
                 {
+                    GBC_CPU_Register.PC++;
+
                     GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
                     break;
                 }
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
 
                 GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + operand);
 
@@ -4027,15 +4771,16 @@ void GBC_CPU_Step()
             {
                 GBC_CPU_InstructionTicks += 16;
 
-                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
-
-                GBC_CPU_Register.PC += 2;
-
                 if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
                 {
+                    GBC_CPU_Register.PC += 2;
+
                     GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
                     break;
                 }
+
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC += 2;
 
                 GBC_CPU_Register.A = GBC_MMU_ReadByte(operand);
 
