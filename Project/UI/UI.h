@@ -23,8 +23,8 @@
 #define UI_WALL_WIDTH1            66
 #define UI_WALL_WIDTH2            33
 #define UI_BRICK_COLOR            0xFFFF
-#define UI_BRICK_LENGTH           40
-#define UI_BRICK_HEIGHT           15
+#define UI_BRICK_LENGTH           10
+#define UI_BRICK_HEIGHT           4
 #define UI_BRICK_BORDER_COLOR     0x0000
 #define UI_BRICK_BORDER_WIDTH     1
 
@@ -103,11 +103,11 @@ UI_ScrollOption_t;
 typedef struct
 {
     char        Text[UI_MAX_MP_LENGTH + 1];  // MenuPoint Text
-    uint16_t    X;                       // MenuPoint upperLeftCorner x coordinate
-    uint16_t    Y;                       // MenuPoint upperLeftCorner y coordinate
-    uint16_t    Height;                  // MenuPoint height
-    uint16_t    Length;                  // MenuPoint length
-    OS_Action_t Action;                  // Action to be performed when selection is confirmed
+    uint16_t    X;                           // MenuPoint upperLeftCorner x coordinate
+    uint16_t    Y;                           // MenuPoint upperLeftCorner y coordinate
+    uint16_t    Height;                      // MenuPoint height
+    uint16_t    Length;                      // MenuPoint length
+    OS_Action_t Action;                      // Action to be performed when selection is confirmed
 }
 UI_MenuPoint_t;
 

@@ -201,12 +201,15 @@ void UI_DrawScrollBar(int currentGameEntry)
     uint16_t X   = UI_WALL_WIDTH2 + UI_GE_LENGTH2;
     uint16_t Y   = UI_GE_HEIGHT + lastPlayedGameOffset;
     uint16_t Len = (gameEntriesFullyFitting - 1) * UI_GE_HEIGHT;
+    double ratio = (gameEntriesFullyFitting - 1) / OS_GamesLoaded;
+
     LCD_DrawLine(X, Y, Len, UI_SCROLLBAR_WIDTH, UI_SCROLLBAR_BG_COLOR, LCD_VERTICAL);
 
-    // Draw the scrollbar depending of the position of the currently selected entry
+    // Draw scrollbar depending of currently selected entry position and totalgames/displayedgames ratio
     X++;
     Y   = UI_GE_HEIGHT + lastPlayedGameOffset + (LCD_DISPLAY_SIZE_Y * currentGameEntry / OS_GamesLoaded);
-    Len = LCD_DISPLAY_SIZE_Y * (gameEntriesFullyFitting - 1) / OS_GamesLoaded;
+    Len = LCD_DISPLAY_SIZE_Y * (ratio < 1 ? ratio : 1);
+
     LCD_DrawLine(X, Y, Len, UI_SCROLLBAR_WIDTH - 2, UI_SCROLLBAR_FG_COLOR, LCD_VERTICAL);
 }
 

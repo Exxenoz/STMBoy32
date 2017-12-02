@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,USE_STM324x9I_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\tm;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts</IncludePath>
+              <IncludePath>../;../Libraries/CMSIS/Device/ST/STM32F4xx/Include;../Libraries/STM32F4xx_StdPeriph_Driver/inc;..\Libraries\ff;..\Libraries\tm;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM324x9I_EVAL;.\Common;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts;.\OS</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -506,6 +506,11 @@
               <FileName>common.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -821,6 +826,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1368,6 +1388,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1682,6 +1707,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2228,6 +2268,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2542,6 +2587,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3086,6 +3146,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3400,6 +3465,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3944,6 +4024,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4258,6 +4343,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4802,6 +4902,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5116,6 +5221,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5662,6 +5782,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5976,6 +6101,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6520,6 +6660,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6834,6 +6979,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7380,6 +7540,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7694,6 +7859,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8241,6 +8421,11 @@
               <FileType>5</FileType>
               <FilePath>.\Common\common.h</FilePath>
             </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\common.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8555,6 +8740,21 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\OS\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\OS\os.h</FilePath>
             </File>
           </Files>
         </Group>
