@@ -112,7 +112,7 @@ void HandleShowAllGamesPage(void)
     // If lastPlayedGame isn't valid (UI_DrawShowAllPage returns false) it's not selectable (firstGameEntryID = 0)
     int firstGameEntryID = UI_DrawShowAllPage() ? -1 : 0;
     int currGameEntryID  = firstGameEntryID;
-    int lastGameEntryID  = OS_GamesLoaded;
+    int lastGameEntryID  = OS_GamesLoaded - 1;
     int firstDisplayedID = 0;
 
     while (1)
@@ -157,11 +157,13 @@ void HandleShowAllGamesPage(void)
             // Set the game which is to be started
             if (currGameEntryID == -1)
             {
-                copyString(OS_CurrentGame, OS_InitOptions.lastPlayed, OS_MAX_GAME_TITLE_LENGTH + 1);
+                copyString(OS_CurrentGame.Name, OS_InitOptions.lastPlayed, OS_MAX_GAME_TITLE_LENGTH + 1);
+                //OS_CurrentGame.IsFavorite = ?
             }
             else
             {
-                copyString(OS_CurrentGame, OS_GameEntries[currGameEntryID].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+                copyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryID].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+                OS_CurrentGame.IsFavorite = OS_GameEntries[currGameEntryID].IsFavorite;
             }
 
             // Switch to Ingame from SDCard
@@ -235,7 +237,7 @@ bool HandleSDCIngame(void)
         GBC_Update();
 
         while (!LCD_READY_FLAG);
-        LCD_DrawGBCFrameBuffer();
+        LCD_DrawGBCFrameBufferScaled();
     }
 }
 
