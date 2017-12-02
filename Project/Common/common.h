@@ -35,7 +35,8 @@ typedef enum bool_e
 }
 bool;
 
-// Custom strcpy function to ensure null termination
+// Custom string functions to ensure null termination
 void copyString(char *dest, const char *src, int destSize);
+void appendString(char *dest, const char *src, int destSize);
 
 #endif //COMMON_H
