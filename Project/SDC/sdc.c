@@ -3,7 +3,6 @@
 #include "led.h"
 
 FATFS SDC_FatFS;                    // Global FatFS object
-DIR   SDC_CurrDir;                  // Structure representing the currently opened directory
 bool  SDC_Mounted = false;          // Global mounted state
 
 void SDC_InitializeInterrupts(void)

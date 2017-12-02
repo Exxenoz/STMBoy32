@@ -5,7 +5,7 @@
 
 #define OS_INIT_OPTIONS_FILE      "init.txt"
 #define OS_GAME_DIRECTORY         "Games"
-#define OS_FAVS_DIRECTORY         "Favorites"
+#define OS_FAVS_DIRECTORY         "Games/Favorites"
 
 #define OS_MAX_GAME_TITLE_LENGTH  15
 #define OS_MAX_NUMBER_OF_GAMES    1500
@@ -54,7 +54,7 @@ OS_Action_t;
 
 extern OS_Options_t OS_InitOptions;
 
-extern char OS_CurrentGame[OS_MAX_GAME_TITLE_LENGTH + 1];
+extern OS_GameEntry_t OS_CurrentGame;
 
 extern OS_State_t OS_CurrState;
 extern OS_State_t OS_LastState;

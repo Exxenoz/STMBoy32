@@ -5,7 +5,7 @@
 
 OS_Options_t OS_InitOptions;                           // Inititial Options
 
-char OS_CurrentGame[OS_MAX_GAME_TITLE_LENGTH + 1];     // Path of the currenty/last played game      
+OS_GameEntry_t OS_CurrentGame;                         // Path of the currenty/last played game      
 
 OS_State_t OS_CurrState = OS_MAIN_PAGE;                // Current Operatingsystem state
 OS_State_t OS_LastState = OS_MAIN_PAGE;                // Last Operatingsystem state
@@ -100,47 +100,54 @@ int OS_CmpFunc(const void *a, const void *b)
 
 bool OS_InitializeGameEntries(void)
 {
+    // If it's a re-initialization reset LoadedGames counter
+    if (OS_GamesLoaded != 0) OS_GamesLoaded = 0;
+
     if (!SDC_Mount()) return false;
 
     int i = 0;
+    DIR directory;
     FILINFO fileInfo;
 
 
     // If game-directory couldn't be opened or reading the first file info failed something went wrong
-    if (f_opendir(&SDC_CurrDir, OS_GAME_DIRECTORY) != FR_OK || f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK)
+    if (f_opendir(&directory, OS_GAME_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
     {
         return false;
     }
 
     // Get the titles of all games in gamedirectory (If there is no file anymore 0 is written to fname)
-    for (; fileInfo.fname[0] != NULL && i < OS_MAX_NUMBER_OF_GAMES; i++)
+    for (; fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR && i < OS_MAX_NUMBER_OF_GAMES; i++)
     {
-        if (f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK) return false;
-
         copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
         OS_GameEntries[i].IsFavorite = false;
         OS_GamesLoaded++;
+
+        if (f_readdir(&directory, &fileInfo) != FR_OK) return false;
     }
 
-    // Repeat for favorites (dont close game directory since Favorite directory should be located inside it)
-    if (f_opendir(&SDC_CurrDir, OS_FAVS_DIRECTORY) != FR_OK || f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK)
+    // Close gamedirectory
+    f_closedir(&directory);
+
+    // Repeat for favorites
+    if (f_opendir(&directory, OS_FAVS_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
     {
         return false;
     }
 
     // Get the titles of all favorites
-    for (; fileInfo.fname[0] != NULL && i < OS_MAX_NUMBER_OF_GAMES; i++)
+    for (; fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR && i < OS_MAX_NUMBER_OF_GAMES; i++)
     {
-        if (f_readdir(&SDC_CurrDir, &fileInfo) != FR_OK) return false;
-
         copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
         OS_GameEntries[i].IsFavorite = true;
         OS_GamesLoaded++;
+
+        if (f_readdir(&directory, &fileInfo) != FR_OK) return false;
     }
 
-    // Sort the list alphabetically (case insensitive) and close directories
+    // Close directory and sort the list alphabetically (case insensitive)
+    f_closedir(&directory);
     qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
-    f_closedir(&SDC_CurrDir);
 
     return true;
 }
