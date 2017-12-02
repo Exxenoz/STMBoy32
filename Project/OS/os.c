@@ -81,21 +81,26 @@ bool OS_StoreOptions(void)
 // Compare Function used to sort all game entries
 int OS_CmpFunc(const void *a, const void *b)
 {
-    char letter1 = *((char*)a);
-    char letter2 = *((char*)b);
+    OS_GameEntry_t game1 = *((OS_GameEntry_t*)a);
+    OS_GameEntry_t game2 = *((OS_GameEntry_t*)b);
+    int i = -1;
 
-    // Compare case insensitive
-    if (letter1 >= 97 && letter1 <= 122)
+    // Get the first different letters and compare them (case insensitive)
+    do
     {
-        letter1 -= 32;
-    }
+        i++;
+        if (game1.Name[i] >= 97 && game1.Name[i] <= 122)
+        {
+            game1.Name[i] -= 32;
+        }
+        if (game2.Name[i] >= 97 && game2.Name[i] <= 122)
+        {
+            game2.Name[i] -= 32;
+        }
 
-    if (letter2 >= 97 && letter2 <= 122)
-    {
-        letter2 -= 32;
-    }
+    } while (game1.Name[i] == game2.Name[i] && game1.Name[i] != '\0');
 
-    return (letter1 - letter2);
+    return (game1.Name[i] - game2.Name[i]);
 }
 
 bool OS_InitializeGameEntries(void)
