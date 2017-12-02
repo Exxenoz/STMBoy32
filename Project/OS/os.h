@@ -67,6 +67,7 @@ bool OS_StoreOptions(void);
 bool OS_InitializeGameEntries(void);
 
 OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1]);
+void OS_GetGamePath(OS_GameEntry_t game, char* path, int pathLength);
 void OS_DoAction(OS_Action_t action);
 
 #endif

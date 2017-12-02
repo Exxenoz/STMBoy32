@@ -175,6 +175,22 @@ OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
     return noMatch;
 }
 
+void OS_GetGamePath(OS_GameEntry_t game, char* path, int pathLength)
+{
+    if (OS_CurrentGame.IsFavorite)
+    {
+        copyString(path, OS_FAVS_DIRECTORY, pathLength);
+        appendString(path, "/", pathLength);
+        appendString(path, OS_CurrentGame.Name, pathLength);
+    }
+    else
+    {
+        copyString(path, OS_GAME_DIRECTORY, pathLength);
+        appendString(path, "/", pathLength);
+        appendString(path, OS_CurrentGame.Name, pathLength);
+    }
+}
+
 void OS_DoAction(OS_Action_t action)
 {
     OS_State_t temp = OS_CurrState;

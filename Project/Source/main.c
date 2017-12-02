@@ -212,7 +212,14 @@ void HandleOptionPage(void)
 
 bool HandleSDCIngame(void)
 {
-    if(GBC_LoadFromSDC(OS_CurrentGame) != GBC_LOAD_RESULT_OK)
+    // Define path array with maximal needed size and get the game path
+    int  pathLength = sizeof(OS_FAVS_DIRECTORY) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    char path[pathLength];
+
+    OS_GetGamePath(OS_CurrentGame, path, pathLength);
+
+    // Load the game
+    if(GBC_LoadFromSDC(path) != GBC_LOAD_RESULT_OK)
     {
         LED_EnableRed(true);
         return false;
