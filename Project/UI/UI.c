@@ -14,9 +14,6 @@ const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
      UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_OPTIONS},
 };
 
-const int gameEntriesFullyFitting  = LCD_DISPLAY_SIZE_Y / UI_GE_HEIGHT;
-const int lastPlayedGameOffset = LCD_DISPLAY_SIZE_Y - (gameEntriesFullyFitting * UI_GE_HEIGHT);
-
 
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
@@ -54,10 +51,10 @@ bool UI_DrawShowAllPage(void)
     brick.Border.Color = UI_BRICK_BORDER_COLOR;
     brick.Border.Width = UI_BRICK_BORDER_WIDTH;
 
-    LCD_DrawWall(0, 0, UI_WALL_WIDTH1, UI_GE_HEIGHT, &brick);
-    LCD_DrawWall(0, UI_GE_HEIGHT, UI_WALL_WIDTH2, LCD_DISPLAY_SIZE_Y, &brick);
-    LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_WIDTH1, 0, UI_WALL_WIDTH1, UI_GE_HEIGHT, &brick);
-    LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_WIDTH2, UI_GE_HEIGHT, UI_WALL_WIDTH2, LCD_DISPLAY_SIZE_Y, &brick);
+    LCD_DrawWall(0, 0, UI_WALL_WIDTH1, UI_SHOWALL_GE_HEIGHT, &brick);
+    LCD_DrawWall(0, UI_SHOWALL_GE_HEIGHT, UI_WALL_WIDTH2, LCD_DISPLAY_SIZE_Y, &brick);
+    LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_WIDTH1, 0, UI_WALL_WIDTH1, UI_SHOWALL_GE_HEIGHT, &brick);
+    LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_WIDTH2, UI_SHOWALL_GE_HEIGHT, UI_WALL_WIDTH2, LCD_DISPLAY_SIZE_Y, &brick);
 
     // Draw last played Game either highlighted or disabled (if not found/valid) centered to the top of the screen
     OS_GameEntry_t lastPlayedGame = OS_GetGameEntry(OS_InitOptions.lastPlayed);
@@ -74,14 +71,14 @@ bool UI_DrawShowAllPage(void)
 
     // Fill lower part of the screen with as many Gameentries as possible
     int gameEntryY;
-    for (int i = 1; i < gameEntriesFullyFitting && i <= OS_GamesLoaded; i++)
+    for (int i = 1; i < UI_LIST_LENGTH && i <= OS_GamesLoaded; i++)
     {
-        gameEntryY = lastPlayedGameOffset + i * UI_GE_HEIGHT;
+        gameEntryY = UI_UPPER_LIST_PADDING + i * UI_SHOWALL_GE_HEIGHT;
         UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[i-1]), UI_ENABLED, false);
     }
 
     // Draw the offset between lastPlayedGame and first Gameentry in border color
-    LCD_DrawLine(UI_WALL_WIDTH2, UI_GE_HEIGHT, UI_GE_LENGTH2, lastPlayedGameOffset, UI_GE_BG_COLOR, LCD_HORIZONTAL); 
+    LCD_DrawLine(UI_WALL_WIDTH2, UI_SHOWALL_GE_HEIGHT, UI_SHOWALL_GE_LENGTH, UI_UPPER_LIST_PADDING, UI_GE_BG_COLOR, LCD_HORIZONTAL); 
 
     // Draw the initial Scrollbar
     UI_DrawScrollBar(0);
@@ -89,7 +86,7 @@ bool UI_DrawShowAllPage(void)
     // Highlight first Gameentry if lastPlayedGame isn't valid
     if (!lastPlayedGameValid)
     {
-        UI_DrawGameEntry(UI_WALL_WIDTH2, UI_GE_HEIGHT, &(OS_GameEntries[0]), UI_HIGHLIGHTED, false);
+        UI_DrawGameEntry(UI_WALL_WIDTH2, UI_SHOWALL_GE_HEIGHT, &(OS_GameEntries[0]), UI_HIGHLIGHTED, false);
     }
 
     return lastPlayedGameValid;
@@ -152,17 +149,17 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
     copyString(gameEntryDef.Characters, gameEntry->Name, LCD_MAX_TEXT_LENGTH + 1);
     gameEntryDef.Spacing       = UI_GE_SPACING;
     gameEntryDef.Border.Width  = UI_GE_BORDER_WIDTH;
-    gameEntryDef.Padding.Upper = ((UI_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2);
-    gameEntryDef.Padding.Lower = ((UI_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2) - 4;
+    gameEntryDef.Padding.Upper = ((UI_SHOWALL_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2);
+    gameEntryDef.Padding.Lower = ((UI_SHOWALL_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2) - 4;
     if (lastPlayed)
     {
-        gameEntryDef.Padding.Left  = ((UI_GE_LENGTH1 - 2 * UI_GE_BORDER_WIDTH - stringLen) / 2);
-        gameEntryDef.Padding.Right = ((UI_GE_LENGTH1 - 2 * UI_GE_BORDER_WIDTH - stringLen) / 2);
+        gameEntryDef.Padding.Left  = ((UI_SHOWALL_MP_LENGTH - 2 * UI_GE_BORDER_WIDTH - stringLen) / 2);
+        gameEntryDef.Padding.Right = ((UI_SHOWALL_MP_LENGTH - 2 * UI_GE_BORDER_WIDTH - stringLen) / 2);
     }
     else
     {
         gameEntryDef.Padding.Left  = 0;
-        gameEntryDef.Padding.Right = (UI_GE_LENGTH2 - 2 * UI_GE_BORDER_WIDTH  - stringLen);
+        gameEntryDef.Padding.Right = (UI_SHOWALL_GE_LENGTH - 2 * UI_GE_BORDER_WIDTH  - stringLen);
     }
 
     switch(option)
@@ -198,16 +195,16 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
 void UI_DrawScrollBar(int currentGameEntry)
 {
     // Draw the scrollbar background
-    uint16_t X   = UI_WALL_WIDTH2 + UI_GE_LENGTH2;
-    uint16_t Y   = UI_GE_HEIGHT + lastPlayedGameOffset;
-    uint16_t Len = (gameEntriesFullyFitting - 1) * UI_GE_HEIGHT;
-    double ratio = (gameEntriesFullyFitting - 1) / OS_GamesLoaded;
+    uint16_t X   = UI_WALL_WIDTH2 + UI_SHOWALL_GE_LENGTH;
+    uint16_t Y   = UI_SHOWALL_GE_HEIGHT + UI_UPPER_LIST_PADDING;
+    uint16_t Len = (UI_LIST_LENGTH - 1) * UI_SHOWALL_GE_HEIGHT;
+    double ratio = (UI_LIST_LENGTH - 1) / OS_GamesLoaded;
 
     LCD_DrawLine(X, Y, Len, UI_SCROLLBAR_WIDTH, UI_SCROLLBAR_BG_COLOR, LCD_VERTICAL);
 
     // Draw scrollbar depending of currently selected entry position and totalgames/displayedgames ratio
     X++;
-    Y   = UI_GE_HEIGHT + lastPlayedGameOffset + (LCD_DISPLAY_SIZE_Y * currentGameEntry / OS_GamesLoaded);
+    Y   = UI_SHOWALL_GE_HEIGHT + UI_UPPER_LIST_PADDING + (LCD_DISPLAY_SIZE_Y * currentGameEntry / OS_GamesLoaded);
     Len = LCD_DISPLAY_SIZE_Y * (ratio < 1 ? ratio : 1);
 
     LCD_DrawLine(X, Y, Len, UI_SCROLLBAR_WIDTH - 2, UI_SCROLLBAR_FG_COLOR, LCD_VERTICAL);
@@ -217,9 +214,9 @@ bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option)
 {
     // Scrollable list consists of gameEntriesFullyFitting - 1 displayed games
     // If currGE is -1 lastPlayedGame is selected but currGameDisplayID & gameEntryY refer to the listed games
-    int currGameDisplayID = (currGE == -1 ? 0 : currGE) % (gameEntriesFullyFitting - 1);
-    int lastDisplayedGE   = firstDisplayedGE + (gameEntriesFullyFitting - 2);
-    int gameEntryY        = (currGameDisplayID + 1) * UI_GE_HEIGHT + lastPlayedGameOffset;
+    int currGameDisplayID = (currGE == -1 ? 0 : currGE) % (UI_LIST_LENGTH - 1);
+    int lastDisplayedGE   = firstDisplayedGE + (UI_LIST_LENGTH - 2);
+    int gameEntryY        = (currGameDisplayID + 1) * UI_SHOWALL_GE_HEIGHT + UI_UPPER_LIST_PADDING;
 
     if (option == UI_SCROLLUP)
     {
@@ -244,9 +241,9 @@ bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option)
 
             // Draw as many gameentries as fit the screen
             // (-2 because gameEntriesFullyFitting includes lastPlayed and first was already drawn)
-            for (int i = 1; i < (gameEntriesFullyFitting - 1); i++)
+            for (int i = 1; i < (UI_LIST_LENGTH - 1); i++)
             {
-                gameEntryY += UI_GE_HEIGHT;
+                gameEntryY += UI_SHOWALL_GE_HEIGHT;
                 UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE - 1 + i]), UI_ENABLED, false);
             }
 
@@ -257,7 +254,7 @@ bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option)
         // Selected gameentry is neither first nor first displayed
         // Reset highlighting of currGE and highlight prev gameentry
         UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE]), UI_ENABLED, false);
-        gameEntryY -= UI_GE_HEIGHT;
+        gameEntryY -= UI_SHOWALL_GE_HEIGHT;
         UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE - 1]), UI_HIGHLIGHTED, false);
 
         // List didn't scroll
@@ -286,9 +283,9 @@ bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option)
 
             // Draw as many gameentries as fit the screen
             // (-2 because gameEntriesFullyFitting includes lastPlayed and last was already drawn)
-            for (int i = 1; i < (gameEntriesFullyFitting - 1); i++)
+            for (int i = 1; i < (UI_LIST_LENGTH - 1); i++)
             {
-                gameEntryY -= UI_GE_HEIGHT;
+                gameEntryY -= UI_SHOWALL_GE_HEIGHT;
                 UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE + 1 - i]), UI_ENABLED, false);
             }
 
@@ -299,7 +296,7 @@ bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option)
         // Selected gameentry isn't the last displayed
         // Reset highlighting of currGE and highlight next gameentry
         UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE]), UI_ENABLED, false);
-        gameEntryY += UI_GE_HEIGHT;
+        gameEntryY += UI_SHOWALL_GE_HEIGHT;
         UI_DrawGameEntry(UI_WALL_WIDTH2, gameEntryY, &(OS_GameEntries[currGE + 1]), UI_HIGHLIGHTED, false);
 
         // List didn't scroll

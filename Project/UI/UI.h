@@ -6,9 +6,17 @@
 #include "lcd.h"
 #include "os.h"
 
-// Max values
-#define UI_NUMBER_OF_MAINPAGE_MPS 4                 // Total number of MainPage menupoints
-#define UI_MAX_MP_LENGTH          15                // Max char length of a menupoint
+// Total number of MainPage menupoints
+#define UI_NUMBER_OF_MAINPAGE_MPS 4
+
+// Max char length of a menupoint
+#define UI_MAX_MP_LENGTH          15
+
+//Number of gameentries (GEs) fitting the display
+#define UI_LIST_LENGTH            ((int)((LCD_DISPLAY_SIZE_Y - UI_SHOWALL_MP_HEIGHT) / UI_SHOWALL_GE_HEIGHT))
+
+// Spacing between the Showall page menupoint and the list displaying the gameentries
+#define UI_UPPER_LIST_PADDING     (LCD_DISPLAY_SIZE_Y - (UI_LIST_LENGTH * UI_SHOWALL_GE_HEIGHT))
 
 // Page Backgrounds
 #define UI_MAINPAGE_BG_COLOR      0xFFC0
@@ -33,9 +41,10 @@
 #define UI_MAINPAGE_MP_HEIGHT     36
 #define UI_OPTIONS_MP_LENGTH      0
 #define UI_OPTIONS_MP_HEIGHT      0
-#define UI_GE_LENGTH1             (LCD_DISPLAY_SIZE_X - 2 * UI_WALL_WIDTH1)
-#define UI_GE_LENGTH2             (LCD_DISPLAY_SIZE_X - 2 * UI_WALL_WIDTH2 - UI_SCROLLBAR_WIDTH)
-#define UI_GE_HEIGHT              34
+#define UI_SHOWALL_MP_LENGTH      (LCD_DISPLAY_SIZE_X - 2 * UI_WALL_WIDTH1)
+#define UI_SHOWALL_MP_HEIGHT      34
+#define UI_SHOWALL_GE_LENGTH      (LCD_DISPLAY_SIZE_X - 2 * UI_WALL_WIDTH2 - UI_SCROLLBAR_WIDTH)
+#define UI_SHOWALL_GE_HEIGHT      34
 
 // Mainpage menupoint texts
 #define UI_MAINPAGE_MP_1_STRING   "BOOT CARTRIDGE"
