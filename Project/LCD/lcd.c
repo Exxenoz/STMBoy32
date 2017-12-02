@@ -332,24 +332,9 @@ void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
         LCD_SET_WR;
     }
     LCD_SET_CS;
-}
 
-//Draw a line that is alternately colored
-void LCD_DrawLine2C(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t w1, uint16_t w2, uint16_t color1, uint16_t color2)
-{
-    int x;
-
-    // Draw as many boxes alteratingly as fully fit into the  specified line
-    for (x = x0; x <= (x0 + length - w1 - w2);)
-    {
-        LCD_DrawFilledBox(x, y0, w1, height, color1);
-        x += w1;
-        LCD_DrawFilledBox(x, y0, w2, height, color2);
-        x += w2;
-    }
-
-    // Draw as much of last box as possible
-    LCD_DrawFilledBox(x, y0, height, x0 + length - x, color1);
+    // Set drawarea back to full size
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
 // Draw a line of bricks, use height to truncate the line
@@ -358,7 +343,7 @@ void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
     uint16_t x;
 
     // Draw either a full or an half brick at the beginning of every brick line, depending on offset
-    LCD_DrawFilledBox(x0, y0, (brick->Length / (offset + 1)) - brick->Border.Width, height, brick->Color);
+    LCD_DrawFilledBox(x0, y0, (brick->Length / (offset + 1)), height, brick->Color);
 
     // Draw as many bricks as fully fit into the line
     for (x = (x0 + brick->Length / (offset + 1)); x < (x0 + length - brick->Length - 2 * brick->Border.Width);)
