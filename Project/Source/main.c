@@ -201,7 +201,7 @@ void HandleOptionPage(void)
 bool HandleSDCIngame(void)
 {
     // Define path array with maximal needed size and get the game path
-    int  pathLength = sizeof(OS_FAVS_DIRECTORY) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    int  pathLength = sizeof(OS_FAVORITE_DIRECTORY) + OS_MAX_GAME_TITLE_LENGTH + 1;
     char path[pathLength];
 
     OS_GetGamePath(OS_CurrentGame, path, pathLength);

@@ -213,6 +213,45 @@ bool OS_UpdateLastPlayed(void)
     return true;
 }
 
+void OS_LoadFavorites(void)
+{
+    DIR     directory;
+    FILINFO fileInfo;
+
+    // Reset gameCounter
+    OS_GamesLoaded = 0;
+
+    // If there is no favorite directory or it can't be opened return
+    if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK) return;
+
+    // Store all favorite games (or as many as possible) in OS_GameEntries
+    int i = 0;
+
+    do
+    {
+        if (f_readdir(&directory, &fileInfo) == FR_OK && fileInfo.fattrib != AM_DIR)
+        {
+            // If the end of the favorite directory is reached stop reading files
+            if (fileInfo.fname[0] == NULL) break;
+
+            copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
+            OS_GameEntries[i].IsFavorite = true;
+            OS_GamesLoaded++;
+        }
+        i++;
+
+    } while (i < OS_MAX_NUMBER_OF_GAMES);
+
+    // Close the directory and sort OS_GameEntries alphabetically (case insensitive)
+    f_closedir(&directory);
+    qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
+}
+
+void OS_UpdateFavorites(OS_GameEntry_t game, OS_Operation_t operation)
+{
+    // YTBI
+}
+
 OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
 {
     int c;
@@ -236,19 +275,35 @@ OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
     return noMatch;
 }
 
-void OS_GetGamePath(OS_GameEntry_t game, char* path, int pathLength)
+void OS_GetGamePath(OS_GameEntry_t game, char *path, int pathLength)
 {
     if (OS_CurrentGame.IsFavorite)
     {
-        copyString(path, OS_FAVS_DIRECTORY, pathLength);
-        appendString(path, "/", pathLength);
+        copyString(path, OS_FAVORITE_PATH, pathLength);
         appendString(path, OS_CurrentGame.Name, pathLength);
     }
     else
     {
-        copyString(path, OS_GAME_DIRECTORY, pathLength);
-        appendString(path, "/", pathLength);
+        copyString(path, OS_GAME_PATH, pathLength);
         appendString(path, OS_CurrentGame.Name, pathLength);
+    }
+}
+
+bool OS_IsFavorite(char *name)
+{
+    FIL  file;
+    int  pathSize = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    char path[pathSize];
+
+    // If the game is located inside the favorite folder it's a favorite
+    if (f_open(&file, path, FA_OPEN_EXISTING) == FR_OK)
+    {
+        f_close(&file);
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
