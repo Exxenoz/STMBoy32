@@ -18,7 +18,14 @@
 
 typedef struct
 {
-    bool AutoBootCartridge; 
+    char Name[OS_MAX_GAME_TITLE_LENGTH + 1];        // Name of the Game
+    bool IsFavorite;                                // Indicates whether game is a favorite or not
+}
+OS_GameEntry_t;
+
+typedef struct
+{
+    bool AutoBootCartridge;
     bool AutoBootSDC;
     bool DrawScaled;
     int  Brightness;
@@ -41,13 +48,6 @@ typedef enum
     OS_INGAME_FROM_CARTRIDGE,
 }
 OS_State_t;
-
-typedef struct
-{
-    char Name[OS_MAX_GAME_TITLE_LENGTH + 1]; // Name of the Game
-    bool IsFavorite;                         // Indicates whether game is a favorite or not
-}
-OS_GameEntry_t;
 
 typedef enum
 {

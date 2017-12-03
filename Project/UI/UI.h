@@ -127,7 +127,7 @@ void UI_DrawShowFavPage(void);
 void UI_DrawOptionsPage(void);
 
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_DrawOption_t option);
-void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_DrawOption_t option, bool lastPlayed);
+void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_DrawOption_t option);
 void UI_DrawScrollBar(int currentGameEntry);
 bool UI_ScrollGames(int currGE, int firstDisplayedGE, UI_ScrollOption_t option);
 
