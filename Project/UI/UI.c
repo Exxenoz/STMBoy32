@@ -8,9 +8,6 @@ const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
      UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_SHOWALL},
 
     {UI_MAINPAGE_MP_3_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_3_Y,
-     UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_SHOWFAV},
-
-    {UI_MAINPAGE_MP_4_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_4_Y,
      UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_OPTIONS},
 };
 
@@ -27,7 +24,6 @@ void UI_DrawMainPage(int firstValidMenuPoint)
     // Draw the other menu points (enabled)
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]), UI_ENABLED);
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[2]), UI_ENABLED);
-    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[3]), UI_ENABLED);
 
     // Highlight the first valid menupoint
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[firstValidMenuPoint]), UI_HIGHLIGHTED);

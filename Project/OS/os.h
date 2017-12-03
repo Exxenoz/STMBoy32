@@ -26,7 +26,6 @@ typedef enum
 {
     OS_MAIN_PAGE,
     OS_SHOW_ALL,
-    OS_SHOW_FAV,
     OS_OPTIONS,
     OS_INGAME_FROM_SDC,
     OS_INGAME_FROM_CARTRIDGE,

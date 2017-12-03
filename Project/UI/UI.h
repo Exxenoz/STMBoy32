@@ -7,7 +7,7 @@
 #include "os.h"
 
 // Total number of MainPage menupoints
-#define UI_NUMBER_OF_MAINPAGE_MPS 4
+#define UI_NUMBER_OF_MAINPAGE_MPS 3
 
 // Max char length of a menupoint
 #define UI_MAX_MP_LENGTH          15
@@ -49,15 +49,13 @@
 // Mainpage menupoint texts
 #define UI_MAINPAGE_MP_1_STRING   "BOOT CARTRIDGE"
 #define UI_MAINPAGE_MP_2_STRING   "SHOW ALL GAMES"
-#define UI_MAINPAGE_MP_3_STRING   "SHOW FAVORITES"
-#define UI_MAINPAGE_MP_4_STRING   "OPTIONS"
+#define UI_MAINPAGE_MP_3_STRING   "OPTIONS"
 
 // Mainpage menupoint coordinates (in pixel)
 #define UI_MAINPAGE_MPS_X   29
 #define UI_MAINPAGE_MP_1_Y  35
 #define UI_MAINPAGE_MP_2_Y  81
 #define UI_MAINPAGE_MP_3_Y  127
-#define UI_MAINPAGE_MP_4_Y  173 
 
 // General menupoint specifications (measurements in pixel)
 #define UI_MP_SPACING       0

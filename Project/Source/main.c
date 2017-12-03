@@ -185,18 +185,6 @@ void HandleShowAllGamesPage(void)
     }
 }
 
-void HandleShowFavoritesPage(void)
-{
-    // Initialize Fonts needed for this Page
-    Fonts_InitializeSTMFonts();
-
-    // YTBI
-    while (1)
-    {
-        
-    }
-}
-
 void HandleOptionPage(void)
 {
     // Initialize Fonts needed for this Page
@@ -330,21 +318,23 @@ int main(void)
             case OS_MAIN_PAGE:
                 HandleMainPage();
                 break;
+
             case OS_SHOW_ALL:
                 HandleShowAllGamesPage();
                 break;
-            case OS_SHOW_FAV:
-                HandleShowFavoritesPage();
-                break;
+
             case OS_OPTIONS:
                 HandleOptionPage();
                 break;
+
             case OS_INGAME_FROM_SDC:
                 if (HandleSDCIngame() == false) return 0;
                 break;
+
             case OS_INGAME_FROM_CARTRIDGE:
                 if (HandleCartridgeIngame() == false) return 0;
                 break;
+
             default:
                 return 0;
         }
