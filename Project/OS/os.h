@@ -61,10 +61,12 @@ extern OS_State_t OS_LastState;
 extern OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];
 extern int OS_GamesLoaded;
 
-void OS_LoadInitialOptions(void);
-bool OS_StoreOptions(void);
 bool OS_InitializeGameEntries(void);
+void OS_LoadOptions(void);
+void OS_UpdateOptions(void);
 
+void OS_LoadLastPlayed(void);
+bool OS_UpdateLastPlayed(void);
 OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1]);
 void OS_GetGamePath(OS_GameEntry_t game, char* path, int pathLength);
 void OS_DoAction(OS_Action_t action);

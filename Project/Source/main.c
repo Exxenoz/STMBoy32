@@ -291,7 +291,7 @@ int main(void)
     SDC_Initialize();
     
     // Load initial options
-    OS_LoadInitialOptions();
+    OS_LoadOptions();
 
     // Turn on Display
     LCD_DimBacklight(0);

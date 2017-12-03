@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "os.h"
 #include "ff.h"
 #include "sdc.h"
@@ -13,70 +14,6 @@ OS_State_t OS_LastState = OS_MAIN_PAGE;                // Last Operatingsystem s
 OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES]; // Array containing all game titles & their favorite status
 int OS_GamesLoaded = 0;                                // Number of successfully loaded Games
 
-
-void OS_LoadInitialOptions(void)
-{
-    // OS_INIT_OPTIONS_FILE contains (OS_MAX_GAME_TITLE_LENGTH + 1) byte for the name of the last game and
-    // 1 addidtional byte for every other information stored in OS_InitOptions
-    uint16_t initOptionsBufferSize = (OS_MAX_GAME_TITLE_LENGTH + 1) + 4;
-    char     initOptionsBuffer[initOptionsBufferSize];
-    uint32_t bytesRead;
-    FIL      file;
-
-    // If no SDC can be mounted, file can't be opened/created or (fully) read initialize with default values
-    if (!SDC_Mount() || f_open(&file, OS_INIT_OPTIONS_FILE, FA_CREATE_ALWAYS) != FR_OK ||
-        f_read(&file, initOptionsBuffer, initOptionsBufferSize, &bytesRead) != FR_OK ||
-        bytesRead != initOptionsBufferSize)
-    {
-        OS_InitOptions.AutoBootCartridge = false;
-        OS_InitOptions.AutoBootSDC       = false;
-        OS_InitOptions.DrawScaled        = true;
-        OS_InitOptions.Brightness        = 100;
-        OS_InitOptions.lastPlayed[0]     = '\0';
-
-        return;
-    }
-
-    // If everything is ok, load the initial Options values
-    OS_InitOptions.AutoBootCartridge = initOptionsBuffer[0] == 0 ? false : true;
-    OS_InitOptions.AutoBootSDC       = initOptionsBuffer[1] == 0 ? false : true;
-    OS_InitOptions.DrawScaled        = initOptionsBuffer[2] == 0 ? false : true;
-    OS_InitOptions.Brightness        = initOptionsBuffer[3] <= 0100 ? initOptionsBuffer[3] : 100;
-    copyString(OS_InitOptions.lastPlayed, &(initOptionsBuffer[4]), OS_MAX_GAME_TITLE_LENGTH + 1);
-
-    // Close OS_INIT_OPTIONS_FILE
-    f_close(&file);
-}
-
-bool OS_StoreOptions(void)
-{
-    // OS_INIT_OPTIONS_FILE contains (OS_MAX_GAME_TITLE_LENGTH + 1) byte for the name of the last game and
-    // 1 addidtional byte for every other information stored in OS_InitOptions
-    uint16_t initOptionsBufferSize = (OS_MAX_GAME_TITLE_LENGTH + 1) + 4;
-    char     initOptionsBuffer[initOptionsBufferSize];
-    uint32_t bytesWritten;
-    FIL      file;
-
-    // Convert OS_InitOptions to a storable string (Brightness is increased so it can't be interpreted as '\0'
-    initOptionsBuffer[0] = OS_InitOptions.AutoBootCartridge == true ? 1 : 0;
-    initOptionsBuffer[1] = OS_InitOptions.AutoBootSDC       == true ? 1 : 0;
-    initOptionsBuffer[2] = OS_InitOptions.DrawScaled        == true ? 1 : 0;
-    initOptionsBuffer[3] = OS_InitOptions.Brightness;
-    copyString(&(initOptionsBuffer[4]), OS_InitOptions.lastPlayed, OS_MAX_GAME_TITLE_LENGTH + 1);
-    
-    // If no SDC can be mounted, initOptionsFile can't be opened/created or (everything) written to exit
-    if (!SDC_Mount() || f_open(&file, OS_INIT_OPTIONS_FILE, FA_CREATE_ALWAYS) != FR_OK ||
-        f_write(&file, initOptionsBuffer, initOptionsBufferSize, &bytesWritten) != FR_OK ||
-        bytesWritten != initOptionsBufferSize)
-    {
-        return false;
-    }
-
-    // Close OS_INIT_OPTIONS_FILE
-    f_close(&file);
-
-    return true;
-}
 
 // Compare Function used to sort all game entries
 int OS_CmpFunc(const void *a, const void *b)
@@ -104,6 +41,18 @@ int OS_CmpFunc(const void *a, const void *b)
 }
 
 bool OS_InitializeGameEntries(void)
+void OS_LoadOptions(void)
+{
+    // Load the initial options from internal flash
+    // YTBI
+}
+
+void OS_UpdateOptions(void)
+{
+    // Store the current options to internal flash
+    // YTBI
+}
+
 {
     // If it's a re-initialization reset LoadedGames counter
     if (OS_GamesLoaded != 0) OS_GamesLoaded = 0;
@@ -154,6 +103,113 @@ bool OS_InitializeGameEntries(void)
     f_closedir(&directory);
     qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
 
+    return;
+}
+
+void OS_LoadLastPlayed(void)
+{
+    // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
+    int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
+    char     buffer[bufferSize];
+    uint32_t bytesRead;
+    FIL      file;
+
+    // If no SDC can be mounted, file can't be opened/created or (fully) read set gameCounter to 0
+    if (!SDC_Mount() || f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING) != FR_OK ||
+        f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK ||
+        bytesRead != bufferSize)
+    {
+        OS_GamesLoaded = 0;
+        return;
+    }
+
+    // If everything is ok, load the games and close the file afterwards
+    int i = 0;
+    int currPosition;
+    for (; i < OS_LAST_PLAYED_GAMES_NUM; i++)
+    {
+        currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
+
+        if (buffer[currPosition] == '\0') break;
+
+        copyString(OS_GameEntries[i].Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+        OS_GameEntries[i].IsFavorite = OS_IsFavorite(OS_GameEntries[i].Name);
+    }
+
+    OS_GamesLoaded = i;
+    f_close(&file);
+}
+
+bool OS_UpdateLastPlayed(void)
+{
+    FIL file;
+
+    // If no SDC can be mounted return false
+    if (!SDC_Mount()) return false;
+
+    // If the file doesn't exist try to create a new one, if it does update it
+    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING) != FR_OK)
+    {
+        // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
+        int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
+        char     buffer[bufferSize];
+        uint32_t bytesWritten;
+
+        // Initialize buffer with the first line (containing first game title) and 0s for the rest
+        memset(buffer, '\0', bufferSize);
+        appendString(buffer, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        buffer[OS_MAX_GAME_TITLE_LENGTH + 2] = '\r';
+        buffer[OS_MAX_GAME_TITLE_LENGTH + 3] = '\n';
+
+        // If creating a new file or writing to it fails return false
+        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW) != FR_OK ||
+            f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK ||
+            bytesWritten != bufferSize)
+        {
+            return false;
+        }
+        else
+        {
+            f_close(&file);
+            return true;
+        }   
+    }
+    // Update the lastPlayed file
+    else
+    {
+        // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
+        int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
+        char     buffer[bufferSize];
+        uint32_t bytesWritten;
+        uint32_t bytesRead;
+        int i = 0;
+
+        // Read the lastPlayed entries to buffer
+        if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize) return false;
+
+        // If current game is already stored as one of the lastPlayed get it's position otherwise the last one
+        for (; i < (OS_LAST_PLAYED_GAMES_NUM - 1); i++)
+        {
+            if (strcmp(&(buffer[i * (OS_MAX_GAME_TITLE_LENGTH + 3)]), OS_CurrentGame.Name) == 0) break;
+        }
+
+        // Move all entries 1 position down (last gets deleted)
+        // If current game already was in the list start there (-> basically just moves it to the first position)
+        int currPosition;
+        int lastPosition;
+        for (; i > 0; i--)
+        {
+            currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
+            lastPosition = (i - 1) * (OS_MAX_GAME_TITLE_LENGTH + 3);
+            copyString(&(buffer[currPosition]), &(buffer[lastPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+        }
+
+        // Store current game on position 1 of last played games and write buffer back into OS_LAST_PLAYED_FILE 
+        copyString(buffer, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize) return false;
+    }
+
+    f_close(&file);
     return true;
 }
 
@@ -210,11 +266,6 @@ void OS_DoAction(OS_Action_t action)
         case OS_SWITCH_TO_STATE_SHOWALL:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_SHOW_ALL;
-            break;
-
-        case OS_SWITCH_TO_STATE_SHOWFAV:
-            OS_LastState = OS_CurrState;
-            OS_CurrState = OS_SHOW_FAV;
             break;
 
         case OS_SWITCH_TO_STATE_OPTIONS:
