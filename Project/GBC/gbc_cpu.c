@@ -4548,12 +4548,12 @@ void GBC_CPU_Step()
                 if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
                 {
                     GBC_CPU_InstructionTicks += 16;
-                    GBC_CPU_Register.PC = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+                    GBC_CPU_Register.PC = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
                 }
                 else
                 {
                     GBC_CPU_InstructionTicks += 12;
-                    GBC_CPU_Register.PC++;
+                    GBC_CPU_Register.PC += 2;
                 }
 
                 break;
@@ -4767,6 +4767,108 @@ void GBC_CPU_Step()
 
                 break;
             }
+            case 0xF1: // Pop 16-bit value from stack into AF
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                GBC_CPU_POP_FROM_STACK(GBC_CPU_Register.AF);
+                GBC_CPU_Register.AF = GBC_CPU_Register.AF & 0xFFF0;
+
+                break;
+            }
+            case 0xF2: // Load A from address pointed to by (FF00h + C)
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.A = GBC_MMU_ReadByte(0xFF00 + GBC_CPU_Register.C);
+
+                break;
+            }
+            case 0xF3: // Disable Interrupts
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_InterruptMasterEnableDelayTicks = 0;
+                GBC_CPU_InterruptMasterEnable = false;
+
+                break;
+            }
+            case 0xF4: // Operation removed in this CPU
+            {
+                // Do nothing
+
+                break;
+            }
+            case 0xF5: // Push 16-bit AF onto stack
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.AF);
+
+                break;
+            }
+            case 0xF6: // Logical OR 8-bit value immediate against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_OR(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xF7: // Call routine at address 0030h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x30;
+
+                break;
+            }
+            case 0xF8: // Add signed 8-bit immediate to SP and save result in HL
+            {
+                GBC_CPU_InstructionTicks += 12;
+
+                int8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                int32_t result = GBC_CPU_Register.SP + operand;
+
+                if ((GBC_CPU_Register.SP & 0xFF) + (operand & 0xFF) > 0xFF)
+                {
+                    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+                }
+                else
+                {
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+                }
+
+                if ((GBC_CPU_Register.SP & 0x0F) + (operand & 0x0F) > 0x0F)
+                {
+                    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
+                }
+                else
+                {
+                    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
+                }
+
+                // GBC_CPU_FLAGS_ZERO is cleared according to documentation
+                GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+
+                result &= 0xFFFF;
+
+                GBC_CPU_Register.HL = result;
+
+                break;
+            }
+            case 0xF9: // Copy HL to SP
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                GBC_CPU_Register.SP = GBC_CPU_Register.HL;
+
+                break;
+            }
             case 0xFA: // Load A from given 16-bit address
             {
                 GBC_CPU_InstructionTicks += 16;
@@ -4783,6 +4885,40 @@ void GBC_CPU_Step()
                 GBC_CPU_Register.PC += 2;
 
                 GBC_CPU_Register.A = GBC_MMU_ReadByte(operand);
+
+                break;
+            }
+            case 0xFB: // Enable Interrupts
+            {
+                GBC_CPU_InstructionTicks += 4;
+
+                GBC_CPU_InterruptMasterEnableDelayTicks = GBC_CPU_Instructions[0xFB].Ticks + 1;
+
+                break;
+            }
+            case 0xFC: // Operation removed in this CPU
+            case 0xFD: // Operation removed in this CPU
+            {
+                // Do nothing
+                
+                break;
+            }
+            case 0xFE: // Compare 8-bit value immediate against A
+            {
+                GBC_CPU_InstructionTicks += 8;
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC++);
+
+                GBC_CPU_COMPARE(GBC_CPU_Register.A, operand);
+
+                break;
+            }
+            case 0xFF: // Call routine at address 0038h
+            {
+                GBC_CPU_InstructionTicks += 16;
+
+                GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
+                GBC_CPU_Register.PC = 0x38;
 
                 break;
             }
