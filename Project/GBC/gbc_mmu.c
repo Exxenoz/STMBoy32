@@ -222,27 +222,6 @@ void GBC_MMU_Unload(void)
     GBC_MMU_RTC_LatchClockDataHelper = 0;
 }
 
-void GBC_MMU_StartDMA(uint8_t value)
-{
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
-    {
-        // ToDo
-    }
-    else
-    {
-        // The written value specifies the transfer source address divided by 100h
-        uint16_t address = value << 8;
-
-        if (address >= 0x8000 && address < 0xE000)
-        {
-            for (uint32_t i = 0; i < 160; i++, address++)
-            {
-                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
-            }
-        }
-    }
-}
-
 uint8_t GBC_MMU_ReadByte(uint16_t address)
 {
     switch (address & 0xF000)
@@ -338,8 +317,8 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
 
             return GBC_MMU_Memory.WRAMBank1[address - 0xD000];
         case 0xE000:
-            // Shadow RAM redirection to WRAM
-            return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+            // Shadow RAM redirection to WRAM Bank 0
+            return GBC_MMU_Memory.WRAMBank0[address - 0xE000];
         case 0xF000:
             switch (address & 0xFF00)
             {
@@ -362,8 +341,27 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                         return GBC_MMU_Memory.HRAM[address - 0xFF80];
                     }
                 default:
-                    // Shadow RAM redirection to WRAM
-                    return GBC_MMU_ReadByte(0xC000 + (address - 0xE000));
+                    // Shadow RAM redirection to WRAM Bank X
+                    switch (GBC_MMU_Memory.WRAMBankID)
+                    {
+                        case 0:
+                        case 1:
+                            return GBC_MMU_Memory.WRAMBank1[address - 0xF000];
+                        case 2:
+                            return GBC_MMU_Memory.WRAMBank2[address - 0xF000];
+                        case 3:
+                            return GBC_MMU_Memory.WRAMBank3[address - 0xF000];
+                        case 4:
+                            return GBC_MMU_Memory.WRAMBank4[address - 0xF000];
+                        case 5:
+                            return GBC_MMU_Memory.WRAMBank5[address - 0xF000];
+                        case 6:
+                            return GBC_MMU_Memory.WRAMBank6[address - 0xF000];
+                        case 7:
+                            return GBC_MMU_Memory.WRAMBank7[address - 0xF000];
+                    }
+
+                    return GBC_MMU_Memory.WRAMBank1[address - 0xF000];
             }
             break;
     }
@@ -551,7 +549,7 @@ void GBC_MMU_MBC5_Write(uint16_t address, uint8_t value)
     }
 }
 
-void (*GBC_MMU_MBC_Table[6])(uint16_t, uint8_t) =
+GBC_MMU_MBC GBC_MMU_MBC_Table[6] =
 {
     GBC_MMU_MBC_None,
     GBC_MMU_MBC_None,
@@ -563,155 +561,391 @@ void (*GBC_MMU_MBC_Table[6])(uint16_t, uint8_t) =
 
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 {
-    // Memory Bank Switch
-    if (address <= 0x7FFF)
+    switch (address & 0xF000)
     {
-        if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
+        case 0x0000:
+        case 0x1000:
+        case 0x2000:
+        case 0x3000:
+        case 0x4000:
+        case 0x5000:
+        case 0x6000:
+        case 0x7000:
         {
-            CMOD_WriteByte(address, &value);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
-        }
-        else // Loaded from SDC
-        {
-            GBC_MMU_MBC_Table[GBC_MMU_MemoryBankController](address, value);
-        }
-    }
-    // Video RAM bank X
-    else if (address <= 0x9FFF)
-    {
-        if (GBC_MMU_Memory.VRAMBankID == 1)
-        {
-            GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
-        }
-        else
-        {
-            GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
-        }
-    }
-    // External RAM bank X
-    else if (address <= 0xBFFF)
-    {
-        if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
-        {
-            CMOD_WriteByte(address, &value);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
-        }
-        else if (GBC_MMU_ERAMEnabled)
-        {
-            if (GBC_MMU_RTC_Selected)
+            // Memory Bank Switch
+            if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
             {
-                GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID] = value;
+                CMOD_WriteByte(address, &value);
+                while (CMOD_GetStatus() == CMOD_PROCESSING);
             }
-            else switch (GBC_MMU_CurrentERAMBankID)
+            else // Loaded from SDC
+            {
+                GBC_MMU_MBC_Table[GBC_MMU_MemoryBankController](address, value);
+            }
+            break;
+        }
+        case 0x8000:
+        case 0x9000:
+        {
+            // Video RAM bank X
+            if (GBC_MMU_Memory.VRAMBankID == 1)
+            {
+                GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
+            }
+            else
+            {
+                GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
+            }
+            break;
+        }
+        case 0xA000:
+        case 0xB000:
+        {
+            // External RAM bank X
+            if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
+            {
+                CMOD_WriteByte(address, &value);
+                while (CMOD_GetStatus() == CMOD_PROCESSING);
+            }
+            else if (GBC_MMU_ERAMEnabled)
+            {
+                if (GBC_MMU_RTC_Selected)
+                {
+                    GBC_MMU_RTC_Register.Data[GBC_MMU_RTC_RegisterID] = value;
+                }
+                else switch (GBC_MMU_CurrentERAMBankID)
+                {
+                    case 0:
+                        GBC_MMU_Memory.ERAMBank0[address - 0xA000] = value;
+                        break;
+                    case 1:
+                        GBC_MMU_Memory.ERAMBank1[address - 0xA000] = value;
+                        break;
+                    case 2:
+                        GBC_MMU_Memory.ERAMBank2[address - 0xA000] = value;
+                        break;
+                    case 3:
+                        GBC_MMU_Memory.ERAMBank3[address - 0xA000] = value;
+                        break;
+                }
+            }
+            break;
+        }
+        case 0xC000:
+        {
+            // Work RAM Bank 0
+            GBC_MMU_Memory.WRAMBank0[address - 0xC000] = value;
+            break;
+        }
+        case 0xD000:
+        {
+            // Work RAM Bank X
+            switch (GBC_MMU_Memory.WRAMBankID)
             {
                 case 0:
-                    GBC_MMU_Memory.ERAMBank0[address - 0xA000] = value;
-                    break;
                 case 1:
-                    GBC_MMU_Memory.ERAMBank1[address - 0xA000] = value;
+                    GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
                     break;
                 case 2:
-                    GBC_MMU_Memory.ERAMBank2[address - 0xA000] = value;
+                    GBC_MMU_Memory.WRAMBank2[address - 0xD000] = value;
                     break;
                 case 3:
-                    GBC_MMU_Memory.ERAMBank3[address - 0xA000] = value;
+                    GBC_MMU_Memory.WRAMBank3[address - 0xD000] = value;
+                    break;
+                case 4:
+                    GBC_MMU_Memory.WRAMBank4[address - 0xD000] = value;
+                    break;
+                case 5:
+                    GBC_MMU_Memory.WRAMBank5[address - 0xD000] = value;
+                    break;
+                case 6:
+                    GBC_MMU_Memory.WRAMBank6[address - 0xD000] = value;
+                    break;
+                case 7:
+                    GBC_MMU_Memory.WRAMBank7[address - 0xD000] = value;
+                    break;
+                default:
+                    GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
                     break;
             }
+            break;
         }
-    }
-    // Work RAM Bank 0
-    else if (address <= 0xCFFF)
-    {
-        GBC_MMU_Memory.WRAMBank0[address - 0xC000] = value;
-    }
-    // Work RAM Bank X
-    else if (address <= 0xDFFF)
-    {
-        switch (GBC_MMU_Memory.WRAMBankID)
+        case 0xE000:
         {
-            case 0:
-            case 1:
-                GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
-                break;
-            case 2:
-                GBC_MMU_Memory.WRAMBank2[address - 0xD000] = value;
-                break;
-            case 3:
-                GBC_MMU_Memory.WRAMBank3[address - 0xD000] = value;
-                break;
-            case 4:
-                GBC_MMU_Memory.WRAMBank4[address - 0xD000] = value;
-                break;
-            case 5:
-                GBC_MMU_Memory.WRAMBank5[address - 0xD000] = value;
-                break;
-            case 6:
-                GBC_MMU_Memory.WRAMBank6[address - 0xD000] = value;
-                break;
-            case 7:
-                GBC_MMU_Memory.WRAMBank7[address - 0xD000] = value;
-                break;
-            default:
-                GBC_MMU_Memory.WRAMBank1[address - 0xD000] = value;
-                break;
+            // Shadow RAM redirection to WRAM Bank 0
+            GBC_MMU_Memory.WRAMBank0[address - 0xE000] = value;
+            break;
         }
-    }
-    // Shadow RAM redirection to WRAM
-    else if (address <= 0xFDFF)
-    {
-        GBC_MMU_WriteByte(0xC000 + (address - 0xE000), value);
-    }
-    // Object Attribute Memory
-    else if (address <= 0xFE9F)
-    {
-        GBC_MMU_Memory.OAM[address - 0xFE00] = value;
-    }
-    // Unused
-    else if (address <= 0xFEFF)
-    {
-        // Do nothing
-    }
-    // Memory-mapped I/O
-    else if (address <= 0xFF7F)
-    {
-        switch (address)
+        case 0xF000:
         {
-            case 0xFF00: // Joypad
-                GBC_MMU_Memory.Joypad = value;
+            switch (address)
+            {
+                // Object Attribute Memory
+                case 0xFE00: case 0xFE01: case 0xFE02: case 0xFE03: case 0xFE04: case 0xFE05: case 0xFE06: case 0xFE07:
+                case 0xFE08: case 0xFE09: case 0xFE0A: case 0xFE0B: case 0xFE0C: case 0xFE0D: case 0xFE0E: case 0xFE0F:
+                case 0xFE10: case 0xFE11: case 0xFE12: case 0xFE13: case 0xFE14: case 0xFE15: case 0xFE16: case 0xFE17:
+                case 0xFE18: case 0xFE19: case 0xFE1A: case 0xFE1B: case 0xFE1C: case 0xFE1D: case 0xFE1E: case 0xFE1F:
+                case 0xFE20: case 0xFE21: case 0xFE22: case 0xFE23: case 0xFE24: case 0xFE25: case 0xFE26: case 0xFE27:
+                case 0xFE28: case 0xFE29: case 0xFE2A: case 0xFE2B: case 0xFE2C: case 0xFE2D: case 0xFE2E: case 0xFE2F:
+                case 0xFE30: case 0xFE31: case 0xFE32: case 0xFE33: case 0xFE34: case 0xFE35: case 0xFE36: case 0xFE37:
+                case 0xFE38: case 0xFE39: case 0xFE3A: case 0xFE3B: case 0xFE3C: case 0xFE3D: case 0xFE3E: case 0xFE3F:
+                case 0xFE40: case 0xFE41: case 0xFE42: case 0xFE43: case 0xFE44: case 0xFE45: case 0xFE46: case 0xFE47:
+                case 0xFE48: case 0xFE49: case 0xFE4A: case 0xFE4B: case 0xFE4C: case 0xFE4D: case 0xFE4E: case 0xFE4F:
+                case 0xFE50: case 0xFE51: case 0xFE52: case 0xFE53: case 0xFE54: case 0xFE55: case 0xFE56: case 0xFE57:
+                case 0xFE58: case 0xFE59: case 0xFE5A: case 0xFE5B: case 0xFE5C: case 0xFE5D: case 0xFE5E: case 0xFE5F:
+                case 0xFE60: case 0xFE61: case 0xFE62: case 0xFE63: case 0xFE64: case 0xFE65: case 0xFE66: case 0xFE67:
+                case 0xFE68: case 0xFE69: case 0xFE6A: case 0xFE6B: case 0xFE6C: case 0xFE6D: case 0xFE6E: case 0xFE6F:
+                case 0xFE70: case 0xFE71: case 0xFE72: case 0xFE73: case 0xFE74: case 0xFE75: case 0xFE76: case 0xFE77:
+                case 0xFE78: case 0xFE79: case 0xFE7A: case 0xFE7B: case 0xFE7C: case 0xFE7D: case 0xFE7E: case 0xFE7F:
+                case 0xFE80: case 0xFE81: case 0xFE82: case 0xFE83: case 0xFE84: case 0xFE85: case 0xFE86: case 0xFE87:
+                case 0xFE88: case 0xFE89: case 0xFE8A: case 0xFE8B: case 0xFE8C: case 0xFE8D: case 0xFE8E: case 0xFE8F:
+                case 0xFE90: case 0xFE91: case 0xFE92: case 0xFE93: case 0xFE94: case 0xFE95: case 0xFE96: case 0xFE97:
+                case 0xFE98: case 0xFE99: case 0xFE9A: case 0xFE9B: case 0xFE9C: case 0xFE9D: case 0xFE9E: case 0xFE9F:
+                    GBC_MMU_Memory.OAM[address - 0xFE00] = value;
+                    break;
+                // Unused Memory
+                case 0xFEA0: case 0xFEA1: case 0xFEA2: case 0xFEA3: case 0xFEA4: case 0xFEA5: case 0xFEA6: case 0xFEA7:
+                case 0xFEA8: case 0xFEA9: case 0xFEAA: case 0xFEAB: case 0xFEAC: case 0xFEAD: case 0xFEAE: case 0xFEAF:
+                case 0xFEB0: case 0xFEB1: case 0xFEB2: case 0xFEB3: case 0xFEB4: case 0xFEB5: case 0xFEB6: case 0xFEB7:
+                case 0xFEB8: case 0xFEB9: case 0xFEBA: case 0xFEBB: case 0xFEBC: case 0xFEBD: case 0xFEBE: case 0xFEBF:
+                case 0xFEC0: case 0xFEC1: case 0xFEC2: case 0xFEC3: case 0xFEC4: case 0xFEC5: case 0xFEC6: case 0xFEC7:
+                case 0xFEC8: case 0xFEC9: case 0xFECA: case 0xFECB: case 0xFECC: case 0xFECD: case 0xFECE: case 0xFECF:
+                case 0xFED0: case 0xFED1: case 0xFED2: case 0xFED3: case 0xFED4: case 0xFED5: case 0xFED6: case 0xFED7:
+                case 0xFED8: case 0xFED9: case 0xFEDA: case 0xFEDB: case 0xFEDC: case 0xFEDD: case 0xFEDE: case 0xFEDF:
+                case 0xFEE0: case 0xFEE1: case 0xFEE2: case 0xFEE3: case 0xFEE4: case 0xFEE5: case 0xFEE6: case 0xFEE7:
+                case 0xFEE8: case 0xFEE9: case 0xFEEA: case 0xFEEB: case 0xFEEC: case 0xFEED: case 0xFEEE: case 0xFEEF:
+                case 0xFEF0: case 0xFEF1: case 0xFEF2: case 0xFEF3: case 0xFEF4: case 0xFEF5: case 0xFEF6: case 0xFEF7:
+                case 0xFEF8: case 0xFEF9: case 0xFEFA: case 0xFEFB: case 0xFEFC: case 0xFEFD: case 0xFEFE: case 0xFEFF:
+                    // Do nothing
+                    break;
+                // Memory-mapped I/O
+                case 0xFF00: // Joypad
+                    GBC_MMU_Memory.Joypad = value;
+                    Input_UpdateJoypadState();
+                    break;
+                case 0xFF01:
+                case 0xFF02:
+                case 0xFF03:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
+                case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
+                    GBC_TIM_ResetDivider();
+                    break;
+                case 0xFF05:
+                case 0xFF06:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
+                case 0xFF07: // Timer Control
+                    value &= 0x07;
 
-                Input_UpdateGBCJoypad();
-                break;
-            case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
-                GBC_TIM_ResetDivider();
-                break;
-            case 0xFF07: // Timer Control
-                value &= 0x07;
+                    if (GBC_MMU_Memory.TimerRunning != (value & 0x03))
+                    {
+                        GBC_TIM_ResetCounter();
+                    }
 
-                if (GBC_MMU_Memory.TimerRunning != (value & 0x03))
-                {
-                    GBC_TIM_ResetCounter();
-                }
+                    GBC_MMU_Memory.TimerControl = value;
+                    break;
+                case 0xFF08:
+                case 0xFF09:
+                case 0xFF0A:
+                case 0xFF0B:
+                case 0xFF0C:
+                case 0xFF0D:
+                case 0xFF0E:
+                case 0xFF0F:
+                case 0xFF10:
+                case 0xFF11:
+                case 0xFF12:
+                case 0xFF13:
+                case 0xFF14:
+                case 0xFF15:
+                case 0xFF16:
+                case 0xFF17:
+                case 0xFF18:
+                case 0xFF19:
+                case 0xFF1A:
+                case 0xFF1B:
+                case 0xFF1C:
+                case 0xFF1D:
+                case 0xFF1E:
+                case 0xFF1F:
+                case 0xFF20:
+                case 0xFF21:
+                case 0xFF22:
+                case 0xFF23:
+                case 0xFF24:
+                case 0xFF25:
+                case 0xFF26:
+                case 0xFF27:
+                case 0xFF28:
+                case 0xFF29:
+                case 0xFF2A:
+                case 0xFF2B:
+                case 0xFF2C:
+                case 0xFF2D:
+                case 0xFF2E:
+                case 0xFF2F:
+                case 0xFF30:
+                case 0xFF31:
+                case 0xFF32:
+                case 0xFF33:
+                case 0xFF34:
+                case 0xFF35:
+                case 0xFF36:
+                case 0xFF37:
+                case 0xFF38:
+                case 0xFF39:
+                case 0xFF3A:
+                case 0xFF3B:
+                case 0xFF3C:
+                case 0xFF3D:
+                case 0xFF3E:
+                case 0xFF3F:
+                case 0xFF40:
+                case 0xFF41:
+                case 0xFF42:
+                case 0xFF43:
+                case 0xFF44:
+                case 0xFF45:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
+                case 0xFF46: // DMA Transfer and Start Address
+                    GBC_MMU_Memory.OAMTransferStartAddress = value;
 
-                GBC_MMU_Memory.TimerControl = value;
-                break;
-            case 0xFF46: // DMA Transfer and Start Address
-                GBC_MMU_Memory.OAMTransferStartAddress = value;
-                GBC_MMU_StartDMA(value);
-                break;
-            default:
-                GBC_MMU_Memory.IO[address - 0xFF00] = value;
-                break;
+                    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                    {
+                        // ToDo
+                    }
+                    else
+                    {
+                        // The written value specifies the transfer source address divided by 100h
+                        uint16_t address = value << 8;
+
+                        if (address >= 0x8000 && address < 0xE000)
+                        {
+                            for (uint32_t i = 0; i < 160; i++, address++)
+                            {
+                                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
+                            }
+                        }
+                    }
+                    break;
+                case 0xFF47:
+                case 0xFF48:
+                case 0xFF49:
+                case 0xFF4A:
+                case 0xFF4B:
+                case 0xFF4C:
+                case 0xFF4D:
+                case 0xFF4E:
+                case 0xFF4F:
+                case 0xFF50:
+                case 0xFF51:
+                case 0xFF52:
+                case 0xFF53:
+                case 0xFF54:
+                case 0xFF55:
+                case 0xFF56:
+                case 0xFF57:
+                case 0xFF58:
+                case 0xFF59:
+                case 0xFF5A:
+                case 0xFF5B:
+                case 0xFF5C:
+                case 0xFF5D:
+                case 0xFF5E:
+                case 0xFF5F:
+                case 0xFF60:
+                case 0xFF61:
+                case 0xFF62:
+                case 0xFF63:
+                case 0xFF64:
+                case 0xFF65:
+                case 0xFF66:
+                case 0xFF67:
+                case 0xFF68:
+                case 0xFF69:
+                case 0xFF6A:
+                case 0xFF6B:
+                case 0xFF6C:
+                case 0xFF6D:
+                case 0xFF6E:
+                case 0xFF6F:
+                case 0xFF70:
+                case 0xFF71:
+                case 0xFF72:
+                case 0xFF73:
+                case 0xFF74:
+                case 0xFF75:
+                case 0xFF76:
+                case 0xFF77:
+                case 0xFF78:
+                case 0xFF79:
+                case 0xFF7A:
+                case 0xFF7B:
+                case 0xFF7C:
+                case 0xFF7D:
+                case 0xFF7E:
+                case 0xFF7F:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
+                // High RAM
+                case 0xFF80: case 0xFF81: case 0xFF82: case 0xFF83: case 0xFF84: case 0xFF85: case 0xFF86: case 0xFF87:
+                case 0xFF88: case 0xFF89: case 0xFF8A: case 0xFF8B: case 0xFF8C: case 0xFF8D: case 0xFF8E: case 0xFF8F:
+                case 0xFF90: case 0xFF91: case 0xFF92: case 0xFF93: case 0xFF94: case 0xFF95: case 0xFF96: case 0xFF97:
+                case 0xFF98: case 0xFF99: case 0xFF9A: case 0xFF9B: case 0xFF9C: case 0xFF9D: case 0xFF9E: case 0xFF9F:
+                case 0xFFA0: case 0xFFA1: case 0xFFA2: case 0xFFA3: case 0xFFA4: case 0xFFA5: case 0xFFA6: case 0xFFA7:
+                case 0xFFA8: case 0xFFA9: case 0xFFAA: case 0xFFAB: case 0xFFAC: case 0xFFAD: case 0xFFAE: case 0xFFAF:
+                case 0xFFB0: case 0xFFB1: case 0xFFB2: case 0xFFB3: case 0xFFB4: case 0xFFB5: case 0xFFB6: case 0xFFB7:
+                case 0xFFB8: case 0xFFB9: case 0xFFBA: case 0xFFBB: case 0xFFBC: case 0xFFBD: case 0xFFBE: case 0xFFBF:
+                case 0xFFC0: case 0xFFC1: case 0xFFC2: case 0xFFC3: case 0xFFC4: case 0xFFC5: case 0xFFC6: case 0xFFC7:
+                case 0xFFC8: case 0xFFC9: case 0xFFCA: case 0xFFCB: case 0xFFCC: case 0xFFCD: case 0xFFCE: case 0xFFCF:
+                case 0xFFD0: case 0xFFD1: case 0xFFD2: case 0xFFD3: case 0xFFD4: case 0xFFD5: case 0xFFD6: case 0xFFD7:
+                case 0xFFD8: case 0xFFD9: case 0xFFDA: case 0xFFDB: case 0xFFDC: case 0xFFDD: case 0xFFDE: case 0xFFDF:
+                case 0xFFE0: case 0xFFE1: case 0xFFE2: case 0xFFE3: case 0xFFE4: case 0xFFE5: case 0xFFE6: case 0xFFE7:
+                case 0xFFE8: case 0xFFE9: case 0xFFEA: case 0xFFEB: case 0xFFEC: case 0xFFED: case 0xFFEE: case 0xFFEF:
+                case 0xFFF0: case 0xFFF1: case 0xFFF2: case 0xFFF3: case 0xFFF4: case 0xFFF5: case 0xFFF6: case 0xFFF7:
+                case 0xFFF8: case 0xFFF9: case 0xFFFA: case 0xFFFB: case 0xFFFC: case 0xFFFD: case 0xFFFE:
+                    GBC_MMU_Memory.HRAM[address - 0xFF80] = value;
+                    break;
+                // Interrupt Enable Register
+                case 0xFFFF:
+                    GBC_MMU_Memory.InterruptEnable = value;
+                    break;
+                default:
+                    // Shadow RAM redirection to WRAM Bank X
+                    switch (GBC_MMU_Memory.WRAMBankID)
+                    {
+                        case 0:
+                        case 1:
+                            GBC_MMU_Memory.WRAMBank1[address - 0xF000] = value;
+                            break;
+                        case 2:
+                            GBC_MMU_Memory.WRAMBank2[address - 0xF000] = value;
+                            break;
+                        case 3:
+                            GBC_MMU_Memory.WRAMBank3[address - 0xF000] = value;
+                            break;
+                        case 4:
+                            GBC_MMU_Memory.WRAMBank4[address - 0xF000] = value;
+                            break;
+                        case 5:
+                            GBC_MMU_Memory.WRAMBank5[address - 0xF000] = value;
+                            break;
+                        case 6:
+                            GBC_MMU_Memory.WRAMBank6[address - 0xF000] = value;
+                            break;
+                        case 7:
+                            GBC_MMU_Memory.WRAMBank7[address - 0xF000] = value;
+                            break;
+                        default:
+                            GBC_MMU_Memory.WRAMBank1[address - 0xF000] = value;
+                            break;
+                    }
+                    break;
+            }
+            break;
         }
-    }
-    // High RAM
-    else if (address < 0xFFFF)
-    {
-        GBC_MMU_Memory.HRAM[address - 0xFF80] = value;
-    }
-    // Interrupt Enable Register
-    else if (address == 0xFFFF)
-    {
-        GBC_MMU_Memory.InterruptEnable = value;
     }
 }
 
