@@ -721,7 +721,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 // Memory-mapped I/O
                 case 0xFF00: // Joypad
                     GBC_MMU_Memory.Joypad = value;
-                    Input_UpdateJoypadState();
+                    Input_UpdateGBCJoypad();
                     break;
                 case 0xFF01:
                 case 0xFF02:
