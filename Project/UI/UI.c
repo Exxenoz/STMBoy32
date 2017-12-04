@@ -35,7 +35,10 @@ bool UI_DrawShowAllPage(void)
     bool lastPlayedGameValid;
 
     // Load all games starting with 'A' / 'a' and UI_LIST_LENGTH - 1 games starting with b into OS_GameEntries
-    OS_LoadGameEntries('A', UI_LIST_LENGTH - 1);
+    //OS_LoadGameEntries('A', UI_LIST_LENGTH - 1);
+
+    // ToDo: Is this correct? -Andreas
+    OS_InitializeGameEntries();
 
     // Print the List background color (only noticable when therre are less elements then would fit on the screen)
     LCD_ClearColor(UI_GE_BG_COLOR);

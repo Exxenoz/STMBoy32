@@ -40,7 +40,6 @@ int OS_CmpFunc(const void *a, const void *b)
     return (game1.Name[i] - game2.Name[i]);
 }
 
-bool OS_InitializeGameEntries(void)
 void OS_LoadOptions(void)
 {
     // Load the initial options from internal flash
@@ -53,6 +52,7 @@ void OS_UpdateOptions(void)
     // YTBI
 }
 
+bool OS_InitializeGameEntries(void)
 {
     // If it's a re-initialization reset LoadedGames counter
     if (OS_GamesLoaded != 0) OS_GamesLoaded = 0;
@@ -84,7 +84,7 @@ void OS_UpdateOptions(void)
     f_closedir(&directory);
 
     // Repeat for favorites
-    if (f_opendir(&directory, OS_FAVS_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
+    if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
     {
         return false;
     }
@@ -103,7 +103,7 @@ void OS_UpdateOptions(void)
     f_closedir(&directory);
     qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
 
-    return;
+    return true;
 }
 
 void OS_LoadLastPlayed(void)

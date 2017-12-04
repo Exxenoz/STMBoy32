@@ -226,7 +226,9 @@ bool HandleSDCIngame(void)
             return true;
         }
 
+        GPIOA->ODR ^= GPIO_Pin_5;
         GBC_Update();
+        GPIOA->ODR ^= GPIO_Pin_5;
 
         while (!LCD_READY_FLAG);
         LCD_DrawGBCFrameBufferScaled();
@@ -257,7 +259,9 @@ bool HandleCartridgeIngame(void)
             return true;
         }
 
+        GPIOA->ODR ^= GPIO_Pin_5;
         GBC_Update();
+        GPIOA->ODR ^= GPIO_Pin_5;
 
         while (!LCD_READY_FLAG);
         LCD_DrawGBCFrameBufferScaled();
