@@ -501,24 +501,19 @@ void GBC_CPU_LD_B_X(uint8_t operand)    // 0x06 - Load 8-bit immediate into B
 
 void GBC_CPU_RLC_A()                    // 0x07 - Rotate A left with carry
 {
-    uint8_t value = GBC_CPU_Register.A;
-
-    if (value & 0x80)
+    if (GBC_CPU_Register.A & 0x80)
     {
-        value <<= 1;
-        value  |= 1;
+        GBC_CPU_Register.A <<= 1;
+        GBC_CPU_Register.A  |= 1;
 
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
     }
     else
     {
-        value <<= 1;
+        GBC_CPU_Register.A <<= 1;
 
-        GBC_CPU_FLAGS_CLEAR_ALL;
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
     }
-
-    GBC_CPU_Register.A = value;
 }
 
 void GBC_CPU_LD_XXP_SP(uint16_t operand)// 0x08 - Save SP to given address
@@ -560,24 +555,19 @@ void GBC_CPU_LD_C_X(uint8_t operand)    // 0x0E - Load 8-bit immediate into C
 
 void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
 {
-    uint8_t value = GBC_CPU_Register.A;
-
-    if (value & 0x1)
+    if (GBC_CPU_Register.A & 0x1)
     {
-        value >>= 1;
-        value  |= 0x80;
+        GBC_CPU_Register.A >>= 1;
+        GBC_CPU_Register.A  |= 0x80;
 
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
     }
     else
     {
-        value >>= 1;
+        GBC_CPU_Register.A >>= 1;
 
-        GBC_CPU_FLAGS_CLEAR_ALL;
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
     }
-
-    GBC_CPU_Register.A = value;
 }
 
 void GBC_CPU_STOP()                     // 0x10 - Stop processor
@@ -627,22 +617,18 @@ void GBC_CPU_LD_D_X(uint8_t operand)    // 0x16 - Load 8-bit immediate into D
 void GBC_CPU_RL_A()                     // 0x17 - Rotate A left
 {
     uint8_t carry = GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 1 : 0;
-    uint8_t value = GBC_CPU_Register.A;
 
-    if (value & 0x80)
+    if (GBC_CPU_Register.A & 0x80)
     {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR_ALL;
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
     }
 
-    value <<= 1;
-    value  |= carry;
-
-    GBC_CPU_Register.A = value;
+    GBC_CPU_Register.A <<= 1;
+    GBC_CPU_Register.A  |= carry;
 }
 
 void GBC_CPU_JR_X(uint8_t operand)      // 0x18 - Relative jump by signed immediate
@@ -686,22 +672,18 @@ void GBC_CPU_LD_E_X(uint8_t operand)    // 0x1E - Load 8-bit immediate into E
 void GBC_CPU_RR_A()                     // 0x1F - Rotate A right
 {
     uint8_t carry = GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY) ? 0x80 : 0;
-    uint8_t value = GBC_CPU_Register.A;
 
-    if (value & 0x1)
+    if (GBC_CPU_Register.A & 0x1)
     {
-        GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION | GBC_CPU_FLAGS_ZERO);
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_CARRY;
     }
     else
     {
-        GBC_CPU_FLAGS_CLEAR_ALL;
+        GBC_CPU_Register.F = GBC_CPU_FLAGS_NONE;
     }
 
-    value >>= 0x1;
-    value  |= carry;
-
-    GBC_CPU_Register.A = value;
+    GBC_CPU_Register.A >>= 0x1;
+    GBC_CPU_Register.A  |= carry;
 }
 
 void GBC_CPU_JR_NZ_X(uint8_t operand)   // 0x20 - Relative jump by signed immediate if last result was not zero
@@ -854,8 +836,7 @@ void GBC_CPU_CPL()                      // 0x2F - Complement (logical NOT) on A 
     GBC_CPU_Register.A = ~GBC_CPU_Register.A;
 
     // Carry flag not affected
-    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_SUBTRACTION);
+    GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     // Zero flag not affected
 }
 
@@ -912,8 +893,7 @@ void GBC_CPU_LD_HLP_X(uint8_t operand)  // 0x36 - Load 8-bit immediate into addr
 void GBC_CPU_SCF()                      // 0x37 - Set carry flag
 {
     GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY);
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_SUBTRACTION);
+    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     // Zero flag not affected
 }
 
@@ -963,14 +943,14 @@ void GBC_CPU_CCF()                      // 0x3F - Complement carry flag
 {
     if (GBC_CPU_FLAGS_HAS(GBC_CPU_FLAGS_CARRY))
     {
-        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY | GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
     else
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
+        GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     }
 
-    GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_HALFCARRY | GBC_CPU_FLAGS_SUBTRACTION);
     // Zero flag not affected
 }
 
@@ -1844,11 +1824,10 @@ void GBC_CPU_RST_20H()                  // 0xE7 - Call routine at address 0020h
 
 void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to SP
 {
-    uint16_t sp = GBC_CPU_Register.SP;
     int8_t value = operand;
-    int32_t result = sp + value;
+    int32_t result = GBC_CPU_Register.SP + value;
 
-    if ((sp & 0xFF) + (operand & 0xFF) > 0xFF)
+    if ((GBC_CPU_Register.SP & 0xFF) + (operand & 0xFF) > 0xFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
@@ -1857,7 +1836,7 @@ void GBC_CPU_ADD_SP_X(uint8_t operand)  // 0xE8 - Add signed 8-bit immediate to 
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
 
-    if ((sp & 0x0F) + (value & 0x0F) > 0x0F)
+    if ((GBC_CPU_Register.SP & 0x0F) + (value & 0x0F) > 0x0F)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
     }
@@ -1941,11 +1920,10 @@ void GBC_CPU_RST_30H()                  // 0xF7 - Call routine at address 0030h
 
 void GBC_CPU_LDHL_SP_X(uint8_t operand) // 0xF8 - Add signed 8-bit immediate to SP and save result in HL
 {
-    uint16_t sp = GBC_CPU_Register.SP;
     int8_t value = operand;
-    int32_t result = sp + value;
+    int32_t result = GBC_CPU_Register.SP + value;
 
-    if ((sp & 0xFF) + (operand & 0xFF) > 0xFF)
+    if ((GBC_CPU_Register.SP & 0xFF) + (operand & 0xFF) > 0xFF)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_CARRY);
     }
@@ -1954,7 +1932,7 @@ void GBC_CPU_LDHL_SP_X(uint8_t operand) // 0xF8 - Add signed 8-bit immediate to 
         GBC_CPU_FLAGS_CLEAR(GBC_CPU_FLAGS_CARRY);
     }
 
-    if ((sp & 0x0F) + (value & 0x0F) > 0x0F)
+    if ((GBC_CPU_Register.SP & 0x0F) + (value & 0x0F) > 0x0F)
     {
         GBC_CPU_FLAGS_SET(GBC_CPU_FLAGS_HALFCARRY);
     }
@@ -2447,13 +2425,13 @@ void GBC_CPU_Step()
         {
             case 0x00: // NOP
             {
-                // Do nothing
-
                 GBC_CPU_InstructionTicks += 4;
+
+                // Do nothing
 
                 break;
             }
-            case 0x01: // Load 16-bit immediate into BC
+            /*case 0x01: // Load 16-bit immediate into BC
             {
                 GBC_CPU_InstructionTicks += 12;
 
@@ -4921,7 +4899,7 @@ void GBC_CPU_Step()
                 GBC_CPU_Register.PC = 0x38;
 
                 break;
-            }
+            }*/
             default:
             {
                 // Get instruction information from instruction array
