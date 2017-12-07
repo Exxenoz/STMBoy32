@@ -3,6 +3,7 @@
 #include "gbc_gpu.h"
 #include "gbc_mmu.h"
 #include "gbc_tim.h"
+#include "gbc_sfx.h"
 #include "cmod.h"
 #include "sdc.h"
 
@@ -85,6 +86,7 @@ void GBC_Update(void)
     {
         GBC_CPU_Step();
         GBC_TIM_Step();
+        GBC_SFX_Step();
     }
     while (!GBC_GPU_Step());
 }

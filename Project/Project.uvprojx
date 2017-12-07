@@ -804,14 +804,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1696,14 +1696,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2587,14 +2587,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3476,14 +3476,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4365,14 +4365,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5254,14 +5254,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6145,14 +6145,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7034,14 +7034,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7925,14 +7925,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8817,14 +8817,14 @@
               <FilePath>.\GBC\gbc_tim.c</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GBC\gbc_audio.c</FilePath>
+              <FileName>gbc_sfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GBC\gbc_sfx.h</FilePath>
             </File>
             <File>
-              <FileName>gbc_audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GBC\gbc_audio.h</FilePath>
+              <FileName>gbc_sfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GBC\gbc_sfx.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -12340,24 +12340,24 @@
     <File>
       <GroupNumber>17</GroupNumber>
       <FileNumber>70</FileNumber>
-      <FileType>1</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\GBC\gbc_audio.c</PathWithFileName>
-      <FilenameWithoutPath>gbc_audio.c</FilenameWithoutPath>
+      <PathWithFileName>.\GBC\gbc_sfx.h</PathWithFileName>
+      <FilenameWithoutPath>gbc_sfx.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>17</GroupNumber>
       <FileNumber>71</FileNumber>
-      <FileType>5</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\GBC\gbc_audio.h</PathWithFileName>
-      <FilenameWithoutPath>gbc_audio.h</FilenameWithoutPath>
+      <PathWithFileName>.\GBC\gbc_sfx.c</PathWithFileName>
+      <FilenameWithoutPath>gbc_sfx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
