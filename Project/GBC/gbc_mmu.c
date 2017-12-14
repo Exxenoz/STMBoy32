@@ -1,5 +1,6 @@
 #include "gbc_mmu.h"
 #include "gbc_tim.h"
+#include "gbc_sfx.h"
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
@@ -753,6 +754,8 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF0D:
                 case 0xFF0E:
                 case 0xFF0F:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
                 case 0xFF10:
                 case 0xFF11:
                 case 0xFF12:
@@ -776,6 +779,9 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF24:
                 case 0xFF25:
                 case 0xFF26:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_SFX_OnWriteToSoundRegister(address, value);
+                    break;
                 case 0xFF27:
                 case 0xFF28:
                 case 0xFF29:

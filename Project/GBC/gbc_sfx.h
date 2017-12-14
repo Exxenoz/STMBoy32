@@ -8,5 +8,6 @@
 
 void GBC_SFX_Initialize(void);
 void GBC_SFX_Step(void);
+void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value);
 
 #endif
