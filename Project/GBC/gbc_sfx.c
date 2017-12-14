@@ -15,6 +15,14 @@ uint32_t GBC_SFX_Channel1EnvelopeVolume = 0;
 uint32_t GBC_SFX_Channel1SweepTicks = 0;
 uint32_t GBC_SFX_Channel1SweepLength = 0;
 
+uint32_t GBC_SFX_Channel2Ticks = 0;
+uint32_t GBC_SFX_Channel2Length = 0;
+uint32_t GBC_SFX_Channel2Position = 0;
+uint32_t GBC_SFX_Channel2Frequency = 0;
+uint32_t GBC_SFX_Channel2EnvelopeTicks = 0;
+uint32_t GBC_SFX_Channel2EnvelopeLength = 0;
+uint32_t GBC_SFX_Channel2EnvelopeVolume = 0;
+
 static const int8_t GBC_SFX_SQUARE_WAVE[4][8] =
 {
 	{  0, 0,-1, 0, 0, 0, 0, 0 },
@@ -36,6 +44,14 @@ void GBC_SFX_Initialize(void)
     GBC_SFX_Channel1EnvelopeVolume = 0;
     GBC_SFX_Channel1SweepTicks = 0;
     GBC_SFX_Channel1SweepLength = 0;
+
+    GBC_SFX_Channel2Ticks = 0;
+    GBC_SFX_Channel2Length = 0;
+    GBC_SFX_Channel2Position = 0;
+    GBC_SFX_Channel2Frequency = 0;
+    GBC_SFX_Channel2EnvelopeTicks = 0;
+    GBC_SFX_Channel2EnvelopeLength = 0;
+    GBC_SFX_Channel2EnvelopeVolume = 0;
 }
 
 void GBC_SFX_Step(void)
@@ -157,7 +173,58 @@ void GBC_SFX_Step(void)
 
         if (GBC_MMU_Memory.ChannelSound2Enabled)
         {
-            
+            // Stop output when length expires
+            if (GBC_MMU_Memory.Channel2CounterSelection)
+            {
+                GBC_SFX_Channel2Ticks += GBC_SFX_SAMPLE_RATE;
+
+                if (GBC_SFX_Channel2Ticks >= GBC_SFX_Channel2Length)
+                {
+                    GBC_MMU_Memory.ChannelSound2Enabled = 0;
+                }
+            }
+
+            // Envelope handling
+            if (GBC_SFX_Channel2EnvelopeLength)
+            {
+                GBC_SFX_Channel2EnvelopeTicks += GBC_SFX_SAMPLE_RATE;
+
+                if (GBC_SFX_Channel2EnvelopeTicks >= GBC_SFX_Channel2EnvelopeLength)
+                {
+                    GBC_SFX_Channel2EnvelopeTicks -= GBC_SFX_Channel2EnvelopeLength;
+
+                    // Envelope Direction (0 = Decrease, 1 = Increase)
+                    if (GBC_MMU_Memory.Channel2EnvelopeDirection)
+                    {
+                        if (GBC_SFX_Channel2EnvelopeVolume < 15)
+                        {
+                            GBC_SFX_Channel2EnvelopeVolume++;
+                        }
+                    }
+                    else
+                    {
+                        if (GBC_SFX_Channel2EnvelopeVolume > 0)
+                        {
+                            GBC_SFX_Channel2EnvelopeVolume--;
+                        }
+                    }
+                }
+            }
+
+            s = GBC_SFX_SQUARE_WAVE[GBC_MMU_Memory.Channel2WavePatternDuty][(GBC_SFX_Channel2Position >> 18) & 7] & GBC_SFX_Channel2EnvelopeVolume;
+            s <<= 2;
+
+            GBC_SFX_Channel2Position += GBC_SFX_Channel2Frequency;
+
+            if (GBC_MMU_Memory.SoundOutputChannel2ToSO1)
+            {
+                r += s;
+            }
+
+            if (GBC_MMU_Memory.SoundOutputChannel2ToSO2)
+            {
+                l += s;
+            }
         }
 
         if (GBC_MMU_Memory.ChannelSound3Enabled)
