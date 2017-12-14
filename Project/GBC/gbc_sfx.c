@@ -606,11 +606,6 @@ void GBC_SFX_Initialize(void)
 
 void GBC_SFX_Step(void)
 {
-    if (!GBC_MMU_Memory.ChannelSoundsEnabled)
-    {
-        return;
-    }
-
     long f = 0;
     long l = 0;
     long r = 0;
@@ -905,6 +900,30 @@ void GBC_SFX_Step(void)
             {
                 l += s;
             }
+        }
+
+        l *= GBC_MMU_Memory.ChannelControlOutputVinToSO1;
+		r *= GBC_MMU_Memory.ChannelControlOutputVinToSO2;
+
+		l >>= 4;
+		r >>= 4;
+
+        if (l > 127)
+        {
+            l = 127;
+        }
+		else if (l < -128)
+        {
+            l = -128;
+        }
+
+		if (r > 127)
+        {
+            r = 127;
+        }
+		else if (r < -128)
+        {
+            r = -128;
         }
     }
 }
