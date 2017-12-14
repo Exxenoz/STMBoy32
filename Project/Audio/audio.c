@@ -25,7 +25,7 @@ void Audio_TimerConfig(void)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseObject;
     TIM_TimeBaseStructInit(&TIM_TimeBaseObject);
 
-    TIM_TimeBaseObject.TIM_Period = 30000;
+    TIM_TimeBaseObject.TIM_Period = 4081;
     TIM_TimeBaseObject.TIM_Prescaler = 0;
     TIM_TimeBaseObject.TIM_ClockDivision = 0;
     TIM_TimeBaseObject.TIM_CounterMode = TIM_CounterMode_Up;
@@ -57,9 +57,9 @@ void Audio_SinusConfig(void)
     DMA_InitObject.DMA_BufferSize = 32;
     DMA_InitObject.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
     DMA_InitObject.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitObject.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-    DMA_InitObject.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-    DMA_InitObject.DMA_Mode = DMA_Mode_Circular;
+    DMA_InitObject.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    DMA_InitObject.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+    DMA_InitObject.DMA_Mode = DMA_Mode_Normal;
     DMA_InitObject.DMA_Priority = DMA_Priority_High;
     DMA_InitObject.DMA_FIFOMode = DMA_FIFOMode_Disable;         
     DMA_InitObject.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
