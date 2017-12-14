@@ -633,7 +633,7 @@ static const int32_t GBC_SFX_NoiseFrequencies[8] =
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
-void GBC_SFX_InitializeModule(void)
+void GBC_SFX_InitializeChannel1(void)
 {
     GBC_SFX_Channel1Ticks = 0;
     GBC_SFX_Channel1Length = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
@@ -644,7 +644,10 @@ void GBC_SFX_InitializeModule(void)
     GBC_SFX_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
     GBC_SFX_Channel1SweepTicks = 0;
     GBC_SFX_Channel1SweepLength = GBC_MMU_Memory.Channel1SweepTime << 14;
+}
 
+void GBC_SFX_InitializeChannel2(void)
+{
     GBC_SFX_Channel2Ticks = 0;
     GBC_SFX_Channel2Length = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
     GBC_SFX_Channel2Position = 0;
@@ -652,12 +655,18 @@ void GBC_SFX_InitializeModule(void)
     GBC_SFX_Channel2EnvelopeTicks = 0;
     GBC_SFX_Channel2EnvelopeLength = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
     GBC_SFX_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
+}
 
+void GBC_SFX_InitializeChannel3(void)
+{
     GBC_SFX_Channel3Ticks = 0;
     GBC_SFX_Channel3Length = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
     GBC_SFX_Channel3Position = 0;
     UPDATE_CHANNEL3_FREQUENCY();
+}
 
+void GBC_SFX_InitializeChannel4(void)
+{
     GBC_SFX_Channel4Ticks = 0;
     GBC_SFX_Channel4Length = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
     GBC_SFX_Channel4Position = 0;
@@ -667,6 +676,14 @@ void GBC_SFX_InitializeModule(void)
     GBC_SFX_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
 }
 
+void GBC_SFX_InitializeChannels(void)
+{
+    GBC_SFX_InitializeChannel1();
+    GBC_SFX_InitializeChannel2();
+    GBC_SFX_InitializeChannel3();
+    GBC_SFX_InitializeChannel4();
+}
+
 void GBC_SFX_Initialize(void)
 {
     GBC_SFX_Ticks = 0;
@@ -674,11 +691,16 @@ void GBC_SFX_Initialize(void)
     memset(&GBC_SFX_Buffer_L, 0, GBC_SFX_BUFFER_SIZE);
     memset(&GBC_SFX_Buffer_R, 0, GBC_SFX_BUFFER_SIZE);
 
-    GBC_SFX_InitializeModule();
+    GBC_SFX_InitializeChannels();
 }
 
 void GBC_SFX_Step(void)
 {
+    if (!GBC_MMU_Memory.ChannelSoundsEnabled)
+    {
+        return;
+    }
+
     long f = 0;
     long l = 0;
     long r = 0;
