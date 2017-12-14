@@ -1,9 +1,12 @@
 #include "gbc_sfx.h"
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
+#include <string.h>
 
 uint32_t GBC_SFX_Ticks = 0;
-uint8_t GBC_SFX_Buffer[GBC_SFX_BUFFER_SIZE];
+
+uint8_t GBC_SFX_Buffer_L[GBC_SFX_BUFFER_SIZE];
+uint8_t GBC_SFX_Buffer_R[GBC_SFX_BUFFER_SIZE];
 
 uint32_t GBC_SFX_Channel1Ticks = 0;
 uint32_t GBC_SFX_Channel1Length = 0;
@@ -568,40 +571,110 @@ static const int8_t GBC_SFX_NOISE15[] =
 #endif /* NO_NOISE15*/
 };
 
+static const int32_t GBC_SFX_NoiseFrequencies[8] =
+{
+	(1 << 14) * 2,
+	(1 << 14),
+	(1 << 14) / 2,
+	(1 << 14) / 3,
+	(1 << 14) / 4,
+	(1 << 14) / 5,
+	(1 << 14) / 6,
+	(1 << 14) / 7
+};
+
+#define UPDATE_CHANNEL1_FREQUENCY(D)                                                                                                                    \
+{                                                                                                                                                       \
+    uint32_t d = 2048 - GBC_MMU_Memory.Channel1Frequency;                                                                                               \
+    if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel1Frequency = 0;                                                                                                                  \
+    }                                                                                                                                                   \
+	else                                                                                                                                                \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel1Frequency = (GBC_SFX_SAMPLE_RATE << 17) / d;                                                                                    \
+    }                                                                                                                                                   \
+}                                                                                                                                                       \
+
+#define UPDATE_CHANNEL2_FREQUENCY()                                                                                                                     \
+{                                                                                                                                                       \
+    uint32_t d = 2048 - GBC_MMU_Memory.Channel2Frequency;                                                                                               \
+	if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel2Frequency = 0;                                                                                                                  \
+    }                                                                                                                                                   \
+	else                                                                                                                                                \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel2Frequency = (GBC_SFX_SAMPLE_RATE << 17) / d;                                                                                    \
+    }                                                                                                                                                   \
+}                                                                                                                                                       \
+
+#define UPDATE_CHANNEL3_FREQUENCY()                                                                                                                     \
+{                                                                                                                                                       \
+    uint32_t d = 2048 - GBC_MMU_Memory.Channel3Frequency;                                                                                               \
+	if (GBC_SFX_SAMPLE_RATE > (d << 3))                                                                                                                 \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel3Frequency = 0;                                                                                                                  \
+    }                                                                                                                                                   \
+	else                                                                                                                                                \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel3Frequency = (GBC_SFX_SAMPLE_RATE << 21) / d;                                                                                    \
+    }                                                                                                                                                   \
+}                                                                                                                                                       \
+
+#define UPDATE_CHANNEL4_FREQUENCY()                                                                                                                     \
+{                                                                                                                                                       \
+    GBC_SFX_Channel4Frequency = (GBC_SFX_NoiseFrequencies[GBC_MMU_Memory.Channel4PolynomialCounterFreqDivRatio]                                         \
+        >> GBC_MMU_Memory.Channel4PolynomialCounterShiftClockFreq) * GBC_SFX_SAMPLE_RATE;                                                               \
+                                                                                                                                                        \
+	if (GBC_SFX_Channel4Frequency >> 18)                                                                                                                \
+    {                                                                                                                                                   \
+        GBC_SFX_Channel4Frequency = 1 << 18;                                                                                                            \
+    }                                                                                                                                                   \
+}                                                                                                                                                       \
+
+void GBC_SFX_InitializeModule(void)
+{
+    GBC_SFX_Channel1Ticks = 0;
+    GBC_SFX_Channel1Length = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
+    GBC_SFX_Channel1Position = 0;
+    UPDATE_CHANNEL1_FREQUENCY();
+    GBC_SFX_Channel1EnvelopeTicks = 0;
+    GBC_SFX_Channel1EnvelopeLength = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 15;
+    GBC_SFX_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
+    GBC_SFX_Channel1SweepTicks = 0;
+    GBC_SFX_Channel1SweepLength = GBC_MMU_Memory.Channel1SweepTime << 14;
+
+    GBC_SFX_Channel2Ticks = 0;
+    GBC_SFX_Channel2Length = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
+    GBC_SFX_Channel2Position = 0;
+    UPDATE_CHANNEL2_FREQUENCY();
+    GBC_SFX_Channel2EnvelopeTicks = 0;
+    GBC_SFX_Channel2EnvelopeLength = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
+    GBC_SFX_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
+
+    GBC_SFX_Channel3Ticks = 0;
+    GBC_SFX_Channel3Length = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
+    GBC_SFX_Channel3Position = 0;
+    UPDATE_CHANNEL3_FREQUENCY();
+
+    GBC_SFX_Channel4Ticks = 0;
+    GBC_SFX_Channel4Length = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
+    GBC_SFX_Channel4Position = 0;
+    UPDATE_CHANNEL4_FREQUENCY();
+    GBC_SFX_Channel4EnvelopeTicks = 0;
+    GBC_SFX_Channel4EnvelopeLength = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 15;
+    GBC_SFX_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
+}
+
 void GBC_SFX_Initialize(void)
 {
     GBC_SFX_Ticks = 0;
 
-    GBC_SFX_Channel1Ticks = 0;
-    GBC_SFX_Channel1Length = 0;
-    GBC_SFX_Channel1Position = 0;
-    GBC_SFX_Channel1Frequency = 0;
-    GBC_SFX_Channel1EnvelopeTicks = 0;
-    GBC_SFX_Channel1EnvelopeLength = 0;
-    GBC_SFX_Channel1EnvelopeVolume = 0;
-    GBC_SFX_Channel1SweepTicks = 0;
-    GBC_SFX_Channel1SweepLength = 0;
+    memset(&GBC_SFX_Buffer_L, 0, GBC_SFX_BUFFER_SIZE);
+    memset(&GBC_SFX_Buffer_R, 0, GBC_SFX_BUFFER_SIZE);
 
-    GBC_SFX_Channel2Ticks = 0;
-    GBC_SFX_Channel2Length = 0;
-    GBC_SFX_Channel2Position = 0;
-    GBC_SFX_Channel2Frequency = 0;
-    GBC_SFX_Channel2EnvelopeTicks = 0;
-    GBC_SFX_Channel2EnvelopeLength = 0;
-    GBC_SFX_Channel2EnvelopeVolume = 0;
-
-    GBC_SFX_Channel3Ticks = 0;
-    GBC_SFX_Channel3Length = 0;
-    GBC_SFX_Channel3Position = 0;
-    GBC_SFX_Channel3Frequency = 0;
-
-    GBC_SFX_Channel4Ticks = 0;
-    GBC_SFX_Channel4Length = 0;
-    GBC_SFX_Channel4Position = 0;
-    GBC_SFX_Channel4Frequency = 0;
-    GBC_SFX_Channel4EnvelopeTicks = 0;
-    GBC_SFX_Channel4EnvelopeLength = 0;
-    GBC_SFX_Channel4EnvelopeVolume = 0;
+    GBC_SFX_InitializeModule();
 }
 
 void GBC_SFX_Step(void)
