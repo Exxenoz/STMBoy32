@@ -23,6 +23,11 @@ uint32_t GBC_SFX_Channel2EnvelopeTicks = 0;
 uint32_t GBC_SFX_Channel2EnvelopeLength = 0;
 uint32_t GBC_SFX_Channel2EnvelopeVolume = 0;
 
+uint32_t GBC_SFX_Channel3Ticks = 0;
+uint32_t GBC_SFX_Channel3Length = 0;
+uint32_t GBC_SFX_Channel3Position = 0;
+uint32_t GBC_SFX_Channel3Frequency = 0;
+
 static const int8_t GBC_SFX_SQUARE_WAVE[4][8] =
 {
 	{  0, 0,-1, 0, 0, 0, 0, 0 },
@@ -52,6 +57,11 @@ void GBC_SFX_Initialize(void)
     GBC_SFX_Channel2EnvelopeTicks = 0;
     GBC_SFX_Channel2EnvelopeLength = 0;
     GBC_SFX_Channel2EnvelopeVolume = 0;
+
+    GBC_SFX_Channel3Ticks = 0;
+    GBC_SFX_Channel3Length = 0;
+    GBC_SFX_Channel3Position = 0;
+    GBC_SFX_Channel3Frequency = 0;
 }
 
 void GBC_SFX_Step(void)
@@ -229,7 +239,58 @@ void GBC_SFX_Step(void)
 
         if (GBC_MMU_Memory.ChannelSound3Enabled)
         {
-            
+            // Stop output when length expires
+            if (GBC_MMU_Memory.Channel3CounterSelection)
+            {
+                GBC_SFX_Channel3Ticks += GBC_SFX_SAMPLE_RATE;
+
+                if (GBC_SFX_Channel3Ticks >= GBC_SFX_Channel3Length)
+                {
+                    GBC_MMU_Memory.ChannelSound3Enabled = 0;
+                }
+            }
+
+            s = GBC_MMU_Memory.Channel3WavePatternRAM[(GBC_SFX_Channel3Position >> 22) & 15];
+
+            if (GBC_SFX_Channel3Position & (1 << 21))
+            {
+                s &= 15;
+            }
+			else
+            {
+                s >>= 4;
+            }
+
+			s -= 8;
+
+            GBC_SFX_Channel3Position += GBC_SFX_Channel3Frequency;
+
+            // Select output level
+            switch (GBC_MMU_Memory.Channel3SelectOutputLevel)
+            {
+                case 0: // Mute
+                    s = 0;
+                    break;
+                case 1: // 100%
+                    // Do nothing
+                    break;
+                case 2: // 50%
+                    s <<= 1;
+                    break;
+                case 3: // 25%
+                    s <<= 2;
+                    break;
+            }
+
+            if (GBC_MMU_Memory.SoundOutputChannel3ToSO1)
+            {
+                r += s;
+            }
+
+            if (GBC_MMU_Memory.SoundOutputChannel3ToSO2)
+            {
+                l += s;
+            }
         }
 
         if (GBC_MMU_Memory.ChannelSound4Enabled)
