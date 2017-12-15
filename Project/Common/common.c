@@ -12,6 +12,18 @@ void copyString(char *dest, const char *src, int destSize)
     dest[i] = '\0';
 }
 
+void copyWithoutSuffix(char *dest, const char *src, int destSize)
+{
+    int i;
+
+    for (i = 0; i < (destSize - 1) && src[i] != '\0' && (src[i] != '.' || src[i+1] != 'g' || src[i+2] != 'b'); i++)
+    {
+        dest[i] = src[i];
+    }
+
+    dest[i] = '\0';
+}
+
 void appendString(char *dest, const char *src, int destSize)
 {
     int i;

@@ -6,6 +6,12 @@
 
 // Max even timer period (65534) => 32 767 ms (timer runs with 2kHz)
 #define INPUT_MAX_LOCK_TIME       (MAX_16BIT_TIMER_PERIOD - 1)
+
+// Dynamic lock perimeters (used for scrolling a list)
+#define INPUT_MIN_DYNAMIC_LOCK_TIME        10
+#define INPUT_MAX_DYNAMIC_LOCK_TIME        150
+#define INPUT_DYNAMIC_LOCK_TIME_STEP       10
+
 // Locks button until it's released (second unlock condition) because value can never be reached
 #define INPUT_LOCK_UNTIL_RELEASED (INPUT_MAX_LOCK_TIME + 1)
 
@@ -47,8 +53,8 @@ typedef union
     {
         unsigned int ButtonA      : 1;
         unsigned int ButtonB      : 1;
-        unsigned int ButtonStart  : 1;
         unsigned int ButtonSelect : 1;
+        unsigned int ButtonStart  : 1;
         unsigned int FadeRight    : 1;
         unsigned int FadeLeft     : 1;
         unsigned int FadeTop      : 1;
@@ -68,6 +74,7 @@ void Input_UpdateLocks(void);
 bool Input_IsLocked(Input_Button_ID_t id);
 void Input_Lock(Input_Button_ID_t id, time_t lockTime);
 void Input_LockAll(time_t lockTime);
+void Input_LockDynamically(Input_Button_ID_t id);
 
 void TIM3_IRQHandler(void);
 

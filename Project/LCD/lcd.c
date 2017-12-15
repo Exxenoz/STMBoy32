@@ -232,7 +232,6 @@ void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t
     LCD_WriteCommandWithParameters(LCD_REG_FRAME_RATE_CONTROL, frameRateControlData.Data, 2);
 }
 
-// ToDo: Test if rowColExchange completly inverts Row-Col-Logic
 void LCD_SetDrawBehaviour(bool writeBotToTop, bool writeRightToLeft, bool rowColExchange, bool refreshBotToTop, bool refreshRightToLeft, bool bgr)
 {
     MemoryAccessControlData_t memoryAccessControlData = {0};
@@ -300,6 +299,23 @@ void LCD_ClearColor(uint16_t color)
     LCD_SET_CS;
 }
 
+// Not very time efficient when called thousands of times but totally fine for drawing symbols etc.
+void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
+{
+    LCD_SetDrawArea(x, y, 1, 1);
+
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+
+    LCD_DATA_PORT->ODR = color;
+    LCD_RST_WR;
+    LCD_SET_WR;
+    LCD_SET_CS;
+
+    // Set drawarea back to full size
+    LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
+}
+
 // This function is used to increase readability
 // However if speed is important rather use DrawFilledBox
 void LCD_DrawLine(uint16_t x0, uint16_t y0, uint16_t length, uint16_t width, uint16_t color, LCD_Orientation_t o)
@@ -319,6 +335,7 @@ void LCD_DrawEmptyBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height
     LCD_DrawLine(x0 + length - width, y0 + width, height - 2 * width, width, color, LCD_VERTICAL);
 }
 
+// This function doesn't use DrawPixel in order to avoid unneccessary function calls
 void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, uint16_t color)
 {
     LCD_SetDrawArea(x0, y0, length, height);
@@ -337,56 +354,56 @@ void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
-// Draw a line of bricks, use height to truncate the line
-void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool offset, LCD_Brick_t *brick)
+// Draws a line of bricks, use height to truncate the line
+void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool offset, LCD_Brick_t *p_brick)
 {
     uint16_t x;
 
     // Draw either a full or an half brick at the beginning of every brick line, depending on offset
-    LCD_DrawFilledBox(x0, y0, (brick->Length / (offset + 1)), height, brick->Color);
+    LCD_DrawFilledBox(x0, y0, (p_brick->Length / (offset + 1)), height, p_brick->Color);
 
     // Draw as many bricks as fully fit into the line
-    for (x = (x0 + brick->Length / (offset + 1)); x < (x0 + length - brick->Length - 2 * brick->Border.Width);)
+    for (x = (x0 + p_brick->Length / (offset + 1)); x < (x0 + length - p_brick->Length - 2 * p_brick->Border.Width);)
     {
-        LCD_DrawLine(x, y0, height, brick->Border.Width, brick->Border.Color, LCD_VERTICAL);
-        x += brick->Border.Width;
-        LCD_DrawFilledBox(x, y0, brick->Length, height, brick->Color);
-        x += brick->Length;
+        LCD_DrawLine(x, y0, height, p_brick->Border.Width, p_brick->Border.Color, LCD_VERTICAL);
+        x += p_brick->Border.Width;
+        LCD_DrawFilledBox(x, y0, p_brick->Length, height, p_brick->Color);
+        x += p_brick->Length;
     }
 
     // Draw as much of last brick as possible
-    LCD_DrawLine(x, y0, height, brick->Border.Width, brick->Border.Color, LCD_VERTICAL);
-    x += brick->Border.Width;
-    LCD_DrawFilledBox(x, y0, x0 + length - x, height, brick->Color);
+    LCD_DrawLine(x, y0, height, p_brick->Border.Width, p_brick->Border.Color, LCD_VERTICAL);
+    x += p_brick->Border.Width;
+    LCD_DrawFilledBox(x, y0, x0 + length - x, height, p_brick->Color);
 
-    // Draw the horizontal brick border if line is not truncated
-    if (height >= brick->Height)
+    // Draw the bottom horizontal brick border if line is not truncated
+    if (height >= p_brick->Height)
     {
-        LCD_DrawLine(x0, y0 + height, length, brick->Border.Width, brick->Border.Color, LCD_HORIZONTAL);
+        LCD_DrawLine(x0, y0 + height, length, p_brick->Border.Width, p_brick->Border.Color, LCD_HORIZONTAL);
     }
 }
 
-void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, LCD_Brick_t *brick)
+void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool initOffset, LCD_Brick_t *p_brick)
 {
     uint16_t y = y0;
-    bool offset = false;
+    bool offset = initOffset;
 
     // Draw as many brick lines as fully fit into wall height
-    for (; y < (y0 + height - brick->Height - brick->Border.Width); y += (brick->Height + brick->Border.Width))
+    for (; y < (y0 + height - p_brick->Height - p_brick->Border.Width); y += (p_brick->Height + p_brick->Border.Width))
     {
-        LCD_DrawBrickline(x0, y, length, brick->Height, offset, brick);
-        
-        // Shift every second line to get the wall pattern 
+        LCD_DrawBrickline(x0, y, length, p_brick->Height, offset, p_brick);
+
+        // Shift every second line to get the wall pattern
         if (offset) offset = false;
         else        offset = true;
     }
 
     // Draw as much of the last line as possible
-    LCD_DrawBrickline(x0, y, length, y0 + height - y, offset, brick);
+    LCD_DrawBrickline(x0, y, length, y0 + height - y, offset, p_brick);
 }
 
 // Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
-void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_t *font)
+void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_16_t *p_font)
 {
     // Calculate number of characters to draw and replace unknown chars with '?'
     int chars = 0;
@@ -397,8 +414,8 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     }
 
     // Calculate needed size
-    int length = text->Padding.Left + chars * (font->FontWidth + text->Spacing) + text->Padding.Right;
-    int height = text->Padding.Upper + font->FontHeight + text->Padding.Lower;
+    int length = text->Padding.Left + chars * (p_font->FontWidth + text->Spacing) + text->Padding.Right;
+    int height = text->Padding.Upper + p_font->FontHeight + text->Padding.Lower;
     int size   = length * height;
 
     // Initialize FrameBuffer with background color
@@ -408,24 +425,24 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     }
 
     // Draw first line of all chars, then second one, ...
-    for (int yChar = 0; yChar < font->FontHeight; yChar++)
+    for (int yChar = 0; yChar < p_font->FontHeight; yChar++)
     {
         for (int c = 0; c < chars; c++)
         {
-            for (int xChar = 0; xChar < font->FontWidth; xChar++)
+            for (int xChar = 0; xChar < p_font->FontWidth; xChar++)
             {
                 // Calculate the current buffer coordinates
-                int xBuffer = text->Padding.Left + c * (font->FontWidth + text->Spacing) + xChar;
+                int xBuffer = text->Padding.Left + c * (p_font->FontWidth + text->Spacing) + xChar;
                 int yBuffer = text->Padding.Upper + yChar;
 
                 // Each byte of fontData represents a line of a char where a set bit means a pixel must be drawn
                 // All lines of a char are stored sequentially in fontData, same goes for all chars
                 // The first char is space (ASCII 32), afterwards all chars are stored in ASCII order
-                uint16_t currentCharLine = font->FontData[(text->Characters[c] - 32) * font->FontHeight + yChar];
+                uint16_t currentCharLine = p_font->FontData[(text->Characters[c] - 32) * p_font->FontHeight + yChar];
 
                 // If FontData is mirrored check lines from right to left
-                if ((font->LettersMirrored && ((currentCharLine >> xChar) & 0x0001)) ||
-                   (!font->LettersMirrored && ((currentCharLine << xChar) & 0x8000)))
+                if ((p_font->LettersMirrored && ((currentCharLine >> xChar) & 0x0001)) ||
+                   (!p_font->LettersMirrored && ((currentCharLine << xChar) & 0x8000)))
                 {
                     // If a bit is set write textColor to the current Buffer position
                     // Padding Right and Bot is accomplished because buffer is actually
@@ -457,9 +474,19 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
-void LCD_DrawStar(uint16_t x0, uint16_t y0, uint16_t color)
+void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, Fonts_SymbolDef_32_t *p_symbol)
 {
-        //YTBI
+    for (int y = 0; y < p_symbol->SymbolHeight; y++)
+    {
+        for (int x = 0; x < p_symbol->SymbolWidth; x++)
+        {
+            uint32_t currentSymbolLine = p_symbol->SymbolData[y];
+            if ((currentSymbolLine << x) & 0x80000000)
+            {
+                LCD_DrawPixel(x0 + x, y0 + y, color);
+            }
+        }
+    }
 }
 
 void LCD_DrawGBCFrameBuffer(void)

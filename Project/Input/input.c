@@ -9,6 +9,7 @@ Input_ButtonState_t Input_CurrState[8];
 uint8_t             Input_Counter[8];
 
 Input_Lock_t        Input_Locks[8];
+time_t              Input_DynamicLockTimes[8];
 
 const uint32_t Input_Pins[8] =
 {
@@ -105,6 +106,8 @@ void Input_Initialize()
         Input_Locks[i].LockedSince          = false;
         Input_Locks[i].IsLocked             = false;
         Input_Locks[i].WasUnlockedByTimeout = false;
+
+        Input_DynamicLockTimes[i] = INPUT_MAX_DYNAMIC_LOCK_TIME;
     }
 
     //-----------DEBUG LED----------
@@ -187,6 +190,20 @@ void Input_LockAll(time_t lockTime)
     {
         Input_Lock(i, lockTime);
     }
+}
+
+void Input_LockDynamically(Input_Button_ID_t id)
+{
+    if (Input_Locks[id].WasUnlockedByTimeout && Input_DynamicLockTimes[id] > INPUT_MIN_DYNAMIC_LOCK_TIME)
+    {
+        Input_DynamicLockTimes[id] -= INPUT_DYNAMIC_LOCK_TIME_STEP;
+    }
+    else
+    {
+        Input_DynamicLockTimes[id] = INPUT_MAX_DYNAMIC_LOCK_TIME;
+    }
+
+    Input_Lock(id, Input_DynamicLockTimes[id]);
 }
 
 void TIM3_IRQHandler(void)

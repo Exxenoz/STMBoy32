@@ -42,7 +42,7 @@ void HandleMainPage(void)
 
     // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
     int firstMenuPointID = CMOD_Detect() ? 0 : 1;
-    int lastMenuPointID  = 3;
+    int lastMenuPointID  = 2;
     int currMenuPointID  = firstMenuPointID;
 
     // Draw MainPage
@@ -109,14 +109,18 @@ void HandleShowAllGamesPage(void)
     // Initialize Fonts needed for this Page
     Fonts_InitializeSTMFonts();
 
+    // ?
+    UI_ShowAllDesign_t designs[UI_NUMBER_OF_SHOWALL_MPS] = { UI_ALLGAMES, UI_FAVORITES, UI_LASTPLAYED };
+    int currDesignID = 0;
+
     // Draw the page
-    UI_DrawShowAllPage();
+    UI_DrawShowAllPage(designs[currDesignID]);
 
     // Initialize IDs
-    int firstGameEntryID = 0;
-    int firstDisplayedID = 0;
-    int currGameEntryID  = 0;
-    int lastGameEntryID  = OS_GamesLoaded - 1;
+    int lastGameEntryID     = OS_TotalGamesCounter - 1;
+    int currGameEntryID     = 0;
+    int currGameEntryIndex  = 0;
+    int currGameEntryListID = 0;
 
     while (1)
     {
@@ -124,59 +128,114 @@ void HandleShowAllGamesPage(void)
         // Locks are needed because otherwise a short press would trigger multiple scroll downs
         Input_UpdateLocks();
 
-        // If Fade-Top is pressed and we don't have the first valid entry already selected, scroll up
-        if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currGameEntryID > firstGameEntryID)
+        // If Fade-Right is pressed switch design accordingly
+        if (Input_Interrupt_Flags.FadeRight && !Input_IsLocked(INPUT_FADE_RIGHT_ID))
         {
-            // If ScrollGames returns true the displayed gameentries changed (scrolled up)
-            if (UI_ScrollGames(currGameEntryID, firstDisplayedID, UI_SCROLLUP))
-            {
-                firstDisplayedID--;
-            }
+            if (currDesignID == UI_NUMBER_OF_SHOWALL_MPS - 1) currDesignID = 0;
+            else                                              currDesignID++;
 
-            // Even if the displayed gameentries didn't change the selection changed
+            UI_DrawShowAllPage(designs[currDesignID]);
+
+            // Re-Initialize IDs
+            lastGameEntryID     = OS_TotalGamesCounter - 1;
+            currGameEntryID     = 0;
+            currGameEntryIndex  = 0;
+            currGameEntryListID = 0;
+
+            Input_Lock(INPUT_FADE_RIGHT_ID, INPUT_LOCK_UNTIL_RELEASED);
+        }
+
+        // If Fade-Left is pressed switch design accordingly
+        if (Input_Interrupt_Flags.FadeLeft && !Input_IsLocked(INPUT_FADE_LEFT_ID))
+        {
+            if (currDesignID == 0) currDesignID = UI_NUMBER_OF_SHOWALL_MPS - 1;
+            else                   currDesignID--;
+
+            UI_DrawShowAllPage(designs[currDesignID]);
+
+            // Re-Initialize IDs
+            lastGameEntryID     = OS_TotalGamesCounter - 1;
+            currGameEntryID     = 0;
+            currGameEntryIndex  = 0;
+            currGameEntryListID = 0;
+
+            Input_Lock(INPUT_FADE_LEFT_ID, INPUT_LOCK_UNTIL_RELEASED);
+        }
+
+        // If Fade-Top is pressed & Fade-Bot not & we don't have the first valid entry already selected, scroll up
+        if (Input_Interrupt_Flags.FadeTop && !Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_TOP_ID)
+            && currGameEntryID > 0)
+        {
+            UI_ScrollGames(&currGameEntryIndex, &currGameEntryListID, UI_SCROLLUP);
             currGameEntryID--;
+            UI_DrawScrollBar(currGameEntryID);
 
-            Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
+            Input_LockDynamically(INPUT_FADE_TOP_ID);
         }
 
-        // If Fade-Bot is pressed and we don't have the last valid gameentry already selected, scroll down
-        if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currGameEntryID < lastGameEntryID)
+        // If Fade-Bot is pressed & Fade-Top not & we don't have the last valid entry already selected, scroll down
+        if (Input_Interrupt_Flags.FadeBot && !Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_BOT_ID)
+            && currGameEntryID < lastGameEntryID)
         {
-            // If ScrollGames returns true the displayed gameentries changed (scrolled down)
-            if (UI_ScrollGames(currGameEntryID, firstDisplayedID, UI_SCROLLDOWN))
+            UI_ScrollGames(&currGameEntryIndex, &currGameEntryListID, UI_SCROLLDOWN);
+            currGameEntryID++;
+            UI_DrawScrollBar(currGameEntryID);
+
+            Input_LockDynamically(INPUT_FADE_BOT_ID);
+        }
+
+        // If Select-Button is pressed invert the favorite-status of the currently selected game (if valid)
+        if (Input_Interrupt_Flags.ButtonSelect && !Input_IsLocked(INPUT_SELECT_ID) && currGameEntryID != -1)
+        {
+            OS_UpdateFavorite(&OS_GameEntries[currGameEntryIndex]);
+
+            // If only favorites are displayed this means deleting the currently selected game from the list
+            if (designs[currDesignID] == UI_FAVORITES)
             {
-                firstDisplayedID++;
+                OS_RemoveGameEntry(currGameEntryIndex);
+
+                // If the last GE was selected previously now the previous GE is selected, otherwise the next
+                if (currGameEntryIndex == OS_TotalGamesCounter)
+                {
+                    currGameEntryID--;
+                    currGameEntryIndex--;
+                    currGameEntryListID--;
+                }
+                lastGameEntryID--;
+
+                UI_ReDrawGEList(currGameEntryIndex, currGameEntryListID);
+                UI_DrawScrollBar(currGameEntryID);
+            }
+            // If all games or last played are displayed only the favorite-indication (star) changes
+            else
+            {
+                UI_ReDrawCurrGE(currGameEntryIndex, currGameEntryListID);
             }
 
-            // Even if the displayed gameentries didn't change the selection changed
-            currGameEntryID++;
-
-            Input_Lock(INPUT_FADE_TOP_ID, INPUT_LOCK_UNTIL_RELEASED);
+            Input_Lock(INPUT_SELECT_ID, INPUT_LOCK_UNTIL_RELEASED);
         }
 
-        // If A-Button is pressed confirm the current selection and end the infinite loop
-        if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
+        // If A-Button is pressed confirm the current selection (if valid) and end the infinite loop
+        if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID) && currGameEntryID != -1)
         {
             // Set the game which is to be started
-            copyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryID].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
-            OS_CurrentGame.IsFavorite = OS_GameEntries[currGameEntryID].IsFavorite;
+            copyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryIndex].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            OS_CurrentGame.IsFavorite = OS_GameEntries[currGameEntryIndex].IsFavorite;
 
-            // Switch to Ingame from SDCard and reset gamecounter
+            // Update the last played games accordingly
+            OS_UpdateLastPlayed();
+
+            // Switch state
             OS_DoAction(OS_SWITCH_TO_STATE_INGAME_FSD);
-            OS_GamesLoaded = 0;
-
+            Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
             break;
         }
 
         // If B-Button is pressed switch to previous state and end the infinite loop
         if (Input_Interrupt_Flags.ButtonB && !Input_IsLocked(INPUT_B_ID))
         {
-            // Switch to previous state and reset gamecounter
             OS_DoAction(OS_SWITCH_TO_PREVIOUS_STATE);
-            OS_GamesLoaded = 0;
-
             Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
-
             break;
         }
     }
@@ -201,7 +260,7 @@ bool HandleSDCIngame(void)
     int  pathLength = sizeof(OS_FAVORITE_DIRECTORY) + OS_MAX_GAME_TITLE_LENGTH + 1;
     char path[pathLength];
 
-    OS_GetGamePath(OS_CurrentGame, path, pathLength);
+    OS_GetGamePath(&OS_CurrentGame, path, pathLength);
 
     // Load the game
     if(GBC_LoadFromSDC(path) != GBC_LOAD_RESULT_OK)
@@ -226,9 +285,7 @@ bool HandleSDCIngame(void)
             return true;
         }
 
-        GPIOA->ODR ^= GPIO_Pin_5;
         GBC_Update();
-        GPIOA->ODR ^= GPIO_Pin_5;
 
         while (!LCD_READY_FLAG);
         LCD_DrawGBCFrameBufferScaled();
@@ -259,9 +316,7 @@ bool HandleCartridgeIngame(void)
             return true;
         }
 
-        GPIOA->ODR ^= GPIO_Pin_5;
         GBC_Update();
-        GPIOA->ODR ^= GPIO_Pin_5;
 
         while (!LCD_READY_FLAG);
         LCD_DrawGBCFrameBufferScaled();

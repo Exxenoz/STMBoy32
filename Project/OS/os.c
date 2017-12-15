@@ -12,32 +12,42 @@ OS_State_t OS_CurrState = OS_MAIN_PAGE;                // Current Operatingsyste
 OS_State_t OS_LastState = OS_MAIN_PAGE;                // Last Operatingsystem state
 
 OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES]; // Array containing all game titles & their favorite status
-int OS_GamesLoaded = 0;                                // Number of successfully loaded Games
+int OS_LoadedGamesCounter = 0;                         // Number of successfully loaded Games
+int OS_TotalGamesCounter = 0;                          // Number of all games detected on SDC
 
 
-// Compare Function used to sort all game entries
-int OS_CmpFunc(const void *a, const void *b)
+// Compare two gametitles if title b is alphabetically 'higher' the return value is < 0
+int OS_CmpGameTitles(const void *a, const void *b)
 {
-    OS_GameEntry_t game1 = *((OS_GameEntry_t*)a);
-    OS_GameEntry_t game2 = *((OS_GameEntry_t*)b);
-    int i = -1;
+    char *title1 = (char*)a;
+    char *title2 = (char*)b;
 
     // Get the first different letters and compare them (case insensitive)
+    int i = -1;
     do
     {
         i++;
-        if (game1.Name[i] >= 97 && game1.Name[i] <= 122)
+        if (title1[i] >= 97 && title1[i] <= 122)
         {
-            game1.Name[i] -= 32;
+            title1[i] -= 32;
         }
-        if (game2.Name[i] >= 97 && game2.Name[i] <= 122)
+        if (title2[i] >= 97 && title2[i] <= 122)
         {
-            game2.Name[i] -= 32;
+            title2[i] -= 32;
         }
 
-    } while (game1.Name[i] == game2.Name[i] && game1.Name[i] != '\0');
+    } while (title1[i] == title2[i] && title1[i] != '\0');
 
-    return (game1.Name[i] - game2.Name[i]);
+    return (title1[i] - title2[i]);
+}
+
+// Compare Function used to sort all game entries
+int OS_CmpGameEntries(const void *a, const void *b)
+{
+    OS_GameEntry_t game1 = *((OS_GameEntry_t*)a);
+    OS_GameEntry_t game2 = *((OS_GameEntry_t*)b);
+
+    return OS_CmpGameTitles(game1.Name, game2.Name);
 }
 
 void OS_LoadOptions(void)
@@ -52,92 +62,171 @@ void OS_UpdateOptions(void)
     // YTBI
 }
 
-bool OS_InitializeGameEntries(void)
+// Loads maxLoad gameentries in alphabetical (starting with the one following startingName) order to OS_GameEntries
+void OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorites)
 {
-    // If it's a re-initialization reset LoadedGames counter
-    if (OS_GamesLoaded != 0) OS_GamesLoaded = 0;
-
-    if (!SDC_Mount()) return false;
-
-    int i = 0;
-    DIR directory;
+    DIR     directory;
+    char    *directoryPath;
+    bool    isFavorite;
     FILINFO fileInfo;
 
+    // Reset gameCounters
+    OS_LoadedGamesCounter = 0;
+    OS_TotalGamesCounter  = 0;
 
-    // If game-directory couldn't be opened or reading the first file info failed something went wrong
-    if (f_opendir(&directory, OS_GAME_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
+    // If only favorites are to be read set the directory-path accordingly
+    if (onlyFavorites)
     {
-        return false;
+        directoryPath = OS_FAVORITE_DIRECTORY;
+        isFavorite    = true;
+    }
+    else
+    {
+        directoryPath = OS_GAME_DIRECTORY;
+        isFavorite    = false;
     }
 
-    // Get the titles of all games in gamedirectory (If there is no file anymore 0 is written to fname)
-    for (; fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR && i < OS_MAX_NUMBER_OF_GAMES; i++)
+    // If no SDC can be mounted or the specified directory doesn't exist / can't be opened return
+    if (!SDC_Mount() || f_opendir(&directory, directoryPath) != FR_OK) return;
+
+    // Get the alphabetically 'lowest' OS_MAX_NUMBER_OF_GAMES titles 'higher' than startingName from the directory
+    bool finishedLoading = false;
+    do
     {
-        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
-        OS_GameEntries[i].IsFavorite = false;
-        OS_GamesLoaded++;
+        if (f_readdir(&directory, &fileInfo) == FR_OK && fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR)
+        {
+            // If the read gametitle is not 'higher'/'lower' than startingName continue
+            if (previous && OS_CmpGameTitles(startingName, fileInfo.fname) < 0) continue;
+            if (!previous && OS_CmpGameTitles(startingName, fileInfo.fname) > 0) continue;
 
-        if (f_readdir(&directory, &fileInfo) != FR_OK) return false;
-    }
+            // If OS_GameEntries is not fully populated add the name of the game unconditionally
+            if (OS_LoadedGamesCounter < OS_MAX_NUMBER_OF_GAMES)
+            {
+                copyString(OS_GameEntries[OS_LoadedGamesCounter].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
+                OS_GameEntries[OS_LoadedGamesCounter].IsFavorite = isFavorite;
+                OS_LoadedGamesCounter++;
+            }
+            // If it is, check if the current title is alphabetically 'lower' than any of the stored titles
+            else
+            {
+                int currentDifferenze;
+                int biggestDifferenze = 0;
+                int highestTitleIndex = -1;
 
-    // Close gamedirectory
-    f_closedir(&directory);
+                for (int i = 0; i < OS_MAX_NUMBER_OF_GAMES; i++)
+                {
+                    currentDifferenze = OS_CmpGameTitles(OS_GameEntries[i].Name, fileInfo.fname);
+                    if (currentDifferenze > biggestDifferenze)
+                    {
+                        biggestDifferenze = currentDifferenze;
+                        highestTitleIndex  = i;
+                    }
+                }
 
-    // Repeat for favorites
-    if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK || f_readdir(&directory, &fileInfo) != FR_OK)
-    {
-        return false;
-    }
+                // If it is, replace the alphabetically 'highest' stored title with the currently read title
+                if (highestTitleIndex != -1)
+                {
+                    copyString(OS_GameEntries[highestTitleIndex].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
+                }
+            }
 
-    // Get the titles of all favorites
-    for (; fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR && i < OS_MAX_NUMBER_OF_GAMES; i++)
-    {
-        copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
-        OS_GameEntries[i].IsFavorite = true;
-        OS_GamesLoaded++;
+            // Increase total gameCounter after every successful read even if the game title doesn't get stored
+            OS_TotalGamesCounter++;
+        }
 
-        if (f_readdir(&directory, &fileInfo) != FR_OK) return false;
-    }
+        // If fileInfo.fname[0] == NULL (all titles read) and the favorite directory was read loading finished
+        // Loading the favorite gametitles is always the last thing to do whether we read just them or all titles
+        if (fileInfo.fname[0] == NULL)
+        {
+            if (isFavorite)
+            {
+                finishedLoading = true;
+            }
+            else
+            {
+                directoryPath = OS_FAVORITE_DIRECTORY;
+                isFavorite    = true;
+
+                // Close the game-directory
+                f_closedir(&directory);
+
+                // If opening the favorite directory fails sort what was already stored and exit
+                if (f_opendir(&directory, directoryPath) != FR_OK)
+                {
+                    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
+                    return;
+                }
+            }
+        }
+
+    } while (!finishedLoading);
 
     // Close directory and sort the list alphabetically (case insensitive)
     f_closedir(&directory);
-    qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
+    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
+}
 
-    return true;
+void OS_UpdateFavorite(OS_GameEntry_t *p_game)
+{
+    // Define path array with maximal needed size
+    int  pathLength = sizeof(OS_FAVORITE_DIRECTORY) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    char oldPath[pathLength];
+    char newPath[pathLength];
+
+    // Get old path, change the favorite attribute and then get the new path
+    OS_GetGamePath(p_game, oldPath, pathLength);
+    p_game->IsFavorite = p_game->IsFavorite ? false : true;
+    OS_GetGamePath(p_game, newPath, pathLength);
+
+    // Move the game into the new directory
+    f_rename(oldPath, newPath);
 }
 
 void OS_LoadLastPlayed(void)
 {
     // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
+    FIL      file;  
     int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
     char     buffer[bufferSize];
     uint32_t bytesRead;
-    FIL      file;
 
     // If no SDC can be mounted, file can't be opened/created or (fully) read set gameCounter to 0
     if (!SDC_Mount() || f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING) != FR_OK ||
         f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK ||
         bytesRead != bufferSize)
     {
-        OS_GamesLoaded = 0;
+        OS_LoadedGamesCounter = 0;
         return;
     }
+    f_close(&file);
 
-    // If everything is ok, load the games and close the file afterwards
-    int i = 0;
-    int currPosition;
+    // If everything is ok, load the games, set gameCounter accordingly and close the file afterwards
+    int  i = 0;
+    int  currPosition;
+    int  pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    char path[pathLength];
+
     for (; i < OS_LAST_PLAYED_GAMES_NUM; i++)
     {
         currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
 
         if (buffer[currPosition] == '\0') break;
 
+        // Check if the game is still stored on the SDC and can be opened
+        OS_GameEntry_t lastPlayed;
+        copyString(lastPlayed.Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+        lastPlayed.IsFavorite = OS_IsFavorite(&(buffer[currPosition]));
+
+        OS_GetGamePath(&lastPlayed, path, pathLength);
+        if (f_open(&file, path, FA_OPEN_EXISTING) != FR_OK) continue;
+        f_close(&file);
+
         copyString(OS_GameEntries[i].Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
         OS_GameEntries[i].IsFavorite = OS_IsFavorite(OS_GameEntries[i].Name);
     }
 
-    OS_GamesLoaded = i;
-    f_close(&file);
+    OS_LoadedGamesCounter = i;
+    OS_TotalGamesCounter  = i;
 }
 
 bool OS_UpdateLastPlayed(void)
@@ -213,50 +302,11 @@ bool OS_UpdateLastPlayed(void)
     return true;
 }
 
-void OS_LoadFavorites(void)
-{
-    DIR     directory;
-    FILINFO fileInfo;
-
-    // Reset gameCounter
-    OS_GamesLoaded = 0;
-
-    // If there is no favorite directory or it can't be opened return
-    if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK) return;
-
-    // Store all favorite games (or as many as possible) in OS_GameEntries
-    int i = 0;
-
-    do
-    {
-        if (f_readdir(&directory, &fileInfo) == FR_OK && fileInfo.fattrib != AM_DIR)
-        {
-            // If the end of the favorite directory is reached stop reading files
-            if (fileInfo.fname[0] == NULL) break;
-
-            copyString(OS_GameEntries[i].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
-            OS_GameEntries[i].IsFavorite = true;
-            OS_GamesLoaded++;
-        }
-        i++;
-
-    } while (i < OS_MAX_NUMBER_OF_GAMES);
-
-    // Close the directory and sort OS_GameEntries alphabetically (case insensitive)
-    f_closedir(&directory);
-    qsort(OS_GameEntries, OS_GamesLoaded, sizeof(OS_GameEntry_t), OS_CmpFunc);
-}
-
-void OS_UpdateFavorites(OS_GameEntry_t game, OS_Operation_t operation)
-{
-    // YTBI
-}
-
-OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
+OS_GameEntry_t OS_GetGameEntry(char *name)
 {
     int c;
 
-    for (int i = 0; i < OS_GamesLoaded; i++)
+    for (int i = 0; i < OS_LoadedGamesCounter; i++)
     {
         for (c = 0; c < OS_MAX_GAME_TITLE_LENGTH; c++)
         {
@@ -275,27 +325,48 @@ OS_GameEntry_t OS_GetGameEntry(char name[OS_MAX_GAME_TITLE_LENGTH + 1])
     return noMatch;
 }
 
-void OS_GetGamePath(OS_GameEntry_t game, char *path, int pathLength)
+void OS_RemoveGameEntry(int currGameEntryIndex)
 {
-    if (OS_CurrentGame.IsFavorite)
+    for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
+    {
+        if (i == OS_LoadedGamesCounter - 1)
+        {
+            copyString(OS_GameEntries[i].Name, "", OS_MAX_GAME_TITLE_LENGTH + 1);
+        }
+        else
+        {
+            copyString(OS_GameEntries[i].Name, OS_GameEntries[i + 1].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
+        }
+    }
+
+    OS_LoadedGamesCounter--;
+    OS_TotalGamesCounter--;
+}
+
+void OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
+{
+    if (p_game->IsFavorite)
     {
         copyString(path, OS_FAVORITE_PATH, pathLength);
-        appendString(path, OS_CurrentGame.Name, pathLength);
+        appendString(path, p_game->Name, pathLength);
     }
     else
     {
         copyString(path, OS_GAME_PATH, pathLength);
-        appendString(path, OS_CurrentGame.Name, pathLength);
+        appendString(path, p_game->Name, pathLength);
     }
 }
 
 bool OS_IsFavorite(char *name)
 {
     FIL  file;
-    int  pathSize = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
-    char path[pathSize];
+    int  pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
+    char path[pathLength];
 
     // If the game is located inside the favorite folder it's a favorite
+    copyString(path, OS_FAVORITE_PATH, pathLength);
+    appendString(path, name, pathLength);
     if (f_open(&file, path, FA_OPEN_EXISTING) == FR_OK)
     {
         f_close(&file);
@@ -313,6 +384,9 @@ void OS_DoAction(OS_Action_t action)
 
     switch (action)
     {
+        case OS_NO_ACTION:
+            break;
+
         case OS_SWITCH_TO_PREVIOUS_STATE:
             OS_CurrState = OS_LastState;
             OS_LastState = temp;

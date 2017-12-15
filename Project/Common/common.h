@@ -37,6 +37,7 @@ bool;
 
 // Custom string functions to ensure null termination
 void copyString(char *dest, const char *src, int destSize);
+void copyWithoutSuffix(char *dest, const char *src, int destSize);
 void appendString(char *dest, const char *src, int destSize);
 
 #endif //COMMON_H
