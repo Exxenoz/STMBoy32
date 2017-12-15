@@ -4,7 +4,7 @@
 #include "common.h"
 
 #define GBC_SFX_BUFFER_SIZE 512
-#define GBC_SFX_SAMPLE_RATE 260 // 4 * 2097152 / 32000
+#define GBC_SFX_SAMPLE_RATE 190
 
 void GBC_SFX_Initialize(void);
 void GBC_SFX_Step(void);

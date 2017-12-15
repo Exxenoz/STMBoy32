@@ -1,12 +1,15 @@
 #include "gbc_sfx.h"
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
+#include "audio.h"
 #include <string.h>
 
 uint32_t GBC_SFX_Ticks = 0;
 
 uint8_t GBC_SFX_Buffer_L[GBC_SFX_BUFFER_SIZE];
 uint8_t GBC_SFX_Buffer_R[GBC_SFX_BUFFER_SIZE];
+
+uint32_t GBC_SFX_BufferPosition = 0;
 
 uint32_t GBC_SFX_Channel1Ticks = 0;
 uint32_t GBC_SFX_Channel1Length = 0;
@@ -691,7 +694,11 @@ void GBC_SFX_Initialize(void)
     memset(&GBC_SFX_Buffer_L, 0, GBC_SFX_BUFFER_SIZE);
     memset(&GBC_SFX_Buffer_R, 0, GBC_SFX_BUFFER_SIZE);
 
+    GBC_SFX_BufferPosition = 0;
+
     GBC_SFX_InitializeChannels();
+
+    Audio_SetAudioBuffer(&GBC_SFX_Buffer_L[0], GBC_SFX_BUFFER_SIZE);
 }
 
 void GBC_SFX_Step(void)
@@ -1019,6 +1026,15 @@ void GBC_SFX_Step(void)
 		else if (r < -128)
         {
             r = -128;
+        }
+
+        GBC_SFX_Buffer_L[GBC_SFX_BufferPosition] = l + 128;
+        GBC_SFX_Buffer_R[GBC_SFX_BufferPosition] = r + 128;
+
+        GBC_SFX_BufferPosition++;
+        if (GBC_SFX_BufferPosition >= GBC_SFX_BUFFER_SIZE)
+        {
+            GBC_SFX_BufferPosition = 0;
         }
     }
 }
