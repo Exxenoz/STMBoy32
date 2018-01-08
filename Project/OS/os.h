@@ -18,6 +18,12 @@
 
 typedef struct
 {
+    char buffer[105];
+}
+OS_Test;
+
+typedef struct
+{
     char Name[OS_MAX_GAME_TITLE_LENGTH + 1];
     bool IsFavorite;
 }

@@ -67,7 +67,7 @@ void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
             UI_DrawMenuPoint(&(UI_ShowAll_MenuPoints[0]), UI_ENABLED);
             OS_LoadGameEntries("A", false, false);
             break;
-        
+
         case UI_FAVORITES:
             UI_DrawMenuPoint(&(UI_ShowAll_MenuPoints[1]), UI_ENABLED);
             OS_LoadGameEntries("A", false, true);
@@ -84,7 +84,7 @@ void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
 
     // Draw the initial Scrollbar, offset between menupoint and as many gameentries as possible (first highlighted)
     int gameEntryY = UI_SHOWALL_GE_LIST_Y;
-    
+
     UI_DrawScrollBar(0);
     LCD_DrawLine(UI_SHOWALL_MPS_X, UI_SHOWALL_MP_HEIGHT - 1, UI_SHOWALL_MP_LENGTH, UI_UPPER_LIST_PADDING, 0x0000, LCD_HORIZONTAL); 
     UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[0]), UI_HIGHLIGHTED);

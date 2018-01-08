@@ -184,6 +184,7 @@ void OS_UpdateFavorite(OS_GameEntry_t *p_game)
 
 void OS_LoadLastPlayed(void)
 {
+    OS_Test test;
     // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
     FIL      file;  
     int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
@@ -191,8 +192,8 @@ void OS_LoadLastPlayed(void)
     uint32_t bytesRead;
 
     // If no SDC can be mounted, file can't be opened/created or (fully) read set gameCounter to 0
-    if (!SDC_Mount() || f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING) != FR_OK ||
-        f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK ||
+    if (!SDC_Mount() || f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK ||
+        f_read(&file, test.buffer, bufferSize, &bytesRead) != FR_OK ||
         bytesRead != bufferSize)
     {
         OS_LoadedGamesCounter = 0;
@@ -201,28 +202,29 @@ void OS_LoadLastPlayed(void)
     f_close(&file);
 
     // If everything is ok, load the games, set gameCounter accordingly and close the file afterwards
-    int  i = 0;
+    OS_GameEntry_t lastPlayed;
     int  currPosition;
     int  pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
     char path[pathLength];
+    int  i = 0;
 
     for (; i < OS_LAST_PLAYED_GAMES_NUM; i++)
     {
         currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
 
-        if (buffer[currPosition] == '\0') break;
+        if (test.buffer[currPosition] == '\0') break;
 
         // Check if the game is still stored on the SDC and can be opened
-        OS_GameEntry_t lastPlayed;
-        copyString(lastPlayed.Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
-        lastPlayed.IsFavorite = OS_IsFavorite(&(buffer[currPosition]));
+        memset(lastPlayed.Name, 0, sizeof(lastPlayed.Name));
+        copyString(lastPlayed.Name, &(test.buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+        lastPlayed.IsFavorite = OS_IsFavorite(&(test.buffer[currPosition]));
 
         OS_GetGamePath(&lastPlayed, path, pathLength);
         if (f_open(&file, path, FA_OPEN_EXISTING) != FR_OK) continue;
         f_close(&file);
 
-        copyString(OS_GameEntries[i].Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
-        OS_GameEntries[i].IsFavorite = OS_IsFavorite(OS_GameEntries[i].Name);
+        copyString(OS_GameEntries[i].Name, lastPlayed.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        OS_GameEntries[i].IsFavorite = lastPlayed.IsFavorite;
     }
 
     OS_LoadedGamesCounter = i;
@@ -233,25 +235,26 @@ bool OS_UpdateLastPlayed(void)
 {
     FIL file;
 
+    // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
+    int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
+    char     buffer[bufferSize];
+    uint32_t bytesWritten;
+    uint32_t bytesRead;
+
     // If no SDC can be mounted return false
     if (!SDC_Mount()) return false;
 
     // If the file doesn't exist try to create a new one, if it does update it
-    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING) != FR_OK)
+    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ | FA_WRITE) != FR_OK)
     {
-        // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
-        int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
-        char     buffer[bufferSize];
-        uint32_t bytesWritten;
-
         // Initialize buffer with the first line (containing first game title) and 0s for the rest
         memset(buffer, '\0', bufferSize);
-        appendString(buffer, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
-        buffer[OS_MAX_GAME_TITLE_LENGTH + 2] = '\r';
-        buffer[OS_MAX_GAME_TITLE_LENGTH + 3] = '\n';
+        copyString(buffer, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        buffer[OS_MAX_GAME_TITLE_LENGTH + 1] = '\r';
+        buffer[OS_MAX_GAME_TITLE_LENGTH + 2] = '\n';
 
         // If creating a new file or writing to it fails return false
-        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW) != FR_OK ||
+        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK ||
             f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK ||
             bytesWritten != bufferSize)
         {
@@ -266,16 +269,11 @@ bool OS_UpdateLastPlayed(void)
     // Update the lastPlayed file
     else
     {
-        // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
-        int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
-        char     buffer[bufferSize];
-        uint32_t bytesWritten;
-        uint32_t bytesRead;
         int i = 0;
 
         // Read the lastPlayed entries to buffer
-        if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize) return false;
-
+        if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK) return false;
+        
         // If current game is already stored as one of the lastPlayed get it's position otherwise the last one
         for (; i < (OS_LAST_PLAYED_GAMES_NUM - 1); i++)
         {
@@ -290,11 +288,22 @@ bool OS_UpdateLastPlayed(void)
         {
             currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
             lastPosition = (i - 1) * (OS_MAX_GAME_TITLE_LENGTH + 3);
-            copyString(&(buffer[currPosition]), &(buffer[lastPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+
+            copyChars(&(buffer[currPosition]), &(buffer[lastPosition]), OS_MAX_GAME_TITLE_LENGTH + 3);
         }
 
-        // Store current game on position 1 of last played games and write buffer back into OS_LAST_PLAYED_FILE 
-        copyString(buffer, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        // Get the string representing the current game
+        char paddedName[OS_MAX_GAME_TITLE_LENGTH + 3];
+        memset(paddedName, 0, sizeof(paddedName));
+
+        copyString(paddedName, OS_CurrentGame.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+        paddedName[OS_MAX_GAME_TITLE_LENGTH + 1] = '\r';
+        paddedName[OS_MAX_GAME_TITLE_LENGTH + 2] = '\n';
+        
+        copyChars(buffer, paddedName, OS_MAX_GAME_TITLE_LENGTH + 3);
+
+        // Store current game on position 1 of last played games and write buffer back into OS_LAST_PLAYED_FILE
+        f_lseek(&file, 0);
         if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize) return false;
     }
 
