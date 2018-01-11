@@ -333,7 +333,21 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                     break;
                 case 0xFF00:
                     // Memory-mapped I/O
-                    if (address <= 0xFF7F)
+                    if (address >= 0xFF10 && address <= 0xFF2F) // Sound Register
+                    {
+                        static const uint8_t soundRegisterReadMask[] =
+                        {
+                            0x80, 0x3F, 0x00, 0xFF, 0xBF, // Sound Channel 1 Register Read Mask
+                            0xFF, 0x3F, 0x00, 0xFF, 0xBF, // Sound Channel 2 Register Read Mask (first register byte unused/unknown)
+                            0x7F, 0xFF, 0x9F, 0xFF, 0xBF, // Sound Channel 3 Register Read Mask
+                            0xFF, 0xFF, 0x00, 0x00, 0xBF, // Sound Channel 4 Register Read Mask (first register byte unused/unknown)
+                            0x00, 0x00, 0x70,             // Sound Control Registers
+                            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF // Unused/unknown register bytes
+                        };
+
+                        return GBC_MMU_Memory.IO[address - 0xFF00] | soundRegisterReadMask[address - 0xFF10];
+                    }
+                    else if (address <= 0xFF7F)
                     {
                         return GBC_MMU_Memory.IO[address - 0xFF00];
                     }
@@ -791,7 +805,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF2D:
                 case 0xFF2E:
                 case 0xFF2F:
-                case 0xFF30:
+                case 0xFF30: // Wave Pattern RAM Start
                 case 0xFF31:
                 case 0xFF32:
                 case 0xFF33:
@@ -806,7 +820,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF3C:
                 case 0xFF3D:
                 case 0xFF3E:
-                case 0xFF3F:
+                case 0xFF3F: // Wave Pattern RAM End
                 case 0xFF40:
                 case 0xFF41:
                 case 0xFF42:
