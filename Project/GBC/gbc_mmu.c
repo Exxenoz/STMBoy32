@@ -792,9 +792,44 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF23:
                 case 0xFF24:
                 case 0xFF25:
-                case 0xFF26:
+                    if (!GBC_MMU_Memory.ChannelSoundsEnabled)
+                    {
+                        // Read-only in CGB mode
+                        if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                        {
+                            break;
+                        }
+
+                        // Length registers can be written in DMG mode
+                        if (address == 0xFF11 || address == 0xFF16)
+                        {
+                            // Clear wave pattern duty
+                            value &= 0x3F;
+                        }
+                        else if (address == 0xFF1B || address == 0xFF20)
+                        {
+                            // Do nothing
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
                     GBC_MMU_Memory.IO[address - 0xFF00] = value;
                     GBC_SFX_OnWriteToSoundRegister(address, value);
+                    break;
+                case 0xFF26:
+                    if (value & 0x80)
+                    {
+                        GBC_MMU_Memory.ChannelSoundsEnabled = 1;
+                    }
+                    else
+                    {
+                        // "Disabeling the sound controller by clearing Bit 7 destroys the contents of all sound registers." - not necessary
+                        GBC_MMU_Memory.ChannelSoundsEnabled = 0;
+                    }
+                    // Other 7 bits of 0xFF26 are read only
                     break;
                 case 0xFF27:
                 case 0xFF28:
