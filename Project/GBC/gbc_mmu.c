@@ -824,10 +824,19 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     {
                         GBC_MMU_Memory.ChannelSoundsEnabled = 1;
                     }
-                    else
+                    else if (GBC_MMU_Memory.ChannelSoundsEnabled)
                     {
-                        // "Disabeling the sound controller by clearing Bit 7 destroys the contents of all sound registers." - not necessary
-                        GBC_MMU_Memory.ChannelSoundsEnabled = 0;
+                        GBC_MMU_Memory.ChannelSoundTerminal = 0;
+
+                        // Disabeling the sound controller by clearing Bit 7 destroys the contents of all sound registers.
+
+                        for (long i = 0x10; i < 0x30; i++)
+                        {
+                            GBC_MMU_Memory.IO[i] = 0;
+                        }
+
+                        // Reinitialize sound module
+                        GBC_SFX_Initialize();
                     }
                     // Other 7 bits of 0xFF26 are read only
                     break;
