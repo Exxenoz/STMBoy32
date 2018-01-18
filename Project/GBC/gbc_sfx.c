@@ -588,7 +588,7 @@ static const int32_t GBC_SFX_NoiseFrequencies[8] =
 
 #define UPDATE_CHANNEL1_FREQUENCY(D)                                                                                                                    \
 {                                                                                                                                                       \
-    uint32_t d = 2048 - GBC_MMU_Memory.Channel1Frequency;                                                                                               \
+    uint32_t d = 2048 - ((GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO);                                               \
     if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
     {                                                                                                                                                   \
         GBC_SFX_Channel1Frequency = 0;                                                                                                                  \
@@ -601,7 +601,7 @@ static const int32_t GBC_SFX_NoiseFrequencies[8] =
 
 #define UPDATE_CHANNEL2_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
-    uint32_t d = 2048 - GBC_MMU_Memory.Channel2Frequency;                                                                                               \
+    uint32_t d = 2048 - ((GBC_MMU_Memory.Channel2FrequencyHI << 8) + GBC_MMU_Memory.Channel2FrequencyLO);                                                                                               \
 	if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
     {                                                                                                                                                   \
         GBC_SFX_Channel2Frequency = 0;                                                                                                                  \
@@ -614,7 +614,7 @@ static const int32_t GBC_SFX_NoiseFrequencies[8] =
 
 #define UPDATE_CHANNEL3_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
-    uint32_t d = 2048 - GBC_MMU_Memory.Channel3Frequency;                                                                                               \
+    uint32_t d = 2048 - ((GBC_MMU_Memory.Channel3FrequencyHI << 8) + GBC_MMU_Memory.Channel3FrequencyLO);                                                                                               \
 	if (GBC_SFX_SAMPLE_RATE > (d << 3))                                                                                                                 \
     {                                                                                                                                                   \
         GBC_SFX_Channel3Frequency = 0;                                                                                                                  \
@@ -766,7 +766,7 @@ void GBC_SFX_Step(void)
                 {
                     GBC_SFX_Channel1SweepTicks -= GBC_SFX_Channel1SweepLengthTicks;
 
-                    f = GBC_MMU_Memory.Channel1Frequency;
+                    f = (GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO;
 
                     // Sweep Increase / Decrease
                     // 0: Addition    (frequency increases)
@@ -786,7 +786,8 @@ void GBC_SFX_Step(void)
                     }
                     else
                     {
-                        GBC_MMU_Memory.Channel1Frequency = f;
+                        GBC_MMU_Memory.Channel1FrequencyLO = f & 0xFF;
+                        GBC_MMU_Memory.Channel1FrequencyHI = f >> 8;
 
                         f = 2048 - f;
 

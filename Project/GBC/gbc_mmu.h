@@ -268,10 +268,11 @@ typedef struct GBC_MMU_Memory_s
                 #pragma pack(1)
                 struct
                 {
-                    unsigned int Channel1Frequency        : 11; // Frequency X -> Frequency = 131072/(2048-X) Hz
-                    unsigned int                          :  3;
-                    unsigned int Channel1CounterSelection :  1; // (1 = Stop output when length in 0xFF11 expires)
-                    unsigned int Channel1InitialRestart   :  1; // Initial (1 = Restart Sound)
+                    unsigned int Channel1FrequencyHI      : 3; // Frequency's higher 3 bits (x). Frequency X -> Frequency = 131072/(2048-X) Hz
+                    unsigned int                          : 3;
+                    unsigned int Channel1CounterSelection : 1; // (1 = Stop output when length in 0xFF11 expires)
+                    unsigned int Channel1InitialRestart   : 1; // Initial (1 = Restart Sound)
+                    unsigned int Channel1FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             uint8_t IO_Unk14; // 0xFF15
@@ -311,10 +312,11 @@ typedef struct GBC_MMU_Memory_s
                 #pragma pack(1)
                 struct
                 {
-                    unsigned int Channel2Frequency        : 11; // Frequency X -> Frequency = 131072/(2048-X) Hz
-                    unsigned int                          :  3;
-                    unsigned int Channel2CounterSelection :  1; // (1 = Stop output when length in 0xFF16 expires)
-                    unsigned int Channel2InitialRestart   :  1; // Initial (1 = Restart Sound)
+                    unsigned int Channel2FrequencyHI      : 3; // Frequency's higher 3 bits (x). Frequency X -> Frequency = 131072/(2048-X) Hz
+                    unsigned int                          : 3;
+                    unsigned int Channel2CounterSelection : 1; // (1 = Stop output when length in 0xFF16 expires)
+                    unsigned int Channel2InitialRestart   : 1; // Initial (1 = Restart Sound)
+                    unsigned int Channel2FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             #pragma pack(1)
@@ -355,10 +357,11 @@ typedef struct GBC_MMU_Memory_s
                 #pragma pack(1)
                 struct
                 {
-                    unsigned int Channel3Frequency        : 11; // Frequency X -> Frequency = 4194304/(64*(2048-x)) Hz = 65536/(2048-x) Hz
-                    unsigned int                          :  3;
-                    unsigned int Channel3CounterSelection :  1; // (1 = Stop output when length in 0xFF1B expires)
-                    unsigned int Channel3InitialRestart   :  1; // Initial (1 = Restart Sound)
+                    unsigned int Channel3FrequencyHI      : 3; // Frequency's higher 3 bits (x). Frequency X -> Frequency = 131072/(2048-X) Hz
+                    unsigned int                          : 3;
+                    unsigned int Channel3CounterSelection : 1; // (1 = Stop output when length in 0xFF1B expires)
+                    unsigned int Channel3InitialRestart   : 1; // Initial (1 = Restart Sound)
+                    unsigned int Channel3FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             uint8_t IO_Unk16;                   // 0xFF1F
