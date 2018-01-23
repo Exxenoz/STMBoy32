@@ -260,10 +260,11 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int Channel1InitialEnvelopeVolume : 4; // Initial volume of envelope (0-0Fh) (0 = No sound)
                 };
             };
+            uint8_t Channel1FrequencyLO; // 0xFF13  Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
             #pragma pack(1)
             union
             {
-                uint16_t Channel1FrequencyData; // 0xFF13, 0xFF14
+                uint8_t Channel1TriggerData; // 0xFF14
 
                 #pragma pack(1)
                 struct
@@ -272,7 +273,6 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int                          : 3;
                     unsigned int Channel1CounterSelection : 1; // (1 = Stop output when length in 0xFF11 expires)
                     unsigned int Channel1InitialRestart   : 1; // Initial (1 = Restart Sound)
-                    unsigned int Channel1FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             uint8_t IO_Unk14; // 0xFF15
@@ -304,10 +304,11 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int Channel2InitialEnvelopeVolume : 4; // Initial volume of envelope (0-0Fh) (0 = No sound)
                 };
             };
+            uint8_t Channel2FrequencyLO;            // 0xFF18  Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
             #pragma pack(1)
             union
             {
-                uint16_t Channel2FrequencyData;     // 0xFF18, 0xFF19
+                uint8_t Channel2TriggerData;        // 0xFF19
 
                 #pragma pack(1)
                 struct
@@ -316,7 +317,6 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int                          : 3;
                     unsigned int Channel2CounterSelection : 1; // (1 = Stop output when length in 0xFF16 expires)
                     unsigned int Channel2InitialRestart   : 1; // Initial (1 = Restart Sound)
-                    unsigned int Channel2FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             #pragma pack(1)
@@ -349,10 +349,11 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int                           : 1;
                 };
             };
+            uint8_t Channel3FrequencyLO;        // 0xFF1D Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
             #pragma pack(1)
             union
             {
-                uint16_t Channel3FrequencyData; // 0xFF1D, 0xFF1E
+                uint8_t Channel3TriggerData;    // 0xFF1E
 
                 #pragma pack(1)
                 struct
@@ -361,7 +362,6 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int                          : 3;
                     unsigned int Channel3CounterSelection : 1; // (1 = Stop output when length in 0xFF1B expires)
                     unsigned int Channel3InitialRestart   : 1; // Initial (1 = Restart Sound)
-                    unsigned int Channel3FrequencyLO      : 8; // Lower 8 bits of 11 bit frequency (x). Frequency X -> Frequency = 131072/(2048-X) Hz
                 };
             };
             uint8_t IO_Unk16;                   // 0xFF1F
