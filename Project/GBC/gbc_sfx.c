@@ -1062,6 +1062,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             if (GBC_MMU_Memory.Channel1InitialRestart)
             {
                 GBC_SFX_InitializeChannel1();
+                GBC_MMU_Memory.ChannelSound1Enabled = true;
             }
             break;
         case 0xFF16:
@@ -1079,6 +1080,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             if (GBC_MMU_Memory.Channel2InitialRestart)
             {
                 GBC_SFX_InitializeChannel2();
+                GBC_MMU_Memory.ChannelSound2Enabled = true;
             }
             break;
         case 0xFF1A:
@@ -1098,6 +1100,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             if (GBC_MMU_Memory.Channel3InitialRestart)
             {
                 GBC_SFX_InitializeChannel3();
+                GBC_MMU_Memory.ChannelSound3Enabled = GBC_MMU_Memory.Channel3PlaybackEnabled;
             }
             break;
         case 0xFF20:
@@ -1115,6 +1118,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             if (GBC_MMU_Memory.Channel4InitialRestart)
             {
                 GBC_SFX_InitializeChannel4();
+                GBC_MMU_Memory.ChannelSound4Enabled = true;
             }
             break;
     }
