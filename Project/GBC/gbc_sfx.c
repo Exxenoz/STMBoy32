@@ -1045,13 +1045,13 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
     switch (address)
     {
         case 0xFF10:
-            GBC_SFX_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 14;
+            GBC_SFX_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 15; // 128 Hz
             break;
         case 0xFF11:
-            GBC_SFX_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
+            GBC_SFX_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 14; // 256 Hz
             break;
         case 0xFF12:
-            GBC_SFX_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 15;
+            GBC_SFX_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 16; // 64 Hz
             GBC_SFX_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
             break;
         case 0xFF13:
@@ -1065,10 +1065,10 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             }
             break;
         case 0xFF16:
-            GBC_SFX_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
+            GBC_SFX_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 14; // 256 Hz
             break;
         case 0xFF17:
-            GBC_SFX_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
+            GBC_SFX_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 16; // 64 Hz
             GBC_SFX_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
             break;
         case 0xFF18:
@@ -1082,7 +1082,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             }
             break;
         case 0xFF1B:
-            GBC_SFX_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
+            GBC_SFX_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 14; // 256 Hz
             break;
         case 0xFF1D:
             UPDATE_CHANNEL3_FREQUENCY();
@@ -1095,10 +1095,10 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             }
             break;
         case 0xFF20:
-            GBC_SFX_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
+            GBC_SFX_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 14; // 256 Hz
             break;
         case 0xFF21:
-            GBC_SFX_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 15;
+            GBC_SFX_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 16; // 64 Hz
             GBC_SFX_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
             break;
         case 0xFF22:
