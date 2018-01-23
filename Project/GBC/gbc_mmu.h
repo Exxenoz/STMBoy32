@@ -327,8 +327,8 @@ typedef struct GBC_MMU_Memory_s
                 #pragma pack(1)
                 struct
                 {
-                    unsigned int                      : 7;
-                    unsigned int Channel3SoundEnabled : 1; // Sound Channel 3 Off  (0 = Stop, 1 = Playback)
+                    unsigned int                         : 7;
+                    unsigned int Channel3PlaybackEnabled : 1; // Sound Channel 3 Off  (0 = Stop, 1 = Playback)
                 };
             };
             uint8_t Channel3SoundLength;    // 0xFF1B          Sound length (t1: 0 - 255), Sound Length = (256-t1)*(1/256) seconds. This value is used only if Bit 6 in 0xFF1E is set.

@@ -1081,6 +1081,12 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
                 GBC_SFX_InitializeChannel2();
             }
             break;
+        case 0xFF1A:
+            if (!GBC_MMU_Memory.Channel3PlaybackEnabled)
+            {
+                GBC_MMU_Memory.ChannelSound3Enabled = false;
+            }
+            break;
         case 0xFF1B:
             GBC_SFX_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 14; // 256 Hz
             break;
