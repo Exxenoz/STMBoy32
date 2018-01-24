@@ -201,30 +201,16 @@ void OS_LoadLastPlayed(void)
     }
     f_close(&file);
 
-    // If everything is ok, load the games, set gameCounter accordingly and close the file afterwards
-    OS_GameEntry_t lastPlayed;
-    int  currPosition;
-    int  pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
-    char path[pathLength];
+    // If everything is ok, load the games and set gameCounter accordingly
+    int  currPosition = 0;
     int  i = 0;
 
-    for (; i < OS_LAST_PLAYED_GAMES_NUM; i++)
-    {
-        currPosition = i * (OS_MAX_GAME_TITLE_LENGTH + 3);
-
+    for (; i < OS_LAST_PLAYED_GAMES_NUM; i++, currPosition += (OS_MAX_GAME_TITLE_LENGTH + 3))
+    {        
         if (test.buffer[currPosition] == '\0') break;
 
-        // Check if the game is still stored on the SDC and can be opened
-        memset(lastPlayed.Name, 0, sizeof(lastPlayed.Name));
-        copyString(lastPlayed.Name, &(test.buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
-        lastPlayed.IsFavorite = OS_IsFavorite(&(test.buffer[currPosition]));
-
-        OS_GetGamePath(&lastPlayed, path, pathLength);
-        if (f_open(&file, path, FA_OPEN_EXISTING) != FR_OK) continue;
-        f_close(&file);
-
-        copyString(OS_GameEntries[i].Name, lastPlayed.Name, OS_MAX_GAME_TITLE_LENGTH + 1);
-        OS_GameEntries[i].IsFavorite = lastPlayed.IsFavorite;
+        copyChars(OS_GameEntries[i].Name, &(test.buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
+        OS_GameEntries[i].IsFavorite = OS_IsFavorite(&(test.buffer[currPosition]));
     }
 
     OS_LoadedGamesCounter = i;
@@ -376,7 +362,8 @@ bool OS_IsFavorite(char *name)
     // If the game is located inside the favorite folder it's a favorite
     copyString(path, OS_FAVORITE_PATH, pathLength);
     appendString(path, name, pathLength);
-    if (f_open(&file, path, FA_OPEN_EXISTING) == FR_OK)
+    FRESULT test = f_open(&file, path, FA_OPEN_EXISTING);
+    if (test == FR_OK)
     {
         f_close(&file);
         return true;

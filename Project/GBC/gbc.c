@@ -37,6 +37,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
 
 GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
 {
+    // ToDo: Implement UI Error Notification
     GBC_Unload();
 
     if (!SDC_Mount())

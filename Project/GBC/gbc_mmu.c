@@ -160,7 +160,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
 
     GBC_MMU_Unload();
 
-    if (f_open(&GBC_MMU_SDC_ROMFile, fileName, FA_OPEN_ALWAYS | FA_READ) == FR_OK)
+    if (f_open(&GBC_MMU_SDC_ROMFile, fileName, FA_OPEN_EXISTING | FA_READ) == FR_OK)
     {
         uint32_t bytesRead = 0;
 

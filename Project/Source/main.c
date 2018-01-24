@@ -274,7 +274,7 @@ bool HandleSDCIngame(void)
         // If select and start are pressed simultaneously in game pause it and go to options page
         if (Input_Interrupt_Flags.ButtonSelect && Input_Interrupt_Flags.ButtonStart)
         {
-             //ToDo: Pause?
+            //ToDo: Pause?
 
             OS_DoAction(OS_SWITCH_TO_STATE_OPTIONS);
 
