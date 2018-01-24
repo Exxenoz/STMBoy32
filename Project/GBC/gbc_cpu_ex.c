@@ -583,11 +583,11 @@ void GBC_CPU_EX_BIT_0_H()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.H);       
 void GBC_CPU_EX_BIT_0_L()   { GBC_CPU_EX_BIT(1 << 0, GBC_CPU_Register.L);                    } // 0x45 - Test bit 0 of L
 void GBC_CPU_EX_BIT_0_HLP()                                                                    // 0x46 - Test bit 0 of value pointed by HL
 {
-    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    /*if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
     {
         GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
         return;
-    }
+    }*/
 
     GBC_CPU_EX_BIT(1 << 0, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
@@ -601,11 +601,11 @@ void GBC_CPU_EX_BIT_1_H()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.H);       
 void GBC_CPU_EX_BIT_1_L()   { GBC_CPU_EX_BIT(1 << 1, GBC_CPU_Register.L);                    } // 0x4D - Test bit 1 of L
 void GBC_CPU_EX_BIT_1_HLP()                                                                    // 0x4E - Test bit 1 of value pointed by HL
 {
-    if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
+    /*if (GBC_CPU_MemoryAccessDelayState == GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE)
     {
         GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_08_TICKS_LEFT;
         return;
-    }
+    }*/
 
     GBC_CPU_EX_BIT(1 << 1, GBC_MMU_ReadByte(GBC_CPU_Register.HL));
 }
