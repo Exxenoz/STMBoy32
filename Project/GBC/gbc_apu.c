@@ -1,48 +1,48 @@
-#include "gbc_sfx.h"
+#include "gbc_apu.h"
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
 #include "audio.h"
 #include <string.h>
 
-uint32_t GBC_SFX_Ticks = 0;
+uint32_t GBC_APU_Ticks = 0;
 
-uint8_t GBC_SFX_Buffer_L[GBC_SFX_BUFFER_SIZE];
-uint8_t GBC_SFX_Buffer_R[GBC_SFX_BUFFER_SIZE];
+uint8_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
+uint8_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
-uint32_t GBC_SFX_BufferPosition = 0;
+uint32_t GBC_APU_BufferPosition = 0;
 
-uint32_t GBC_SFX_Channel1Ticks = 0;
-uint32_t GBC_SFX_Channel1LengthTicks = 0;
-uint32_t GBC_SFX_Channel1Position = 0;
-uint32_t GBC_SFX_Channel1Frequency = 0;
-uint32_t GBC_SFX_Channel1EnvelopeTicks = 0;
-uint32_t GBC_SFX_Channel1EnvelopeLengthTicks = 0;
-uint32_t GBC_SFX_Channel1EnvelopeVolume = 0;
-uint32_t GBC_SFX_Channel1SweepTicks = 0;
-uint32_t GBC_SFX_Channel1SweepLengthTicks = 0;
+uint32_t GBC_APU_Channel1Ticks = 0;
+uint32_t GBC_APU_Channel1LengthTicks = 0;
+uint32_t GBC_APU_Channel1Position = 0;
+uint32_t GBC_APU_Channel1Frequency = 0;
+uint32_t GBC_APU_Channel1EnvelopeTicks = 0;
+uint32_t GBC_APU_Channel1EnvelopeLengthTicks = 0;
+uint32_t GBC_APU_Channel1EnvelopeVolume = 0;
+uint32_t GBC_APU_Channel1SweepTicks = 0;
+uint32_t GBC_APU_Channel1SweepLengthTicks = 0;
 
-uint32_t GBC_SFX_Channel2Ticks = 0;
-uint32_t GBC_SFX_Channel2LengthTicks = 0;
-uint32_t GBC_SFX_Channel2Position = 0;
-uint32_t GBC_SFX_Channel2Frequency = 0;
-uint32_t GBC_SFX_Channel2EnvelopeTicks = 0;
-uint32_t GBC_SFX_Channel2EnvelopeLengthTicks = 0;
-uint32_t GBC_SFX_Channel2EnvelopeVolume = 0;
+uint32_t GBC_APU_Channel2Ticks = 0;
+uint32_t GBC_APU_Channel2LengthTicks = 0;
+uint32_t GBC_APU_Channel2Position = 0;
+uint32_t GBC_APU_Channel2Frequency = 0;
+uint32_t GBC_APU_Channel2EnvelopeTicks = 0;
+uint32_t GBC_APU_Channel2EnvelopeLengthTicks = 0;
+uint32_t GBC_APU_Channel2EnvelopeVolume = 0;
 
-uint32_t GBC_SFX_Channel3Ticks = 0;
-uint32_t GBC_SFX_Channel3LengthTicks = 0;
-uint32_t GBC_SFX_Channel3Position = 0;
-uint32_t GBC_SFX_Channel3Frequency = 0;
+uint32_t GBC_APU_Channel3Ticks = 0;
+uint32_t GBC_APU_Channel3LengthTicks = 0;
+uint32_t GBC_APU_Channel3Position = 0;
+uint32_t GBC_APU_Channel3Frequency = 0;
 
-uint32_t GBC_SFX_Channel4Ticks = 0;
-uint32_t GBC_SFX_Channel4LengthTicks = 0;
-uint32_t GBC_SFX_Channel4Position = 0;
-uint32_t GBC_SFX_Channel4Frequency = 0;
-uint32_t GBC_SFX_Channel4EnvelopeTicks = 0;
-uint32_t GBC_SFX_Channel4EnvelopeLengthTicks = 0;
-uint32_t GBC_SFX_Channel4EnvelopeVolume = 0;
+uint32_t GBC_APU_Channel4Ticks = 0;
+uint32_t GBC_APU_Channel4LengthTicks = 0;
+uint32_t GBC_APU_Channel4Position = 0;
+uint32_t GBC_APU_Channel4Frequency = 0;
+uint32_t GBC_APU_Channel4EnvelopeTicks = 0;
+uint32_t GBC_APU_Channel4EnvelopeLengthTicks = 0;
+uint32_t GBC_APU_Channel4EnvelopeVolume = 0;
 
-static const int8_t GBC_SFX_SQUARE_WAVE[4][8] =
+static const int8_t GBC_APU_SQUARE_WAVE[4][8] =
 {
 	{  0, 0,-1, 0, 0, 0, 0, 0 },
 	{  0,-1,-1, 0, 0, 0, 0, 0 },
@@ -50,13 +50,13 @@ static const int8_t GBC_SFX_SQUARE_WAVE[4][8] =
 	{ -1, 0, 0,-1,-1,-1,-1,-1 }
 };
 
-static const int8_t GBC_SFX_NOISE7[16] =
+static const int8_t GBC_APU_NOISE7[16] =
 {
     0xfb, 0xe7, 0xae, 0x1b, 0xa6, 0x2b, 0x05, 0xe3,
     0xb6, 0x4a, 0x42, 0x72, 0xd1, 0x19, 0xaa, 0x03,
 };
 
-static const int8_t GBC_SFX_NOISE15[] =
+static const int8_t GBC_APU_NOISE15[] =
 {
     0xff, 0xfb, 0xff, 0xe7, 0xff, 0xaf, 0xfe, 0x1f,
     0xfb, 0xbf, 0xe6, 0x7f, 0xaa, 0xfe, 0x01, 0xfb,
@@ -574,7 +574,7 @@ static const int8_t GBC_SFX_NOISE15[] =
 #endif /* NO_NOISE15*/
 };
 
-static const int32_t GBC_SFX_NoiseFrequencies[8] =
+static const int32_t GBC_APU_NoiseFrequencies[8] =
 {
 	(1 << 14) * 2,
 	(1 << 14),
@@ -589,119 +589,119 @@ static const int32_t GBC_SFX_NoiseFrequencies[8] =
 #define UPDATE_CHANNEL1_FREQUENCY(D)                                                                                                                    \
 {                                                                                                                                                       \
     uint32_t d = 2048 - ((GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO);                                               \
-    if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
+    if (GBC_APU_SAMPLE_RATE > (d << 4))                                                                                                                 \
     {                                                                                                                                                   \
-        GBC_SFX_Channel1Frequency = 0;                                                                                                                  \
+        GBC_APU_Channel1Frequency = 0;                                                                                                                  \
     }                                                                                                                                                   \
 	else                                                                                                                                                \
     {                                                                                                                                                   \
-        GBC_SFX_Channel1Frequency = (GBC_SFX_SAMPLE_RATE << 17) / d;                                                                                    \
+        GBC_APU_Channel1Frequency = (GBC_APU_SAMPLE_RATE << 17) / d;                                                                                    \
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
 #define UPDATE_CHANNEL2_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
     uint32_t d = 2048 - ((GBC_MMU_Memory.Channel2FrequencyHI << 8) + GBC_MMU_Memory.Channel2FrequencyLO);                                                                                               \
-	if (GBC_SFX_SAMPLE_RATE > (d << 4))                                                                                                                 \
+	if (GBC_APU_SAMPLE_RATE > (d << 4))                                                                                                                 \
     {                                                                                                                                                   \
-        GBC_SFX_Channel2Frequency = 0;                                                                                                                  \
+        GBC_APU_Channel2Frequency = 0;                                                                                                                  \
     }                                                                                                                                                   \
 	else                                                                                                                                                \
     {                                                                                                                                                   \
-        GBC_SFX_Channel2Frequency = (GBC_SFX_SAMPLE_RATE << 17) / d;                                                                                    \
+        GBC_APU_Channel2Frequency = (GBC_APU_SAMPLE_RATE << 17) / d;                                                                                    \
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
 #define UPDATE_CHANNEL3_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
     uint32_t d = 2048 - ((GBC_MMU_Memory.Channel3FrequencyHI << 8) + GBC_MMU_Memory.Channel3FrequencyLO);                                                                                               \
-	if (GBC_SFX_SAMPLE_RATE > (d << 3))                                                                                                                 \
+	if (GBC_APU_SAMPLE_RATE > (d << 3))                                                                                                                 \
     {                                                                                                                                                   \
-        GBC_SFX_Channel3Frequency = 0;                                                                                                                  \
+        GBC_APU_Channel3Frequency = 0;                                                                                                                  \
     }                                                                                                                                                   \
 	else                                                                                                                                                \
     {                                                                                                                                                   \
-        GBC_SFX_Channel3Frequency = (GBC_SFX_SAMPLE_RATE << 21) / d;                                                                                    \
+        GBC_APU_Channel3Frequency = (GBC_APU_SAMPLE_RATE << 21) / d;                                                                                    \
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
 #define UPDATE_CHANNEL4_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
-    GBC_SFX_Channel4Frequency = (GBC_SFX_NoiseFrequencies[GBC_MMU_Memory.Channel4PolynomialCounterFreqDivRatio]                                         \
-        >> GBC_MMU_Memory.Channel4PolynomialCounterShiftClockFreq) * GBC_SFX_SAMPLE_RATE;                                                               \
+    GBC_APU_Channel4Frequency = (GBC_APU_NoiseFrequencies[GBC_MMU_Memory.Channel4PolynomialCounterFreqDivRatio]                                         \
+        >> GBC_MMU_Memory.Channel4PolynomialCounterShiftClockFreq) * GBC_APU_SAMPLE_RATE;                                                               \
                                                                                                                                                         \
-	if (GBC_SFX_Channel4Frequency >> 18)                                                                                                                \
+	if (GBC_APU_Channel4Frequency >> 18)                                                                                                                \
     {                                                                                                                                                   \
-        GBC_SFX_Channel4Frequency = 1 << 18;                                                                                                            \
+        GBC_APU_Channel4Frequency = 1 << 18;                                                                                                            \
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
-void GBC_SFX_InitializeChannel1(void)
+void GBC_APU_InitializeChannel1(void)
 {
-    GBC_SFX_Channel1Ticks = 0;
-    GBC_SFX_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
-    GBC_SFX_Channel1Position = 0;
+    GBC_APU_Channel1Ticks = 0;
+    GBC_APU_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
+    GBC_APU_Channel1Position = 0;
     UPDATE_CHANNEL1_FREQUENCY();
-    GBC_SFX_Channel1EnvelopeTicks = 0;
-    GBC_SFX_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 15;
-    GBC_SFX_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
-    GBC_SFX_Channel1SweepTicks = 0;
-    GBC_SFX_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 14;
+    GBC_APU_Channel1EnvelopeTicks = 0;
+    GBC_APU_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 15;
+    GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
+    GBC_APU_Channel1SweepTicks = 0;
+    GBC_APU_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 14;
 }
 
-void GBC_SFX_InitializeChannel2(void)
+void GBC_APU_InitializeChannel2(void)
 {
-    GBC_SFX_Channel2Ticks = 0;
-    GBC_SFX_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
-    GBC_SFX_Channel2Position = 0;
+    GBC_APU_Channel2Ticks = 0;
+    GBC_APU_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
+    GBC_APU_Channel2Position = 0;
     UPDATE_CHANNEL2_FREQUENCY();
-    GBC_SFX_Channel2EnvelopeTicks = 0;
-    GBC_SFX_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
-    GBC_SFX_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
+    GBC_APU_Channel2EnvelopeTicks = 0;
+    GBC_APU_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
+    GBC_APU_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
 }
 
-void GBC_SFX_InitializeChannel3(void)
+void GBC_APU_InitializeChannel3(void)
 {
-    GBC_SFX_Channel3Ticks = 0;
-    GBC_SFX_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
-    GBC_SFX_Channel3Position = 0;
+    GBC_APU_Channel3Ticks = 0;
+    GBC_APU_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
+    GBC_APU_Channel3Position = 0;
     UPDATE_CHANNEL3_FREQUENCY();
 }
 
-void GBC_SFX_InitializeChannel4(void)
+void GBC_APU_InitializeChannel4(void)
 {
-    GBC_SFX_Channel4Ticks = 0;
-    GBC_SFX_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
-    GBC_SFX_Channel4Position = 0;
+    GBC_APU_Channel4Ticks = 0;
+    GBC_APU_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
+    GBC_APU_Channel4Position = 0;
     UPDATE_CHANNEL4_FREQUENCY();
-    GBC_SFX_Channel4EnvelopeTicks = 0;
-    GBC_SFX_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 15;
-    GBC_SFX_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
+    GBC_APU_Channel4EnvelopeTicks = 0;
+    GBC_APU_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 15;
+    GBC_APU_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
 }
 
-void GBC_SFX_InitializeChannels(void)
+void GBC_APU_InitializeChannels(void)
 {
-    GBC_SFX_InitializeChannel1();
-    GBC_SFX_InitializeChannel2();
-    GBC_SFX_InitializeChannel3();
-    GBC_SFX_InitializeChannel4();
+    GBC_APU_InitializeChannel1();
+    GBC_APU_InitializeChannel2();
+    GBC_APU_InitializeChannel3();
+    GBC_APU_InitializeChannel4();
 }
 
-void GBC_SFX_Initialize(void)
+void GBC_APU_Initialize(void)
 {
-    GBC_SFX_Ticks = 0;
+    GBC_APU_Ticks = 0;
 
-    memset(&GBC_SFX_Buffer_L, 0, GBC_SFX_BUFFER_SIZE);
-    memset(&GBC_SFX_Buffer_R, 0, GBC_SFX_BUFFER_SIZE);
+    memset(&GBC_APU_Buffer_L, 0, GBC_APU_BUFFER_SIZE);
+    memset(&GBC_APU_Buffer_R, 0, GBC_APU_BUFFER_SIZE);
 
-    GBC_SFX_BufferPosition = 0;
+    GBC_APU_BufferPosition = 0;
 
-    GBC_SFX_InitializeChannels();
+    GBC_APU_InitializeChannels();
 
-    Audio_SetAudioBuffer(&GBC_SFX_Buffer_L[0], GBC_SFX_BUFFER_SIZE);
+    Audio_SetAudioBuffer(&GBC_APU_Buffer_L[0], GBC_APU_BUFFER_SIZE);
 }
 
-void GBC_SFX_Step(void)
+void GBC_APU_Step(void)
 {
     if (!GBC_MMU_Memory.ChannelSoundsEnabled)
     {
@@ -713,58 +713,58 @@ void GBC_SFX_Step(void)
     long r = 0;
     long s = 0;
 
-    GBC_SFX_Ticks += GBC_CPU_StepTicks;
+    GBC_APU_Ticks += GBC_CPU_StepTicks;
 
-    for (; GBC_SFX_Ticks >= GBC_SFX_SAMPLE_RATE; GBC_SFX_Ticks -= GBC_SFX_SAMPLE_RATE)
+    for (; GBC_APU_Ticks >= GBC_APU_SAMPLE_RATE; GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE)
     {
         if (GBC_MMU_Memory.ChannelSound1Enabled)
         {
             // Stop output when length expires
             if (GBC_MMU_Memory.Channel1CounterSelection)
             {
-                GBC_SFX_Channel1Ticks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel1Ticks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel1Ticks >= GBC_SFX_Channel1LengthTicks)
+                if (GBC_APU_Channel1Ticks >= GBC_APU_Channel1LengthTicks)
                 {
                     GBC_MMU_Memory.ChannelSound1Enabled = 0;
                 }
             }
 
             // Envelope handling
-            if (GBC_SFX_Channel1EnvelopeLengthTicks)
+            if (GBC_APU_Channel1EnvelopeLengthTicks)
             {
-                GBC_SFX_Channel1EnvelopeTicks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel1EnvelopeTicks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel1EnvelopeTicks >= GBC_SFX_Channel1EnvelopeLengthTicks)
+                if (GBC_APU_Channel1EnvelopeTicks >= GBC_APU_Channel1EnvelopeLengthTicks)
                 {
-                    GBC_SFX_Channel1EnvelopeTicks -= GBC_SFX_Channel1EnvelopeLengthTicks;
+                    GBC_APU_Channel1EnvelopeTicks -= GBC_APU_Channel1EnvelopeLengthTicks;
 
                     // Envelope Direction (0 = Decrease, 1 = Increase)
                     if (GBC_MMU_Memory.Channel1EnvelopeDirection)
                     {
-                        if (GBC_SFX_Channel1EnvelopeVolume < 15)
+                        if (GBC_APU_Channel1EnvelopeVolume < 15)
                         {
-                            GBC_SFX_Channel1EnvelopeVolume++;
+                            GBC_APU_Channel1EnvelopeVolume++;
                         }
                     }
                     else
                     {
-                        if (GBC_SFX_Channel1EnvelopeVolume > 0)
+                        if (GBC_APU_Channel1EnvelopeVolume > 0)
                         {
-                            GBC_SFX_Channel1EnvelopeVolume--;
+                            GBC_APU_Channel1EnvelopeVolume--;
                         }
                     }
                 }
             }
 
             // Sweep handling
-            if (GBC_SFX_Channel1SweepLengthTicks)
+            if (GBC_APU_Channel1SweepLengthTicks)
             {
-                GBC_SFX_Channel1SweepTicks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel1SweepTicks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel1SweepTicks >= GBC_SFX_Channel1SweepLengthTicks)
+                if (GBC_APU_Channel1SweepTicks >= GBC_APU_Channel1SweepLengthTicks)
                 {
-                    GBC_SFX_Channel1SweepTicks -= GBC_SFX_Channel1SweepLengthTicks;
+                    GBC_APU_Channel1SweepTicks -= GBC_APU_Channel1SweepLengthTicks;
 
                     f = (GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO;
 
@@ -791,22 +791,22 @@ void GBC_SFX_Step(void)
 
                         f = 2048 - f;
 
-                        if ((f << 4) < GBC_SFX_SAMPLE_RATE)
+                        if ((f << 4) < GBC_APU_SAMPLE_RATE)
                         {
-                            GBC_SFX_Channel1Frequency = 0;
+                            GBC_APU_Channel1Frequency = 0;
                         }
                         else
                         {
-                            GBC_SFX_Channel1Frequency = (GBC_SFX_SAMPLE_RATE << 17) / f;
+                            GBC_APU_Channel1Frequency = (GBC_APU_SAMPLE_RATE << 17) / f;
                         }
                     }
                 }
             }
 
-            s = GBC_SFX_SQUARE_WAVE[GBC_MMU_Memory.Channel1WavePatternDuty][(GBC_SFX_Channel1Position >> 18) & 7] & GBC_SFX_Channel1EnvelopeVolume;
+            s = GBC_APU_SQUARE_WAVE[GBC_MMU_Memory.Channel1WavePatternDuty][(GBC_APU_Channel1Position >> 18) & 7] & GBC_APU_Channel1EnvelopeVolume;
             s <<= 2;
 
-            GBC_SFX_Channel1Position += GBC_SFX_Channel1Frequency;
+            GBC_APU_Channel1Position += GBC_APU_Channel1Frequency;
 
             if (GBC_MMU_Memory.SoundOutputChannel1ToSO1)
             {
@@ -824,45 +824,45 @@ void GBC_SFX_Step(void)
             // Stop output when length expires
             if (GBC_MMU_Memory.Channel2CounterSelection)
             {
-                GBC_SFX_Channel2Ticks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel2Ticks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel2Ticks >= GBC_SFX_Channel2LengthTicks)
+                if (GBC_APU_Channel2Ticks >= GBC_APU_Channel2LengthTicks)
                 {
                     GBC_MMU_Memory.ChannelSound2Enabled = 0;
                 }
             }
 
             // Envelope handling
-            if (GBC_SFX_Channel2EnvelopeLengthTicks)
+            if (GBC_APU_Channel2EnvelopeLengthTicks)
             {
-                GBC_SFX_Channel2EnvelopeTicks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel2EnvelopeTicks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel2EnvelopeTicks >= GBC_SFX_Channel2EnvelopeLengthTicks)
+                if (GBC_APU_Channel2EnvelopeTicks >= GBC_APU_Channel2EnvelopeLengthTicks)
                 {
-                    GBC_SFX_Channel2EnvelopeTicks -= GBC_SFX_Channel2EnvelopeLengthTicks;
+                    GBC_APU_Channel2EnvelopeTicks -= GBC_APU_Channel2EnvelopeLengthTicks;
 
                     // Envelope Direction (0 = Decrease, 1 = Increase)
                     if (GBC_MMU_Memory.Channel2EnvelopeDirection)
                     {
-                        if (GBC_SFX_Channel2EnvelopeVolume < 15)
+                        if (GBC_APU_Channel2EnvelopeVolume < 15)
                         {
-                            GBC_SFX_Channel2EnvelopeVolume++;
+                            GBC_APU_Channel2EnvelopeVolume++;
                         }
                     }
                     else
                     {
-                        if (GBC_SFX_Channel2EnvelopeVolume > 0)
+                        if (GBC_APU_Channel2EnvelopeVolume > 0)
                         {
-                            GBC_SFX_Channel2EnvelopeVolume--;
+                            GBC_APU_Channel2EnvelopeVolume--;
                         }
                     }
                 }
             }
 
-            s = GBC_SFX_SQUARE_WAVE[GBC_MMU_Memory.Channel2WavePatternDuty][(GBC_SFX_Channel2Position >> 18) & 7] & GBC_SFX_Channel2EnvelopeVolume;
+            s = GBC_APU_SQUARE_WAVE[GBC_MMU_Memory.Channel2WavePatternDuty][(GBC_APU_Channel2Position >> 18) & 7] & GBC_APU_Channel2EnvelopeVolume;
             s <<= 2;
 
-            GBC_SFX_Channel2Position += GBC_SFX_Channel2Frequency;
+            GBC_APU_Channel2Position += GBC_APU_Channel2Frequency;
 
             if (GBC_MMU_Memory.SoundOutputChannel2ToSO1)
             {
@@ -880,17 +880,17 @@ void GBC_SFX_Step(void)
             // Stop output when length expires
             if (GBC_MMU_Memory.Channel3CounterSelection)
             {
-                GBC_SFX_Channel3Ticks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel3Ticks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel3Ticks >= GBC_SFX_Channel3LengthTicks)
+                if (GBC_APU_Channel3Ticks >= GBC_APU_Channel3LengthTicks)
                 {
                     GBC_MMU_Memory.ChannelSound3Enabled = 0;
                 }
             }
 
-            s = GBC_MMU_Memory.Channel3WavePatternRAM[(GBC_SFX_Channel3Position >> 22) & 15];
+            s = GBC_MMU_Memory.Channel3WavePatternRAM[(GBC_APU_Channel3Position >> 22) & 15];
 
-            if (GBC_SFX_Channel3Position & (1 << 21))
+            if (GBC_APU_Channel3Position & (1 << 21))
             {
                 s &= 15;
             }
@@ -901,7 +901,7 @@ void GBC_SFX_Step(void)
 
 			s -= 8;
 
-            GBC_SFX_Channel3Position += GBC_SFX_Channel3Frequency;
+            GBC_APU_Channel3Position += GBC_APU_Channel3Frequency;
 
             // Select output level
             switch (GBC_MMU_Memory.Channel3SelectOutputLevel)
@@ -937,9 +937,9 @@ void GBC_SFX_Step(void)
             // Stop output when length expires
             if (GBC_MMU_Memory.Channel4CounterSelection)
             {
-                GBC_SFX_Channel4Ticks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel4Ticks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel4Ticks >= GBC_SFX_Channel4LengthTicks)
+                if (GBC_APU_Channel4Ticks >= GBC_APU_Channel4LengthTicks)
                 {
                     GBC_MMU_Memory.ChannelSound4Enabled = 0;
                 }
@@ -950,41 +950,41 @@ void GBC_SFX_Step(void)
             // and some frequencies will sound more like Tone than Noise.
             if (GBC_MMU_Memory.Channel4PolynomialCounterStepWidth)
             {
-                s = 1 & (GBC_SFX_NOISE7[(GBC_SFX_Channel4Position >> 20) & 15] >> (7 - ((GBC_SFX_Channel4Position >> 17) & 7)));
+                s = 1 & (GBC_APU_NOISE7[(GBC_APU_Channel4Position >> 20) & 15] >> (7 - ((GBC_APU_Channel4Position >> 17) & 7)));
             }
             else
             {
             #ifdef NO_NOISE15
-				s = 1 & (GBC_SFX_NOISE15[(GBC_SFX_Channel4Position >> 20) & 1023] >> (7 - ((GBC_SFX_Channel4Position >> 17) & 7)));
+				s = 1 & (GBC_APU_NOISE15[(GBC_APU_Channel4Position >> 20) & 1023] >> (7 - ((GBC_APU_Channel4Position >> 17) & 7)));
 			#else 
-				s = 1 & (GBC_SFX_NOISE15[(GBC_SFX_Channel4Position >> 20) & 4095] >> (7 - ((GBC_SFX_Channel4Position >> 17) & 7)));
+				s = 1 & (GBC_APU_NOISE15[(GBC_APU_Channel4Position >> 20) & 4095] >> (7 - ((GBC_APU_Channel4Position >> 17) & 7)));
 			#endif /* NO_NOISE15 */
             }
 
-            s = (-s) & GBC_SFX_Channel4EnvelopeVolume;
+            s = (-s) & GBC_APU_Channel4EnvelopeVolume;
 
             // Envelope handling
-            if (GBC_SFX_Channel4EnvelopeLengthTicks)
+            if (GBC_APU_Channel4EnvelopeLengthTicks)
             {
-                GBC_SFX_Channel4EnvelopeTicks += GBC_SFX_SAMPLE_RATE;
+                GBC_APU_Channel4EnvelopeTicks += GBC_APU_SAMPLE_RATE;
 
-                if (GBC_SFX_Channel4EnvelopeTicks >= GBC_SFX_Channel4EnvelopeLengthTicks)
+                if (GBC_APU_Channel4EnvelopeTicks >= GBC_APU_Channel4EnvelopeLengthTicks)
                 {
-                    GBC_SFX_Channel4EnvelopeTicks -= GBC_SFX_Channel4EnvelopeLengthTicks;
+                    GBC_APU_Channel4EnvelopeTicks -= GBC_APU_Channel4EnvelopeLengthTicks;
 
                     // Envelope Direction (0 = Decrease, 1 = Increase)
                     if (GBC_MMU_Memory.Channel4EnvelopeDirection)
                     {
-                        if (GBC_SFX_Channel4EnvelopeVolume < 15)
+                        if (GBC_APU_Channel4EnvelopeVolume < 15)
                         {
-                            GBC_SFX_Channel4EnvelopeVolume++;
+                            GBC_APU_Channel4EnvelopeVolume++;
                         }
                     }
                     else
                     {
-                        if (GBC_SFX_Channel4EnvelopeVolume > 0)
+                        if (GBC_APU_Channel4EnvelopeVolume > 0)
                         {
-                            GBC_SFX_Channel4EnvelopeVolume--;
+                            GBC_APU_Channel4EnvelopeVolume--;
                         }
                     }
                 }
@@ -992,7 +992,7 @@ void GBC_SFX_Step(void)
 
             s += s << 1;
 
-			GBC_SFX_Channel4Position += GBC_SFX_Channel4Frequency;
+			GBC_APU_Channel4Position += GBC_APU_Channel4Frequency;
 
             if (GBC_MMU_Memory.SoundOutputChannel4ToSO1)
             {
@@ -1029,30 +1029,30 @@ void GBC_SFX_Step(void)
             r = -128;
         }
 
-        GBC_SFX_Buffer_L[GBC_SFX_BufferPosition] = l + 128;
-        GBC_SFX_Buffer_R[GBC_SFX_BufferPosition] = r + 128;
+        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l + 128;
+        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r + 128;
 
-        GBC_SFX_BufferPosition++;
-        if (GBC_SFX_BufferPosition >= GBC_SFX_BUFFER_SIZE)
+        GBC_APU_BufferPosition++;
+        if (GBC_APU_BufferPosition >= GBC_APU_BUFFER_SIZE)
         {
-            GBC_SFX_BufferPosition = 0;
+            GBC_APU_BufferPosition = 0;
         }
     }
 }
 
-void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
+void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value)
 {
     switch (address)
     {
         case 0xFF10:
-            GBC_SFX_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 15; // 128 Hz
+            GBC_APU_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 15; // 128 Hz
             break;
         case 0xFF11:
-            GBC_SFX_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 14; // 256 Hz
+            GBC_APU_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 14; // 256 Hz
             break;
         case 0xFF12:
-            GBC_SFX_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 16; // 64 Hz
-            GBC_SFX_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
+            GBC_APU_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 16; // 64 Hz
+            GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
             break;
         case 0xFF13:
             UPDATE_CHANNEL1_FREQUENCY();
@@ -1061,16 +1061,16 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             UPDATE_CHANNEL1_FREQUENCY();
             if (GBC_MMU_Memory.Channel1InitialRestart)
             {
-                GBC_SFX_InitializeChannel1();
+                GBC_APU_InitializeChannel1();
                 GBC_MMU_Memory.ChannelSound1Enabled = true;
             }
             break;
         case 0xFF16:
-            GBC_SFX_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 14; // 256 Hz
+            GBC_APU_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 14; // 256 Hz
             break;
         case 0xFF17:
-            GBC_SFX_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 16; // 64 Hz
-            GBC_SFX_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
+            GBC_APU_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 16; // 64 Hz
+            GBC_APU_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
             break;
         case 0xFF18:
             UPDATE_CHANNEL2_FREQUENCY();
@@ -1079,7 +1079,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             UPDATE_CHANNEL2_FREQUENCY();
             if (GBC_MMU_Memory.Channel2InitialRestart)
             {
-                GBC_SFX_InitializeChannel2();
+                GBC_APU_InitializeChannel2();
                 GBC_MMU_Memory.ChannelSound2Enabled = true;
             }
             break;
@@ -1090,7 +1090,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             }
             break;
         case 0xFF1B:
-            GBC_SFX_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 14; // 256 Hz
+            GBC_APU_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 14; // 256 Hz
             break;
         case 0xFF1D:
             UPDATE_CHANNEL3_FREQUENCY();
@@ -1099,16 +1099,16 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             UPDATE_CHANNEL3_FREQUENCY();
             if (GBC_MMU_Memory.Channel3InitialRestart)
             {
-                GBC_SFX_InitializeChannel3();
+                GBC_APU_InitializeChannel3();
                 GBC_MMU_Memory.ChannelSound3Enabled = GBC_MMU_Memory.Channel3PlaybackEnabled;
             }
             break;
         case 0xFF20:
-            GBC_SFX_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 14; // 256 Hz
+            GBC_APU_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 14; // 256 Hz
             break;
         case 0xFF21:
-            GBC_SFX_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 16; // 64 Hz
-            GBC_SFX_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
+            GBC_APU_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 16; // 64 Hz
+            GBC_APU_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
             break;
         case 0xFF22:
             UPDATE_CHANNEL4_FREQUENCY();
@@ -1117,7 +1117,7 @@ void GBC_SFX_OnWriteToSoundRegister(uint16_t address, uint8_t value)
             UPDATE_CHANNEL4_FREQUENCY();
             if (GBC_MMU_Memory.Channel4InitialRestart)
             {
-                GBC_SFX_InitializeChannel4();
+                GBC_APU_InitializeChannel4();
                 GBC_MMU_Memory.ChannelSound4Enabled = true;
             }
             break;

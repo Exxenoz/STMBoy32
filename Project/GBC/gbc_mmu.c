@@ -1,6 +1,6 @@
 #include "gbc_mmu.h"
 #include "gbc_tim.h"
-#include "gbc_sfx.h"
+#include "gbc_apu.h"
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
@@ -817,7 +817,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     }
 
                     GBC_MMU_Memory.IO[address - 0xFF00] = value;
-                    GBC_SFX_OnWriteToSoundRegister(address, value);
+                    GBC_APU_OnWriteToSoundRegister(address, value);
                     break;
                 case 0xFF26:
                     if (value & 0x80)
@@ -836,7 +836,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                         }
 
                         // Reinitialize sound module
-                        GBC_SFX_Initialize();
+                        GBC_APU_Initialize();
                     }
                     // Other 7 bits of 0xFF26 are read only
                     break;
