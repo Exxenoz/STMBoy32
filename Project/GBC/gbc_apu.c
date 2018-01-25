@@ -639,31 +639,31 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
 void GBC_APU_InitializeChannel1(void)
 {
     GBC_APU_Channel1Ticks = 0;
-    GBC_APU_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 13;
+    GBC_APU_Channel1LengthTicks = (64 - GBC_MMU_Memory.Channel1SoundLengthData) << 14; // 256 Hz
     GBC_APU_Channel1Position = 0;
     UPDATE_CHANNEL1_FREQUENCY();
     GBC_APU_Channel1EnvelopeTicks = 0;
-    GBC_APU_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 15;
+    GBC_APU_Channel1EnvelopeLengthTicks = GBC_MMU_Memory.Channel1EnvelopeSweepNumber << 16; // 64 Hz
     GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
     GBC_APU_Channel1SweepTicks = 0;
-    GBC_APU_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 14;
+    GBC_APU_Channel1SweepLengthTicks = GBC_MMU_Memory.Channel1SweepTime << 15; // 128 Hz
 }
 
 void GBC_APU_InitializeChannel2(void)
 {
     GBC_APU_Channel2Ticks = 0;
-    GBC_APU_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 13;
+    GBC_APU_Channel2LengthTicks = (64 - GBC_MMU_Memory.Channel2SoundLengthData) << 14; // 256 Hz
     GBC_APU_Channel2Position = 0;
     UPDATE_CHANNEL2_FREQUENCY();
     GBC_APU_Channel2EnvelopeTicks = 0;
-    GBC_APU_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 15;
+    GBC_APU_Channel2EnvelopeLengthTicks = GBC_MMU_Memory.Channel2EnvelopeSweepNumber << 16; // 64 Hz
     GBC_APU_Channel2EnvelopeVolume = GBC_MMU_Memory.Channel2InitialEnvelopeVolume;
 }
 
 void GBC_APU_InitializeChannel3(void)
 {
     GBC_APU_Channel3Ticks = 0;
-    GBC_APU_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 20;
+    GBC_APU_Channel3LengthTicks = (256 - GBC_MMU_Memory.Channel3SoundLength) << 14; // 256 Hz
     GBC_APU_Channel3Position = 0;
     UPDATE_CHANNEL3_FREQUENCY();
 }
@@ -671,11 +671,11 @@ void GBC_APU_InitializeChannel3(void)
 void GBC_APU_InitializeChannel4(void)
 {
     GBC_APU_Channel4Ticks = 0;
-    GBC_APU_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 13;
+    GBC_APU_Channel4LengthTicks = (64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63)) << 14; // 256 Hz
     GBC_APU_Channel4Position = 0;
     UPDATE_CHANNEL4_FREQUENCY();
     GBC_APU_Channel4EnvelopeTicks = 0;
-    GBC_APU_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 15;
+    GBC_APU_Channel4EnvelopeLengthTicks = GBC_MMU_Memory.Channel4EnvelopeSweepNumber << 16; // 64 Hz
     GBC_APU_Channel4EnvelopeVolume = GBC_MMU_Memory.Channel4InitialEnvelopeVolume;
 }
 
