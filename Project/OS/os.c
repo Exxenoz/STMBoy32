@@ -3,7 +3,6 @@
 #include "os.h"
 #include "ff.h"
 #include "sdc.h"
-#include "error.h"
 
 OS_Options_t OS_InitOptions;                           // Inititial Options
 
@@ -39,12 +38,13 @@ void OS_UpdateOptions(void)
 }
 
 // Loads maxLoad gameentries in alphabetical (starting with the one following startingName) order to OS_GameEntries
-uint32_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorites)
+Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorites)
 {
-    DIR     directory;
-    char    *directoryPath;
-    bool    isFavorite;
-    FILINFO fileInfo;
+    DIR         directory;
+    char       *directoryPath;
+    bool        isFavorite;
+    FILINFO     fileInfo;
+    Error_Def_t err_def;
 
     // Clear OS_GameEntries
     memset(OS_GameEntries, 0, OS_MAX_NUMBER_OF_GAMES * sizeof(OS_GameEntry_t));
@@ -68,12 +68,14 @@ uint32_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorite
     // If no SDC can be mounted or the specified directory doesn't exist / can't be opened return
     if (!SDC_Mount())
     {
-        return SDC_ERROR_NO_SDC;
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
+        return err_def;
     }
 
     if (f_opendir(&directory, directoryPath) != FR_OK)
     {
-        return SDC_ERROR_GAME_DIR_ACCESS_FAILED;
+        ERR_DEF_INIT(err_def, SDC_ERROR_DIR_ACCESS_FAILED, directoryPath);
+        return err_def;
     }
 
     // Get the alphabetically 'lowest' OS_MAX_NUMBER_OF_GAMES titles 'higher' than startingName from the directory
@@ -131,17 +133,18 @@ uint32_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorite
             }
             else
             {
-                directoryPath = OS_FAVORITE_DIRECTORY;
                 isFavorite    = true;
 
                 // Close the game-directory
                 f_closedir(&directory);
 
                 // If opening the favorite directory fails sort what was already stored and exit
-                if (f_opendir(&directory, directoryPath) != FR_OK)
+                if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK)
                 {
                     qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
-                    return SDC_ERROR_FAV_DIR_ACCESS_FAILED;
+
+                    ERR_DEF_INIT(err_def, SDC_ERROR_DIR_ACCESS_FAILED, OS_FAVORITE_DIRECTORY);
+                    return err_def;
                 }
             }
         }
@@ -151,19 +154,20 @@ uint32_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorite
     // Close directory and sort the list alphabetically (case insensitive)
     f_closedir(&directory);
     qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
-    return OS_SUCCESS;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
+Error_Def_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
 {
-    // Define path arrays with maximal needed size
-    char     oldPath[OS_MAX_PATH_LENGTH];
-    char     newPath[OS_MAX_PATH_LENGTH];
-    uint32_t err_code;
+    char        oldPath[OS_MAX_PATH_LENGTH];
+    char        newPath[OS_MAX_PATH_LENGTH];
+    Error_Def_t err_def;
 
     // Get old path
-    err_code = OS_GetGamePath(p_game, oldPath, OS_MAX_PATH_LENGTH);
-    ERROR_CHECK(err_code);
+    err_def = OS_GetGamePath(p_game, oldPath, OS_MAX_PATH_LENGTH);
+    ERROR_CHECK(err_def);
 
     // Invert the favorite attribute
     p_game->IsFavorite = p_game->IsFavorite ? false : true;
@@ -182,17 +186,19 @@ uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
 
     // Move the game into the new directory
     f_rename(oldPath, newPath);
-    return OS_SUCCESS;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-uint32_t OS_LoadLastPlayed(void)
+Error_Def_t OS_LoadLastPlayed(void)
 {
     // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
-    FIL      file;  
-    int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
-    char     buffer[bufferSize];
-    uint32_t bytesRead;
-    uint32_t err_code;
+    FIL         file;  
+    int         bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
+    char        buffer[bufferSize];
+    uint32_t    bytesRead;
+    Error_Def_t err_def;
 
     // Clear OS_GameEntries
     memset(OS_GameEntries, 0, OS_MAX_NUMBER_OF_GAMES * sizeof(OS_GameEntry_t));
@@ -201,15 +207,25 @@ uint32_t OS_LoadLastPlayed(void)
     if (!SDC_Mount())
     {
         OS_LoadedGamesCounter = 0;
-        return SDC_ERROR_NO_SDC;
+
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
+        return err_def;
     }
 
-    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK ||
-        f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK ||
-        bytesRead != bufferSize)
+    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK)
     {
         OS_LoadedGamesCounter = 0;
-        return SDC_ERROR_FILE_ACCESS_FAILED;
+
+        ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
+        return err_def;
+    }
+
+    if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize)
+    {
+        OS_LoadedGamesCounter = 0;
+
+        ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+        return err_def;
     }
 
     // If everything is ok close the file, load the games and set gameCounter accordingly
@@ -222,18 +238,20 @@ uint32_t OS_LoadLastPlayed(void)
         if (buffer[currPosition] == '\0') break;
 
         CopyChars(OS_GameEntries[i].Name, &(buffer[currPosition]), OS_MAX_GAME_TITLE_LENGTH + 1);
-        err_code = OS_IsFavorite(&(OS_GameEntries[i]));
-        ERROR_CHECK(err_code);
+        err_def = OS_IsFavorite(&(OS_GameEntries[i]));
+        ERROR_CHECK(err_def);
     }
-
     OS_LoadedGamesCounter = i;
     OS_TotalGamesCounter  = i;
-    return OS_SUCCESS;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-uint32_t OS_UpdateLastPlayed(void)
+Error_Def_t OS_UpdateLastPlayed(void)
 {
-    FIL file;
+    FIL         file;
+    Error_Def_t err_def;
 
     // The game titles are stored padded by 0bytes (OS_MAX_GAME_TITLE_LENGTH + 1 bytes) followed by '\r''\n'
     int      bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 3);
@@ -244,7 +262,8 @@ uint32_t OS_UpdateLastPlayed(void)
     // If no SDC can be mounted return false
     if (!SDC_Mount())
     {
-        return SDC_ERROR_NO_SDC;
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
+        return err_def;
     }
 
     // If the file doesn't exist try to create a new one, if it does update it
@@ -257,17 +276,22 @@ uint32_t OS_UpdateLastPlayed(void)
         buffer[OS_MAX_GAME_TITLE_LENGTH + 2] = '\n';
 
         // If creating a new file or writing to it fails return false
-        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK ||
-            f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK ||
-            bytesWritten != bufferSize)
+        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
         {
-            return SDC_ERROR_FILE_ACCESS_FAILED;
+            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
         }
-        else
+
+        if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
         {
-            f_close(&file);
-            return OS_SUCCESS;
-        }   
+            ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
+        }
+        
+        f_close(&file);
+
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+        return err_def;
     }
     // Update the lastPlayed file
     else
@@ -277,7 +301,8 @@ uint32_t OS_UpdateLastPlayed(void)
         // Read the lastPlayed entries to buffer
         if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK)
         {
-            return SDC_ERROR_FILE_ACCESS_FAILED;
+            ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
         }
 
         // If current game is already stored as one of the lastPlayed get it's position otherwise the last one
@@ -312,33 +337,43 @@ uint32_t OS_UpdateLastPlayed(void)
         f_lseek(&file, 0);
         if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
         {
-            return SDC_ERROR_FILE_ACCESS_FAILED;
+            ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
         }
     }
-
     f_close(&file);
-    return OS_SUCCESS;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-uint32_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry)
+Error_Def_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry)
 {
+    Error_Def_t err_def;
+
     for (int i = 0; i < OS_LoadedGamesCounter; i++)
     {
         if (CmpStrings(OS_GameEntries[i].Name, name) == 0)
         {
             *gameEntry = &(OS_GameEntries[i]);
-            return OS_SUCCESS;
+
+            ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+            return err_def;
         }
     }
 
-    return OS_ERROR_GAME_NOT_FOUND;
+    ERR_DEF_INIT(err_def, OS_ERROR_GAME_NOT_FOUND, name);
+    return err_def;
 }
 
-uint32_t OS_RemoveGameEntry(int currGameEntryIndex)
+Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex)
 {
+    Error_Def_t err_def;
+
     if (currGameEntryIndex >= OS_LoadedGamesCounter)
     {
-        return OS_ERROR_INVALID_INDEX;
+        ERR_DEF_INIT(err_def, OS_ERROR_INVALID_INDEX, (char*)(&currGameEntryIndex)); // ?
+        return err_def;
     }
 
     for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
@@ -353,53 +388,64 @@ uint32_t OS_RemoveGameEntry(int currGameEntryIndex)
             OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
         }
     }
-
     OS_LoadedGamesCounter--;
     OS_TotalGamesCounter--;
-    return OS_SUCCESS;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-uint32_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
+Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
 {
+    FIL         file;
+    FRESULT     test;
+    Error_Def_t err_def;
+
     // Check if the array in which the path is to be stored is long enough
     if (pathLength < OS_MAX_PATH_LENGTH)
     {
-        return OS_ERROR_INVALID_PATH_LENGTH;
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_ERROR_INVALID_PATH_LENGTH);
+        return err_def;
     }
-
-    FIL  file;
 
     // Check if the game is located inside the favorite folder
     CopyString(path, OS_FAVORITE_PATH, pathLength);
     AppendString(path, p_game->Name, pathLength);
-    if (f_open(&file, path, FA_OPEN_EXISTING) == FR_OK)
+    test = f_open(&file, path, FA_OPEN_EXISTING);
+    if (test == FR_OK)
     {
         f_close(&file);
-        return OS_SUCCESS;
+
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+        return err_def;
     }
 
     // If the game isn't located inside the favorite folder check if its located in the game folder
     CopyString(path, OS_GAME_PATH, pathLength);
     AppendString(path, p_game->Name, pathLength);
-    if (f_open(&file, path, FA_OPEN_EXISTING) == FR_OK)
+    test = f_open(&file, path, FA_OPEN_EXISTING);
+    if (test == FR_OK)
     {
         f_close(&file);
-        return OS_SUCCESS;
+
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+        return err_def;
     }
 
     // If it's located in neither it doesn't exist
     memset(path, 0, pathLength);
-    return OS_ERROR_GAME_NOT_FOUND;
+    ERR_DEF_INIT(err_def, OS_ERROR_GAME_NOT_FOUND, p_game->Name);
+    return err_def;
 }
 
-uint32_t OS_IsFavorite(OS_GameEntry_t *p_game)
+Error_Def_t OS_IsFavorite(OS_GameEntry_t *p_game)
 {
-    char     path[OS_MAX_PATH_LENGTH];
-    char     favoritePath[OS_MAX_PATH_LENGTH];
-    uint32_t err_code;
+    Error_Def_t err_def;
+    char        path[OS_MAX_PATH_LENGTH];
+    char        favoritePath[OS_MAX_PATH_LENGTH];
 
-    err_code = OS_GetGamePath(p_game, path, OS_MAX_PATH_LENGTH);
-    ERROR_CHECK(err_code);
+    err_def = OS_GetGamePath(p_game, path, OS_MAX_PATH_LENGTH);
+    ERROR_CHECK(err_def);
 
     CopyString(favoritePath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
     AppendString(favoritePath, p_game->Name, OS_MAX_PATH_LENGTH);
@@ -413,7 +459,8 @@ uint32_t OS_IsFavorite(OS_GameEntry_t *p_game)
         p_game->IsFavorite = false;
     }
 
-    return OS_SUCCESS;
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
 void OS_DoAction(OS_Action_t action)

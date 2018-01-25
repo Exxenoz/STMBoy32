@@ -2,6 +2,7 @@
 #define OS_H
 
 #include "common.h"
+#include "error.h"
 
 #define OS_LAST_PLAYED_GAMES_NUM      5                     // defines how many of the last played games are stored
 
@@ -70,15 +71,15 @@ extern int OS_TotalGamesCounter;
 void OS_LoadOptions(void);
 void OS_UpdateOptions(void);
 
-uint32_t OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
-uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game);
-uint32_t OS_LoadLastPlayed(void);
-uint32_t OS_UpdateLastPlayed(void);
+Error_Def_t OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
+Error_Def_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game);
+Error_Def_t OS_LoadLastPlayed(void);
+Error_Def_t OS_UpdateLastPlayed(void);
 
-uint32_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry);
-uint32_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
-uint32_t OS_IsFavorite(OS_GameEntry_t *p_game);
-uint32_t OS_RemoveGameEntry(int currGameEntryIndex);
+Error_Def_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry);
+Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
+Error_Def_t OS_IsFavorite(OS_GameEntry_t *p_game);
+Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex);
 void OS_DoAction(OS_Action_t action);
 
 #endif
