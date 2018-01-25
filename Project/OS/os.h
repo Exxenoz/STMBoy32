@@ -13,6 +13,7 @@
 
 #define OS_MAX_GAME_TITLE_LENGTH      18
 #define OS_MAX_NUMBER_OF_GAMES        100                   // defines how many games can be loaded to buffer
+#define OS_MAX_PATH_LENGTH            (sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1)
 
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
 

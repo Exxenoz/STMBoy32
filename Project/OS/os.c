@@ -157,13 +157,12 @@ uint32_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavorite
 uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
 {
     // Define path arrays with maximal needed size
-    int      pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
-    char     oldPath[pathLength];
-    char     newPath[pathLength];
+    char     oldPath[OS_MAX_PATH_LENGTH];
+    char     newPath[OS_MAX_PATH_LENGTH];
     uint32_t err_code;
 
     // Get old path
-    err_code = OS_GetGamePath(p_game, oldPath, pathLength);
+    err_code = OS_GetGamePath(p_game, oldPath, OS_MAX_PATH_LENGTH);
     ERROR_CHECK(err_code);
 
     // Invert the favorite attribute
@@ -172,13 +171,13 @@ uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
     // Get the new path
     if (p_game->IsFavorite)
     {
-        CopyString(newPath, OS_FAVORITE_PATH, pathLength);
-        AppendString(newPath, p_game->Name, pathLength);
+        CopyString(newPath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
+        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
     }
     else
     {
-        CopyString(newPath, OS_GAME_PATH, pathLength);
-        AppendString(newPath, p_game->Name, pathLength);
+        CopyString(newPath, OS_GAME_PATH, OS_MAX_PATH_LENGTH);
+        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
     }
 
     // Move the game into the new directory
@@ -363,10 +362,7 @@ uint32_t OS_RemoveGameEntry(int currGameEntryIndex)
 uint32_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
 {
     // Check if the array in which the path is to be stored is long enough
-    int test;
-    test    = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
-    test = 0;
-    if (pathLength < test)
+    if (pathLength < OS_MAX_PATH_LENGTH)
     {
         return OS_ERROR_INVALID_PATH_LENGTH;
     }
@@ -398,16 +394,15 @@ uint32_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
 
 uint32_t OS_IsFavorite(OS_GameEntry_t *p_game)
 {
-    int      pathLength = sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1;
-    char     path[pathLength];
-    char     favoritePath[pathLength];
+    char     path[OS_MAX_PATH_LENGTH];
+    char     favoritePath[OS_MAX_PATH_LENGTH];
     uint32_t err_code;
 
-    err_code = OS_GetGamePath(p_game, path, pathLength);
+    err_code = OS_GetGamePath(p_game, path, OS_MAX_PATH_LENGTH);
     ERROR_CHECK(err_code);
 
-    CopyString(favoritePath, OS_FAVORITE_PATH, pathLength);
-    AppendString(favoritePath, p_game->Name, pathLength);
+    CopyString(favoritePath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
+    AppendString(favoritePath, p_game->Name, OS_MAX_PATH_LENGTH);
 
     if (CmpStrings(path, favoritePath) == 0)
     {
