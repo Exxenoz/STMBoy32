@@ -18,12 +18,6 @@
 
 typedef struct
 {
-    char buffer[105];
-}
-OS_Test;
-
-typedef struct
-{
     char Name[OS_MAX_GAME_TITLE_LENGTH + 1];
     bool IsFavorite;
 }
@@ -75,15 +69,15 @@ extern int OS_TotalGamesCounter;
 void OS_LoadOptions(void);
 void OS_UpdateOptions(void);
 
-void OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
-void OS_UpdateFavorite(OS_GameEntry_t *p_game);
-void OS_LoadLastPlayed(void);
-bool OS_UpdateLastPlayed(void);
+uint32_t OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
+uint32_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game);
+uint32_t OS_LoadLastPlayed(void);
+uint32_t OS_UpdateLastPlayed(void);
 
-OS_GameEntry_t OS_GetGameEntry(char *name);
-void OS_RemoveGameEntry(int currGameEntryIndex);
-void OS_GetGamePath(OS_GameEntry_t *p_name, char *path, int pathLength);
-bool OS_IsFavorite(char *name);
+uint32_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry);
+uint32_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
+uint32_t OS_IsFavorite(OS_GameEntry_t *p_game);
+uint32_t OS_RemoveGameEntry(int currGameEntryIndex);
 void OS_DoAction(OS_Action_t action);
 
 #endif

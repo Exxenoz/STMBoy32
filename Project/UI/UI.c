@@ -108,7 +108,7 @@ void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_DrawOption_t option)
     // Initialize menupoint specification
     int stringLength = Fonts_GetStringLength(menuPoint->Text, UI_MP_SPACING, &UI_MP_FONT);
 
-    copyString(menuPointDef.Characters, menuPoint->Text, LCD_MAX_TEXT_LENGTH + 1);
+    CopyString(menuPointDef.Characters, menuPoint->Text, LCD_MAX_TEXT_LENGTH + 1);
     menuPointDef.Spacing       = UI_MP_SPACING;
     menuPointDef.Border.Width  = UI_MP_BORDER_WIDTH;
     menuPointDef.Padding.Upper = ((menuPoint->Height - 2 * UI_MP_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2);
@@ -145,7 +145,7 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
     // Initialize gameentry specifications
     int stringLen = Fonts_GetStringLengthWithoutSuffix(gameEntry->Name, UI_GE_SPACING, &UI_GE_FONT);
 
-    copyWithoutSuffix(gameEntryDef.Characters, gameEntry->Name, LCD_MAX_TEXT_LENGTH + 1);
+    CopyWithoutSuffix(gameEntryDef.Characters, gameEntry->Name, LCD_MAX_TEXT_LENGTH + 1);
     gameEntryDef.Spacing       = UI_GE_SPACING;
     gameEntryDef.Border.Width  = UI_GE_BORDER_WIDTH;
     gameEntryDef.Padding.Upper = ((UI_SHOWALL_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2);

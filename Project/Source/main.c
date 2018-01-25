@@ -187,7 +187,7 @@ void HandleShowAllGamesPage(void)
         // If Select-Button is pressed invert the favorite-status of the currently selected game (if valid)
         if (Input_Interrupt_Flags.ButtonSelect && !Input_IsLocked(INPUT_SELECT_ID) && currGameEntryID != -1)
         {
-            OS_UpdateFavorite(&OS_GameEntries[currGameEntryIndex]);
+            OS_InvertFavoriteStatus(&OS_GameEntries[currGameEntryIndex]);
 
             // If only favorites are displayed this means deleting the currently selected game from the list
             if (designs[currDesignID] == UI_FAVORITES)
@@ -219,7 +219,7 @@ void HandleShowAllGamesPage(void)
         if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID) && currGameEntryID != -1)
         {
             // Set the game which is to be started
-            copyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryIndex].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            CopyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryIndex].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
             OS_CurrentGame.IsFavorite = OS_GameEntries[currGameEntryIndex].IsFavorite;
 
             // Update the last played games accordingly

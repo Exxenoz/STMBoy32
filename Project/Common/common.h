@@ -36,9 +36,10 @@ typedef enum bool_e
 bool;
 
 // Custom string functions to ensure null termination
-void copyString(char *dest, const char *src, int destSize);
-void copyChars(char *dest, const char *src, int destSize);
-void copyWithoutSuffix(char *dest, const char *src, int destSize);
-void appendString(char *dest, const char *src, int destSize);
+int  CmpStrings(const void *a, const void *b);
+void CopyString(char *dest, const char *src, int destSize);
+void CopyChars(char *dest, const char *src, int destSize);
+void CopyWithoutSuffix(char *dest, const char *src, int destSize);
+void AppendString(char *dest, const char *src, int destSize);
 
 #endif //COMMON_H
