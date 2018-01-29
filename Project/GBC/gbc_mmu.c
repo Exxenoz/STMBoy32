@@ -792,6 +792,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF23:
                 case 0xFF24:
                 case 0xFF25:
+                {
                     if (!GBC_MMU_Memory.ChannelSoundsEnabled)
                     {
                         // Read-only in CGB mode
@@ -816,9 +817,11 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                         }
                     }
 
+                    uint8_t oldValue = GBC_MMU_Memory.IO[address - 0xFF00];
                     GBC_MMU_Memory.IO[address - 0xFF00] = value;
-                    GBC_APU_OnWriteToSoundRegister(address, value);
+                    GBC_APU_OnWriteToSoundRegister(address, value, oldValue);
                     break;
+                }
                 case 0xFF26:
                     if (value & 0x80)
                     {

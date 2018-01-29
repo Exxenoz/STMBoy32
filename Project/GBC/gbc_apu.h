@@ -8,6 +8,6 @@
 
 void GBC_APU_Initialize(void);
 void GBC_APU_Step(void);
-void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value);
+void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t oldValue);
 
 #endif
