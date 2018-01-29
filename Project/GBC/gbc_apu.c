@@ -16,6 +16,9 @@ uint8_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 uint32_t GBC_APU_BufferPosition = 0;
 
 uint32_t GBC_APU_Channel1LengthCounter = 0;
+bool     GBC_APU_Channel1SweepEnabled = false;
+uint32_t GBC_APU_Channel1SweepFrequency = 0;
+bool     GBC_APU_Channel1SweepDecrease = false;
 int32_t  GBC_APU_Channel1SweepLengthCounter = 0;
 bool     GBC_APU_Channel1EnvelopeEnabled = false;
 uint32_t GBC_APU_Channel1EnvelopeVolume = 0;
@@ -595,6 +598,10 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
 #define IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() (GBC_APU_FrameIndex & 1)
 #define IS_APU_IN_SECOND_HALF_OF_LENGTH_PERIOD() (!(GBC_APU_FrameIndex & 1))
 
+#define GET_CHANNEL1_FREQUENCY() ((GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO)
+#define GET_CHANNEL2_FREQUENCY() ((GBC_MMU_Memory.Channel2FrequencyHI << 8) + GBC_MMU_Memory.Channel2FrequencyLO)
+#define GET_CHANNEL3_FREQUENCY() ((GBC_MMU_Memory.Channel3FrequencyHI << 8) + GBC_MMU_Memory.Channel3FrequencyLO)
+
 #define UPDATE_CHANNEL1_FREQUENCY(D)                                                                                                                    \
 {                                                                                                                                                       \
     uint32_t d = 2048 - ((GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO);                                               \
@@ -645,9 +652,39 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
+#define CALCULATE_CHANNEL1_SWEEP(UPDATE_SWEEP)                                                                                                          \
+{                                                                                                                                                       \
+    long sweepFrequency = GBC_APU_Channel1SweepFrequency;                                                                                               \
+    GBC_APU_Channel1SweepDecrease = GBC_MMU_Memory.Channel1SweepType ? true : false;                                                                    \
+                                                                                                                                                        \
+    if (GBC_APU_Channel1SweepDecrease)                                                                                                                  \
+    {                                                                                                                                                   \
+        sweepFrequency -= GBC_APU_Channel1SweepFrequency >> GBC_MMU_Memory.Channel1SweepShift;                                                          \
+    }                                                                                                                                                   \
+    else                                                                                                                                                \
+    {                                                                                                                                                   \
+        sweepFrequency += GBC_APU_Channel1SweepFrequency >> GBC_MMU_Memory.Channel1SweepShift;                                                          \
+    }                                                                                                                                                   \
+                                                                                                                                                        \
+    if (sweepFrequency > 2047)                                                                                                                          \
+    {                                                                                                                                                   \
+        GBC_MMU_Memory.ChannelSound1Enabled = 0;                                                                                                        \
+    }                                                                                                                                                   \
+    else if (GBC_MMU_Memory.Channel1SweepShift && UPDATE_SWEEP)                                                                                         \
+    {                                                                                                                                                   \
+        GBC_APU_Channel1SweepFrequency = sweepFrequency;                                                                                                \
+                                                                                                                                                        \
+        GBC_MMU_Memory.Channel1FrequencyLO = sweepFrequency & 0xFF;                                                                                     \
+        GBC_MMU_Memory.Channel1FrequencyHI = sweepFrequency >> 8;                                                                                       \
+    }                                                                                                                                                   \
+}                                                                                                                                                       \
+
 void GBC_APU_InitializeChannel1(void)
 {
     GBC_APU_Channel1LengthCounter = 64 - GBC_MMU_Memory.Channel1SoundLengthData;
+    GBC_APU_Channel1SweepEnabled = false;
+    GBC_APU_Channel1SweepFrequency = 0;
+    GBC_APU_Channel1SweepDecrease = false;
     GBC_APU_Channel1SweepLengthCounter = GBC_MMU_Memory.Channel1SweepTime;
     GBC_APU_Channel1EnvelopeEnabled = false;
     GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
@@ -712,7 +749,6 @@ void GBC_APU_Step(void)
         return;
     }
 
-    long f = 0;
     long l = 0;
     long r = 0;
     long s = 0;
@@ -738,43 +774,11 @@ void GBC_APU_Step(void)
                         GBC_APU_Channel1SweepLengthCounter = 8;
                     }
 
-                    if (GBC_MMU_Memory.Channel1SweepTime &&
-                        GBC_MMU_Memory.Channel1SweepShift)
+                    if (GBC_APU_Channel1SweepEnabled &&
+                        GBC_MMU_Memory.Channel1SweepTime)
                     {
-                        f = (GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO;
-
-                        // Sweep Increase / Decrease
-                        // 0: Addition    (frequency increases)
-                        // 1: Subtraction (frequency decreases)
-                        if (GBC_MMU_Memory.Channel1SweepType)
-                        {
-                            f -= f >> GBC_MMU_Memory.Channel1SweepShift;
-                        }
-                        else
-                        {
-                            f += f >> GBC_MMU_Memory.Channel1SweepShift;
-                        }
-
-                        if (f > 2047)
-                        {
-                            GBC_MMU_Memory.ChannelSound1Enabled = 0;
-                        }
-                        else
-                        {
-                            GBC_MMU_Memory.Channel1FrequencyLO = f & 0xFF;
-                            GBC_MMU_Memory.Channel1FrequencyHI = f >> 8;
-
-                            /*f = 2048 - f;
-
-                            if ((f << 4) < GBC_APU_SAMPLE_RATE)
-                            {
-                                GBC_APU_Channel1Frequency = 0;
-                            }
-                            else
-                            {
-                                GBC_APU_Channel1Frequency = (GBC_APU_SAMPLE_RATE << 17) / f;
-                            }*/
-                        }
+                        CALCULATE_CHANNEL1_SWEEP(true);
+                        CALCULATE_CHANNEL1_SWEEP(false);
                     }
                 }
 
@@ -1105,9 +1109,9 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
         case 0xFF10:
             GBC_APU_Channel1SweepLengthCounter = GBC_MMU_Memory.Channel1SweepTime;
 
-            if ((oldValue & 0x77) && // Sweep enabled
-                (oldValue & 0x08) && // Frequency decreases
-                !(value & 0x08)) // Frequency increases now
+            if (GBC_APU_Channel1SweepEnabled && // Sweep enabled
+                GBC_APU_Channel1SweepDecrease && // Frequency decreases
+                !GBC_MMU_Memory.Channel1SweepType) // Frequency increases now
             {
                 GBC_MMU_Memory.ChannelSound1Enabled = false;
             }
@@ -1160,6 +1164,16 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 }
 
                 GBC_APU_Channel1Position = 0;
+
+                GBC_APU_Channel1SweepEnabled = IS_CHANNEL1_SWEEP_ENABLED() ? true : false;
+                GBC_APU_Channel1SweepFrequency = GET_CHANNEL1_FREQUENCY();
+                GBC_APU_Channel1SweepDecrease = false;
+
+                // If shift > 0, calculates on trigger
+                if (GBC_MMU_Memory.Channel1SweepShift)
+                {
+                    CALCULATE_CHANNEL1_SWEEP(false);
+                }
 
                 GBC_APU_Channel1EnvelopeEnabled = true;
                 GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.Channel1InitialEnvelopeVolume;
