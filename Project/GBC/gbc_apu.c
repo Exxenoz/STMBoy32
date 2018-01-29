@@ -1112,11 +1112,9 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
     switch (address)
     {
         case 0xFF10:
-            GBC_APU_Channel1SweepLengthCounter = GBC_MMU_Memory.Channel1SweepTime;
-
             if (GBC_APU_Channel1SweepEnabled && // Sweep enabled
                 GBC_APU_Channel1SweepDecrease && // Frequency decreases
-                !GBC_MMU_Memory.Channel1SweepType) // Frequency increases now
+                !(value & 0x08)) // Frequency increases now
             {
                 GBC_MMU_Memory.ChannelSound1Enabled = false;
             }
