@@ -592,6 +592,9 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
 
 #define IS_CHANNEL1_SWEEP_ENABLED() ((GBC_MMU_Memory.Channel1Sweep & 0x77) != 0)
 
+#define IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() (GBC_APU_FrameIndex & 1)
+#define IS_APU_IN_SECOND_HALF_OF_LENGTH_PERIOD() (!(GBC_APU_FrameIndex & 1))
+
 #define UPDATE_CHANNEL1_FREQUENCY(D)                                                                                                                    \
 {                                                                                                                                                       \
     uint32_t d = 2048 - ((GBC_MMU_Memory.Channel1FrequencyHI << 8) + GBC_MMU_Memory.Channel1FrequencyLO);                                               \
@@ -1127,12 +1130,33 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             break;
         case 0xFF14:
             UPDATE_CHANNEL1_FREQUENCY();
+
+            // Check for counter activation in first half of length period
+            if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                !(oldValue & 0x40) && // Counter is disabled
+                    (value & 0x40) && // Counter is enabled now
+                GBC_APU_Channel1LengthCounter)
+            {
+                --GBC_APU_Channel1LengthCounter;
+            }
+
             if (GBC_MMU_Memory.Channel1InitialRestart)
             {
+                if (IS_CHANNEL1_DAC_ENABLED())
+                {
+                    GBC_MMU_Memory.ChannelSound1Enabled = true;
+                }
+
                 // Trigger should treat 0 counter as maximum
                 if (GBC_APU_Channel1LengthCounter == 0)
                 {
                     GBC_APU_Channel1LengthCounter = 64;
+
+                    if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                        GBC_MMU_Memory.Channel1CounterSelection)
+                    {
+                        --GBC_APU_Channel1LengthCounter;
+                    }
                 }
 
                 GBC_APU_Channel1Position = 0;
@@ -1145,12 +1169,13 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 {
                     GBC_APU_Channel1EnvelopeLengthCounter = 8;
                 }
-
-                if (IS_CHANNEL1_DAC_ENABLED())
-                {
-                    GBC_MMU_Memory.ChannelSound1Enabled = true;
-                }
             }
+            
+            if (GBC_APU_Channel1LengthCounter == 0)
+            {
+                GBC_MMU_Memory.ChannelSound1Enabled = false;
+            }
+
             break;
         case 0xFF16:
             GBC_APU_Channel2LengthCounter = 64 - GBC_MMU_Memory.Channel2SoundLengthData;
@@ -1169,12 +1194,33 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             break;
         case 0xFF19:
             UPDATE_CHANNEL2_FREQUENCY();
+
+            // Check for counter activation in first half of length period
+            if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                !(oldValue & 0x40) && // Counter is disabled
+                    (value & 0x40) && // Counter is enabled now
+                GBC_APU_Channel2LengthCounter)
+            {
+                --GBC_APU_Channel2LengthCounter;
+            }
+
             if (GBC_MMU_Memory.Channel2InitialRestart)
             {
+                if (IS_CHANNEL2_DAC_ENABLED())
+                {
+                    GBC_MMU_Memory.ChannelSound2Enabled = true;
+                }
+
                 // Trigger should treat 0 counter as maximum
                 if (GBC_APU_Channel2LengthCounter == 0)
                 {
                     GBC_APU_Channel2LengthCounter = 64;
+
+                    if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                        GBC_MMU_Memory.Channel2CounterSelection)
+                    {
+                        --GBC_APU_Channel2LengthCounter;
+                    }
                 }
 
                 GBC_APU_Channel2Position = 0;
@@ -1187,12 +1233,13 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 {
                     GBC_APU_Channel2EnvelopeLengthCounter = 8;
                 }
-
-                if (IS_CHANNEL2_DAC_ENABLED())
-                {
-                    GBC_MMU_Memory.ChannelSound2Enabled = true;
-                }
             }
+            
+            if (GBC_APU_Channel2LengthCounter == 0)
+            {
+                GBC_MMU_Memory.ChannelSound2Enabled = false;
+            }
+
             break;
         case 0xFF1A:
             if (!IS_CHANNEL3_DAC_ENABLED())
@@ -1208,21 +1255,43 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             break;
         case 0xFF1E:
             UPDATE_CHANNEL3_FREQUENCY();
+
+            // Check for counter activation in first half of length period
+            if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                !(oldValue & 0x40) && // Counter is disabled
+                    (value & 0x40) && // Counter is enabled now
+                GBC_APU_Channel3LengthCounter)
+            {
+                --GBC_APU_Channel3LengthCounter;
+            }
+
             if (GBC_MMU_Memory.Channel3InitialRestart)
             {
-                // Trigger should treat 0 counter as maximum
-                if (GBC_APU_Channel3LengthCounter == 0)
-                {
-                    GBC_APU_Channel3LengthCounter = 256;
-                }
-
-                GBC_APU_Channel3Position = 0;
-
                 if (IS_CHANNEL3_DAC_ENABLED())
                 {
                     GBC_MMU_Memory.ChannelSound3Enabled = true;
                 }
+
+                // Trigger should treat 0 counter as maximum
+                if (GBC_APU_Channel3LengthCounter == 0)
+                {
+                    GBC_APU_Channel3LengthCounter = 256;
+
+                    if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                        GBC_MMU_Memory.Channel3CounterSelection)
+                    {
+                        --GBC_APU_Channel3LengthCounter;
+                    }
+                }
+
+                GBC_APU_Channel3Position = 0;
             }
+            
+            if (GBC_APU_Channel3LengthCounter == 0)
+            {
+                GBC_MMU_Memory.ChannelSound3Enabled = false;
+            }
+
             break;
         case 0xFF20:
             GBC_APU_Channel4LengthCounter = 64 - (GBC_MMU_Memory.Channel4SoundLengthData & 63);
@@ -1241,12 +1310,33 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             break;
         case 0xFF23:
             UPDATE_CHANNEL4_FREQUENCY();
+
+            // Check for counter activation in first half of length period
+            if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                !(oldValue & 0x40) && // Counter is disabled
+                    (value & 0x40) && // Counter is enabled now
+                GBC_APU_Channel4LengthCounter)
+            {
+                --GBC_APU_Channel4LengthCounter;
+            }
+
             if (GBC_MMU_Memory.Channel4InitialRestart)
             {
+                if (IS_CHANNEL4_DAC_ENABLED())
+                {
+                    GBC_MMU_Memory.ChannelSound4Enabled = true;
+                }
+
                 // Trigger should treat 0 counter as maximum
                 if (GBC_APU_Channel4LengthCounter == 0)
                 {
                     GBC_APU_Channel4LengthCounter = 64;
+
+                    if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
+                        GBC_MMU_Memory.Channel4CounterSelection)
+                    {
+                        --GBC_APU_Channel4LengthCounter;
+                    }
                 }
 
                 GBC_APU_Channel4Position = 0;
@@ -1259,12 +1349,13 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 {
                     GBC_APU_Channel4EnvelopeLengthCounter = 8;
                 }
-
-                if (IS_CHANNEL4_DAC_ENABLED())
-                {
-                    GBC_MMU_Memory.ChannelSound4Enabled = true;
-                }
             }
+            
+            if (GBC_APU_Channel4LengthCounter == 0)
+            {
+                GBC_MMU_Memory.ChannelSound4Enabled = false;
+            }
+
             break;
     }
 }
