@@ -652,7 +652,7 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
-#define CALCULATE_CHANNEL1_SWEEP(UPDATE_SWEEP)                                                                                                          \
+#define CALCULATE_CHANNEL1_SWEEP(UPDATE_SWEEP_FREQUENCY)                                                                                                \
 {                                                                                                                                                       \
     long sweepFrequency = GBC_APU_Channel1SweepFrequency;                                                                                               \
     GBC_APU_Channel1SweepDecrease = GBC_MMU_Memory.Channel1SweepType ? true : false;                                                                    \
@@ -670,7 +670,7 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
     {                                                                                                                                                   \
         GBC_MMU_Memory.ChannelSound1Enabled = 0;                                                                                                        \
     }                                                                                                                                                   \
-    else if (GBC_MMU_Memory.Channel1SweepShift && UPDATE_SWEEP)                                                                                         \
+    else if (GBC_MMU_Memory.Channel1SweepShift && UPDATE_SWEEP_FREQUENCY)                                                                               \
     {                                                                                                                                                   \
         GBC_APU_Channel1SweepFrequency = sweepFrequency;                                                                                                \
                                                                                                                                                         \
@@ -730,6 +730,10 @@ void GBC_APU_InitializeChannels(void)
 
 void GBC_APU_Initialize(void)
 {
+    GBC_APU_FrameTicks = 0;
+    GBC_APU_FramePeriod = 4194304 / 512; // 512 Hz
+    GBC_APU_FrameIndex = 0;
+
     GBC_APU_Ticks = 0;
 
     memset(&GBC_APU_Buffer_L, 0, GBC_APU_BUFFER_SIZE);
@@ -769,6 +773,7 @@ void GBC_APU_Step(void)
                 {
                     GBC_APU_Channel1SweepLengthCounter = GBC_MMU_Memory.Channel1SweepTime;
 
+                    // Sweep counter treats period 0 as 8
                     if (GBC_APU_Channel1SweepLengthCounter == 0)
                     {
                         GBC_APU_Channel1SweepLengthCounter = 8;
@@ -1168,6 +1173,13 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 GBC_APU_Channel1SweepEnabled = IS_CHANNEL1_SWEEP_ENABLED() ? true : false;
                 GBC_APU_Channel1SweepFrequency = GET_CHANNEL1_FREQUENCY();
                 GBC_APU_Channel1SweepDecrease = false;
+                GBC_APU_Channel1SweepLengthCounter = GBC_MMU_Memory.Channel1SweepTime;
+
+                // Sweep counter treats period 0 as 8
+                if (GBC_APU_Channel1SweepLengthCounter == 0)
+                {
+                    GBC_APU_Channel1SweepLengthCounter = 8;
+                }
 
                 // If shift > 0, calculates on trigger
                 if (GBC_MMU_Memory.Channel1SweepShift)
