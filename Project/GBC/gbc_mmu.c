@@ -359,7 +359,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                                 {
                                     ++address;
 
-                                    if (GBC_APU_Channel3PhaseTicks < 0)
+                                    if (GBC_APU_Channel3PhaseTicks < -1)
                                     {
                                         return 0xFF;
                                     }
@@ -904,7 +904,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                         {
                             ++address;
 
-                            if (GBC_APU_Channel3PhaseTicks < 0)
+                            if (GBC_APU_Channel3PhaseTicks < -1)
                             {
                                 break;
                             }

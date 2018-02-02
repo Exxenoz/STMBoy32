@@ -1293,12 +1293,31 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             {
                 if (IS_CHANNEL3_DAC_ENABLED())
                 {
-                    GBC_MMU_Memory.ChannelSound3Enabled = true;
+                    int32_t delay = GBC_APU_Channel3PhaseTicks < 0 ? -GBC_APU_Channel3PhaseTicks : 0;
 
-                    if (GBC_MMU_IS_DMG_MODE())
+                    // Channel was enabled and we are in DMG mode
+                    if (GBC_MMU_Memory.ChannelSound3Enabled && GBC_MMU_IS_DMG_MODE() &&
+                        ((uint32_t)(delay - 2)) < 2)
                     {
-                        // ToDo: Wave corruption (?)
+                        // Wave corruption
+                        uint32_t index = ((GBC_APU_Channel3Phase + 1) & 0x1F) >> 1;
+
+                        if (index < 4)
+                        {
+                            GBC_MMU_Memory.Channel3WavePatternRAM[0] = GBC_MMU_Memory.Channel3WavePatternRAM[index];
+                        }
+                        else
+                        {
+                            index &= ~3;
+
+                            for (uint32_t i = 0; i < 4; ++i)
+                            {
+                                GBC_MMU_Memory.Channel3WavePatternRAM[i] = GBC_MMU_Memory.Channel3WavePatternRAM[index + i];
+                            }
+                        }
                     }
+
+                    GBC_MMU_Memory.ChannelSound3Enabled = true;
                 }
                 else
                 {
