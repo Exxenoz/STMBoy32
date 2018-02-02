@@ -333,7 +333,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                     break;
                 case 0xFF00:
                     // Memory-mapped I/O
-                    if (address >= 0xFF10 && address <= 0xFF2F) // Sound Register
+                    if (address >= 0xFF10 && address <= 0xFF3F) // Sound Register
                     {
                         static const uint8_t soundRegisterReadMask[] =
                         {
@@ -345,7 +345,33 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                             0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF // Unused/unknown register bytes
                         };
 
-                        return GBC_MMU_Memory.IO[address - 0xFF00] | soundRegisterReadMask[address - 0xFF10];
+                        if (address <= 0xFF2F)
+                        {
+                            return GBC_MMU_Memory.IO[address - 0xFF00] | soundRegisterReadMask[address - 0xFF10];
+                        }
+                        else // Wave RAM
+                        {
+                            if (GBC_MMU_Memory.ChannelSound3Enabled)
+                            {
+                                address = GBC_APU_Channel3Phase;
+
+                                if (GBC_MMU_IS_DMG_MODE())
+                                {
+                                    ++address;
+
+                                    if (GBC_APU_Channel3PhaseTicks < 0)
+                                    {
+                                        return 0xFF;
+                                    }
+                                }
+
+                                address >>= 1;
+                            }
+
+                            address &= 0x0F;
+
+                            return GBC_MMU_Memory.Channel3WavePatternRAM[address];
+                        }
                     }
                     else if (address <= 0xFF7F)
                     {
@@ -852,6 +878,8 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF2D:
                 case 0xFF2E:
                 case 0xFF2F:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
                 case 0xFF30: // Wave Pattern RAM Start
                 case 0xFF31:
                 case 0xFF32:
@@ -868,6 +896,27 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF3D:
                 case 0xFF3E:
                 case 0xFF3F: // Wave Pattern RAM End
+                    if (GBC_MMU_Memory.ChannelSound3Enabled)
+                    {
+                        address = GBC_APU_Channel3Phase;
+
+                        if (GBC_MMU_IS_DMG_MODE())
+                        {
+                            ++address;
+
+                            if (GBC_APU_Channel3PhaseTicks < 0)
+                            {
+                                break;
+                            }
+                        }
+
+                        address >>= 1;
+                    }
+
+                    address &= 0x0F;
+
+                    GBC_MMU_Memory.Channel3WavePatternRAM[address] = value;
+                    break;
                 case 0xFF40:
                 case 0xFF41:
                 case 0xFF42:

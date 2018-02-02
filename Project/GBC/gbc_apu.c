@@ -33,9 +33,12 @@ int32_t  GBC_APU_Channel2EnvelopeLengthCounter = 0;
 uint32_t GBC_APU_Channel2Position = 0;
 uint32_t GBC_APU_Channel2Frequency = 0;
 
+uint32_t GBC_APU_Channel3Phase = 0;
+int32_t  GBC_APU_Channel3PhaseTicks = 0;
+uint32_t GBC_APU_Channel3PhaseFrequency = 0;
+int32_t  GBC_APU_Channel3PhasePeriod = 0;
+uint32_t GBC_APU_Channel3LastSample = 0;
 uint32_t GBC_APU_Channel3LengthCounter = 0;
-uint32_t GBC_APU_Channel3Position = 0;
-uint32_t GBC_APU_Channel3Frequency = 0;
 
 uint32_t GBC_APU_Channel4LengthCounter = 0;
 bool     GBC_APU_Channel4EnvelopeEnabled = false;
@@ -628,19 +631,6 @@ static const int32_t GBC_APU_NoiseFrequencies[8] =
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
-#define UPDATE_CHANNEL3_FREQUENCY()                                                                                                                     \
-{                                                                                                                                                       \
-    uint32_t d = 2048 - ((GBC_MMU_Memory.Channel3FrequencyHI << 8) + GBC_MMU_Memory.Channel3FrequencyLO);                                                                                               \
-	if (GBC_APU_SAMPLE_RATE > (d << 3))                                                                                                                 \
-    {                                                                                                                                                   \
-        GBC_APU_Channel3Frequency = 0;                                                                                                                  \
-    }                                                                                                                                                   \
-	else                                                                                                                                                \
-    {                                                                                                                                                   \
-        GBC_APU_Channel3Frequency = (GBC_APU_SAMPLE_RATE << 21) / d;                                                                                    \
-    }                                                                                                                                                   \
-}                                                                                                                                                       \
-
 #define UPDATE_CHANNEL4_FREQUENCY()                                                                                                                     \
 {                                                                                                                                                       \
     GBC_APU_Channel4Frequency = (GBC_APU_NoiseFrequencies[GBC_MMU_Memory.Channel4PolynomialCounterFreqDivRatio]                                         \
@@ -705,9 +695,12 @@ void GBC_APU_InitializeChannel2(void)
 
 void GBC_APU_InitializeChannel3(void)
 {
+    GBC_APU_Channel3Phase = 0;
+    GBC_APU_Channel3PhaseTicks = 0;
+    GBC_APU_Channel3PhaseFrequency = GET_CHANNEL3_FREQUENCY();
+    GBC_APU_Channel3PhasePeriod = (2048 - GBC_APU_Channel3PhaseFrequency) * 2; // (4194304 / (4194304 / (64 * (2048 - f)))) / 32
+    GBC_APU_Channel3LastSample = 0;
     GBC_APU_Channel3LengthCounter = 256 - GBC_MMU_Memory.Channel3SoundLength;
-    GBC_APU_Channel3Position = 0;
-    UPDATE_CHANNEL3_FREQUENCY();
 }
 
 void GBC_APU_InitializeChannel4(void)
@@ -753,9 +746,49 @@ void GBC_APU_Step(void)
         return;
     }
 
-    long l = 0;
-    long r = 0;
+    long l = 0; // Left speaker
+    long r = 0; // Right speaker
     long s = 0;
+
+    GBC_APU_Channel3PhaseTicks += GBC_CPU_StepTicks;
+
+    if (GBC_APU_Channel3PhaseTicks > 0)
+    {
+        do
+        {
+            GBC_APU_Channel3PhaseTicks -= GBC_APU_Channel3PhasePeriod;
+
+            ++GBC_APU_Channel3Phase;
+            GBC_APU_Channel3Phase &= 0x1F;
+        }
+        while (GBC_APU_Channel3PhaseTicks > 0);
+
+        if (GBC_MMU_Memory.ChannelSound3Enabled)
+        {
+            GBC_APU_Channel3LastSample = (GBC_MMU_Memory.Channel3WavePatternRAM[GBC_APU_Channel3Phase >> 1] << ((GBC_APU_Channel3Phase << 2) & 4)) & 0xF0;
+
+            // Select output level
+            switch (GBC_MMU_Memory.Channel3SelectOutputLevel)
+            {
+                case 0: // Mute
+                    GBC_APU_Channel3LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+                    break;
+                case 1: // 100%
+                    // Do nothing
+                    break;
+                case 2: // 50%
+                    GBC_APU_Channel3LastSample >>= 1;
+                    break;
+                case 3: // 25%
+                    GBC_APU_Channel3LastSample >>= 2;
+                    break;
+            }
+        }
+        else
+        {
+            GBC_APU_Channel3LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+        }
+    }
 
     GBC_APU_FrameTicks += GBC_CPU_StepTicks;
 
@@ -991,49 +1024,14 @@ void GBC_APU_Step(void)
             }
         }
 
-        if (GBC_MMU_Memory.ChannelSound3Enabled)
+        if (GBC_MMU_Memory.SoundOutputChannel3ToSO1)
         {
-            s = GBC_MMU_Memory.Channel3WavePatternRAM[(GBC_APU_Channel3Position >> 22) & 15];
+            r += GBC_APU_Channel3LastSample;
+        }
 
-            if (GBC_APU_Channel3Position & (1 << 21))
-            {
-                s &= 15;
-            }
-			else
-            {
-                s >>= 4;
-            }
-
-			s -= 8;
-
-            GBC_APU_Channel3Position += GBC_APU_Channel3Frequency;
-
-            // Select output level
-            switch (GBC_MMU_Memory.Channel3SelectOutputLevel)
-            {
-                case 0: // Mute
-                    s = 0;
-                    break;
-                case 1: // 100%
-                    // Do nothing
-                    break;
-                case 2: // 50%
-                    s <<= 1;
-                    break;
-                case 3: // 25%
-                    s <<= 2;
-                    break;
-            }
-
-            if (GBC_MMU_Memory.SoundOutputChannel3ToSO1)
-            {
-                r += s;
-            }
-
-            if (GBC_MMU_Memory.SoundOutputChannel3ToSO2)
-            {
-                l += s;
-            }
+        if (GBC_MMU_Memory.SoundOutputChannel3ToSO2)
+        {
+            l += GBC_APU_Channel3LastSample;
         }
 
         // This channel is used to output white noise.
@@ -1275,10 +1273,12 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
             GBC_APU_Channel3LengthCounter = 256 - GBC_MMU_Memory.Channel3SoundLength;
             break;
         case 0xFF1D:
-            UPDATE_CHANNEL3_FREQUENCY();
+            GBC_APU_Channel3PhaseFrequency = GET_CHANNEL3_FREQUENCY();
+            GBC_APU_Channel3PhasePeriod = (2048 - GBC_APU_Channel3PhaseFrequency) * 2; // (4194304 / (4194304 / (64 * (2048 - f)))) / 32
             break;
         case 0xFF1E:
-            UPDATE_CHANNEL3_FREQUENCY();
+            GBC_APU_Channel3PhaseFrequency = GET_CHANNEL3_FREQUENCY();
+            GBC_APU_Channel3PhasePeriod = (2048 - GBC_APU_Channel3PhaseFrequency) * 2; // (4194304 / (4194304 / (64 * (2048 - f)))) / 32
 
             // Check for counter activation in first half of length period
             if (IS_APU_IN_FIRST_HALF_OF_LENGTH_PERIOD() &&
@@ -1294,7 +1294,19 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                 if (IS_CHANNEL3_DAC_ENABLED())
                 {
                     GBC_MMU_Memory.ChannelSound3Enabled = true;
+
+                    if (GBC_MMU_IS_DMG_MODE())
+                    {
+                        // ToDo: Wave corruption (?)
+                    }
                 }
+                else
+                {
+                    GBC_MMU_Memory.ChannelSound3Enabled = false;
+                }
+
+                GBC_APU_Channel3Phase = 0;
+                GBC_APU_Channel3PhaseTicks = -(GBC_APU_Channel3PhasePeriod + 6); // Start delay
 
                 // Trigger should treat 0 counter as maximum
                 if (GBC_APU_Channel3LengthCounter == 0)
@@ -1307,8 +1319,6 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
                         --GBC_APU_Channel3LengthCounter;
                     }
                 }
-
-                GBC_APU_Channel3Position = 0;
             }
             
             if (GBC_APU_Channel3LengthCounter == 0)
