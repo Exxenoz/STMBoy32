@@ -10,8 +10,8 @@ uint32_t GBC_APU_FrameIndex = 0;
 
 uint32_t GBC_APU_Ticks = 0;
 
-uint8_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
-uint8_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
+uint16_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
+uint16_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
 uint32_t GBC_APU_BufferPosition = 0;
 
@@ -715,14 +715,14 @@ void GBC_APU_Initialize(void)
 
     GBC_APU_Ticks = 0;
 
-    memset(&GBC_APU_Buffer_L, 0, GBC_APU_BUFFER_SIZE);
-    memset(&GBC_APU_Buffer_R, 0, GBC_APU_BUFFER_SIZE);
+    memset(&GBC_APU_Buffer_L, 0, sizeof(GBC_APU_Buffer_L));
+    memset(&GBC_APU_Buffer_R, 0, sizeof(GBC_APU_Buffer_R));
 
     GBC_APU_BufferPosition = 0;
 
     GBC_APU_InitializeChannels();
 
-    Audio_SetAudioBuffer(&GBC_APU_Buffer_L[0], GBC_APU_BUFFER_SIZE);
+    Audio_SetAudioBuffer(GBC_APU_Buffer_L, GBC_APU_BUFFER_SIZE);
 }
 
 void GBC_APU_Step(void)
@@ -734,6 +734,7 @@ void GBC_APU_Step(void)
 
     static const uint8_t SquareDutyOffsets[4] = { 1, 1, 3, 7 };
     static const uint8_t SquareDuties[4] = { 1, 2, 4, 6 };
+    static const uint8_t WaveVolumeMultipliers[4] = { 0, 4, 2, 1 };
 
     long l = 0; // Left speaker
     long r = 0; // Right speaker
@@ -751,16 +752,20 @@ void GBC_APU_Step(void)
         }
         while (GBC_APU_Channel1PhaseTicks > 0);
 
-        GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-
         if (IS_CHANNEL1_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound1Enabled)
         {
-            GBC_APU_Channel1LastSample += GBC_APU_Channel1EnvelopeVolume;
+            uint32_t p = (GBC_APU_Channel1Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel1WavePatternDuty]) & 7;
+
+            if (p < SquareDuties[GBC_MMU_Memory.Channel1WavePatternDuty])
+            {
+                GBC_APU_Channel1LastSample = GBC_APU_Channel1EnvelopeVolume;
+            }
+            else
+            {
+                GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+            }
         }
-
-        uint32_t p = (GBC_APU_Channel1Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel1WavePatternDuty]) & 7;
-
-        if (p >= SquareDuties[GBC_MMU_Memory.Channel1WavePatternDuty])
+        else
         {
             GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
         }
@@ -779,16 +784,20 @@ void GBC_APU_Step(void)
         }
         while (GBC_APU_Channel2PhaseTicks > 0);
 
-        GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-
         if (IS_CHANNEL2_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound2Enabled)
         {
-            GBC_APU_Channel2LastSample += GBC_APU_Channel2EnvelopeVolume;
+            uint32_t p = (GBC_APU_Channel2Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel2WavePatternDuty]) & 7;
+
+            if (p < SquareDuties[GBC_MMU_Memory.Channel2WavePatternDuty])
+            {
+                GBC_APU_Channel2LastSample = GBC_APU_Channel2EnvelopeVolume;
+            }
+            else
+            {
+                GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+            }
         }
-
-        uint32_t p = (GBC_APU_Channel2Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel2WavePatternDuty]) & 7;
-
-        if (p >= SquareDuties[GBC_MMU_Memory.Channel2WavePatternDuty])
+        else
         {
             GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
         }
@@ -810,23 +819,7 @@ void GBC_APU_Step(void)
         if (GBC_MMU_Memory.ChannelSound3Enabled)
         {
             GBC_APU_Channel3LastSample = (GBC_MMU_Memory.Channel3WavePatternRAM[GBC_APU_Channel3Phase >> 1] << ((GBC_APU_Channel3Phase << 2) & 4)) & 0xF0;
-
-            // Select output level
-            switch (GBC_MMU_Memory.Channel3SelectOutputLevel)
-            {
-                case 0: // Mute
-                    GBC_APU_Channel3LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-                    break;
-                case 1: // 100%
-                    // Do nothing
-                    break;
-                case 2: // 50%
-                    GBC_APU_Channel3LastSample >>= 1;
-                    break;
-                case 3: // 25%
-                    GBC_APU_Channel3LastSample >>= 2;
-                    break;
-            }
+            GBC_APU_Channel3LastSample = (GBC_APU_Channel3LastSample * WaveVolumeMultipliers[GBC_MMU_Memory.Channel3SelectOutputLevel]) >> 6;
         }
         else
         {
@@ -1027,29 +1020,29 @@ void GBC_APU_Step(void)
         }
     }
 
-    /*GBC_APU_Ticks += GBC_CPU_StepTicks;
+    GBC_APU_Ticks += GBC_CPU_StepTicks;
 
     // Calculate samples
     for (; GBC_APU_Ticks >= GBC_APU_SAMPLE_RATE; GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE)
     {
         if (GBC_MMU_Memory.SoundOutputChannel1ToSO1)
         {
-            r += s;
+            r += GBC_APU_Channel1LastSample;
         }
 
         if (GBC_MMU_Memory.SoundOutputChannel1ToSO2)
         {
-            l += s;
+            l += GBC_APU_Channel1LastSample;
         }
 
         if (GBC_MMU_Memory.SoundOutputChannel2ToSO1)
         {
-            r += s;
+            r += GBC_APU_Channel2LastSample;
         }
 
         if (GBC_MMU_Memory.SoundOutputChannel2ToSO2)
         {
-            l += s;
+            l += GBC_APU_Channel2LastSample;
         }
 
         if (GBC_MMU_Memory.SoundOutputChannel3ToSO1)
@@ -1063,7 +1056,7 @@ void GBC_APU_Step(void)
         }
 
         // This channel is used to output white noise.
-        if (GBC_MMU_Memory.ChannelSound4Enabled)
+        /*if (GBC_MMU_Memory.ChannelSound4Enabled)
         {
             // Counter Step/Width (0 = 15 bits, 1 = 7 bits).
             // When set, the output will become more regular,
@@ -1096,41 +1089,33 @@ void GBC_APU_Step(void)
             {
                 l += s;
             }
-        }
+        }*/
 
-        l *= GBC_MMU_Memory.ChannelControlOutputVinToSO1;
-		r *= GBC_MMU_Memory.ChannelControlOutputVinToSO2;
-
-		l >>= 4;
-		r >>= 4;
+        //l *= GBC_MMU_Memory.ChannelControlOutputVinToSO1;
+		//r *= GBC_MMU_Memory.ChannelControlOutputVinToSO2;
 
         if (l > 127)
         {
             l = 127;
-        }
-		else if (l < -128)
-        {
-            l = -128;
         }
 
 		if (r > 127)
         {
             r = 127;
         }
-		else if (r < -128)
-        {
-            r = -128;
-        }
 
-        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l + 128;
-        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r + 128;
+        l <<= 5;
+        r <<= 5;
+
+        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l;
+        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r;
 
         GBC_APU_BufferPosition++;
         if (GBC_APU_BufferPosition >= GBC_APU_BUFFER_SIZE)
         {
             GBC_APU_BufferPosition = 0;
         }
-    }*/
+    }
 }
 
 void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t oldValue)

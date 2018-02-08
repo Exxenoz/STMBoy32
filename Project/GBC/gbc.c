@@ -89,7 +89,7 @@ void GBC_Update(void)
     {
         GBC_CPU_Step();
         GBC_TIM_Step();
-        //GBC_APU_Step();
+        GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
 }
