@@ -20,7 +20,7 @@ void Audio_InitializeTimer(void)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseObject;
     TIM_TimeBaseStructInit(&TIM_TimeBaseObject);
 
-    TIM_TimeBaseObject.TIM_Period = 15789;
+    TIM_TimeBaseObject.TIM_Period = 5626; // 32 kHz
     TIM_TimeBaseObject.TIM_Prescaler = 0;
     TIM_TimeBaseObject.TIM_ClockDivision = 0;
     TIM_TimeBaseObject.TIM_CounterMode = TIM_CounterMode_Up;
@@ -53,7 +53,7 @@ void Audio_Initialize(void)
     Audio_InitializeDAC();
 }
 
-void Audio_SetAudioBuffer(uint8_t* audioBuffer, uint32_t audioBufferSize)
+void Audio_SetAudioBuffer(uint16_t* audioBuffer, uint32_t audioBufferSize)
 {
     RCC_AHB1PeriphClockCmd(AUDIO_DMA_BUS, ENABLE);
 
@@ -67,11 +67,11 @@ void Audio_SetAudioBuffer(uint8_t* audioBuffer, uint32_t audioBufferSize)
     DMA_InitObject.DMA_BufferSize = audioBufferSize;
     DMA_InitObject.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
     DMA_InitObject.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitObject.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    DMA_InitObject.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+    DMA_InitObject.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+    DMA_InitObject.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
     DMA_InitObject.DMA_Mode = DMA_Mode_Circular;
     DMA_InitObject.DMA_Priority = DMA_Priority_High;
-    DMA_InitObject.DMA_FIFOMode = DMA_FIFOMode_Disable;         
+    DMA_InitObject.DMA_FIFOMode = DMA_FIFOMode_Disable;
     DMA_InitObject.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
     DMA_InitObject.DMA_MemoryBurst = DMA_MemoryBurst_Single;
     DMA_InitObject.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;

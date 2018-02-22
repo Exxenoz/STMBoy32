@@ -597,7 +597,10 @@ GBC_MMU_RTC_Register_t;
 
 typedef void (*GBC_MMU_MBC)(uint16_t, uint8_t);
 
-extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory definition for direct CPU access
+extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory declaration for direct CPU access
+
+#define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
+#define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);

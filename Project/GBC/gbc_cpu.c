@@ -572,7 +572,7 @@ void GBC_CPU_RRC_A()                    // 0x0F - Rotate A right with carry
 
 void GBC_CPU_STOP()                     // 0x10 - Stop processor
 {
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         if (GBC_MMU_Memory.PrepareSpeedSwitch)
         {
