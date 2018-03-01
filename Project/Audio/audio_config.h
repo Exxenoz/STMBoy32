@@ -2,7 +2,7 @@
 #define AUDIO_CONFIG_H
 
 #define AUDIO_PORT         GPIOA
-#define AUDIO_PIN          GPIO_Pin_4
+#define AUDIO_PIN          GPIO_PIN_4
 #define AUDIO_BUS          RCC_AHB1Periph_GPIOA
 
 #define AUDIO_TIM          TIM8

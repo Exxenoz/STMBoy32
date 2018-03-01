@@ -281,8 +281,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
 void CMOD_Initialize_CLK(void)
 {
-    RCC_AHB1PeriphClockCmd(CMOD_CLK_BUS, ENABLE);
-    RCC_APB1PeriphClockCmd(CMOD_TIM_BUS, ENABLE);
+    __TIM5_CLK_ENABLE();
 
     GPIO_InitTypeDef        GPIO_InitObject;
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
@@ -290,13 +289,12 @@ void CMOD_Initialize_CLK(void)
     NVIC_InitTypeDef        NVIC_InitObject;
 
 
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = CMOD_CLK_PIN;
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
-    GPIO_PinAFConfig(CMOD_CLK_PORT, CMOD_CLK_PINSOURCE, CMOD_CLK_AF);
+    GPIO_InitObject.Mode  = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin   = CMOD_CLK_PIN;
+    GPIO_InitObject.Pull  = GPIO_NOPULL;
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
+    HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
 
     TIM_BaseObject.TIM_Prescaler         = 0;                         // Tim5 runs with 90Mhz(?) -> keep this rate
     TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
@@ -325,23 +323,14 @@ void CMOD_Initialize_CLK(void)
 
 void CMOD_Initialize(void)
 {
-    RCC_AHB1PeriphClockCmd(CMOD_RESET_BUS,  ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_CS_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_RD_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_WR_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_ADDR_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DATA_BUS,   ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);

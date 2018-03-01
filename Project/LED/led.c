@@ -2,19 +2,14 @@
 
 void LED_Initialize(void)
 {
-    RCC_AHB1PeriphClockCmd(LED_RED_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(LED_GREEN_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(LED_BLUE_BUS,  ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_OD;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_OD;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(LED_RED_PORT,   LED_RED_PIN);
     INITIALIZE_OUTPUT_PIN(LED_GREEN_PORT, LED_GREEN_PIN);

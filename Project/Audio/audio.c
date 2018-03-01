@@ -2,15 +2,12 @@
 
 void Audio_InitializeGPIO(void)
 {
-    RCC_AHB1PeriphClockCmd(AUDIO_BUS, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject = {0};
-    GPIO_InitObject.GPIO_Mode = GPIO_Mode_AN;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin = AUDIO_PIN;
-    GPIO_InitObject.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; 
-    GPIO_Init(AUDIO_PORT, &GPIO_InitObject);
+    GPIO_InitObject.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin = AUDIO_PIN;
+    GPIO_InitObject.Pull = GPIO_NOPULL;
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; 
+    HAL_GPIO_Init(AUDIO_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeTimer(void)
@@ -33,7 +30,7 @@ void Audio_InitializeTimer(void)
 
 void Audio_InitializeDAC(void)
 {
-    RCC_APB1PeriphClockCmd(AUDIO_DAC_BUS, ENABLE);
+    __HAL_RCC_DAC12_CLK_ENABLE();
 
     DAC_InitTypeDef DAC_InitObject = {0};
     DAC_InitObject.DAC_Trigger = AUDIO_DAC_TRIGGER;
@@ -55,7 +52,7 @@ void Audio_Initialize(void)
 
 void Audio_SetAudioBuffer(uint16_t* audioBuffer, uint32_t audioBufferSize)
 {
-    RCC_AHB1PeriphClockCmd(AUDIO_DMA_BUS, ENABLE);
+    __HAL_RCC_DMA1_CLK_ENABLE();
 
     DMA_DeInit(AUDIO_DMA_STREAM);
 

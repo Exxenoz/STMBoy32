@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"		/* FatFs lower layer API */
-#include "stm324x9i_eval_sdio_sd.h"
+#include "stm32h743i_eval_sd.h"
 
 /* Definitions of physical drive number for each drive */
 #define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
@@ -28,10 +28,11 @@ DSTATUS disk_status (
     {
         case DEV_RAM :
         {
-            if (SD_Detect() != SD_PRESENT)
+            // ToDo: Check if SD card is present
+            /*if (SD_Detect() != SD_PRESENT)
             {
                 return RES_NOTRDY;
-            }
+            }*/
 
             // ToDo: Check for write protection and send RES_WRPRT if needed
 
@@ -61,9 +62,7 @@ DSTATUS disk_initialize (
     {
         case DEV_RAM :
         {
-            SD_Error status = SD_Init();
-
-            if (status == SD_OK)
+            if (BSP_SD_Init() == MSD_OK)
             {
                 return RES_OK;
             }
@@ -97,24 +96,12 @@ DRESULT disk_read (
     {
         case DEV_RAM :
         {
-            SD_Error status = SD_ReadMultiBlocks(buff, sector << 9, 512, count);
+            uint8_t status = BSP_SD_ReadBlocks_DMA(buff, sector << 9, count);
 
-            if (status == SD_OK)
+            if (status == MSD_OK)
             {
-                SDTransferState state;
-
-                status = SD_WaitReadOperation();
-
-                while ((state = SD_GetStatus()) == SD_TRANSFER_BUSY);
-
-                if ((state == SD_TRANSFER_ERROR) || (status != SD_OK))
-                {
-                    return RES_ERROR;
-                }
-                else
-                {
-                    return RES_OK;
-                }			
+                while (BSP_SD_GetCardState() == SD_TRANSFER_BUSY);
+                return RES_OK;
             }
 
             return RES_ERROR;
@@ -146,24 +133,12 @@ DRESULT disk_write (
     {
         case DEV_RAM :
         {
-            SD_Error result = SD_WriteMultiBlocks((uint8_t *)buff, sector << 9, 512, count); // 4GB Compliant
+            uint8_t result = BSP_SD_WriteBlocks_DMA((uint8_t *)buff, sector << 9, count); // 4GB Compliant
 
-            if (result == SD_OK)
+            if (status == MSD_OK)
             {
-                SDTransferState state;
-
-                result = SD_WaitWriteOperation(); // Check if the Transfer is finished
-
-                while ((state = SD_GetStatus()) == SD_TRANSFER_BUSY); // BUSY, OK (DONE), ERROR (FAIL)
-
-                if ((state == SD_TRANSFER_ERROR) || (result != SD_OK))
-                {
-                    return RES_ERROR;
-                }
-                else
-                {
-                    return RES_OK;
-                }
+                while (BSP_SD_GetCardState() == SD_TRANSFER_BUSY);
+                return RES_OK;
             }
 
             return RES_ERROR;

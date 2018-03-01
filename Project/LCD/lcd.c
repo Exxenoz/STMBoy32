@@ -6,40 +6,28 @@ bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
 {
-    RCC_AHB1PeriphClockCmd(LCD_RESET_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_CS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RD_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_WR_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_DATA_BUS,    ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_BACKLIT_BUS, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(LCD_RESET_PORT, LCD_RESET_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_RS_PORT,    LCD_RS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_CS_PORT,    LCD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_RD_PORT,    LCD_RD_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_WR_PORT,    LCD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_Pin_All);
+    INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_PIN_All);
 
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = LCD_BACKLIT_PIN;
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
-
-    GPIO_PinAFConfig(LCD_BACKLIT_PORT, LCD_BACKLIT_PIN_SOURCE, GPIO_AF_TIM1);
+    GPIO_InitObject.Mode  = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin   = LCD_BACKLIT_PIN;
+    GPIO_InitObject.Pull  = GPIO_NOPULL;
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
 
     LCD_SET_RESET;
     LCD_SET_RS;
@@ -50,7 +38,7 @@ void LCD_InitializePins(void)
 
 void LCD_InitializeTimer()
 {
-    RCC_APB2PeriphClockCmd(LCD_TIM_BUS, ENABLE);
+    __TIM1_CLK_ENABLE();
 
     TIM_TimeBaseInitTypeDef TIM_BaseObject;
     TIM_OCInitTypeDef       TIM_OCInitObject;
