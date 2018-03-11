@@ -2,17 +2,17 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
+TIM_HandleTypeDef Input_LockTimerHandle = { .Instance = INPUT_LOCK_TIM };
+TIM_HandleTypeDef Input_PollTimerHandle = { .Instance = INPUT_POLLING_TIM};
+
 Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
 Input_ButtonState_t Input_LastState[8];
 Input_ButtonState_t Input_CurrState[8];
 uint8_t             Input_Counter[8];
 
-Input_Lock_t        Input_Locks[8];
-time_t              Input_DynamicLockTimes[8];
-
-TIM_HandleTypeDef Input_LockTimerHandle;
-TIM_HandleTypeDef Input_PollTimerHandle;
+Input_Lock_t Input_Locks[8];
+time_t       Input_DynamicLockTimes[8];
 
 const uint32_t Input_Pins[8] =
 {
@@ -55,7 +55,6 @@ void Input_InitializeTimers(void)
     __TIM4_CLK_ENABLE();
 
     // Initialize lock timer handle
-    Input_LockTimerHandle.Instance = INPUT_LOCK_TIM;
     Input_LockTimerHandle.Channel = HAL_TIM_ACTIVE_CHANNEL_1;
 
     // Initialize lock timer
@@ -69,7 +68,6 @@ void Input_InitializeTimers(void)
     HAL_TIM_Base_Start(&Input_LockTimerHandle);
 
     // Initialize poll timer handle
-    Input_PollTimerHandle.Instance = INPUT_POLLING_TIM;
     Input_PollTimerHandle.Channel = HAL_TIM_ACTIVE_CHANNEL_1;
 
     // Initialise polling timer
