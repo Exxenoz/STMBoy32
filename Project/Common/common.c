@@ -41,12 +41,12 @@ void CopyString(char *dest, const char *src, int destSize)
     dest[i] = '\0';
 }
 
-void CopyChars(char *dest, const char *src, int destSize)
+void CopyChars(char *dest, const char *src, int destSize, int srcSize)
 {
     // Clear destination
     memset(dest, 0, destSize);
 
-    for (int i = 0; i < destSize; i++)
+    for (int i = 0; i < destSize && i < srcSize; i++)
     {
         dest[i] = src[i];
     }
@@ -79,4 +79,23 @@ void AppendString(char *dest, const char *src, int destSize)
     }
 
     dest[i] = '\0';
+}
+
+void AppendChars(char *dest, const char *src, int destSize, int srcSize)
+{
+    int i;
+
+    for (i = 0; dest[i] != '\0'; i++);
+
+    for (int j = 0; i < destSize && j < srcSize; i++, j++)
+    {
+        dest[i] = src[j];
+    }
+}
+
+int CountChars(const char *src)
+{
+    int i;
+    for (i = 0; src[i] != '\0'; i++);
+    return i;
 }

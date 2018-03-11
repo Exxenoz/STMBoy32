@@ -38,8 +38,10 @@ bool;
 // Custom string functions to ensure null termination
 int  CmpStrings(const void *a, const void *b);
 void CopyString(char *dest, const char *src, int destSize);
-void CopyChars(char *dest, const char *src, int destSize);
+void CopyChars(char *dest, const char *src, int destSize, int srcSize);
 void CopyWithoutSuffix(char *dest, const char *src, int destSize);
 void AppendString(char *dest, const char *src, int destSize);
+void AppendChars(char *dest, const char *src, int destSize, int srcSize);
+int  CountChars(const char *src);
 
 #endif //COMMON_H

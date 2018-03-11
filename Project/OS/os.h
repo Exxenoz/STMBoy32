@@ -56,6 +56,12 @@ typedef enum
 }
 OS_Action_t;
 
+typedef struct
+{
+    char buffer[OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1];
+}
+test_t;
+
 extern OS_Options_t OS_InitOptions;
 
 extern OS_GameEntry_t OS_CurrentGame;
