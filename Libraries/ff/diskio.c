@@ -15,10 +15,7 @@
 #define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
 
-SD_HandleTypeDef SD_HandleObject =
-{
-    // ToDo: Implement
-};
+SD_HandleTypeDef SD_HandleObject;
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
