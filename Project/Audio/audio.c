@@ -1,31 +1,29 @@
 #include "audio.h"
 
+TIM_HandleTypeDef Audio_TimerHandle = { .Instance = AUDIO_TIM };
+DMA_HandleTypeDef DMA_Handle;
+
 void Audio_InitializeGPIO(void)
 {
     GPIO_InitTypeDef GPIO_InitObject = {0};
-    GPIO_InitObject.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitObject.Pin = AUDIO_PIN;
-    GPIO_InitObject.Pull = GPIO_NOPULL;
+    GPIO_InitObject.Mode  = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin   = AUDIO_PIN;
+    GPIO_InitObject.Pull  = GPIO_NOPULL;
     GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; 
     HAL_GPIO_Init(AUDIO_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeTimer(void)
 {
-    RCC_APB2PeriphClockCmd(AUDIO_TIM_BUS, ENABLE);
-
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseObject;
-    TIM_TimeBaseStructInit(&TIM_TimeBaseObject);
-
-    TIM_TimeBaseObject.TIM_Period = 5626; // 32 kHz
-    TIM_TimeBaseObject.TIM_Prescaler = 0;
-    TIM_TimeBaseObject.TIM_ClockDivision = 0;
-    TIM_TimeBaseObject.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(AUDIO_TIM, &TIM_TimeBaseObject);
+    Audio_TimerHandle.Init.Period        = 5626; // 32 kHz
+    Audio_TimerHandle.Init.Prescaler     = 0;
+    Audio_TimerHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
+    Audio_TimerHandle.Init.ClockDivision = 0;
 
     TIM_SelectOutputTrigger(AUDIO_TIM, TIM_TRGOSource_Update);
 
-    TIM_Cmd(AUDIO_TIM, ENABLE);
+    HAL_TIM_Base_Init(&Audio_TimerHandle);
+    HAL_TIM_Base_Start(&Audio_TimerHandle);
 }
 
 void Audio_InitializeDAC(void)

@@ -7,14 +7,18 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include "diskio.h"		/* FatFs lower layer API */
-#include "stm32h743i_eval_sd.h"
+#include "diskio.h"		       /* FatFs lower layer API */
+#include "stm32h7xx_hal_sd.h"
 
 /* Definitions of physical drive number for each drive */
 #define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
 #define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
 
+SD_HandleTypeDef SD_HandleObject =
+{
+    // ToDo: Implement
+};
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -62,7 +66,7 @@ DSTATUS disk_initialize (
     {
         case DEV_RAM :
         {
-            if (BSP_SD_Init() == MSD_OK)
+            if (HAL_SD_InitCard(&SD_HandleObject) == HAL_OK)
             {
                 return RES_OK;
             }
@@ -96,11 +100,11 @@ DRESULT disk_read (
     {
         case DEV_RAM :
         {
-            uint8_t status = BSP_SD_ReadBlocks_DMA(buff, sector << 9, count);
+            uint8_t status = HAL_SD_ReadBlocks_DMA(&SD_HandleObject, buff, sector << 9, count);
 
-            if (status == MSD_OK)
+            if (status == HAL_OK)
             {
-                while (BSP_SD_GetCardState() == SD_TRANSFER_BUSY);
+                while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_RECEIVING); // I guess it's receiving
                 return RES_OK;
             }
 
@@ -133,11 +137,11 @@ DRESULT disk_write (
     {
         case DEV_RAM :
         {
-            uint8_t result = BSP_SD_WriteBlocks_DMA((uint8_t *)buff, sector << 9, count); // 4GB Compliant
+            uint8_t status = HAL_SD_WriteBlocks_DMA(&SD_HandleObject, (uint8_t *)buff, sector << 9, count); // 4GB Compliant
 
-            if (status == MSD_OK)
+            if (status == HAL_OK)
             {
-                while (BSP_SD_GetCardState() == SD_TRANSFER_BUSY);
+                while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_SENDING);
                 return RES_OK;
             }
 

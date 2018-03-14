@@ -2,7 +2,7 @@
 #include "lcd_regdef.h"
 #include "gbc_gpu.h"
 
-TIM_HandleTypeDef  Input_LCDTimerHandle = { .Instance = LCD_TIM };
+TIM_HandleTypeDef  LCD_TimerHandle = { .Instance = LCD_TIM };
 TIM_OC_InitTypeDef TIM_OCInitObject;
 
 bool LCD_READY_FLAG;
@@ -43,12 +43,12 @@ void LCD_InitializePWM()
 {
     ENABLE_LCD_TIM();
 
-    Input_LCDTimerHandle.Init.Prescaler            = 16;
-    Input_LCDTimerHandle.Init.CounterMode          = TIM_COUNTERMODE_UP;
-    Input_LCDTimerHandle.Init.Period               = 281;
-    Input_LCDTimerHandle.Init.ClockDivision        = TIM_CLOCKDIVISION_DIV1;
-    Input_LCDTimerHandle.Init.RepetitionCounter    = 0;
-    if (HAL_TIM_PWM_Init(&Input_LCDTimerHandle) != HAL_OK)
+    LCD_TimerHandle.Init.Prescaler            = 16;
+    LCD_TimerHandle.Init.CounterMode          = TIM_COUNTERMODE_UP;
+    LCD_TimerHandle.Init.Period               = 281;
+    LCD_TimerHandle.Init.ClockDivision        = TIM_CLOCKDIVISION_DIV1;
+    LCD_TimerHandle.Init.RepetitionCounter    = 0;
+    if (HAL_TIM_PWM_Init(&LCD_TimerHandle) != HAL_OK)
     {
         //Error_Handler();
     }
@@ -60,12 +60,12 @@ void LCD_InitializePWM()
     TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
     TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
     TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_PWM_ConfigChannel(&Input_LCDTimerHandle, &TIM_OCInitObject, LCD_TIM_CHANNEL) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&LCD_TimerHandle, &TIM_OCInitObject, LCD_TIM_CHANNEL) != HAL_OK)
     {
         //Error_Handler();
     }
 
-    if (HAL_TIM_PWM_Start(&Input_LCDTimerHandle, TIM_CHANNEL_4) != HAL_OK)
+    if (HAL_TIM_PWM_Start(&LCD_TimerHandle, TIM_CHANNEL_4) != HAL_OK)
     {
         //Error_Handler();
     }
@@ -95,7 +95,7 @@ void LCD_DimBacklight(long percent)
         percent = 100;
     }
 
-    __HAL_TIM_SET_COMPARE(&Input_LCDTimerHandle, LCD_TIM_CHANNEL, 2.81f * percent);
+    __HAL_TIM_SET_COMPARE(&LCD_TimerHandle, LCD_TIM_CHANNEL, 2.81f * percent);
 }
 
 // Write register address

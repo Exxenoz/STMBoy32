@@ -2,8 +2,15 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
-TIM_HandleTypeDef Input_LockTimerHandle = { .Instance = INPUT_LOCK_TIM };
-TIM_HandleTypeDef Input_PollTimerHandle = { .Instance = INPUT_POLLING_TIM};
+TIM_HandleTypeDef Input_LockTimerHandle = { 
+    .Instance = INPUT_LOCK_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
+
+TIM_HandleTypeDef Input_PollTimerHandle = { 
+    .Instance = INPUT_POLLING_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
 
 Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
@@ -54,9 +61,6 @@ void Input_InitializeTimers(void)
     __TIM3_CLK_ENABLE();
     __TIM4_CLK_ENABLE();
 
-    // Initialize lock timer handle
-    Input_LockTimerHandle.Channel = HAL_TIM_ACTIVE_CHANNEL_1;
-
     // Initialize lock timer
     Input_LockTimerHandle.Init.Prescaler         = 44999;               // Tim4 runs with 90MHz -> scale it to 2kHz
     Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
@@ -66,9 +70,6 @@ void Input_InitializeTimers(void)
 
     HAL_TIM_Base_Init(&Input_LockTimerHandle);
     HAL_TIM_Base_Start(&Input_LockTimerHandle);
-
-    // Initialize poll timer handle
-    Input_PollTimerHandle.Channel = HAL_TIM_ACTIVE_CHANNEL_1;
 
     // Initialise polling timer
     Input_PollTimerHandle.Init.Prescaler         = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz

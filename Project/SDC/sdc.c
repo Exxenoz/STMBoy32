@@ -1,4 +1,3 @@
-#include "stm32h743i_eval_sd.h"
 #include "sdc.h"
 #include "led.h"
 

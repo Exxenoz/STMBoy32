@@ -717,41 +717,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>GBC</GroupName>
           <Files>
             <File>
@@ -1588,41 +1553,6 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2466,41 +2396,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>GBC</GroupName>
           <Files>
             <File>
@@ -3334,41 +3229,6 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4210,41 +4070,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>GBC</GroupName>
           <Files>
             <File>
@@ -5078,41 +4903,6 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5956,41 +5746,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>GBC</GroupName>
           <Files>
             <File>
@@ -6824,41 +6579,6 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7702,41 +7422,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>GBC</GroupName>
           <Files>
             <File>
@@ -8573,41 +8258,6 @@
               <FileName>cmod_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>EVAL</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32h743i_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sd.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h743i_eval_sdram.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\STM32H743I_EVAL\stm32h743i_eval_sdram.h</FilePath>
             </File>
           </Files>
         </Group>
