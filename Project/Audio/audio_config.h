@@ -8,6 +8,7 @@
 #define AUDIO_TIM          TIM8
 #define AUDIO_TIM_BUS      RCC_APB2Periph_TIM8
 
+#define AUDIO_DAC          DAC1
 #define AUDIO_DAC_BUS      RCC_APB1Periph_DAC
 #define AUDIO_DAC_CHANNEL  DAC_CHANNEL_1
 #define AUDIO_DAC_TRIGGER  DAC_TRIGGER_T8_TRGO

@@ -2,7 +2,7 @@
 
 TIM_HandleTypeDef Audio_TimerHandle = { .Instance = AUDIO_TIM };
 DAC_ChannelConfTypeDef Audio_ChannelConfig;
-DAC_HandleTypeDef Audio_DACHandle = { .Instance = AUDIO_DMA };
+DAC_HandleTypeDef Audio_DACHandle = { .Instance = AUDIO_DAC };
 
 void Audio_InitializeGPIO(void)
 {
