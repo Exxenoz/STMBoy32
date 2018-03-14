@@ -43,9 +43,9 @@ void LCD_InitializePWM()
 {
     ENABLE_LCD_TIM();
 
-    LCD_TimerHandle.Init.Prescaler            = 16;
+    LCD_TimerHandle.Init.Prescaler            = 37;
     LCD_TimerHandle.Init.CounterMode          = TIM_COUNTERMODE_UP;
-    LCD_TimerHandle.Init.Period               = 281;
+    LCD_TimerHandle.Init.Period               = 626;
     LCD_TimerHandle.Init.ClockDivision        = TIM_CLOCKDIVISION_DIV1;
     LCD_TimerHandle.Init.RepetitionCounter    = 0;
     if (HAL_TIM_PWM_Init(&LCD_TimerHandle) != HAL_OK)

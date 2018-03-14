@@ -62,7 +62,7 @@ void Input_InitializeTimers(void)
     __TIM4_CLK_ENABLE();
 
     // Initialize lock timer
-    Input_LockTimerHandle.Init.Prescaler         = 44999;               // Tim4 runs with 90MHz -> scale it to 2kHz
+    Input_LockTimerHandle.Init.Prescaler         = 49999;               // Tim4 runs with 100MHz -> scale it to 2kHz
     Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
     Input_LockTimerHandle.Init.Period            = INPUT_MAX_LOCK_TIME; // Count 'til max even value -> min overflows/s
     Input_LockTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
@@ -72,7 +72,7 @@ void Input_InitializeTimers(void)
     HAL_TIM_Base_Start(&Input_LockTimerHandle);
 
     // Initialise polling timer
-    Input_PollTimerHandle.Init.Prescaler         = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz
+    Input_PollTimerHandle.Init.Prescaler         = 6666;                // Tim3 runs with 100MHz -> scale it to 15kHz
     Input_PollTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
     Input_PollTimerHandle.Init.Period            = 14;                  // Count 'til 14 (+1) -> 1000 overflows/s
     Input_PollTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;

@@ -3,7 +3,7 @@
 #include "ff.h"
 #include "string.h"
 
-TIM_OC_InitTypeDef TIM_OCInitObject;
+TIM_OC_InitTypeDef CMOD_TIM_OCInitObject;
 TIM_HandleTypeDef CMOD_TimerHandle = { 
     .Instance = CMOD_TIM,
     .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
@@ -304,20 +304,20 @@ void CMOD_Initialize_CLK(void)
     GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
 
-    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 90Mhz(?) -> keep this rate
+    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 100Mhz(?) -> keep this rate
     CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    CMOD_TimerHandle.Init.Period            = 85;                     // Count 'til 85 (+1) -> 1,05Mhz PWM
+    CMOD_TimerHandle.Init.Period            = 95;                     // Count 'til 96(-1) -> 1,05Mhz PWM
     CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     CMOD_TimerHandle.Init.RepetitionCounter = 0;
 
-    TIM_OCInitObject.Pulse        = 42; 
-    TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
-    TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
-    TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
-    TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
-    TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
-    TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
+    CMOD_TIM_OCInitObject.Pulse        = 47; 
+    CMOD_TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
+    CMOD_TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
+    CMOD_TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
+    CMOD_TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    CMOD_TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    CMOD_TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &CMOD_TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
     {
         //Error_Handler();
     }
