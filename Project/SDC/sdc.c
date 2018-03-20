@@ -1,7 +1,7 @@
 #include "sdc.h"
 #include "led.h"
 
-FATFS SDC_FatFS;                    // Global FatFS object
+//FATFS SDC_FatFS;                    // Global FatFS object
 bool  SDC_Mounted = false;          // Global mounted state
 
 void SDC_InitializeInterrupts(void)
@@ -37,7 +37,7 @@ bool SDC_Mount(void)
         SDC_Unmount();
     }
 
-    if (f_mount(&SDC_FatFS, "", 1) != FR_OK)
+    //if (f_mount(&SDC_FatFS, "", 1) != FR_OK)
     {
         return false;
     }
@@ -52,7 +52,7 @@ bool SDC_IsMounted(void)
 
 void SDC_Unmount(void)
 {
-    f_mount(NULL, "", 1);
+    //f_mount(NULL, "", 1);
     SDC_Mounted = false;
 }
 

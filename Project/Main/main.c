@@ -9,7 +9,6 @@
   */
 
 #include "common.h"
-#include "stm32h7xx_hal.h"
 #include "audio.h"
 #include "led.h"
 #include "lcd.h"

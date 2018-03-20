@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "sdc_config.h"
-#include "ff.h"
+//#include "ff.h"
 
 
 void SDC_Initialize(void);

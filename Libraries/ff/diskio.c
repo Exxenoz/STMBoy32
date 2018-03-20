@@ -7,15 +7,13 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include "diskio.h"		       /* FatFs lower layer API */
-#include "stm32h7xx_hal_sd.h"
+#include "diskio.h"		/* FatFs lower layer API */
 
 /* Definitions of physical drive number for each drive */
 #define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
 #define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
 
-SD_HandleTypeDef SD_HandleObject;
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -25,27 +23,31 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
-	switch (pdrv)
-    {
-        case DEV_RAM :
-        {
-            // ToDo: Check if SD card is present
-            /*if (SD_Detect() != SD_PRESENT)
-            {
-                return RES_NOTRDY;
-            }*/
+	DSTATUS stat;
+	int result;
 
-            // ToDo: Check for write protection and send RES_WRPRT if needed
+	switch (pdrv) {
+	case DEV_RAM :
+		//result = RAM_disk_status();
 
-            return RES_OK;
-        }
-        case DEV_MMC :
-            return RES_NOTRDY;
+		// translate the reslut code here
 
-        case DEV_USB :
-            return RES_NOTRDY;
+		return stat;
+
+	case DEV_MMC :
+		//result = MMC_disk_status();
+
+		// translate the reslut code here
+
+		return stat;
+
+	case DEV_USB :
+		//result = USB_disk_status();
+
+		// translate the reslut code here
+
+		return stat;
 	}
-
 	return STA_NOINIT;
 }
 
@@ -59,24 +61,31 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	switch (pdrv)
-    {
-        case DEV_RAM :
-        {
-            if (HAL_SD_InitCard(&SD_HandleObject) == HAL_OK)
-            {
-                return RES_OK;
-            }
+	DSTATUS stat;
+	int result;
 
-            return RES_ERROR;
-        }
-        case DEV_MMC :
-            return RES_NOTRDY;
+	switch (pdrv) {
+	case DEV_RAM :
+		//result = RAM_disk_initialize();
 
-        case DEV_USB :
-            return RES_NOTRDY;
+		// translate the reslut code here
+
+		return stat;
+
+	case DEV_MMC :
+		//result = MMC_disk_initialize();
+
+		// translate the reslut code here
+
+		return stat;
+
+	case DEV_USB :
+		//result = USB_disk_initialize();
+
+		// translate the reslut code here
+
+		return stat;
 	}
-
 	return STA_NOINIT;
 }
 
@@ -93,25 +102,36 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	switch (pdrv)
-    {
-        case DEV_RAM :
-        {
-            uint8_t status = HAL_SD_ReadBlocks_DMA(&SD_HandleObject, buff, sector << 9, count);
+	DRESULT res;
+	int result;
 
-            if (status == HAL_OK)
-            {
-                while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_RECEIVING); // I guess it's receiving
-                return RES_OK;
-            }
+	switch (pdrv) {
+	case DEV_RAM :
+		// translate the arguments here
 
-            return RES_ERROR;
-        }
-        case DEV_MMC :
-            return RES_NOTRDY;
+		//result = RAM_disk_read(buff, sector, count);
 
-        case DEV_USB :
-            return RES_NOTRDY;
+		// translate the reslut code here
+
+		return res;
+
+	case DEV_MMC :
+		// translate the arguments here
+
+		//result = MMC_disk_read(buff, sector, count);
+
+		// translate the reslut code here
+
+		return res;
+
+	case DEV_USB :
+		// translate the arguments here
+
+		//result = USB_disk_read(buff, sector, count);
+
+		// translate the reslut code here
+
+		return res;
 	}
 
 	return RES_PARERR;
@@ -125,30 +145,41 @@ DRESULT disk_read (
 
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
-	BYTE *buff,	        /* Data to be written */
+	const BYTE *buff,	/* Data to be written */
 	DWORD sector,		/* Start sector in LBA */
 	UINT count			/* Number of sectors to write */
 )
 {
-	switch (pdrv)
-    {
-        case DEV_RAM :
-        {
-            uint8_t status = HAL_SD_WriteBlocks_DMA(&SD_HandleObject, (uint8_t *)buff, sector << 9, count); // 4GB Compliant
+	DRESULT res;
+	int result;
 
-            if (status == HAL_OK)
-            {
-                while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_SENDING);
-                return RES_OK;
-            }
+	switch (pdrv) {
+	case DEV_RAM :
+		// translate the arguments here
 
-            return RES_ERROR;
-        }
-        case DEV_MMC :
-            return RES_NOTRDY;
+		//result = RAM_disk_write(buff, sector, count);
 
-        case DEV_USB :
-            return RES_NOTRDY;
+		// translate the reslut code here
+
+		return res;
+
+	case DEV_MMC :
+		// translate the arguments here
+
+		//result = MMC_disk_write(buff, sector, count);
+
+		// translate the reslut code here
+
+		return res;
+
+	case DEV_USB :
+		// translate the arguments here
+
+		//result = USB_disk_write(buff, sector, count);
+
+		// translate the reslut code here
+
+		return res;
 	}
 
 	return RES_PARERR;
@@ -166,28 +197,27 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	switch (pdrv)
-    {
-        case DEV_RAM :
-            switch (cmd)
-            {
-                case GET_SECTOR_SIZE :     // Get R/W sector size (WORD) 
-                    *(WORD *) buff = 512;
-                    break;
-                case GET_BLOCK_SIZE :      // Get erase block size in unit of sector (DWORD)
-                    *(DWORD *) buff = 32;
-                    break;
-                case CTRL_SYNC :
-                    break;
-            }
+	DRESULT res;
+	int result;
 
-            return RES_OK;
+	switch (pdrv) {
+	case DEV_RAM :
 
-        case DEV_MMC :
-            return RES_NOTRDY;
+		// Process of the command for the RAM drive
 
-        case DEV_USB :
-            return RES_NOTRDY;
+		return res;
+
+	case DEV_MMC :
+
+		// Process of the command for the MMC/SD card
+
+		return res;
+
+	case DEV_USB :
+
+		// Process of the command the USB drive
+
+		return res;
 	}
 
 	return RES_PARERR;
