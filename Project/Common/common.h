@@ -4,15 +4,11 @@
 #pragma anon_unions
 
 // Workaround for Keil syntax highlighting
-#ifndef USE_STDPERIPH_DRIVER
-    #define USE_STDPERIPH_DRIVER
-#endif
+//#ifndef USE_STDPERIPH_DRIVER
+//    #define USE_STDPERIPH_DRIVER
+//#endif
 
-#ifndef STM32F429_439xx
-    #define STM32F429_439xx
-#endif
-
-#include "stm32f4xx_conf.h"
+#include "stm32h7xx_hal.h"
 //////////////////////////////////////////
 
 #define NOP __ASM("nop")

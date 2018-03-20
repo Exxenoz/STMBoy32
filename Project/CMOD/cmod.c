@@ -3,6 +3,12 @@
 #include "ff.h"
 #include "string.h"
 
+TIM_OC_InitTypeDef CMOD_TIM_OCInitObject;
+TIM_HandleTypeDef CMOD_TimerHandle = { 
+    .Instance = CMOD_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
+
 uint8_t        CMOD_ROMBankX[16384];
 
 CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
@@ -22,7 +28,7 @@ CMOD_Status_t CMOD_GetStatus(void)
 
 void CMOD_EnableInterrupt(void)
 {
-    TIM_ITConfig(CMOD_TIM, TIM_IT_Update, ENABLE);
+    CMOD_TIM->DIER |= (uint16_t)TIM_IT_UPDATE;
 }
 
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
@@ -33,8 +39,14 @@ bool CMOD_Detect(void)
     CMOD_ReadByte(0x0104, &data);
     while (CMOD_Status == CMOD_PROCESSING);
 
-    if (data == 0xCE) return true;
-    else              return false;
+    if (data == 0xCE)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void CMOD_ResetCartridge(void)
@@ -281,67 +293,52 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
 void CMOD_Initialize_CLK(void)
 {
-    RCC_AHB1PeriphClockCmd(CMOD_CLK_BUS, ENABLE);
-    RCC_APB1PeriphClockCmd(CMOD_TIM_BUS, ENABLE);
+    __TIM5_CLK_ENABLE();
 
-    GPIO_InitTypeDef        GPIO_InitObject;
-    TIM_TimeBaseInitTypeDef TIM_BaseObject;
-    TIM_OCInitTypeDef       TIM_OCInitObject;
-    NVIC_InitTypeDef        NVIC_InitObject;
+    GPIO_InitTypeDef GPIO_InitObject;
 
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = CMOD_CLK_PIN;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
+    HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
 
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = CMOD_CLK_PIN;
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
-    GPIO_PinAFConfig(CMOD_CLK_PORT, CMOD_CLK_PINSOURCE, CMOD_CLK_AF);
+    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 100Mhz(?) -> keep this rate
+    CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    CMOD_TimerHandle.Init.Period            = 95;                     // Count 'til 96(-1) -> 1,05Mhz PWM
+    CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    CMOD_TimerHandle.Init.RepetitionCounter = 0;
 
-    TIM_BaseObject.TIM_Prescaler         = 0;                         // Tim5 runs with 90Mhz(?) -> keep this rate
-    TIM_BaseObject.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period            = 85;                        // Count 'til 85 (+1) -> 1,05Mhz PWM
-    TIM_BaseObject.TIM_ClockDivision     = TIM_CKD_DIV1;
-    TIM_BaseObject.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(CMOD_TIM, &TIM_BaseObject);
+    CMOD_TIM_OCInitObject.Pulse        = 47; 
+    CMOD_TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
+    CMOD_TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
+    CMOD_TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
+    CMOD_TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    CMOD_TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    CMOD_TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &CMOD_TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
+    {
+        //Error_Handler();
+    }
+    
+    HAL_TIM_Base_Init(&CMOD_TimerHandle);
+    HAL_TIM_Base_Start(&CMOD_TimerHandle);
 
-    TIM_OCStructInit(&TIM_OCInitObject);
-    TIM_OCInitObject.TIM_OCMode          = TIM_OCMode_PWM1;
-	TIM_OCInitObject.TIM_OutputState     = TIM_OutputState_Enable;
-	TIM_OCInitObject.TIM_OCPolarity      = TIM_OCPolarity_Low;
-	TIM_OCInitObject.TIM_Pulse           = 42;
-	TIM_OC4Init(CMOD_TIM, &TIM_OCInitObject);
-	TIM_OC4PreloadConfig(CMOD_TIM, TIM_OCPreload_Enable);
-
-    TIM_Cmd(CMOD_TIM, ENABLE);
-
-    NVIC_InitObject.NVIC_IRQChannel                   = CMOD_TIM_NVIC_CHANNEL;
-    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
-    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitObject);
-    NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
+    HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
+    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
 }
 
 void CMOD_Initialize(void)
 {
-    RCC_AHB1PeriphClockCmd(CMOD_RESET_BUS,  ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_CS_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_RD_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_WR_BUS,     ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DETECT_BUS, ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_ADDR_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(CMOD_DATA_BUS,   ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
@@ -368,7 +365,7 @@ void CMOD_HandleRead(void)
 
         CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
+        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
         return;
     }
 
@@ -387,7 +384,7 @@ void CMOD_HandleWrite(void)
 
         CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_Update;         // Disable Interrupt until needed again
+        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
         return;
     }
 
@@ -411,11 +408,11 @@ void (*CMOD_OperationTable[3])(void) =
 
 void TIM5_IRQHandler(void)
 {
-  if (((CMOD_TIM->SR   & TIM_IT_Update) != (uint16_t)RESET) && 
-      ((CMOD_TIM->DIER & TIM_IT_Update) != (uint16_t)RESET))    // ITStatus == SET?
+  if (((CMOD_TIM->SR   & TIM_IT_UPDATE) != (uint16_t)RESET) && 
+      ((CMOD_TIM->DIER & TIM_IT_UPDATE) != (uint16_t)RESET))    // ITStatus == SET?
   {
       CMOD_OperationTable[CMOD_Action]();                       // Handle Read / Write / NOP
 
-      CMOD_TIM->SR = (uint16_t)~TIM_IT_Update;                  // ClearITPendingBit
+      CMOD_TIM->SR = (uint16_t)~TIM_IT_UPDATE;                  // ClearITPendingBit
   }
 }

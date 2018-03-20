@@ -1,81 +1,52 @@
 #include "audio.h"
 
+TIM_HandleTypeDef Audio_TimerHandle = { .Instance = AUDIO_TIM };
+DAC_ChannelConfTypeDef Audio_ChannelConfig;
+DAC_HandleTypeDef Audio_DACHandle = { .Instance = AUDIO_DAC };
+
 void Audio_InitializeGPIO(void)
 {
-    RCC_AHB1PeriphClockCmd(AUDIO_BUS, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject = {0};
-    GPIO_InitObject.GPIO_Mode = GPIO_Mode_AN;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin = AUDIO_PIN;
-    GPIO_InitObject.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; 
-    GPIO_Init(AUDIO_PORT, &GPIO_InitObject);
+    GPIO_InitObject.Mode  = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin   = AUDIO_PIN;
+    GPIO_InitObject.Pull  = GPIO_NOPULL;
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; 
+    HAL_GPIO_Init(AUDIO_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeTimer(void)
 {
-    RCC_APB2PeriphClockCmd(AUDIO_TIM_BUS, ENABLE);
+    Audio_TimerHandle.Init.Period        = 3124; // 32 kHz
+    Audio_TimerHandle.Init.Prescaler     = 0;
+    Audio_TimerHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
+    Audio_TimerHandle.Init.ClockDivision = 0;
+    HAL_TIM_Base_Init(&Audio_TimerHandle);
 
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseObject;
-    TIM_TimeBaseStructInit(&TIM_TimeBaseObject);
+    TIM_MasterConfigTypeDef masterConfig;
+    masterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    masterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &masterConfig);
 
-    TIM_TimeBaseObject.TIM_Period = 5626; // 32 kHz
-    TIM_TimeBaseObject.TIM_Prescaler = 0;
-    TIM_TimeBaseObject.TIM_ClockDivision = 0;
-    TIM_TimeBaseObject.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(AUDIO_TIM, &TIM_TimeBaseObject);
-
-    TIM_SelectOutputTrigger(AUDIO_TIM, TIM_TRGOSource_Update);
-
-    TIM_Cmd(AUDIO_TIM, ENABLE);
-}
-
-void Audio_InitializeDAC(void)
-{
-    RCC_APB1PeriphClockCmd(AUDIO_DAC_BUS, ENABLE);
-
-    DAC_InitTypeDef DAC_InitObject = {0};
-    DAC_InitObject.DAC_Trigger = AUDIO_DAC_TRIGGER;
-    DAC_InitObject.DAC_WaveGeneration = DAC_WaveGeneration_None;
-    DAC_InitObject.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
-    DAC_Init(AUDIO_DAC_CHANNEL, &DAC_InitObject);
-
-    DAC_Cmd(AUDIO_DAC_CHANNEL, ENABLE);
-
-    DAC_DMACmd(AUDIO_DAC_CHANNEL, ENABLE);
+    HAL_TIM_Base_Start(&Audio_TimerHandle);
 }
 
 void Audio_Initialize(void)
 {
+    __HAL_RCC_DAC12_CLK_ENABLE();
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
     Audio_InitializeGPIO();
     Audio_InitializeTimer();
-    Audio_InitializeDAC();
 }
 
 void Audio_SetAudioBuffer(uint16_t* audioBuffer, uint32_t audioBufferSize)
 {
-    RCC_AHB1PeriphClockCmd(AUDIO_DMA_BUS, ENABLE);
+    HAL_DAC_DeInit(&Audio_DACHandle);
+    HAL_DAC_Init(&Audio_DACHandle);
 
-    DMA_DeInit(AUDIO_DMA_STREAM);
+    Audio_ChannelConfig.DAC_Trigger = AUDIO_DAC_TRIGGER;
+    Audio_ChannelConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 
-    DMA_InitTypeDef DMA_InitObject = {0};
-    DMA_InitObject.DMA_Channel = AUDIO_DMA_CHANNEL;  
-    DMA_InitObject.DMA_PeripheralBaseAddr = (uint32_t)DAC_DHR12R1_ADDRESS;
-    DMA_InitObject.DMA_Memory0BaseAddr = (uint32_t)audioBuffer;
-    DMA_InitObject.DMA_DIR = DMA_DIR_MemoryToPeripheral;
-    DMA_InitObject.DMA_BufferSize = audioBufferSize;
-    DMA_InitObject.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_InitObject.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitObject.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-    DMA_InitObject.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-    DMA_InitObject.DMA_Mode = DMA_Mode_Circular;
-    DMA_InitObject.DMA_Priority = DMA_Priority_High;
-    DMA_InitObject.DMA_FIFOMode = DMA_FIFOMode_Disable;
-    DMA_InitObject.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
-    DMA_InitObject.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-    DMA_InitObject.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-    DMA_Init(AUDIO_DMA_STREAM, &DMA_InitObject);
-
-    DMA_Cmd(AUDIO_DMA_STREAM, ENABLE);
+    HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfig, AUDIO_DAC_CHANNEL);
+    HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_CHANNEL, (uint32_t *)audioBuffer, audioBufferSize, DAC_ALIGN_8B_R);
 }

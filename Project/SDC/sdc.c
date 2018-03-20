@@ -1,4 +1,3 @@
-#include "stm324x9i_eval_sdio_sd.h"
 #include "sdc.h"
 #include "led.h"
 
@@ -7,7 +6,7 @@ bool  SDC_Mounted = false;          // Global mounted state
 
 void SDC_InitializeInterrupts(void)
 {
-    NVIC_InitTypeDef NVIC_InitStructure;
+    /*NVIC_InitTypeDef NVIC_InitStructure;
 
     // SDIO Interrupt ENABLE
     NVIC_InitStructure.NVIC_IRQChannel = SDC_SDIO_NVIC_CHANNEL;
@@ -18,7 +17,7 @@ void SDC_InitializeInterrupts(void)
     // DMA2 STREAMx Interrupt ENABLE
     NVIC_InitStructure.NVIC_IRQChannel = SDC_DMA_NVIC_CHANNEL;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_Init(&NVIC_InitStructure);
+    NVIC_Init(&NVIC_InitStructure);*/
 }
 
 void SDC_Initialize(void)
@@ -28,10 +27,10 @@ void SDC_Initialize(void)
 
 bool SDC_Mount(void)
 {
-    if (!SD_Detect())
+    /*if (!SD_Detect())
     {
         return false;
-    }
+    }*/
 
     if (SDC_Mounted)
     {
@@ -57,7 +56,7 @@ void SDC_Unmount(void)
     SDC_Mounted = false;
 }
 
-void SDIO_IRQHandler(void)
+/*void SDIO_IRQHandler(void)
 {
     SD_ProcessIRQSrc();  
 }
@@ -65,4 +64,4 @@ void SDIO_IRQHandler(void)
 void SD_SDIO_DMA_IRQHANDLER(void)
 {
     SD_ProcessDMAIRQ();  
-}   
+}*/

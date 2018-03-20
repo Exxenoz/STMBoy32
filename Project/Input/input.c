@@ -2,14 +2,24 @@
 #include "lcd.h"
 #include "gbc_mmu.h"
 
+TIM_HandleTypeDef Input_LockTimerHandle = { 
+    .Instance = INPUT_LOCK_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
+
+TIM_HandleTypeDef Input_PollTimerHandle = { 
+    .Instance = INPUT_POLLING_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
+
 Input_Interrupt_Flags_t Input_Interrupt_Flags;
 
 Input_ButtonState_t Input_LastState[8];
 Input_ButtonState_t Input_CurrState[8];
 uint8_t             Input_Counter[8];
 
-Input_Lock_t        Input_Locks[8];
-time_t              Input_DynamicLockTimes[8];
+Input_Lock_t Input_Locks[8];
+time_t       Input_DynamicLockTimes[8];
 
 const uint32_t Input_Pins[8] =
 {
@@ -26,17 +36,14 @@ const uint32_t Input_Pins[8] =
 
 void Input_InitializePins(void)
 {
-    RCC_AHB1PeriphClockCmd(INPUT_BUS_ALL, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-    
-    #define INITIALIZE_GPIO_PIN(PORT, PIN)                       \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_IN;                   \
-    GPIO_InitObject.GPIO_Pin   = PIN;                            \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_UP;                   \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;              \
-    GPIO_Init(PORT, &GPIO_InitObject);                           \
+    #define INITIALIZE_GPIO_PIN(PORT, PIN)               \
+    GPIO_InitObject.Mode  = GPIO_MODE_INPUT;              \
+    GPIO_InitObject.Pin   = PIN;                           \
+    GPIO_InitObject.Pull  = GPIO_PULLUP;                    \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH;       \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);                    \
 
     INITIALIZE_GPIO_PIN(INPUT_A_PORT,           INPUT_A_PIN);
     INITIALIZE_GPIO_PIN(INPUT_B_PORT,           INPUT_B_PIN);         
@@ -51,42 +58,31 @@ void Input_InitializePins(void)
 
 void Input_InitializeTimers(void)
 {
-    RCC_APB1PeriphClockCmd(INPUT_POLLING_TIM_BUS, ENABLE);
-    RCC_APB1PeriphClockCmd(INPUT_LOCK_TIM_BUS, ENABLE);
-
-    TIM_TimeBaseInitTypeDef TIM_BaseObject;
-    NVIC_InitTypeDef        NVIC_InitObject;
-
+    __TIM3_CLK_ENABLE();
+    __TIM4_CLK_ENABLE();
 
     // Initialize lock timer
-    TIM_BaseObject.TIM_Prescaler            = 44999;               // Tim4 runs with 90MHz -> scale it to 2kHz
-    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period               = INPUT_MAX_LOCK_TIME; // Count 'til max even value -> min overflows/s
-    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
-    TIM_BaseObject.TIM_RepetitionCounter    = 0;
-    TIM_TimeBaseInit(INPUT_LOCK_TIM, &TIM_BaseObject);
+    Input_LockTimerHandle.Init.Prescaler         = 49999;               // Tim4 runs with 100MHz -> scale it to 2kHz
+    Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    Input_LockTimerHandle.Init.Period            = INPUT_MAX_LOCK_TIME; // Count 'til max even value -> min overflows/s
+    Input_LockTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    Input_LockTimerHandle.Init.RepetitionCounter = 0;
 
-    TIM_Cmd(INPUT_LOCK_TIM, ENABLE);
+    HAL_TIM_Base_Init(&Input_LockTimerHandle);
+    HAL_TIM_Base_Start(&Input_LockTimerHandle);
 
     // Initialise polling timer
-    TIM_BaseObject.TIM_Prescaler            = 5999;                // Tim3 runs with 90MHz -> scale it to 15kHz
-    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period               = 14;                  // Count 'til 14 (+1) -> 1000 overflows/s
-    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
-    TIM_BaseObject.TIM_RepetitionCounter    = 0;
-    TIM_TimeBaseInit(INPUT_POLLING_TIM, &TIM_BaseObject);
+    Input_PollTimerHandle.Init.Prescaler         = 6666;                // Tim3 runs with 100MHz -> scale it to 15kHz
+    Input_PollTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    Input_PollTimerHandle.Init.Period            = 14;                  // Count 'til 14 (+1) -> 1000 overflows/s
+    Input_PollTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    Input_PollTimerHandle.Init.RepetitionCounter = 0;
 
-    TIM_ITConfig(INPUT_POLLING_TIM, TIM_IT_Update, ENABLE);
-    TIM_Cmd(INPUT_POLLING_TIM, ENABLE);
+    HAL_TIM_Base_Init(&Input_PollTimerHandle);
+    HAL_TIM_Base_Start_IT(&Input_PollTimerHandle);
 
-    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_POLLING_TIM_NVIC_CHANNEL;
-    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0;
-    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitObject);
-    NVIC_EnableIRQ(INPUT_POLLING_TIM_NVIC_CHANNEL);
-    
-    NVIC_SetPriority(INPUT_POLLING_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2);
+    HAL_NVIC_SetPriority(INPUT_POLLING_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
+    HAL_NVIC_EnableIRQ(INPUT_POLLING_TIM_NVIC_CHANNEL);
 }
 
 void Input_Initialize() 
@@ -112,12 +108,11 @@ void Input_Initialize()
 
     //-----------DEBUG LED----------
     GPIO_InitTypeDef GPIO_InitObject;
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = GPIO_Pin_14;
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(GPIOB, &GPIO_InitObject);
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitObject.Pin   = GPIO_PIN_14;
+    GPIO_InitObject.Pull  = GPIO_NOPULL;
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitObject);
     //------------------------------
 }
 
@@ -240,5 +235,5 @@ void TIM3_IRQHandler(void)
         Input_LastState[i] = Input_CurrState[i];
     }
 
-    TIM_ClearITPendingBit(INPUT_POLLING_TIM, TIM_IT_Update);
+    __HAL_TIM_CLEAR_IT(&Input_PollTimerHandle, TIM_IT_UPDATE);
 }

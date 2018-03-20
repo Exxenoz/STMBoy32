@@ -2,44 +2,35 @@
 #include "lcd_regdef.h"
 #include "gbc_gpu.h"
 
+TIM_HandleTypeDef  LCD_TimerHandle = { .Instance = LCD_TIM };
+TIM_OC_InitTypeDef TIM_OCInitObject;
+
 bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
 {
-    RCC_AHB1PeriphClockCmd(LCD_RESET_BUS,   ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_CS_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_RD_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_WR_BUS,      ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_DATA_BUS,    ENABLE);
-    RCC_AHB1PeriphClockCmd(LCD_BACKLIT_BUS, ENABLE);
-
     GPIO_InitTypeDef GPIO_InitObject;
 
-
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)        \
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_OUT;     \
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;     \
-    GPIO_InitObject.GPIO_Pin   = PIN;               \
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;  \
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz; \
-    GPIO_Init(PORT, &GPIO_InitObject);              \
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(LCD_RESET_PORT, LCD_RESET_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_RS_PORT,    LCD_RS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_CS_PORT,    LCD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_RD_PORT,    LCD_RD_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_WR_PORT,    LCD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_Pin_All);
+    INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_PIN_All);
 
-    GPIO_InitObject.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitObject.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitObject.GPIO_Pin   = LCD_BACKLIT_PIN;
-    GPIO_InitObject.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-    GPIO_InitObject.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
-
-    GPIO_PinAFConfig(LCD_BACKLIT_PORT, LCD_BACKLIT_PIN_SOURCE, GPIO_AF_TIM1);
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = LCD_BACKLIT_PIN;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
 
     LCD_SET_RESET;
     LCD_SET_RS;
@@ -48,58 +39,49 @@ void LCD_InitializePins(void)
     LCD_SET_WR;
 }
 
-void LCD_InitializeTimer()
+void LCD_InitializePWM()
 {
-    RCC_APB2PeriphClockCmd(LCD_TIM_BUS, ENABLE);
+    ENABLE_LCD_TIM();
 
-    TIM_TimeBaseInitTypeDef TIM_BaseObject;
-    TIM_OCInitTypeDef       TIM_OCInitObject;
+    LCD_TimerHandle.Init.Prescaler            = 37;
+    LCD_TimerHandle.Init.CounterMode          = TIM_COUNTERMODE_UP;
+    LCD_TimerHandle.Init.Period               = 626;
+    LCD_TimerHandle.Init.ClockDivision        = TIM_CLOCKDIVISION_DIV1;
+    LCD_TimerHandle.Init.RepetitionCounter    = 0;
+    if (HAL_TIM_PWM_Init(&LCD_TimerHandle) != HAL_OK)
+    {
+        //Error_Handler();
+    }
 
+    TIM_OCInitObject.Pulse        = 281; 
+    TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
+    TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
+    TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
+    TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    if (HAL_TIM_PWM_ConfigChannel(&LCD_TimerHandle, &TIM_OCInitObject, LCD_TIM_CHANNEL) != HAL_OK)
+    {
+        //Error_Handler();
+    }
 
-    TIM_BaseObject.TIM_Prescaler            = 16;
-    TIM_BaseObject.TIM_CounterMode          = TIM_CounterMode_Up;
-    TIM_BaseObject.TIM_Period               = 281;
-    TIM_BaseObject.TIM_ClockDivision        = TIM_CKD_DIV1;
-    TIM_BaseObject.TIM_RepetitionCounter    = 0;
-    TIM_TimeBaseInit(LCD_TIM, &TIM_BaseObject);
-
-    TIM_OCStructInit(&TIM_OCInitObject);
-    TIM_OCInitObject.TIM_OCMode             = TIM_OCMode_PWM1;
-    TIM_OCInitObject.TIM_OutputState        = TIM_OutputState_Enable;
-    TIM_OCInitObject.TIM_OCPolarity         = TIM_OCPolarity_Low;
-    TIM_OCInitObject.TIM_Pulse              = 281; 
-    TIM_OC4Init(LCD_TIM, &TIM_OCInitObject);
-    TIM_OC4PreloadConfig(LCD_TIM, TIM_OCPreload_Enable);
-
-    TIM_ClearITPendingBit(LCD_TIM, TIM_IT_CC4);
-    TIM_Cmd(LCD_TIM, ENABLE);
-
-    TIM_CtrlPWMOutputs(LCD_TIM, ENABLE);  
+    if (HAL_TIM_PWM_Start(&LCD_TimerHandle, TIM_CHANNEL_4) != HAL_OK)
+    {
+        //Error_Handler();
+    }
 }
 
 void LCD_InitializeInterrupt(void)
 {
-    // SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx registers
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-    EXTI_InitTypeDef EXTI_InitObject;
-    NVIC_InitTypeDef NVIC_InitObject;
-
-
-    SYSCFG_EXTILineConfig(INPUT_FRAME_EXTI_PORT, INPUT_FRAME_EXTI_PIN);
+    GPIO_InitTypeDef GPIO_InitStructure;
     
-    EXTI_InitObject.EXTI_Line    = INPUT_FRAME_EXTI_LINE;                         
-    EXTI_InitObject.EXTI_Mode    = EXTI_Mode_Interrupt;          
-    EXTI_InitObject.EXTI_Trigger = EXTI_Trigger_Rising_Falling;  
-    EXTI_InitObject.EXTI_LineCmd = ENABLE;                       
-    EXTI_Init(&EXTI_InitObject);
+    GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStructure.Pull = GPIO_NOPULL;
+    GPIO_InitStructure.Pin  = INPUT_FRAME_PIN;
+    HAL_GPIO_Init(INPUT_FRAME_PORT, &GPIO_InitStructure);
     
-    NVIC_InitObject.NVIC_IRQChannel                   = INPUT_FRAME_NVIC_CHANNEL; 
-    NVIC_InitObject.NVIC_IRQChannelPreemptionPriority = 0x0F;    
-    NVIC_InitObject.NVIC_IRQChannelSubPriority        = 0x0F;    
-    NVIC_InitObject.NVIC_IRQChannelCmd                = ENABLE;  
-    NVIC_Init(&NVIC_InitObject);                                 
-    NVIC_EnableIRQ(INPUT_FRAME_NVIC_CHANNEL);
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 void LCD_DimBacklight(long percent)
@@ -113,7 +95,7 @@ void LCD_DimBacklight(long percent)
         percent = 100;
     }
 
-    TIM_SetCompare4(LCD_TIM, 2.81f * percent);
+    __HAL_TIM_SET_COMPARE(&LCD_TimerHandle, LCD_TIM_CHANNEL, 2.81f * percent);
 }
 
 // Write register address
@@ -249,7 +231,7 @@ void LCD_Initialize(void)
 {
 // Reminder: Porching increases available time to write from RAM to GRAM
     LCD_InitializePins();
-    LCD_InitializeTimer();
+    LCD_InitializePWM();
     LCD_InitializeInterrupt();
     
 
@@ -538,8 +520,8 @@ void LCD_DrawGBCFrameBufferScaled(void)
 
 // ToDo: Disable when not needed
 void EXTI0_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line0) != RESET) 
+{ 
+    if (__HAL_GPIO_EXTI_GET_IT(INPUT_FRAME_PIN) != RESET) 
     {
         if (INPUT_FRAME_PORT->IDR & INPUT_FRAME_PIN)
         {
@@ -550,6 +532,6 @@ void EXTI0_IRQHandler(void)
             LCD_RST_READY_FLAG;
         }
 
-        EXTI_ClearITPendingBit(EXTI_Line0);
+    __HAL_GPIO_EXTI_CLEAR_IT(INPUT_FRAME_PIN);        
     }
 }

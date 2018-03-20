@@ -12,7 +12,7 @@ bool SDC_IsMounted(void);
 void SDC_Unmount(void);
 
 // Interrupt Handler
-void SDIO_IRQHandler(void);
-void SD_SDIO_DMA_IRQHANDLER(void);
+//void SDIO_IRQHandler(void);
+//void SD_SDIO_DMA_IRQHANDLER(void);
 
 #endif //SDC_H
