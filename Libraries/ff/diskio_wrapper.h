@@ -3,6 +3,8 @@
 
 #include "integer.h"
 
+void SDMMC1_IRQHandler(void);
+
 BYTE disk_status_wrapper (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 );
