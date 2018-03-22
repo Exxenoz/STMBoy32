@@ -236,7 +236,7 @@ void LCD_Initialize(void)
     
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
-    for (long i = 0; i < 2000000; i++);         // Wait ~120ms (ILI9341 Datasheet p. 90)
+    HAL_Delay(120); // Wait ~120ms (ILI9341 Datasheet p. 90)
     LCD_WriteCommand(LCD_REG_DISPLAY_OFF);
 
 
