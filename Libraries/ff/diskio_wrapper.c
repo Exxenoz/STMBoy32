@@ -66,7 +66,7 @@ BYTE disk_initialize_wrapper (
     __HAL_RCC_GPIOD_CLK_ENABLE();
 
     gpio_init_structure.Mode      = GPIO_MODE_AF_PP;
-    gpio_init_structure.Pull      = GPIO_NOPULL;
+    gpio_init_structure.Pull      = GPIO_PULLUP;
     gpio_init_structure.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
 
     /* D0(PC8), D1(PC9), D2(PC10), D3(PC11), CK(PC12), CMD(PD2) */
@@ -107,7 +107,7 @@ BYTE disk_read_wrapper (
     if (HAL_SD_ReadBlocks(&SD_HandleObject, buff, (uint32_t)sector, count, SD_TIMEOUT) == HAL_OK)
     {
         /* wait until the read operation is finished */
-        while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_TRANSFER)
+        while (HAL_SD_GetCardState(&SD_HandleObject) != HAL_SD_CARD_TRANSFER)
         {
         }
 
@@ -127,7 +127,7 @@ BYTE disk_write_wrapper (
     if (HAL_SD_WriteBlocks(&SD_HandleObject, (uint8_t*)buff, (uint32_t)sector, count, SD_TIMEOUT) == HAL_OK)
     {
         /* wait until the write operation is finished */
-        while (HAL_SD_GetCardState(&SD_HandleObject) == HAL_SD_CARD_TRANSFER)
+        while (HAL_SD_GetCardState(&SD_HandleObject) != HAL_SD_CARD_TRANSFER)
         {
         }
 
