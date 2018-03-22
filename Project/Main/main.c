@@ -176,6 +176,8 @@ static void SystemClock_Config(void)
     RCC_OscInitTypeDef RCC_OscInitStruct;
     HAL_StatusTypeDef ret = HAL_OK;
 
+    __HAL_RCC_HSI_ENABLE();
+
     /*!< Supply configuration update enable */
     MODIFY_REG(PWR->CR3, PWR_CR3_SCUEN, 0);
 
@@ -187,12 +189,12 @@ static void SystemClock_Config(void)
     while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
     /* Enable HSE Oscillator and activate PLL with HSE as source */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-    RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
-    RCC_OscInitStruct.HSIState = RCC_HSI_OFF;
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+    RCC_OscInitStruct.HSEState = RCC_HSE_OFF;
+    RCC_OscInitStruct.HSIState = RCC_HSI_DIV8;
     RCC_OscInitStruct.CSIState = RCC_CSI_OFF;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
 
     RCC_OscInitStruct.PLL.PLLM = 4;
     RCC_OscInitStruct.PLL.PLLN = 400;
