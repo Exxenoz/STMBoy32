@@ -1,6 +1,58 @@
 #ifndef SDC_CONFIG_H
 #define SDC_CONFIG_H
 
+#define SDC_SPI_MODULE_ENABLED
+
+/*############################### SPI #######################################*/
+#ifdef SDC_SPI_MODULE_ENABLED
+
+#define SDC_SPIx                                     SPI2
+#define SDC_SPIx_CLK_ENABLE()                        __HAL_RCC_SPI2_CLK_ENABLE()
+
+#define SDC_SPIx_SCK_AF                              GPIO_AF5_SPI2
+#define SDC_SPIx_SCK_GPIO_PORT                       GPIOB
+#define SDC_SPIx_SCK_PIN                             GPIO_PIN_10
+#define SDC_SPIx_SCK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SDC_SPIx_SCK_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define SDC_SPIx_MISO_MOSI_AF                        GPIO_AF5_SPI2
+#define SDC_SPIx_MISO_MOSI_GPIO_PORT                 GPIOB
+#define SDC_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SDC_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
+#define SDC_SPIx_MISO_PIN                            GPIO_PIN_14
+#define SDC_SPIx_MOSI_PIN                            GPIO_PIN_15
+/* Maximum Timeout values for flags waiting loops. These timeouts are not based
+   on accurate values, they just guarantee that the application will not remain
+   stuck if the SPI communication is corrupted.
+   You may modify these timeout values depending on CPU frequency and application
+   conditions (interrupts routines ...). */
+#define SDC_SPIx_TIMEOUT_MAX                   1000
+
+#define SDC_SPIx_CS_GPIO_PORT                        GPIOB
+#define SDC_SPIx_CS_PIN                              GPIO_PIN_9
+#define SDC_SPIx_CS_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SDC_SPIx_CS_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define SPIx__CS_LOW()       HAL_GPIO_WritePin(SDC_SPIx_CS_GPIO_PORT, SDC_SPIx_CS_PIN, GPIO_PIN_RESET)
+#define SPIx__CS_HIGH()      HAL_GPIO_WritePin(SDC_SPIx_CS_GPIO_PORT, SDC_SPIx_CS_PIN, GPIO_PIN_SET)
+
+/**
+  * @brief  SD Control Lines management
+  */
+#define SD_CS_LOW()       HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_RESET)
+#define SD_CS_HIGH()      HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_SET)
+
+/**
+  * @brief  SD Control Interface pins (shield D4)
+  */
+#define SD_CS_PIN                                 GPIO_PIN_9
+#define SD_CS_GPIO_PORT                           GPIOB
+#define SD_CS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SD_CS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOB_CLK_DISABLE()
+
+/*############################### SDIO #######################################*/
+#else
+
 #define SDC_SDIO_NVIC_CHANNEL SDIO_IRQn
 #define SDC_DMA_NVIC_CHANNEL  SD_SDIO_DMA_IRQn
 
@@ -27,5 +79,7 @@
 #define SDC_CMD_PORT          GPIOD
 #define SDC_CMD_PIN           GPIO_PIN_2
 #define SDC_CMD_PIN_SOURCE    GPIO_PinSource2
+
+#endif
 
 #endif //SDC_CONFIG_H

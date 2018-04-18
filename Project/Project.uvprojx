@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER, STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\;..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\Libraries\ff;..\Libraries\STM32H7xx_HAL_Driver\Inc;..\Libraries\STM32H7xx_HAL_Driver\Inc\Legacy;..\Libraries\STM32H743I_EVAL;.\Common;.\Core;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts;.\OS</IncludePath>
+              <IncludePath>..\;..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\Libraries\FatFs\src;..\Libraries\STM32H7xx_HAL_Driver\Inc;..\Libraries\STM32H7xx_HAL_Driver\Inc\Legacy;..\Libraries\STM32H743I_EVAL;.\Common;.\Core;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts;.\OS</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -555,6 +555,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -634,6 +644,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -838,52 +863,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1441,6 +1441,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1520,6 +1530,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1724,52 +1749,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2326,6 +2326,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2405,6 +2415,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2609,52 +2634,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3209,6 +3209,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3288,6 +3298,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3492,52 +3517,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4092,6 +4092,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4171,6 +4181,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4375,52 +4400,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4975,6 +4975,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5054,6 +5064,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5258,52 +5283,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5860,6 +5860,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5939,6 +5949,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6143,52 +6168,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6743,6 +6743,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6822,6 +6832,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7026,52 +7051,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7628,6 +7628,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7707,6 +7717,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7911,52 +7936,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8514,6 +8514,16 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_ll_delayblock.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8593,6 +8603,21 @@
               <FileName>sdc_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SDC\sdc_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32_adafruit_sd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDC\stm32_adafruit_sd.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDC\sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8797,52 +8822,27 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ff.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff.c</FilePath>
             </File>
             <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffsystem.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>ffunicode.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\ffunicode.c</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.c</FileName>
+              <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio_wrapper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\ff\diskio_wrapper.h</FilePath>
+              <FilePath>..\Libraries\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
