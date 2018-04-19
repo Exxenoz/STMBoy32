@@ -165,20 +165,27 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         uint32_t bytesRead = 0;
 
         // Read ROM Bank 0
-        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesRead) != FR_OK || bytesRead != 16384)
+        for (long i = 0; i < 16384; i += 512)
         {
-            f_close(&GBC_MMU_SDC_ROMFile);
-            return false;
+            f_lseek(&GBC_MMU_SDC_ROMFile, i);
+
+            if (f_read(&GBC_MMU_SDC_ROMFile, &GBC_MMU_Memory.CartridgeBank0[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
+            {
+                f_close(&GBC_MMU_SDC_ROMFile);
+                return false;
+            }
         }
 
-        // Move to ROM Bank 1
-        f_lseek(&GBC_MMU_SDC_ROMFile, 0x4000);
-
         // Read ROM Bank 1
-        if (f_read(&GBC_MMU_SDC_ROMFile, GBC_MMU_Memory.CartridgeBankX, 16384, &bytesRead) != FR_OK || bytesRead != 16384)
+        for (long i = 0, j = 16384; i < 16384; i += 512, j += 512)
         {
-            f_close(&GBC_MMU_SDC_ROMFile);
-            return false;
+            f_lseek(&GBC_MMU_SDC_ROMFile, j);
+
+            if (f_read(&GBC_MMU_SDC_ROMFile, &GBC_MMU_Memory.CartridgeBankX[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
+            {
+                f_close(&GBC_MMU_SDC_ROMFile);
+                return false;
+            }
         }
 
         // Check ROM Header
