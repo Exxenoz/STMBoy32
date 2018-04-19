@@ -548,11 +548,11 @@ int main(void)
 
     // Initialize drivers
     LED_Initialize();
+    SDC_Initialize();
     Audio_Initialize();
     Input_Initialize();
     LCD_Initialize();
-    CMOD_Initialize();
-    SDC_Initialize();
+    //CMOD_Initialize();
     
     // Load initial options
     OS_LoadOptions();
