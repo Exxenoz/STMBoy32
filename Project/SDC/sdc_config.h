@@ -13,12 +13,12 @@
 #define SDC_SPIx_SCK_GPIO_PORT                       GPIOB
 #define SDC_SPIx_SCK_PIN                             GPIO_PIN_10
 #define SDC_SPIx_SCK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SDC_SPIx_SCK_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
+#define SDC_SPIx_SCK_GPIO_CLK_DISABLE()              //__HAL_RCC_GPIOB_CLK_DISABLE()
 
 #define SDC_SPIx_MISO_MOSI_AF                        GPIO_AF5_SPI2
 #define SDC_SPIx_MISO_MOSI_GPIO_PORT                 GPIOB
 #define SDC_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SDC_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
+#define SDC_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        //__HAL_RCC_GPIOB_CLK_DISABLE()
 #define SDC_SPIx_MISO_PIN                            GPIO_PIN_14
 #define SDC_SPIx_MOSI_PIN                            GPIO_PIN_15
 /* Maximum Timeout values for flags waiting loops. These timeouts are not based
@@ -31,7 +31,7 @@
 #define SDC_SPIx_CS_GPIO_PORT                        GPIOB
 #define SDC_SPIx_CS_PIN                              GPIO_PIN_9
 #define SDC_SPIx_CS_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SDC_SPIx_CS_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE()
+#define SDC_SPIx_CS_GPIO_CLK_DISABLE()               //__HAL_RCC_GPIOB_CLK_DISABLE()
 
 #define SPIx__CS_LOW()       HAL_GPIO_WritePin(SDC_SPIx_CS_GPIO_PORT, SDC_SPIx_CS_PIN, GPIO_PIN_RESET)
 #define SPIx__CS_HIGH()      HAL_GPIO_WritePin(SDC_SPIx_CS_GPIO_PORT, SDC_SPIx_CS_PIN, GPIO_PIN_SET)
@@ -48,7 +48,7 @@
 #define SD_CS_PIN                                 GPIO_PIN_9
 #define SD_CS_GPIO_PORT                           GPIOB
 #define SD_CS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SD_CS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOB_CLK_DISABLE()
+#define SD_CS_GPIO_CLK_DISABLE()                //__HAL_RCC_GPIOB_CLK_DISABLE()
 
 /*############################### SDIO #######################################*/
 #else
