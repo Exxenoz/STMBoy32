@@ -1,10 +1,13 @@
 #include "sdc.h"
 #include "led.h"
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
 
 #define SD_DUMMY_BYTE            0xFF
 #define SD_NO_RESPONSE_EXPECTED  0x80
 
 FATFS SDC_FatFS;                    // Global FatFS object
+char SDPath[4];                     /* SD card logical drive path */
 bool  SDC_Mounted = false;          // Global mounted state
 
 #ifdef SDC_SPI_MODULE_ENABLED
@@ -20,6 +23,7 @@ static void       SPIx_Error(void);
 
 void SDC_Initialize(void)
 {
+    BSP_SD_Init();
 }
 
 bool SDC_Mount(void)
@@ -34,7 +38,12 @@ bool SDC_Mount(void)
         SDC_Unmount();
     }
 
-    if (f_mount(&SDC_FatFS, "", 1) != FR_OK)
+    if(FATFS_LinkDriver(&SD_Driver, SDPath) != 0)
+    {
+        return false;
+    }
+
+    if (f_mount(&SDC_FatFS, (TCHAR const*)SDPath, 1) != FR_OK)
     {
         return false;
     }
@@ -49,7 +58,8 @@ bool SDC_IsMounted(void)
 
 void SDC_Unmount(void)
 {
-    f_mount(NULL, "", 1);
+    f_mount(NULL, (TCHAR const*)SDPath, 1);
+    FATFS_UnLinkDriver(SDPath);
     SDC_Mounted = false;
 }
 
