@@ -23,7 +23,7 @@ static void       SPIx_Error(void);
 
 void SDC_Initialize(void)
 {
-    BSP_SD_Init();
+    //BSP_SD_Init();
 }
 
 bool SDC_Mount(void)
