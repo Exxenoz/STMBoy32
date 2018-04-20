@@ -17,7 +17,7 @@ void Audio_InitializeGPIO(void)
 
 void Audio_InitializeTimer(void)
 {
-    __HAL_RCC_TIM8_CLK_ENABLE();
+    __HAL_RCC_TIM6_CLK_ENABLE();
 
     Audio_TimerHandle.Instance = AUDIO_TIM;
     Audio_TimerHandle.State    = HAL_TIM_STATE_RESET;

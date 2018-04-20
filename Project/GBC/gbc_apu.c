@@ -1104,8 +1104,8 @@ void GBC_APU_Step(void)
             r = 127;
         }
 
-        l <<= 5;
-        r <<= 5;
+        l <<= 2;
+        r <<= 2;
 
         GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l;
         GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r;
