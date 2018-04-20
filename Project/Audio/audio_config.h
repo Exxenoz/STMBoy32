@@ -15,7 +15,8 @@
 
 #define AUDIO_DMA          DMA1
 #define AUDIO_DMA_BUS      RCC_AHB1Periph_DMA1
-#define AUDIO_DMA_STREAM   DMA1_Stream7
-#define AUDIO_DMA_CHANNEL  DMA_CHANNEL_5
+#define AUDIO_DMA_STREAM   DMA1_Stream5
+#define AUDIO_DMA_IRQn     DMA1_Stream5_IRQn
+#define AUDIO_DMA_IRQHandler DMA1_Stream5_IRQHandler
 
 #endif
