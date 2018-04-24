@@ -75,7 +75,7 @@ void LCD_InitializeInterrupt(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     
-    GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING_FALLING;
     GPIO_InitStructure.Pull = GPIO_NOPULL;
     GPIO_InitStructure.Pin  = INPUT_FRAME_PIN;
     HAL_GPIO_Init(INPUT_FRAME_PORT, &GPIO_InitStructure);
