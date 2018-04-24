@@ -105,15 +105,6 @@ void Input_Initialize()
 
         Input_DynamicLockTimes[i] = INPUT_MAX_DYNAMIC_LOCK_TIME;
     }
-
-    //-----------DEBUG LED----------
-    GPIO_InitTypeDef GPIO_InitObject;
-    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitObject.Pin   = GPIO_PIN_14;
-    GPIO_InitObject.Pull  = GPIO_NOPULL;
-    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitObject);
-    //------------------------------
 }
 
 void Input_UpdateGBCJoypad(void)
