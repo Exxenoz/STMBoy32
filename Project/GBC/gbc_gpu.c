@@ -50,6 +50,10 @@ void GBC_GPU_Initialize(void)
 #ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
     GBC_GPU_SkipCurrentFrame = true;
 #endif
+
+    // Start in VBlank mode
+    GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
+    GBC_MMU_Memory.Scanline = 144;
 }
 
 void GBC_GPU_RenderScanline(void)
