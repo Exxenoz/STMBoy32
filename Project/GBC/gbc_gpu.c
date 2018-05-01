@@ -5,6 +5,7 @@
 #include "string.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
+uint32_t GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK; // Needed, because some games overwrite mode
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 uint16_t GBC_GPU_CurrentFrameBufferStartIndex = 0;
 uint16_t GBC_GPU_CurrentFrameBufferEndIndex = 160;
@@ -52,6 +53,7 @@ void GBC_GPU_Initialize(void)
 #endif
 
     // Start in VBlank mode
+    GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
     GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
     GBC_MMU_Memory.Scanline = 144;
 }
@@ -498,7 +500,7 @@ bool GBC_GPU_Step(void)
 {
     GBC_GPU_ModeTicks += GBC_CPU_StepTicks;
 
-    switch (GBC_MMU_Memory.GPUMode)
+    switch (GBC_GPU_Mode)
     {
         case GBC_GPU_MODE_0_DURING_HBLANK:           // During HBlank period: CPU can access VRAM and OAM
         {
@@ -528,7 +530,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
-                    GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_1_DURING_VBLANK;
+                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
 
 #ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
                     if (GBC_GPU_SkipCurrentFrame)
@@ -558,7 +560,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
-                    GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_2_DURING_OAM_READING;
+                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
                 }
             }
             break;
@@ -589,7 +591,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.VBlankInterruptRequest = 0;
 
-                    GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_2_DURING_OAM_READING;
+                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
                 }
                 else
                 {
@@ -607,7 +609,7 @@ bool GBC_GPU_Step(void)
 
                 GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 0;
 
-                GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_3_DURING_DATA_TRANSFER;
+                GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_3_DURING_DATA_TRANSFER;
             }
             break;
         }
@@ -636,7 +638,7 @@ bool GBC_GPU_Step(void)
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 1;
                 }
 
-                GBC_MMU_Memory.GPUStatus = GBC_GPU_MODE_0_DURING_HBLANK;
+                GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
             }
             break;
         }
