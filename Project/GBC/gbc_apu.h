@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-#define GBC_APU_BUFFER_SIZE 536 // Should be at least 70224 / GBC_APU_SAMPLE_RATE
-#define GBC_APU_SAMPLE_RATE 131 // In CPU ticks
+#define GBC_APU_SAMPLE_RATE 132     // In CPU ticks
+#define GBC_APU_BUFFER_SIZE 532 * 2 // Samples per frame doubled due to double buffering. Must be (70224 / GBC_APU_SAMPLE_RATE) * 2
 
 #define GBC_APU_DAC_OFF_AMPLITUDE 0
 

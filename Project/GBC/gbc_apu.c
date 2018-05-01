@@ -13,7 +13,7 @@ uint32_t GBC_APU_Ticks = 0;
 uint16_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
 uint16_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
-uint32_t GBC_APU_BufferPosition = 0;
+uint32_t GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2; // Start filling second buffer, so we are always ahead for filling.
 
 uint32_t GBC_APU_Channel1Phase = 0;
 int32_t  GBC_APU_Channel1PhaseTicks = 0;
@@ -718,11 +718,11 @@ void GBC_APU_Initialize(void)
     memset(&GBC_APU_Buffer_L, 0, sizeof(GBC_APU_Buffer_L));
     memset(&GBC_APU_Buffer_R, 0, sizeof(GBC_APU_Buffer_R));
 
-    GBC_APU_BufferPosition = 0;
+    GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2;
 
     GBC_APU_InitializeChannels();
 
-    Audio_SetAudioBuffer(GBC_APU_Buffer_L, GBC_APU_BUFFER_SIZE);
+    Audio_SetAudioBuffer(GBC_APU_Buffer_L, GBC_APU_Buffer_R, GBC_APU_BUFFER_SIZE);
 }
 
 void GBC_APU_Step(void)
@@ -818,6 +818,7 @@ void GBC_APU_Step(void)
 
         if (GBC_MMU_Memory.ChannelSound3Enabled)
         {
+            // Wave pattern RAM holds 32 4-bit samples that are played back upper 4 bits first.
             GBC_APU_Channel3LastSample = (GBC_MMU_Memory.Channel3WavePatternRAM[GBC_APU_Channel3Phase >> 1] << ((GBC_APU_Channel3Phase << 2) & 4)) & 0xF0;
             GBC_APU_Channel3LastSample = (GBC_APU_Channel3LastSample * WaveVolumeMultipliers[GBC_MMU_Memory.Channel3SelectOutputLevel]) >> 6;
         }
@@ -1094,18 +1095,21 @@ void GBC_APU_Step(void)
         //l *= GBC_MMU_Memory.ChannelControlOutputVinToSO1;
 		//r *= GBC_MMU_Memory.ChannelControlOutputVinToSO2;
 
-        if (l > 127)
+        if (l > 63)
         {
-            l = 127;
+            l = 63;
         }
 
-		if (r > 127)
+		if (r > 63)
         {
-            r = 127;
+            r = 63;
         }
 
-        l <<= 2;
-        r <<= 2;
+        l <<= 3;
+        r <<= 3;
+
+        l += 3584;
+        r += 3584;
 
         GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l;
         GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r;

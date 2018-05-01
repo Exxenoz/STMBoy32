@@ -479,7 +479,9 @@ bool HandleSDCIngame(void)
 
         GBC_Update();
 
-        while (!LCD_READY_FLAG);
+        while (Audio_IsPlayingOfBufferFinished == false);
+        Audio_IsPlayingOfBufferFinished = false;
+
         LCD_DrawGBCFrameBufferScaled();
     }
 }
@@ -510,7 +512,9 @@ bool HandleCartridgeIngame(void)
 
         GBC_Update();
 
-        while (!LCD_READY_FLAG);
+        while (Audio_IsPlayingOfBufferFinished == false);
+        Audio_IsPlayingOfBufferFinished = false;
+
         LCD_DrawGBCFrameBufferScaled();
     }
 }
