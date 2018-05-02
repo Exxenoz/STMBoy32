@@ -5,6 +5,8 @@
 TIM_HandleTypeDef  LCD_TimerHandle = { .Instance = LCD_TIM };
 TIM_OC_InitTypeDef TIM_OCInitObject;
 
+DMA_HandleTypeDef LCD_DMAHandle;
+
 bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
@@ -82,6 +84,30 @@ void LCD_InitializeInterrupt(void)
     
     HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
+void LCD_InitializeDMA(void)
+{
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    LCD_DMAHandle.Instance                 = DMA1_Stream4;
+    LCD_DMAHandle.State                    = HAL_DMA_STATE_RESET;
+    LCD_DMAHandle.Init.Request             = DMA_REQUEST_MEM2MEM;
+    LCD_DMAHandle.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    LCD_DMAHandle.Init.PeriphInc           = DMA_PINC_DISABLE;
+    LCD_DMAHandle.Init.MemInc              = DMA_MINC_ENABLE;
+    LCD_DMAHandle.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    LCD_DMAHandle.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+    LCD_DMAHandle.Init.Mode                = DMA_NORMAL;
+    LCD_DMAHandle.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    LCD_DMAHandle.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL;
+    LCD_DMAHandle.Init.MemBurst            = DMA_MBURST_SINGLE;
+    LCD_DMAHandle.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+    LCD_DMAHandle.Init.Priority            = DMA_PRIORITY_HIGH;
+    HAL_DMA_Init(&LCD_DMAHandle);
+
+    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
 }
 
 void LCD_DimBacklight(long percent)
@@ -233,6 +259,7 @@ void LCD_Initialize(void)
     LCD_InitializePins();
     LCD_InitializePWM();
     LCD_InitializeInterrupt();
+    LCD_InitializeDMA();
     
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
@@ -475,7 +502,7 @@ void LCD_DrawGBCFrameBuffer(void)
 {
     // ToDo: Move to menu so it's only called on change
     // Set Draw Area to the middle 160x144px for non scaled display
-    // LCD_SetDrawArea(80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
+    LCD_SetDrawArea(80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
 
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
@@ -534,4 +561,9 @@ void EXTI0_IRQHandler(void)
 
     __HAL_GPIO_EXTI_CLEAR_IT(INPUT_FRAME_PIN);        
     }
+}
+
+void DMA1_Stream4_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&LCD_DMAHandle);
 }

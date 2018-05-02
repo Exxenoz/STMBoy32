@@ -110,5 +110,6 @@ void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t
 void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
 
 void EXTI0_IRQHandler(void);
+void DMA1_Stream4_IRQHandler(void);
 
 #endif //LCD_H
