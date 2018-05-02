@@ -11,6 +11,8 @@
 #include <stdio.h>
 #endif
 
+#define GBC_CPU_USE_FUNCTION_PTR
+
 GBC_CPU_Register_t GBC_CPU_Register;                  // Register
 
 uint32_t GBC_CPU_PendingInterrupts = 0;               // Current pending interrupts
@@ -2420,6 +2422,50 @@ void GBC_CPU_Step()
         // Increment program counter
         GBC_CPU_Register.PC++;
 
+#ifdef GBC_CPU_USE_FUNCTION_PTR
+        // Get instruction information from instruction array
+        GBC_CPU_Instruction_t instruction = GBC_CPU_Instructions[GBC_CPU_InstructionOpcode];
+
+        switch (instruction.OperandBytes)
+        {
+            case GBC_CPU_OPERAND_BYTES_0:
+            {
+                ((void (*)(void))instruction.Handler)();
+
+                break;
+            }
+            case GBC_CPU_OPERAND_BYTES_1:
+            {
+
+                uint8_t operand = GBC_MMU_ReadByte(GBC_CPU_Register.PC);
+
+#ifdef DEBUG_PRINT_INSTRUCTION_CALLS
+                if (GBC_CPU_InstructionOpcode == 0xCB)
+                {
+                    GBC_CPU_InstructionCalls.instr_calls[256 + operand]++;
+                }
+#endif
+
+                GBC_CPU_Register.PC++;
+
+                ((void (*)(uint8_t))instruction.Handler)(operand);
+
+                break;
+            }
+            case GBC_CPU_OPERAND_BYTES_2:
+            {
+                uint16_t operand = GBC_MMU_ReadShort(GBC_CPU_Register.PC);
+
+                GBC_CPU_Register.PC += 2;
+
+                ((void (*)(uint16_t))instruction.Handler)(operand);
+
+                break;
+            }
+        }
+
+        GBC_CPU_InstructionTicks += instruction.Ticks;
+#else
         // Instruction handling
         switch (GBC_CPU_InstructionOpcode)
         {
@@ -2431,7 +2477,7 @@ void GBC_CPU_Step()
 
                 break;
             }
-            /*case 0x01: // Load 16-bit immediate into BC
+            case 0x01: // Load 16-bit immediate into BC
             {
                 GBC_CPU_InstructionTicks += 12;
 
@@ -4899,7 +4945,7 @@ void GBC_CPU_Step()
                 GBC_CPU_Register.PC = 0x38;
 
                 break;
-            }*/
+            }
             default:
             {
                 // Get instruction information from instruction array
@@ -4948,6 +4994,7 @@ void GBC_CPU_Step()
                 break;
             }
         }
+#endif
 
         GBC_CPU_StepTicks += GBC_CPU_InstructionTicks;
 
