@@ -739,95 +739,6 @@ void GBC_APU_Step(void)
     long l = 0; // Left speaker
     long r = 0; // Right speaker
 
-    GBC_APU_Channel1PhaseTicks += GBC_CPU_StepTicks;
-
-    if (GBC_APU_Channel1PhaseTicks > 0)
-    {
-        do
-        {
-            GBC_APU_Channel1PhaseTicks -= GBC_APU_Channel1PhasePeriod;
-
-            ++GBC_APU_Channel1Phase;
-            GBC_APU_Channel1Phase &= 7;
-        }
-        while (GBC_APU_Channel1PhaseTicks > 0);
-
-        if (IS_CHANNEL1_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound1Enabled)
-        {
-            uint32_t p = (GBC_APU_Channel1Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel1WavePatternDuty]) & 7;
-
-            if (p < SquareDuties[GBC_MMU_Memory.Channel1WavePatternDuty])
-            {
-                GBC_APU_Channel1LastSample = GBC_APU_Channel1EnvelopeVolume;
-            }
-            else
-            {
-                GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-            }
-        }
-        else
-        {
-            GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-        }
-    }
-
-    GBC_APU_Channel2PhaseTicks += GBC_CPU_StepTicks;
-
-    if (GBC_APU_Channel2PhaseTicks > 0)
-    {
-        do
-        {
-            GBC_APU_Channel2PhaseTicks -= GBC_APU_Channel2PhasePeriod;
-
-            ++GBC_APU_Channel2Phase;
-            GBC_APU_Channel2Phase &= 7;
-        }
-        while (GBC_APU_Channel2PhaseTicks > 0);
-
-        if (IS_CHANNEL2_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound2Enabled)
-        {
-            uint32_t p = (GBC_APU_Channel2Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel2WavePatternDuty]) & 7;
-
-            if (p < SquareDuties[GBC_MMU_Memory.Channel2WavePatternDuty])
-            {
-                GBC_APU_Channel2LastSample = GBC_APU_Channel2EnvelopeVolume;
-            }
-            else
-            {
-                GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-            }
-        }
-        else
-        {
-            GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-        }
-    }
-
-    GBC_APU_Channel3PhaseTicks += GBC_CPU_StepTicks;
-
-    if (GBC_APU_Channel3PhaseTicks > 0)
-    {
-        do
-        {
-            GBC_APU_Channel3PhaseTicks -= GBC_APU_Channel3PhasePeriod;
-
-            ++GBC_APU_Channel3Phase;
-            GBC_APU_Channel3Phase &= 0x1F;
-        }
-        while (GBC_APU_Channel3PhaseTicks > 0);
-
-        if (GBC_MMU_Memory.ChannelSound3Enabled)
-        {
-            // Wave pattern RAM holds 32 4-bit samples that are played back upper 4 bits first.
-            GBC_APU_Channel3LastSample = (GBC_MMU_Memory.Channel3WavePatternRAM[GBC_APU_Channel3Phase >> 1] << ((GBC_APU_Channel3Phase << 2) & 4)) & 0xF0;
-            GBC_APU_Channel3LastSample = (GBC_APU_Channel3LastSample * WaveVolumeMultipliers[GBC_MMU_Memory.Channel3SelectOutputLevel]) >> 6;
-        }
-        else
-        {
-            GBC_APU_Channel3LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
-        }
-    }
-
     GBC_APU_FrameTicks += GBC_CPU_StepTicks;
 
     if (GBC_APU_FrameTicks >= GBC_APU_FramePeriod)
@@ -1023,9 +934,117 @@ void GBC_APU_Step(void)
 
     GBC_APU_Ticks += GBC_CPU_StepTicks;
 
-    // Calculate samples
-    for (; GBC_APU_Ticks >= GBC_APU_SAMPLE_RATE; GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE)
+    GBC_APU_Channel1PhaseTicks += GBC_CPU_StepTicks;
+    GBC_APU_Channel2PhaseTicks += GBC_CPU_StepTicks;
+    GBC_APU_Channel3PhaseTicks += GBC_CPU_StepTicks;
+
+    // Calculate sample
+    if (GBC_APU_Ticks >= GBC_APU_SAMPLE_RATE)
     {
+        /***************************************/
+        /************** CHANNEL 1 **************/
+        /***************************************/
+
+        if (GBC_APU_Channel1PhaseTicks > 0)
+        {
+            do
+            {
+                GBC_APU_Channel1PhaseTicks -= GBC_APU_Channel1PhasePeriod;
+
+                ++GBC_APU_Channel1Phase;
+                GBC_APU_Channel1Phase &= 7;
+            }
+            while (GBC_APU_Channel1PhaseTicks > 0);
+
+            if (IS_CHANNEL1_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound1Enabled)
+            {
+                uint32_t p = (GBC_APU_Channel1Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel1WavePatternDuty]) & 7;
+
+                if (p < SquareDuties[GBC_MMU_Memory.Channel1WavePatternDuty])
+                {
+                    GBC_APU_Channel1LastSample = GBC_APU_Channel1EnvelopeVolume;
+                }
+                else
+                {
+                    GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+                }
+            }
+            else
+            {
+                GBC_APU_Channel1LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+            }
+        }
+        /***************************************/
+        /************** CHANNEL 2 **************/
+        /***************************************/
+
+        if (GBC_APU_Channel2PhaseTicks > 0)
+        {
+            do
+            {
+                GBC_APU_Channel2PhaseTicks -= GBC_APU_Channel2PhasePeriod;
+
+                ++GBC_APU_Channel2Phase;
+                GBC_APU_Channel2Phase &= 7;
+            }
+            while (GBC_APU_Channel2PhaseTicks > 0);
+
+            if (IS_CHANNEL2_DAC_ENABLED() && GBC_MMU_Memory.ChannelSound2Enabled)
+            {
+                uint32_t p = (GBC_APU_Channel2Phase + SquareDutyOffsets[GBC_MMU_Memory.Channel2WavePatternDuty]) & 7;
+
+                if (p < SquareDuties[GBC_MMU_Memory.Channel2WavePatternDuty])
+                {
+                    GBC_APU_Channel2LastSample = GBC_APU_Channel2EnvelopeVolume;
+                }
+                else
+                {
+                    GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+                }
+            }
+            else
+            {
+                GBC_APU_Channel2LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+            }
+        }
+
+        /***************************************/
+        /************** CHANNEL 3 **************/
+        /***************************************/
+
+        if (GBC_APU_Channel3PhaseTicks > 0)
+        {
+            do
+            {
+                GBC_APU_Channel3PhaseTicks -= GBC_APU_Channel3PhasePeriod;
+
+                ++GBC_APU_Channel3Phase;
+                GBC_APU_Channel3Phase &= 0x1F;
+            }
+            while (GBC_APU_Channel3PhaseTicks > 0);
+
+            if (GBC_MMU_Memory.ChannelSound3Enabled)
+            {
+                // Wave pattern RAM holds 32 4-bit samples that are played back upper 4 bits first.
+                GBC_APU_Channel3LastSample = (GBC_MMU_Memory.Channel3WavePatternRAM[GBC_APU_Channel3Phase >> 1] << ((GBC_APU_Channel3Phase << 2) & 4)) & 0xF0;
+                GBC_APU_Channel3LastSample = (GBC_APU_Channel3LastSample * WaveVolumeMultipliers[GBC_MMU_Memory.Channel3SelectOutputLevel]) >> 6;
+            }
+            else
+            {
+                GBC_APU_Channel3LastSample = GBC_APU_DAC_OFF_AMPLITUDE;
+            }
+        }
+
+        /***************************************/
+        /************** CHANNEL 4 **************/
+        /***************************************/
+
+        // ToDo: Implement channel 4
+
+        /***************************************/
+        /*************** MIXING ****************/
+        /***************************************/
+
         if (GBC_MMU_Memory.SoundOutputChannel1ToSO1)
         {
             r += GBC_APU_Channel1LastSample;
@@ -1119,6 +1138,8 @@ void GBC_APU_Step(void)
         {
             GBC_APU_BufferPosition = 0;
         }
+
+        GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE;
     }
 }
 
