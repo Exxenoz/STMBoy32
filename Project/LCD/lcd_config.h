@@ -9,10 +9,18 @@
 #define LCD_BUS(NAME)            RCC_AHB1Periph_##NAME
 
 // If necessary, Timer Channel can be changed inside the Initialize-Function
-#define LCD_TIM                  TIM1
-#define LCD_TIM_BUS              RCC_APB2Periph_TIM1
-#define LCD_TIM_CHANNEL          TIM_CHANNEL_4
-#define ENABLE_LCD_TIM()         __TIM1_CLK_ENABLE()
+#define LCD_DMA_TIM              TIM1
+#define LCD_DMA_TIM_BUS          RCC_APB2Periph_TIM1
+#define LCD_DMA_M_TIM_CHANNEL    TIM_CHANNEL_1
+#define LCD_DMA_S1_TIM_CHANNEL   TIM_CHANNEL_2
+#define LCD_DMA_S2_TIM_CHANNEL   TIM_CHANNEL_3
+#define ENABLE_LCD_DMA()         __HAL_RCC_DMA1_CLK_ENABLE();
+#define ENABLE_LCD_DMA_TIM()     __TIM1_CLK_ENABLE()
+
+#define LCD_PWM_TIM              TIM2
+#define LCD_PWM_TIM_BUS          RCC_APB2Periph_TIM2
+#define LCD_PWM_TIM_CHANNEL      TIM_CHANNEL_1
+#define ENABLE_LCD_PWM_TIM()     __TIM2_CLK_ENABLE()
 
 #define LCD_RESET_PORT           GPIOD
 #define LCD_RESET_PIN            GPIO_PIN_6
