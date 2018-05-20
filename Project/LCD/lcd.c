@@ -2,19 +2,17 @@
 #include "lcd_regdef.h"
 #include "gbc_gpu.h"
 
-TIM_HandleTypeDef  LCD_PWM_TimerHandle    = { .Instance = LCD_PWM_TIM };
-TIM_HandleTypeDef  LCD_DMA_M_TimerHandle  = { .Instance = LCD_DMA_TIM, .Channel = };
-TIM_HandleTypeDef  LCD_DMA_S1_TimerHandle = { .Instance = LCD_DMA_TIM, .Channel = };
-TIM_HandleTypeDef  LCD_DMA_S2_TimerHandle = { .Instance = LCD_DMA_TIM, .Channel = };
+TIM_HandleTypeDef  LCD_TIM_Handle_Backlight;
+TIM_HandleTypeDef  LCD_TIM_Handle_WR;
+TIM_HandleTypeDef  LCD_TIM_Handle_DataTransfer;
 
-TIM_OC_InitTypeDef TIM_PWM_OCInitObject;
-TIM_OC_InitTypeDef TIM_DMA_OCInitObject;
+TIM_OC_InitTypeDef LCD_TIM_OC_Init_Backlight;
+TIM_OC_InitTypeDef LCD_TIM_OC_Init_DataTransfer;
 
-TIM_MasterConfigTypeDef LCD_TIM_MasterConfig;
-TIM_SlaveConfigTypeDef  LCD_TIM_SlaveConfig;
+TIM_MasterConfigTypeDef LCD_TIM_MasterConfig; // Master -> WR           Timer
+TIM_SlaveConfigTypeDef  LCD_TIM_SlaveConfig;  // Slave  -> DataTransfer Timer
 
-DMA_HandleTypeDef LCD_DMAHandle1;
-DMA_HandleTypeDef LCD_DMAHandle2;
+DMA_HandleTypeDef LCD_DMA_Handle_DataTransfer;
 
 void LineCompletedCallback(DMA_HandleTypeDef *handle);
 
@@ -37,15 +35,8 @@ void LCD_InitializePins(void)
     INITIALIZE_OUTPUT_PIN(LCD_RS_PORT,    LCD_RS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_CS_PORT,    LCD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(LCD_RD_PORT,    LCD_RD_PIN);
-    INITIALIZE_OUTPUT_PIN(LCD_WR_PORT,    LCD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(LCD_DATA_PORT,  GPIO_PIN_All);
-
-    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitObject.Pin       = LCD_BACKLIT_PIN;
-    GPIO_InitObject.Pull      = GPIO_NOPULL;
-    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitObject.Alternate = GPIO_AF1_TIM2;
-    HAL_GPIO_Init(LCD_BACKLIT_PORT, &GPIO_InitObject);
+    INITIALIZE_OUTPUT_PIN(LCD_PORT_WR,    LCD_PIN_WR);
+    INITIALIZE_OUTPUT_PIN(LCD_PORT_DATA,  GPIO_PIN_All);
 
     LCD_SET_RESET;
     LCD_SET_RS;
@@ -54,100 +45,155 @@ void LCD_InitializePins(void)
     LCD_SET_WR;
 }
 
-void LCD_InitializeTimer()
+void LCD_InitializeBacklight()
 {
-    ENABLE_LCD_DMA_TIM();
-    
-    #define INITIALIZE_DMA_TIMERHANDLE(HANDLE, PERIOD, PRESCALER) \
-    HANDLE.Init.Period             = PERIOD;                       \
-    HANDLE.Init.Prescaler          = PRESCALER;                     \
-    HANDLE.Init.CounterMode        = TIM_COUNTERMODE_UP;             \
-    HANDLE.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;          \
-    HANDLE.Init.RepetitionCounter  = 0;                                \
-    HANDLE.Init.AutoReloadPreload  = TIM_AUTORELOAD_PRELOAD_ENABLE;     \
-    HAL_TIM_Base_Init(&HANDLE);                                          \
+    __TIM1_CLK_ENABLE();
 
-    INITIALIZE_DMA_TIMERHANDLE(LCD_DMA_M_TimerHandle,  -1, -1);
-    INITIALIZE_DMA_TIMERHANDLE(LCD_DMA_S1_TimerHandle, -1, -1);
-    INITIALIZE_DMA_TIMERHANDLE(LCD_DMA_S2_TimerHandle, -1, -1);
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = LCD_PIN_BACKLIGHT;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = LCD_ALT_BACKLIGHT;
+    HAL_GPIO_Init(LCD_PORT_BACKLIGHT, &GPIO_InitObject);
 
+    LCD_TIM_Handle_Backlight.Instance               = LCD_TIM_BACKLIGHT;
+    LCD_TIM_Handle_Backlight.Init.Prescaler         = 37;
+    LCD_TIM_Handle_Backlight.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    LCD_TIM_Handle_Backlight.Init.Period            = 626;
+    LCD_TIM_Handle_Backlight.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    LCD_TIM_Handle_Backlight.Init.RepetitionCounter = 0;
+
+    LCD_TIM_OC_Init_Backlight.Pulse        = 281; 
+    LCD_TIM_OC_Init_Backlight.OCMode       = TIM_OCMODE_PWM1;
+    LCD_TIM_OC_Init_Backlight.OCFastMode   = TIM_OCFAST_DISABLE;
+    LCD_TIM_OC_Init_Backlight.OCPolarity   = TIM_OCPOLARITY_LOW;
+    LCD_TIM_OC_Init_Backlight.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    LCD_TIM_OC_Init_Backlight.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    LCD_TIM_OC_Init_Backlight.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+
+    HAL_TIM_PWM_Init(&LCD_TIM_Handle_Backlight);
+    HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_Backlight, &LCD_TIM_OC_Init_Backlight, LCD_TIM_BACKLIGHT_CHANNEL);
+    HAL_TIM_PWM_Start(&LCD_TIM_Handle_Backlight, LCD_TIM_BACKLIGHT_CHANNEL);
+}
+
+void LCD_InitializeDataTransfer(void)
+{
+    __TIM2_CLK_ENABLE();
+    __TIM5_CLK_ENABLE();
+
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    // Configure WR pin
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = LCD_PIN_WR;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = LCD_ALT_WR;
+    HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
+
+    // DEBUG: Configure data transfer timer signal output pin
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = GPIO_PIN_12;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitObject);
+
+    // Configure WR timer
+    LCD_TIM_Handle_WR.Instance                = LCD_TIM_WR;
+    LCD_TIM_Handle_WR.Init.Period             = 20; // 200 MHz / 20 = 10 MHz, fast enough to send 76800 pixels in about 7.68ms
+    LCD_TIM_Handle_WR.Init.Prescaler          = 0;
+    LCD_TIM_Handle_WR.Init.CounterMode        = TIM_COUNTERMODE_UP;
+    LCD_TIM_Handle_WR.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;
+    LCD_TIM_Handle_WR.Init.RepetitionCounter  = 0;
+    LCD_TIM_Handle_WR.Init.AutoReloadPreload  = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    HAL_TIM_PWM_Init(&LCD_TIM_Handle_WR);
+
+    // Configure WR pulse width modulation
+    static TIM_OC_InitTypeDef OC_Config_WR;
+    OC_Config_WR.Pulse        = 10;
+    OC_Config_WR.OCMode       = TIM_OCMODE_PWM1;
+    OC_Config_WR.OCFastMode   = TIM_OCFAST_DISABLE;
+    OC_Config_WR.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    OC_Config_WR.OCNPolarity  = TIM_OCNPOLARITY_LOW;
+    OC_Config_WR.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    OC_Config_WR.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_WR, &OC_Config_WR, LCD_TIM_CHANNEL_WR);
+
+    // Configure data transfer timer
+    LCD_TIM_Handle_DataTransfer.Instance                = LCD_TIM_DATA;
+    LCD_TIM_Handle_DataTransfer.Init.Period             = 40; // 200 MHz / 40 = 5 MHz
+    LCD_TIM_Handle_DataTransfer.Init.Prescaler          = 0;
+    LCD_TIM_Handle_DataTransfer.Init.CounterMode        = TIM_COUNTERMODE_UP;
+    LCD_TIM_Handle_DataTransfer.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;
+    LCD_TIM_Handle_DataTransfer.Init.RepetitionCounter  = 0;
+    LCD_TIM_Handle_DataTransfer.Init.AutoReloadPreload  = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    HAL_TIM_PWM_Init(&LCD_TIM_Handle_DataTransfer);
+
+    // Configure data transfer pulse width modulation
+    static TIM_OC_InitTypeDef OC_Config_DataTransfer;
+    OC_Config_DataTransfer.Pulse        = 30;
+    OC_Config_DataTransfer.OCMode       = TIM_OCMODE_PWM1;
+    OC_Config_DataTransfer.OCFastMode   = TIM_OCFAST_DISABLE;
+    OC_Config_DataTransfer.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    OC_Config_DataTransfer.OCNPolarity  = TIM_OCNPOLARITY_LOW;
+    OC_Config_DataTransfer.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    OC_Config_DataTransfer.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_DataTransfer, &OC_Config_DataTransfer, LCD_TIM_CHANNEL_DATA);
+
+    // Configure master timer (Data transfer)
     LCD_TIM_MasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
     LCD_TIM_MasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_ENABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&LCD_DMA_M_TimerHandle, &LCD_TIM_MasterConfig);
-    
-    LCD_TIM_SlaveConfig.SlaveMode        = TIM_SLAVEMODE_GATED;
-    LCD_TIM_SlaveConfig.InputTrigger     = TIM_TS_ITR0;
+    HAL_TIMEx_MasterConfigSynchronization(&LCD_TIM_Handle_DataTransfer, &LCD_TIM_MasterConfig);
+
+    // Configure slave timer (WR)
+    LCD_TIM_SlaveConfig.SlaveMode        = TIM_SLAVEMODE_RESET;
+    LCD_TIM_SlaveConfig.InputTrigger     = TIM_TS_ITR3;
     LCD_TIM_SlaveConfig.TriggerPolarity  = TIM_TRIGGERPOLARITY_NONINVERTED;
     LCD_TIM_SlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1;
     LCD_TIM_SlaveConfig.TriggerFilter    = 0;
-    HAL_TIM_SlaveConfigSynchronization(&LCD_DMA_S1_TimerHandle, &LCD_TIM_SlaveConfig);
-    HAL_TIM_SlaveConfigSynchronization(&LCD_DMA_S2_TimerHandle, &LCD_TIM_SlaveConfig);
-}
+    HAL_TIM_SlaveConfigSynchronization(&LCD_TIM_Handle_WR, &LCD_TIM_SlaveConfig);
 
-void LCD_InitializePWM()
-{
-    ENABLE_LCD_PWM_TIM();
+    // Start timers
+    HAL_TIM_PWM_Start(&LCD_TIM_Handle_DataTransfer, LCD_TIM_CHANNEL_DATA);
+    HAL_TIM_PWM_Start(&LCD_TIM_Handle_WR, LCD_TIM_CHANNEL_WR);
 
-    LCD_PWM_TimerHandle.Init.Prescaler         = 37;
-    LCD_PWM_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    LCD_PWM_TimerHandle.Init.Period            = 626;
-    LCD_PWM_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-    LCD_PWM_TimerHandle.Init.RepetitionCounter = 0;
+    // Configure DMA for data tranfer
+    LCD_DMA_Handle_DataTransfer.Instance                 = DMA1_Stream1;
+    LCD_DMA_Handle_DataTransfer.Init.Mode                = DMA_NORMAL;
+    LCD_DMA_Handle_DataTransfer.Init.MemInc              = DMA_MINC_ENABLE;
+    LCD_DMA_Handle_DataTransfer.Init.PeriphInc           = DMA_PINC_DISABLE;
+    LCD_DMA_Handle_DataTransfer.Init.MemBurst            = DMA_MBURST_SINGLE;
+    LCD_DMA_Handle_DataTransfer.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+    LCD_DMA_Handle_DataTransfer.Init.Priority            = DMA_PRIORITY_HIGH;
+    LCD_DMA_Handle_DataTransfer.State                    = HAL_DMA_STATE_RESET;
+    LCD_DMA_Handle_DataTransfer.Init.Request             = DMA_REQUEST_MEM2MEM;
+    LCD_DMA_Handle_DataTransfer.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    LCD_DMA_Handle_DataTransfer.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    LCD_DMA_Handle_DataTransfer.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    LCD_DMA_Handle_DataTransfer.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+    LCD_DMA_Handle_DataTransfer.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL;
+    HAL_DMA_Init(&LCD_DMA_Handle_DataTransfer);
 
-    TIM_PWM_OCInitObject.Pulse        = 281; 
-    TIM_PWM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
-    TIM_PWM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
-    TIM_PWM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
-    TIM_PWM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
-    TIM_PWM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
-    TIM_PWM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    // Set line completed callback
+    LCD_DMA_Handle_DataTransfer.XferCpltCallback = &LineCompletedCallback;
 
-    HAL_TIM_PWM_Init(&LCD_PWM_TimerHandle);
-    HAL_TIM_PWM_ConfigChannel(&LCD_PWM_TimerHandle, &TIM_PWM_OCInitObject, LCD_PWM_TIM_CHANNEL);
-    HAL_TIM_PWM_Start(&LCD_PWM_TimerHandle, LCD_PWM_TIM_CHANNEL);
-}
-
-void LCD_InitializeDMA(void)
-{
-    ENABLE_LCD_DMA();
-
-    #define INITIALIZE_DMA_HANDLE(HANDLE, STREAM)    \
-    HANDLE.Instance                 = STREAM;         \
-    HANDLE.Init.Mode                = DMA_NORMAL;      \
-    HANDLE.Init.MemInc              = DMA_MINC_ENABLE;  \
-    HANDLE.Init.PeriphInc           = DMA_PINC_DISABLE;  \
-    HANDLE.Init.MemBurst            = DMA_MBURST_SINGLE;  \
-    HANDLE.Init.PeriphBurst         = DMA_PBURST_SINGLE;   \
-    HANDLE.Init.Priority            = DMA_PRIORITY_HIGH;    \
-    HANDLE.State                    = HAL_DMA_STATE_RESET;   \
-    HANDLE.Init.Request             = DMA_REQUEST_MEM2MEM;    \
-    HANDLE.Init.Direction           = DMA_MEMORY_TO_PERIPH;    \
-    HANDLE.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;     \
-    HANDLE.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;   \
-    HANDLE.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;    \
-    HANDLE.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL; \
-    HAL_DMA_Init(&HANDLE);
-
-    INITIALIZE_DMA_HANDLE(LCD_DMAHandle1,DMA1_Stream2);
-    INITIALIZE_DMA_HANDLE(LCD_DMAHandle2,DMA1_Stream3);
-    LCD_DMAHandle1.XferCpltCallback = &LineCompletedCallback;
-
-
-    HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 2, 0);    
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 2, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
-    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    // Enable DMA interrupts
+    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
 }
 
 void LCD_InitializeInterrupt(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    
+
     GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING_FALLING;
     GPIO_InitStructure.Pull = GPIO_NOPULL;
     GPIO_InitStructure.Pin  = INPUT_FRAME_PIN;
     HAL_GPIO_Init(INPUT_FRAME_PORT, &GPIO_InitStructure);
-    
+
     HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
@@ -163,13 +209,13 @@ void LCD_DimBacklight(long percent)
         percent = 100;
     }
 
-    __HAL_TIM_SET_COMPARE(&LCD_PWM_TimerHandle, LCD_PWM_TIM_CHANNEL, 2.81f * percent);
+    __HAL_TIM_SET_COMPARE(&LCD_TIM_Handle_Backlight, LCD_TIM_BACKLIGHT_CHANNEL, 2.81f * percent);
 }
 
 // Write register address
 void LCD_WriteAddr(uint16_t addr)
 {
-    LCD_DATA_PORT->ODR = addr;
+    LCD_PORT_DATA->ODR = addr;
     LCD_RST_RS;
     LCD_RST_WR;
     LCD_SET_WR;
@@ -179,7 +225,7 @@ void LCD_WriteAddr(uint16_t addr)
 // Write data
 void LCD_WriteData(uint16_t data)
 {
-    LCD_DATA_PORT->ODR = data;
+    LCD_PORT_DATA->ODR = data;
     LCD_RST_WR;
     LCD_SET_WR;
 }
@@ -215,13 +261,13 @@ void LCD_WriteCommandWithParameters(uint16_t addr, uint16_t parameters[], long l
 
 uint16_t LCD_ReadData(void)
 {
-    LCD_DATA_PORT->MODER = GPIO_INPUT_MODE;
+    LCD_PORT_DATA->MODER = GPIO_INPUT_MODE;
     LCD_RST_RD;
     for (uint16_t i = 0; i < 42; i++);
-    uint16_t data = LCD_DATA_PORT->IDR;
+    uint16_t data = LCD_PORT_DATA->IDR;
     LCD_SET_RD;
     for (uint16_t i = 0; i < 10; i++);
-    LCD_DATA_PORT->MODER = GPIO_OUTPUT_MODE;
+    LCD_PORT_DATA->MODER = GPIO_OUTPUT_MODE;
     return data;
 }
 
@@ -299,9 +345,9 @@ void LCD_Initialize(void)
 {
 // Reminder: Porching increases available time to write from RAM to GRAM
     LCD_InitializePins();
-    LCD_InitializePWM();
+    LCD_InitializeBacklight();
     LCD_InitializeInterrupt();
-    LCD_InitializeDMA();
+    LCD_InitializeDataTransfer();
     
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
@@ -343,7 +389,7 @@ void LCD_ClearColor(uint16_t color)
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < LCD_DISPLAY_PIXELS; i++)
     {
-        LCD_DATA_PORT->ODR = color;
+        LCD_PORT_DATA->ODR = color;
         LCD_RST_WR;
         LCD_SET_WR;
     }
@@ -358,7 +404,7 @@ void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
 
-    LCD_DATA_PORT->ODR = color;
+    LCD_PORT_DATA->ODR = color;
     LCD_RST_WR;
     LCD_SET_WR;
     LCD_SET_CS;
@@ -395,7 +441,7 @@ void LCD_DrawFilledBox(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < length * height; i++)
     {
-        LCD_DATA_PORT->ODR = color;
+        LCD_PORT_DATA->ODR = color;
         LCD_RST_WR;
         LCD_SET_WR;
     }
@@ -515,7 +561,7 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < size; i++)
     {
-        LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
+        LCD_PORT_DATA->ODR = GBC_GPU_FrameBuffer[i].Color;
         LCD_RST_WR;
         LCD_SET_WR;
     }
@@ -550,7 +596,7 @@ void LCD_DrawGBCFrameBuffer(void)
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
     for (long i = 0; i < GBC_GPU_FRAME_SIZE; i++)
     {
-        LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[i].Color;
+        LCD_PORT_DATA->ODR = GBC_GPU_FrameBuffer[i].Color;
         LCD_RST_WR;
         LCD_SET_WR;
     }
@@ -569,7 +615,7 @@ void LCD_DrawGBCFrameBufferScaled(void)
     {
         for (int x = 0; x < GBC_GPU_FRAME_SIZE_X; x++)
         {
-            LCD_DATA_PORT->ODR = GBC_GPU_FrameBuffer[line + x].Color;
+            LCD_PORT_DATA->ODR = GBC_GPU_FrameBuffer[line + x].Color;
             LCD_RST_WR;
             LCD_SET_WR;
 
@@ -585,6 +631,11 @@ void LCD_DrawGBCFrameBufferScaled(void)
         if (linesDrawn == 5) linesDrawn = 0;
     }
     LCD_SET_CS;
+}
+
+void LCD_DrawGBCFrameBufferScaledDMA(void)
+{
+    // ToDo
 }
 
 // ToDo: Disable when not needed
@@ -625,16 +676,11 @@ void LineCompletedCallback(DMA_HandleTypeDef *handle)
         }
     }
 
-    HAL_DMA_Start_IT(&LCD_DMAHandle1, (uint32_t)&GBC_GPU_FrameBuffer[LineIndex],
-                     (uint32_t)&LCD_DATA_PORT->ODR, GBC_GPU_FRAME_SIZE_X);
+    HAL_DMA_Start_IT(&LCD_DMA_Handle_DataTransfer, (uint32_t)&GBC_GPU_FrameBuffer[LineIndex],
+                     (uint32_t)&LCD_PORT_DATA->ODR, GBC_GPU_FRAME_SIZE_X);
 }
 
-void DMA1_Stream2_IRQHandler(void)
+void DMA1_Stream1_IRQHandler(void)
 {
-    HAL_DMA_IRQHandler(&LCD_DMAHandle1);
-}
-
-void DMA1_Stream3_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&LCD_DMAHandle2);
+    HAL_DMA_IRQHandler(&LCD_DMA_Handle_DataTransfer);
 }

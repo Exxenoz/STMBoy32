@@ -9,18 +9,18 @@
 
 #define LCD_SET_RESET       LCD_RESET_PORT->BSRRL |= LCD_RESET_PIN
 #define LCD_RST_RESET       LCD_RESET_PORT->BSRRH |= LCD_RESET_PIN
-                            
+
 #define LCD_SET_RS          LCD_RS_PORT->BSRRL |= LCD_RS_PIN
 #define LCD_RST_RS          LCD_RS_PORT->BSRRH |= LCD_RS_PIN
-                            
+
 #define LCD_SET_CS          LCD_CS_PORT->BSRRL |= LCD_CS_PIN
 #define LCD_RST_CS          LCD_CS_PORT->BSRRH |= LCD_CS_PIN
-                            
+
 #define LCD_SET_RD          LCD_RD_PORT->BSRRL |= LCD_RD_PIN
 #define LCD_RST_RD          LCD_RD_PORT->BSRRH |= LCD_RD_PIN
-                            
-#define LCD_SET_WR          LCD_WR_PORT->BSRRL |= LCD_WR_PIN
-#define LCD_RST_WR          LCD_WR_PORT->BSRRH |= LCD_WR_PIN
+
+#define LCD_SET_WR          LCD_PORT_WR->BSRRL |= LCD_PIN_WR
+#define LCD_RST_WR          LCD_PORT_WR->BSRRH |= LCD_PIN_WR
 
 #define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
 #define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
@@ -105,6 +105,7 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
 void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, Fonts_SymbolDef_32_t *p_symbol);
 void LCD_DrawGBCFrameBuffer(void);
 void LCD_DrawGBCFrameBufferScaled(void);
+void LCD_DrawGBCFrameBufferScaledDMA(void);
 
 void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t frameRate);
 void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
