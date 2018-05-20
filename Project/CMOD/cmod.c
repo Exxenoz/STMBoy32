@@ -20,6 +20,7 @@ int            CMOD_BytesToRead  = 0;
 int            CMOD_BytesRead    = 0;
 int            CMOD_BytesToWrite = 0;
 int            CMOD_BytesWritten = 0;
+bool           CMOD_Initialized  = false;
 
 CMOD_Status_t CMOD_GetStatus(void)
 {
@@ -34,6 +35,11 @@ void CMOD_EnableInterrupt(void)
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_Detect(void)
 {
+    if (!CMOD_Initialized)
+    {
+        return false;
+    }
+
     uint8_t data = 0x00;
 
     CMOD_ReadByte(0x0104, &data);
@@ -346,6 +352,8 @@ void CMOD_Initialize(void)
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
 
     CMOD_Initialize_CLK();
+
+    CMOD_Initialized = true;
 }
 
 void CMOD_HandleRead(void)
