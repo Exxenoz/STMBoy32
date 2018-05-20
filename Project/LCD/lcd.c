@@ -47,8 +47,6 @@ void LCD_InitializePins(void)
 
 void LCD_InitializeBacklight()
 {
-    __TIM1_CLK_ENABLE();
-
     GPIO_InitTypeDef GPIO_InitObject;
     GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitObject.Pin       = LCD_PIN_BACKLIGHT;
@@ -79,11 +77,6 @@ void LCD_InitializeBacklight()
 
 void LCD_InitializeDataTransfer(void)
 {
-    __TIM2_CLK_ENABLE();
-    __TIM5_CLK_ENABLE();
-
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
     // Configure WR pin
     GPIO_InitTypeDef GPIO_InitObject;
     GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;

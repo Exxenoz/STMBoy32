@@ -58,9 +58,6 @@ void Input_InitializePins(void)
 
 void Input_InitializeTimers(void)
 {
-    __TIM3_CLK_ENABLE();
-    __TIM4_CLK_ENABLE();
-
     // Initialize lock timer
     Input_LockTimerHandle.Init.Prescaler         = 49999;               // Tim4 runs with 100MHz -> scale it to 2kHz
     Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;

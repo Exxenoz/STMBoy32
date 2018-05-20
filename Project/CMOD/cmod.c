@@ -293,8 +293,6 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
 void CMOD_Initialize_CLK(void)
 {
-    __TIM5_CLK_ENABLE();
-
     GPIO_InitTypeDef GPIO_InitObject;
 
     GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;

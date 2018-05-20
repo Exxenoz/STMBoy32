@@ -547,6 +547,20 @@ int main(void)
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
 
+    // Enable timers
+    __TIM1_CLK_ENABLE();
+    __TIM2_CLK_ENABLE();
+    __TIM3_CLK_ENABLE();
+    __TIM4_CLK_ENABLE();
+    __TIM5_CLK_ENABLE();
+    __TIM6_CLK_ENABLE();
+
+    // Enable DMA
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    // Enable DAC
+    __HAL_RCC_DAC12_CLK_ENABLE();
+
     // Use all bits of interrupt priority register for preempt priority
     NVIC_SetPriorityGrouping(0U);
 

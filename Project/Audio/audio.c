@@ -24,8 +24,6 @@ void Audio_InitializeGPIO(void)
 
 void Audio_InitializeTimer(void)
 {
-    __HAL_RCC_TIM6_CLK_ENABLE();
-
     Audio_TimerHandle.Instance = AUDIO_TIM;
     Audio_TimerHandle.State    = HAL_TIM_STATE_RESET;
 
@@ -55,8 +53,6 @@ void Audio_InitializeTimer(void)
 
 void Audio_InitializeDAC(void)
 {
-    __HAL_RCC_DAC12_CLK_ENABLE();
-
     Audio_DACHandle.Instance = AUDIO_DAC_L;
     Audio_DACHandle.State    = HAL_DAC_STATE_RESET;
     HAL_DAC_Init(&Audio_DACHandle);
@@ -76,8 +72,6 @@ void Audio_InitializeDAC(void)
 
 void Audio_InitializeDMA(void)
 {
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
     Audio_DMAHandleL.Instance                 = AUDIO_DMA_L_STREAM;
     Audio_DMAHandleL.State                    = HAL_DMA_STATE_RESET;
     Audio_DMAHandleL.Init.Request             = DMA_REQUEST_DAC1;
