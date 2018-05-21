@@ -1,12 +1,10 @@
 #ifndef INPUT_CONFIG_H
 #define INPUT_CONFIG_H
 
-#define INPUT_LOCK_TIM                      TIM4
-#define INPUT_LOCK_TIM_BUS                  RCC_APB1Periph_TIM4
+#define INPUT_LOCK_TIM                      TIM7
 
-#define INPUT_POLLING_TIM                   TIM3
-#define INPUT_POLLING_TIM_BUS               RCC_APB1Periph_TIM3
-#define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM3_IRQn
+#define INPUT_POLLING_TIM                   TIM2
+#define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM2_IRQn
 
 #define INPUT_BUS_ALL                       RCC_AHB1Periph_GPIOB
 #define INPUT_PORT_ALL                      GPIOB

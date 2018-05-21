@@ -76,6 +76,6 @@ void Input_Lock(Input_Button_ID_t id, time_t lockTime);
 void Input_LockAll(time_t lockTime);
 void Input_LockDynamically(Input_Button_ID_t id);
 
-void TIM3_IRQHandler(void);
+void TIM2_IRQHandler(void);
 
 #endif //INPUT_H
