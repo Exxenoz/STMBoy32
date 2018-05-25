@@ -60,19 +60,16 @@ void GBC_GPU_Initialize(void)
 
 void GBC_GPU_RenderScanline(void)
 {
-    // Where to render on the frame buffer
-    uint16_t frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex;
-
     // When the display is disabled the screen is blank (white)
     if (!GBC_MMU_Memory.DisplayEnable)
     {
-        while (frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex)
-        {
-            GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[0];
-        }
-
+        memset(&GBC_GPU_FrameBuffer[GBC_GPU_CurrentFrameBufferStartIndex],
+            GBC_GPU_BackgroundPaletteClassic[0].Color, sizeof(GBC_GPU_Color_t) * GBC_GPU_FRAME_SIZE_X);
         return;
     }
+
+    // Where to render on the frame buffer
+    uint16_t frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex;
 
     // Reset priority pixel line
     memset(GBC_GPU_PriorityPixelLine, 0, sizeof(GBC_GPU_PriorityPixelLine));
@@ -156,9 +153,10 @@ void GBC_GPU_RenderScanline(void)
         }
     }
     // When BGDisplayEnable is false and we are not in GBC mode, the background becomes blank (white).
-    else while (frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex)
+    else
     {
-        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[0];
+        memset(&GBC_GPU_FrameBuffer[GBC_GPU_CurrentFrameBufferStartIndex],
+            GBC_GPU_BackgroundPaletteClassic[0].Color, sizeof(GBC_GPU_Color_t) * GBC_GPU_FRAME_SIZE_X);
     }
 
     // The window becomes visible (if enabled) when positions are set in range WX = 0-166, WY = 0-143

@@ -12,7 +12,7 @@ typedef enum GBC_GPU_Mode_e
 }
 GBC_GPU_Mode_t;
 
-typedef union GBC_GPU_StatusInterruptRequestState_s
+typedef union GBC_GPU_StatusInterruptRequestState_u
 {
     uint8_t RequestFlags;
 
@@ -28,7 +28,7 @@ typedef union GBC_GPU_StatusInterruptRequestState_s
 GBC_GPU_StatusInterruptRequestState_t;
 
 #pragma pack(1)
-typedef union GBC_GPU_Color_e
+typedef union GBC_GPU_Color_u
 {
     uint16_t Color;
 
@@ -43,7 +43,7 @@ typedef union GBC_GPU_Color_e
 GBC_GPU_Color_t;
 
 #pragma pack(1)
-typedef struct GBC_GPU_PriorityPixel_e
+typedef struct GBC_GPU_PriorityPixel_s
 {
     #pragma pack(1)
     union
