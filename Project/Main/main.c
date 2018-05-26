@@ -546,6 +546,8 @@ int main(void)
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOI_CLK_ENABLE();
 
     // Enable timers
     __TIM1_CLK_ENABLE();
@@ -554,6 +556,8 @@ int main(void)
     __TIM4_CLK_ENABLE();
     __TIM5_CLK_ENABLE();
     __TIM6_CLK_ENABLE();
+    __TIM7_CLK_ENABLE();
+    __TIM8_CLK_ENABLE();
 
     // Enable DMA
     __HAL_RCC_DMA1_CLK_ENABLE();
