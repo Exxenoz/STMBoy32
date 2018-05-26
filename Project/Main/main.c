@@ -482,7 +482,7 @@ bool HandleSDCIngame(void)
         while (Audio_IsPlayingOfBufferFinished == false);
         Audio_IsPlayingOfBufferFinished = false;
 
-        LCD_DrawGBCFrameBufferScaled();
+        LCD_DrawGBCFrameBuffer();
     }
 }
 

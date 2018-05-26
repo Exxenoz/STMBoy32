@@ -87,8 +87,22 @@ typedef struct
 }
 LCD_TextDef_t;
 
-extern bool LCD_READY_FLAG; // External declaration for main.c file
+#pragma pack(1)
+typedef union LCD_Pixel_u
+{
+    uint16_t Color;
 
+    #pragma pack(1)
+    struct
+    {
+        unsigned int Blue  : 5; // LSB
+        unsigned int Green : 6;
+        unsigned int Red   : 5; // MSB
+    };
+}
+LCD_Pixel_t;
+
+extern bool LCD_READY_FLAG; // External declaration for main.c file
 
 void LCD_Initialize(void);
 
@@ -111,6 +125,6 @@ void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t
 void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
 
 void EXTI0_IRQHandler(void);
-void DMA1_Stream4_IRQHandler(void);
+void DMA1_Stream0_IRQHandler(void);
 
 #endif //LCD_H

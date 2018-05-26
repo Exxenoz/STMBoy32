@@ -6,18 +6,9 @@ TIM_HandleTypeDef  LCD_TIM_Handle_Backlight;
 TIM_HandleTypeDef  LCD_TIM_Handle_WR;
 TIM_HandleTypeDef  LCD_TIM_Handle_DataTransfer;
 
-TIM_OC_InitTypeDef LCD_TIM_OC_Init_Backlight;
-TIM_OC_InitTypeDef LCD_TIM_OC_Init_DataTransfer;
-
-TIM_MasterConfigTypeDef LCD_TIM_MasterConfig; // Master -> WR           Timer
-TIM_SlaveConfigTypeDef  LCD_TIM_SlaveConfig;  // Slave  -> DataTransfer Timer
-
 DMA_HandleTypeDef LCD_DMA_Handle_DataTransfer;
+LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
 
-void LineCompletedCallback(DMA_HandleTypeDef *handle);
-
-long LineIndex;
-long LinesDrawn;
 bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
@@ -62,6 +53,7 @@ void LCD_InitializeBacklight()
     LCD_TIM_Handle_Backlight.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     LCD_TIM_Handle_Backlight.Init.RepetitionCounter = 0;
 
+    static TIM_OC_InitTypeDef LCD_TIM_OC_Init_Backlight;
     LCD_TIM_OC_Init_Backlight.Pulse        = 281; 
     LCD_TIM_OC_Init_Backlight.OCMode       = TIM_OCMODE_PWM1;
     LCD_TIM_OC_Init_Backlight.OCFastMode   = TIM_OCFAST_DISABLE;
@@ -75,49 +67,29 @@ void LCD_InitializeBacklight()
     HAL_TIM_PWM_Start(&LCD_TIM_Handle_Backlight, LCD_TIM_BACKLIGHT_CHANNEL);
 }
 
-void LCD_InitializeDataTransfer(void)
+void LCD_InitializeDMATimer(void)
 {
-    // Configure WR pin
-    GPIO_InitTypeDef GPIO_InitObject;
-    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitObject.Pin       = LCD_PIN_WR;
-    GPIO_InitObject.Pull      = GPIO_NOPULL;
-    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitObject.Alternate = LCD_ALT_WR;
-    HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
+    // DEBUG: Configure alternate function for WR pin
+    //GPIO_InitTypeDef GPIO_InitObject;
+    //GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    //GPIO_InitObject.Pin       = LCD_PIN_WR;
+    //GPIO_InitObject.Pull      = GPIO_NOPULL;
+    //GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    //GPIO_InitObject.Alternate = LCD_ALT_WR;
+    //HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
 
     // DEBUG: Configure data transfer timer signal output pin
-    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitObject.Pin       = GPIO_PIN_12;
-    GPIO_InitObject.Pull      = GPIO_NOPULL;
-    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitObject);
-
-    // Configure WR timer
-    LCD_TIM_Handle_WR.Instance                = LCD_TIM_WR;
-    LCD_TIM_Handle_WR.Init.Period             = 20; // 200 MHz / 20 = 10 MHz, fast enough to send 76800 pixels in about 7.68ms
-    LCD_TIM_Handle_WR.Init.Prescaler          = 0;
-    LCD_TIM_Handle_WR.Init.CounterMode        = TIM_COUNTERMODE_UP;
-    LCD_TIM_Handle_WR.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;
-    LCD_TIM_Handle_WR.Init.RepetitionCounter  = 0;
-    LCD_TIM_Handle_WR.Init.AutoReloadPreload  = TIM_AUTORELOAD_PRELOAD_ENABLE;
-    HAL_TIM_PWM_Init(&LCD_TIM_Handle_WR);
-
-    // Configure WR pulse width modulation
-    static TIM_OC_InitTypeDef OC_Config_WR;
-    OC_Config_WR.Pulse        = 10;
-    OC_Config_WR.OCMode       = TIM_OCMODE_PWM1;
-    OC_Config_WR.OCFastMode   = TIM_OCFAST_DISABLE;
-    OC_Config_WR.OCPolarity   = TIM_OCPOLARITY_HIGH;
-    OC_Config_WR.OCNPolarity  = TIM_OCNPOLARITY_LOW;
-    OC_Config_WR.OCIdleState  = TIM_OCIDLESTATE_RESET;
-    OC_Config_WR.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_WR, &OC_Config_WR, LCD_TIM_CHANNEL_WR);
+    //GPIO_InitTypeDef GPIO_InitObject;
+    //GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    //GPIO_InitObject.Pin       = GPIO_PIN_7;
+    //GPIO_InitObject.Pull      = GPIO_NOPULL;
+    //GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    //GPIO_InitObject.Alternate = GPIO_AF3_TIM8;
+    //HAL_GPIO_Init(GPIOC, &GPIO_InitObject);
 
     // Configure data transfer timer
     LCD_TIM_Handle_DataTransfer.Instance                = LCD_TIM_DATA;
-    LCD_TIM_Handle_DataTransfer.Init.Period             = 40; // 200 MHz / 40 = 5 MHz
+    LCD_TIM_Handle_DataTransfer.Init.Period             = 40; // 200 MHz / 40 = 5 MHz, fast enough to send 76800 pixels in about 15.36ms
     LCD_TIM_Handle_DataTransfer.Init.Prescaler          = 0;
     LCD_TIM_Handle_DataTransfer.Init.CounterMode        = TIM_COUNTERMODE_UP;
     LCD_TIM_Handle_DataTransfer.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;
@@ -127,7 +99,7 @@ void LCD_InitializeDataTransfer(void)
 
     // Configure data transfer pulse width modulation
     static TIM_OC_InitTypeDef OC_Config_DataTransfer;
-    OC_Config_DataTransfer.Pulse        = 30;
+    OC_Config_DataTransfer.Pulse        = 20;
     OC_Config_DataTransfer.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_DataTransfer.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_DataTransfer.OCPolarity   = TIM_OCPOLARITY_HIGH;
@@ -136,46 +108,43 @@ void LCD_InitializeDataTransfer(void)
     OC_Config_DataTransfer.OCNIdleState = TIM_OCNIDLESTATE_RESET;
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_DataTransfer, &OC_Config_DataTransfer, LCD_TIM_CHANNEL_DATA);
 
-    // Configure master timer (Data transfer)
-    LCD_TIM_MasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    LCD_TIM_MasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_ENABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&LCD_TIM_Handle_DataTransfer, &LCD_TIM_MasterConfig);
+    // Configure WR pulse width modulation
+    static TIM_OC_InitTypeDef OC_Config_WR;
+    OC_Config_WR.Pulse        = 10;
+    OC_Config_WR.OCMode       = TIM_OCMODE_PWM1;
+    OC_Config_WR.OCFastMode   = TIM_OCFAST_DISABLE;
+    OC_Config_WR.OCPolarity   = TIM_OCPOLARITY_LOW;
+    OC_Config_WR.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    OC_Config_WR.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    OC_Config_WR.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_DataTransfer, &OC_Config_WR, LCD_TIM_CHANNEL_WR);
+}
 
-    // Configure slave timer (WR)
-    LCD_TIM_SlaveConfig.SlaveMode        = TIM_SLAVEMODE_RESET;
-    LCD_TIM_SlaveConfig.InputTrigger     = TIM_TS_ITR3;
-    LCD_TIM_SlaveConfig.TriggerPolarity  = TIM_TRIGGERPOLARITY_NONINVERTED;
-    LCD_TIM_SlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1;
-    LCD_TIM_SlaveConfig.TriggerFilter    = 0;
-    HAL_TIM_SlaveConfigSynchronization(&LCD_TIM_Handle_WR, &LCD_TIM_SlaveConfig);
-
-    // Start timers
-    HAL_TIM_PWM_Start(&LCD_TIM_Handle_DataTransfer, LCD_TIM_CHANNEL_DATA);
-    HAL_TIM_PWM_Start(&LCD_TIM_Handle_WR, LCD_TIM_CHANNEL_WR);
-
-    // Configure DMA for data tranfer
-    LCD_DMA_Handle_DataTransfer.Instance                 = DMA1_Stream1;
+void LCD_InitializeDMA(void)
+{
+    // Configure DMA for data transfer
+    LCD_DMA_Handle_DataTransfer.Instance                 = DMA1_Stream0;
+    LCD_DMA_Handle_DataTransfer.State                    = HAL_DMA_STATE_RESET;
+    LCD_DMA_Handle_DataTransfer.Init.Request             = DMA_REQUEST_TIM8_CH2;
+    LCD_DMA_Handle_DataTransfer.Init.Direction           = DMA_MEMORY_TO_PERIPH;
     LCD_DMA_Handle_DataTransfer.Init.Mode                = DMA_NORMAL;
     LCD_DMA_Handle_DataTransfer.Init.MemInc              = DMA_MINC_ENABLE;
     LCD_DMA_Handle_DataTransfer.Init.PeriphInc           = DMA_PINC_DISABLE;
     LCD_DMA_Handle_DataTransfer.Init.MemBurst            = DMA_MBURST_SINGLE;
     LCD_DMA_Handle_DataTransfer.Init.PeriphBurst         = DMA_PBURST_SINGLE;
-    LCD_DMA_Handle_DataTransfer.Init.Priority            = DMA_PRIORITY_HIGH;
-    LCD_DMA_Handle_DataTransfer.State                    = HAL_DMA_STATE_RESET;
-    LCD_DMA_Handle_DataTransfer.Init.Request             = DMA_REQUEST_MEM2MEM;
-    LCD_DMA_Handle_DataTransfer.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    LCD_DMA_Handle_DataTransfer.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     LCD_DMA_Handle_DataTransfer.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
     LCD_DMA_Handle_DataTransfer.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-    LCD_DMA_Handle_DataTransfer.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL;
+    LCD_DMA_Handle_DataTransfer.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    LCD_DMA_Handle_DataTransfer.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    LCD_DMA_Handle_DataTransfer.Init.Priority            = DMA_PRIORITY_HIGH;
     HAL_DMA_Init(&LCD_DMA_Handle_DataTransfer);
 
-    // Set line completed callback
-    LCD_DMA_Handle_DataTransfer.XferCpltCallback = &LineCompletedCallback;
+    // Link DMA with data transfer timer
+    __HAL_LINKDMA(&LCD_TIM_Handle_DataTransfer, hdma[TIM_DMA_ID_CC2], LCD_DMA_Handle_DataTransfer);
 
-    // Enable DMA interrupts
-    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 2, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+    // Enable interrupt handler
+    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 }
 
 void LCD_InitializeInterrupt(void)
@@ -340,7 +309,8 @@ void LCD_Initialize(void)
     LCD_InitializePins();
     LCD_InitializeBacklight();
     LCD_InitializeInterrupt();
-    LCD_InitializeDataTransfer();
+    LCD_InitializeDMATimer();
+    LCD_InitializeDMA();
     
 
     LCD_WriteCommand(LCD_REG_SOFTWARE_RESET);
@@ -587,13 +557,42 @@ void LCD_DrawGBCFrameBuffer(void)
 
     LCD_RST_CS;
     LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-    for (long i = 0; i < GBC_GPU_FRAME_SIZE; i++)
+
+    // Activate alternate function for WR pin
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = LCD_PIN_WR;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = LCD_ALT_WR;
+    HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
+
+    __HAL_TIM_DISABLE_DMA(&LCD_TIM_Handle_DataTransfer, TIM_DMA_CC2);
+
+    // Enable transfer complete IT
+    ((DMA_Stream_TypeDef*)LCD_DMA_Handle_DataTransfer.Instance)->CR |= DMA_IT_TC;
+
+    // Start DMA transfer
+    HAL_DMA_Start(&LCD_DMA_Handle_DataTransfer, (uint32_t)&GBC_GPU_FrameBuffer, (uint32_t)&LCD_PORT_DATA->ODR, GBC_GPU_FRAME_SIZE);
+
+    // Enable the TIM update DMA request
+    __HAL_TIM_ENABLE_DMA(&LCD_TIM_Handle_DataTransfer, TIM_DMA_CC2);
+
+    // Reset counter and start at 3/4 period, so the first WR toggle is skipped
+    LCD_TIM_DATA->CNT = 30;
+
+    // Start timer
+    LCD_TIM_DATA->CCER &= ~((TIM_CCER_CC1E << LCD_TIM_CHANNEL_DATA) | (TIM_CCER_CC1E << LCD_TIM_CHANNEL_WR));
+    LCD_TIM_DATA->CCER |= (uint32_t)((TIM_CCx_ENABLE << LCD_TIM_CHANNEL_DATA) | (TIM_CCx_ENABLE << LCD_TIM_CHANNEL_WR));
+
+    if (IS_TIM_BREAK_INSTANCE(LCD_TIM_Handle_DataTransfer.Instance) != RESET)  
     {
-        LCD_PORT_DATA->ODR = GBC_GPU_FrameBuffer[i].Color;
-        LCD_RST_WR;
-        LCD_SET_WR;
+        // Enable the main output
+        __HAL_TIM_MOE_ENABLE(&LCD_TIM_Handle_DataTransfer);
     }
-    LCD_SET_CS;
+
+    // Enable timer
+    __HAL_TIM_ENABLE(&LCD_TIM_Handle_DataTransfer);
 }
 
 void LCD_DrawGBCFrameBufferScaled(void)
@@ -628,7 +627,56 @@ void LCD_DrawGBCFrameBufferScaled(void)
 
 void LCD_DrawGBCFrameBufferScaledDMA(void)
 {
-    // ToDo
+    // Configure WR pin
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = LCD_PIN_WR;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = LCD_ALT_WR;
+    HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
+
+    
+}
+
+// Copy from stm32h7xx_hal_dma.c
+typedef struct
+{
+  __IO uint32_t ISR;   /*!< DMA interrupt status register */
+  __IO uint32_t Reserved0;
+  __IO uint32_t IFCR;  /*!< DMA interrupt flag clear register */
+} DMA_Base_Registers;
+
+void DMA1_Stream0_IRQHandler(void)
+{
+    LCD_SET_CS;
+
+    // Reset counter to avoid another WR toggle during stopping
+    LCD_TIM_DATA->CNT = 0;
+
+    // Disable timer
+    LCD_TIM_Handle_DataTransfer.Instance->CR1 &= ~(TIM_CR1_CEN);
+
+    // Stop timer
+    LCD_TIM_DATA->CCER &= ~((TIM_CCER_CC1E << LCD_TIM_CHANNEL_DATA) | (TIM_CCER_CC1E << LCD_TIM_CHANNEL_WR));
+    LCD_TIM_DATA->CCER |= (uint32_t)((TIM_CCx_DISABLE << LCD_TIM_CHANNEL_DATA) | (TIM_CCx_DISABLE << LCD_TIM_CHANNEL_WR));
+
+    if (IS_TIM_BREAK_INSTANCE(LCD_TIM_Handle_DataTransfer.Instance) != RESET)  
+    {
+        // Disable the main output
+        __HAL_TIM_MOE_DISABLE(&LCD_TIM_Handle_DataTransfer);
+    }
+
+    // Disable alternate function for WR pin
+    GPIO_InitTypeDef GPIO_InitObject;
+    GPIO_InitObject.Mode      = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitObject.Pin       = LCD_PIN_WR;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = 0;
+    HAL_GPIO_Init(LCD_PORT_WR, &GPIO_InitObject);
+
+    HAL_DMA_IRQHandler(&LCD_DMA_Handle_DataTransfer);
 }
 
 // ToDo: Disable when not needed
@@ -645,35 +693,6 @@ void EXTI0_IRQHandler(void)
             LCD_RST_READY_FLAG;
         }
 
-    __HAL_GPIO_EXTI_CLEAR_IT(INPUT_FRAME_PIN);        
+        __HAL_GPIO_EXTI_CLEAR_IT(INPUT_FRAME_PIN);        
     }
-}
-
-void LineCompletedCallback(DMA_HandleTypeDef *handle)
-{
-    LinesDrawn++;
-
-    if (LinesDrawn != 1 && LinesDrawn != 3)
-    {
-        LineIndex += GBC_GPU_FRAME_SIZE_X;
-        
-        if (LinesDrawn == 5)
-        {
-            LinesDrawn = 0;
-
-            if (LineIndex == GBC_GPU_FRAME_SIZE)
-            {
-                LineIndex  = 0;
-                return;
-            }
-        }
-    }
-
-    HAL_DMA_Start_IT(&LCD_DMA_Handle_DataTransfer, (uint32_t)&GBC_GPU_FrameBuffer[LineIndex],
-                     (uint32_t)&LCD_PORT_DATA->ODR, GBC_GPU_FRAME_SIZE_X);
-}
-
-void DMA1_Stream1_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&LCD_DMA_Handle_DataTransfer);
 }
