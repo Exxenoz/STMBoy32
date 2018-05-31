@@ -571,6 +571,59 @@ HAL_StatusTypeDef HAL_DMA_DeInit(DMA_HandleTypeDef *hdma)
   */
 
 /**
+  * @brief  Configure the DMA Transfer.
+  * @param  hdma      : pointer to a DMA_HandleTypeDef structure that contains
+  *                     the configuration information for the specified DMA Stream.
+  * @param  SrcAddress: The source memory Buffer address
+  * @param  DstAddress: The destination memory Buffer address
+  * @param  DataLength: The length of data to be transferred from source to destination
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_DMA_Config(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  /* Check the parameters */
+  assert_param(IS_DMA_BUFFER_SIZE(DataLength));
+
+  /* Check the DMA peripheral handle */
+  if(hdma == NULL)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Process locked */
+  __HAL_LOCK(hdma);
+
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+    /* Change DMA peripheral state */
+    hdma->State = HAL_DMA_STATE_BUSY;
+
+    /* Initialize the error code */
+    hdma->ErrorCode = HAL_DMA_ERROR_NONE;
+
+    /* Disable the peripheral */
+    __HAL_DMA_DISABLE(hdma);
+
+    /* Configure the source, destination address and the data length */
+    DMA_SetConfig(hdma, SrcAddress, DstAddress, DataLength);
+  }
+  else
+  {
+    /* Process unlocked */
+    __HAL_UNLOCK(hdma);
+
+    /* Set the error code to busy */
+    hdma->ErrorCode = HAL_DMA_ERROR_BUSY;
+
+    /* Return error status */
+    status = HAL_ERROR;
+  }
+  return status;
+}
+
+/**
   * @brief  Starts the DMA Transfer.
   * @param  hdma      : pointer to a DMA_HandleTypeDef structure that contains
   *                     the configuration information for the specified DMA Stream.

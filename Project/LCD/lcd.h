@@ -19,8 +19,8 @@
 #define LCD_SET_RD          LCD_RD_PORT->BSRRL |= LCD_RD_PIN
 #define LCD_RST_RD          LCD_RD_PORT->BSRRH |= LCD_RD_PIN
 
-#define LCD_SET_WR          LCD_PORT_WR->BSRRL |= LCD_PIN_WR
-#define LCD_RST_WR          LCD_PORT_WR->BSRRH |= LCD_PIN_WR
+#define LCD_SET_WR          LCD_WR_PORT->BSRRL |= LCD_WR_PIN
+#define LCD_RST_WR          LCD_WR_PORT->BSRRH |= LCD_WR_PIN
 
 #define LCD_SET_READY_FLAG  LCD_READY_FLAG = true;
 #define LCD_RST_READY_FLAG  LCD_READY_FLAG = false;
@@ -117,14 +117,11 @@ void LCD_DrawBrickline(uint16_t x0, uint16_t y0, uint16_t length, uint16_t heigh
 void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bool initOffset, LCD_Brick_t *p_brick);
 void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_16_t *p_font);
 void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, Fonts_SymbolDef_32_t *p_symbol);
+void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
 void LCD_DrawGBCFrameBuffer(void);
 void LCD_DrawGBCFrameBufferScaled(void);
-void LCD_DrawGBCFrameBufferScaledDMA(void);
 
 void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t frameRate);
 void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
-
-void EXTI0_IRQHandler(void);
-void DMA1_Stream0_IRQHandler(void);
 
 #endif //LCD_H

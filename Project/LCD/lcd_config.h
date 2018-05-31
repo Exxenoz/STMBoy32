@@ -27,13 +27,14 @@
 #define LCD_RD_PORT               GPIOD
 #define LCD_RD_PIN                GPIO_PIN_9
 
-#define LCD_PORT_WR               GPIOC
-#define LCD_PIN_WR                GPIO_PIN_6
-#define LCD_ALT_WR                GPIO_AF3_TIM8
-#define LCD_TIM_CHANNEL_WR        TIM_CHANNEL_1
+#define LCD_WR_PORT               GPIOG
+#define LCD_WR_PORT_ODR_BYTE      0
+#define LCD_WR_PIN                GPIO_PIN_0
+#define LCD_WR_SET_TIM_CHANNEL    TIM_CHANNEL_1
+#define LCD_WR_RST_TIM_CHANNEL    TIM_CHANNEL_3
 
-#define LCD_PORT_DATA             GPIOF
-#define LCD_TIM_DATA              TIM8
-#define LCD_TIM_CHANNEL_DATA      TIM_CHANNEL_2
+#define LCD_DATA_PORT             GPIOF
+#define LCD_DATA_WR_TIM           TIM8
+#define LCD_DATA_TIM_CHANNEL      TIM_CHANNEL_2
 
 #endif //LCD_CONFIG_H
