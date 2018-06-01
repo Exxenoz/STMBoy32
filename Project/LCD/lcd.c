@@ -15,6 +15,25 @@ DMA_HandleTypeDef LCD_DMA_Handle_WR_Rst;
 
 LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
 
+volatile uint16_t* LCD_DMA_TransferFrameBuffer;
+uint32_t LCD_DMA_TransferFrameBufferSize;
+uint32_t LCD_DMA_TransferFrameBufferOffset;
+
+typedef enum LCD_DMA_TransferCompleteFlags_e
+{
+    LCD_DMA_TRANSFER_NOT_COMPLETE         = 0,
+    LCD_DMA_TRANSFER_COMPLETE_FLAG_DATA   = 1,
+    LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_SET = 2,
+    LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_RST = 4,
+    LCD_DMA_TRANSFER_COMPLETE             = LCD_DMA_TRANSFER_COMPLETE_FLAG_DATA | LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_SET | LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_RST,
+}
+LCD_DMA_TransferCompleteFlags_t;
+
+volatile LCD_DMA_TransferCompleteFlags_t LCD_DMA_TransferCompleteFlags = LCD_DMA_TRANSFER_COMPLETE;
+
+// DO not change; must be lower or equal to 2^16 - 2
+#define LCD_DMA_MAX_SIZE_PER_TRANSFER 50000
+
 bool LCD_READY_FLAG;
 
 void LCD_InitializePins(void)
@@ -86,16 +105,16 @@ void LCD_InitializeDMATimer(void)
 
     // DEBUG: Configure data transfer timer signal output pin
     //GPIO_InitTypeDef GPIO_InitObject;
-    //GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    //GPIO_InitObject.Mode      = GPIO_MODE_OUTPUT_PP;
     //GPIO_InitObject.Pin       = GPIO_PIN_7;
     //GPIO_InitObject.Pull      = GPIO_NOPULL;
     //GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    //GPIO_InitObject.Alternate = GPIO_AF3_TIM8;
+    //GPIO_InitObject.Alternate = 0;
     //HAL_GPIO_Init(GPIOC, &GPIO_InitObject);
 
     // Configure pixel transfer timing
     LCD_TIM_Handle_PixelTransferTiming.Instance                = LCD_DATA_WR_TIM;
-    LCD_TIM_Handle_PixelTransferTiming.Init.Period             = 40; // 200 MHz / 40 = 5 MHz, fast enough to send 76800 pixels in about 15.36ms
+    LCD_TIM_Handle_PixelTransferTiming.Init.Period             = 40; // 200 MHz / 40 = ~5 MHz, fast enough to send 76800 pixels in about 15-17ms
     LCD_TIM_Handle_PixelTransferTiming.Init.Prescaler          = 0;
     LCD_TIM_Handle_PixelTransferTiming.Init.CounterMode        = TIM_COUNTERMODE_UP;
     LCD_TIM_Handle_PixelTransferTiming.Init.ClockDivision      = TIM_CLOCKDIVISION_DIV1;
@@ -104,7 +123,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_Init(&LCD_TIM_Handle_PixelTransferTiming);
 
     // Configure data pulse width modulation
-    OC_Config_Data.Pulse        = 1;
+    OC_Config_Data.Pulse        = 5;
     OC_Config_Data.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_Data.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_Data.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -114,7 +133,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_PixelTransferTiming, &OC_Config_Data, LCD_DATA_TIM_CHANNEL);
 
     // Configure WR reset pulse width modulation
-    OC_Config_WR_Rst.Pulse        = 1;
+    OC_Config_WR_Rst.Pulse        = 5;
     OC_Config_WR_Rst.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_WR_Rst.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_WR_Rst.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -604,7 +623,7 @@ void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, Fonts_SymbolDef_32
     }
 }
 
-void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint16_t x0, uint16_t y0, uint16_t width, uint16_t height)
+void LCD_StartFrameBufferTransfer(uint16_t* frameBuffer, uint32_t frameBufferOffset, uint16_t frameBufferLength)
 {
     // Disable the TIM update DMA request
     __HAL_TIM_DISABLE_DMA(&LCD_TIM_Handle_PixelTransferTiming, TIM_DMA_CC1 | TIM_DMA_CC2 | TIM_DMA_CC3);
@@ -613,54 +632,26 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
     DMA_Stream_TypeDef* h2 = ((DMA_Stream_TypeDef *)LCD_DMA_Handle_WR_Set.Instance);
     DMA_Stream_TypeDef* h3 = ((DMA_Stream_TypeDef *)LCD_DMA_Handle_WR_Rst.Instance);
 
-    // Abort DMA transfer and reset DMA handles
-    HAL_DMA_Abort(&LCD_DMA_Handle_Data);
-    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Set);
-    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Rst);
-
-    // ToDo: Move to menu so it's only called on change
-    LCD_SetDrawArea(x0, y0, width, height);
-
-    LCD_RST_CS;
-    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
-
     // Enable transfer complete IT
     h1->CR |= DMA_IT_TC;
     h2->CR |= DMA_IT_TC;
     h3->CR |= DMA_IT_TC;
-
-    // Reset TIM counter
-    LCD_DATA_WR_TIM->CNT = 0;
 
     // Enable capture/compare
     LCD_TIM_Handle_PixelTransferTiming.Instance->CCER |= (uint32_t)(TIM_CCx_ENABLE << LCD_DATA_TIM_CHANNEL);
     LCD_TIM_Handle_PixelTransferTiming.Instance->CCER |= (uint32_t)(TIM_CCx_ENABLE << LCD_WR_SET_TIM_CHANNEL);
     LCD_TIM_Handle_PixelTransferTiming.Instance->CCER |= (uint32_t)(TIM_CCx_ENABLE << LCD_WR_RST_TIM_CHANNEL);
 
+    // Reset TIM counter
+    LCD_DATA_WR_TIM->CNT = 0;
+
+    static const uint8_t WR_SetByte = 0xFF;
+    static const uint8_t WR_RstByte = 0x00;
+
     // Start DMA transfer
-    if (frameBufferLength > 65535)
-    {
-        // ToDo
-    }
-    else
-    {
-        static const uint8_t WR_SetByte = 0xFF;
-        static const uint8_t WR_RstByte = 0x00;
-
-        // Configure DMA transfer
-        /*HAL_DMA_Config(&LCD_DMA_Handle_Data,   (uint32_t)frameBuffer, (uint32_t)(&LCD_DATA_PORT->ODR), frameBufferLength);
-        HAL_DMA_Config(&LCD_DMA_Handle_WR_Set, (uint32_t)&WR_SetByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength + 1);
-        HAL_DMA_Config(&LCD_DMA_Handle_WR_Rst, (uint32_t)&WR_RstByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength);
-
-        // Enable DMA transfer
-        h1->CR |= DMA_SxCR_EN;
-        h2->CR |= DMA_SxCR_EN;
-        h3->CR |= DMA_SxCR_EN;*/
-
-        HAL_DMA_Start(&LCD_DMA_Handle_Data,   (uint32_t)frameBuffer, (uint32_t)(&LCD_DATA_PORT->ODR), frameBufferLength);
-        HAL_DMA_Start(&LCD_DMA_Handle_WR_Set, (uint32_t)&WR_SetByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength + 1);
-        HAL_DMA_Start(&LCD_DMA_Handle_WR_Rst, (uint32_t)&WR_RstByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength);
-    }
+    HAL_DMA_Start(&LCD_DMA_Handle_Data,   (uint32_t)&frameBuffer[frameBufferOffset], (uint32_t)(&LCD_DATA_PORT->ODR), frameBufferLength);
+    HAL_DMA_Start(&LCD_DMA_Handle_WR_Set, (uint32_t)&WR_SetByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength + 1);
+    HAL_DMA_Start(&LCD_DMA_Handle_WR_Rst, (uint32_t)&WR_RstByte, (uint32_t)(&LCD_WR_PORT->ODR) + LCD_WR_PORT_ODR_BYTE, frameBufferLength);
 
     // Enable the TIM update DMA request
     __HAL_TIM_ENABLE_DMA(&LCD_TIM_Handle_PixelTransferTiming, TIM_DMA_CC1 | TIM_DMA_CC2 | TIM_DMA_CC3);
@@ -672,9 +663,33 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
     __HAL_TIM_ENABLE(&LCD_TIM_Handle_PixelTransferTiming);
 }
 
+void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint16_t x0, uint16_t y0, uint16_t width, uint16_t height)
+{
+    // Wait until the current DMA transfer is complete
+    while (LCD_DMA_TransferFrameBuffer);
+
+    // ToDo: Move to menu so it's only called on change
+    LCD_SetDrawArea(x0, y0, width, height);
+
+    LCD_RST_CS;
+    LCD_WriteAddr(LCD_REG_MEMORY_WRITE);
+
+    // Set transfer frame buffer
+    LCD_DMA_TransferFrameBuffer = frameBuffer;
+
+    // Set transfer frame buffer size
+    LCD_DMA_TransferFrameBufferSize = frameBufferLength;
+
+    // Reset transfer complete flags
+    LCD_DMA_TransferCompleteFlags = LCD_DMA_TRANSFER_NOT_COMPLETE;
+
+    // Start DMA transfer; Check if frame buffer length is greater than max supported size for a single DMA transfer
+    LCD_StartFrameBufferTransfer(frameBuffer, LCD_DMA_TransferFrameBufferOffset = 0, (frameBufferLength > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : frameBufferLength);
+}
+
 void LCD_DrawGBCFrameBuffer(void)
 {
-    LCD_DrawFrameBuffer((uint16_t*)&GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE,
+    LCD_DrawFrameBuffer((uint16_t*)GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE,
         80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y); // Set Draw Area to the middle 160x144px for non scaled display
 }
 
@@ -695,25 +710,21 @@ void LCD_DrawGBCFrameBufferScaled(void)
         if (linesDrawn == 5) linesDrawn = 0;
     }
 
-    for (int i = 0; i < 5; i++)
-    {
-        LCD_FrameBuffer[i].Color = 0;
-        LCD_FrameBuffer[i].Red = 31;
-    }
-    for (int i = 5; i < 10; i++)
-    {
-        LCD_FrameBuffer[i].Color = 0;
-        LCD_FrameBuffer[i].Blue = 31;
-    }
-
-    LCD_DrawFrameBuffer((uint16_t*)&LCD_FrameBuffer, 10,
+    LCD_DrawFrameBuffer((uint16_t*)LCD_FrameBuffer, LCD_DISPLAY_PIXELS,
         0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
-void DMA1_Stream0_IRQHandler(void)
+void LCD_OnTransferComplete(LCD_DMA_TransferCompleteFlags_t completeFlag)
 {
-    // Handle DMA interrupt
-    HAL_DMA_IRQHandler(&LCD_DMA_Handle_Data);
+    LCD_DMA_TransferCompleteFlags |= completeFlag;
+
+    if (LCD_DMA_TransferCompleteFlags != LCD_DMA_TRANSFER_COMPLETE)
+    {
+        return;
+    }
+
+    // Calculate next transfer frame buffer offset
+    LCD_DMA_TransferFrameBufferOffset += LCD_DMA_MAX_SIZE_PER_TRANSFER;
 
     // Disable timer
     __HAL_TIM_DISABLE(&LCD_TIM_Handle_PixelTransferTiming);
@@ -730,19 +741,48 @@ void DMA1_Stream0_IRQHandler(void)
     LCD_TIM_Handle_PixelTransferTiming.State = HAL_TIM_STATE_READY;
 
     LCD_SET_WR;
-    LCD_SET_CS;
+
+    if (LCD_DMA_TransferFrameBufferOffset >= LCD_DMA_TransferFrameBufferSize)
+    {
+        LCD_SET_CS;
+
+        LCD_DMA_TransferFrameBufferOffset = 0;
+        LCD_DMA_TransferFrameBufferSize = 0;
+        LCD_DMA_TransferFrameBuffer = NULL;
+    }
+    else
+    {
+        // Reset transfer complete flags
+        LCD_DMA_TransferCompleteFlags = LCD_DMA_TRANSFER_NOT_COMPLETE;
+        // Calculate remaining transfer size
+        uint32_t remainingTransferSize = LCD_DMA_TransferFrameBufferSize - LCD_DMA_TransferFrameBufferOffset;
+        // Start the next DMA transfer; Check if remaining transfer size is greater than max supported size for a single DMA transfer
+        LCD_StartFrameBufferTransfer((uint16_t*)LCD_DMA_TransferFrameBuffer, LCD_DMA_TransferFrameBufferOffset, (remainingTransferSize > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : remainingTransferSize);
+    }
+}
+
+void DMA1_Stream0_IRQHandler(void)
+{
+    // Handle DMA interrupt
+    HAL_DMA_IRQHandler(&LCD_DMA_Handle_Data);
+
+    LCD_OnTransferComplete(LCD_DMA_TRANSFER_COMPLETE_FLAG_DATA);
 }
 
 void DMA1_Stream1_IRQHandler(void)
 {
     // Handle DMA interrupt
     HAL_DMA_IRQHandler(&LCD_DMA_Handle_WR_Set);
+
+    LCD_OnTransferComplete(LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_SET);
 }
 
 void DMA1_Stream2_IRQHandler(void)
 {
     // Handle DMA interrupt
     HAL_DMA_IRQHandler(&LCD_DMA_Handle_WR_Rst);
+
+    LCD_OnTransferComplete(LCD_DMA_TRANSFER_COMPLETE_FLAG_WR_RST);
 }
 
 // ToDo: Disable when not needed
