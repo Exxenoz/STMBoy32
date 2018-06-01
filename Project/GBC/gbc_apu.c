@@ -15,6 +15,11 @@ uint16_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
 uint32_t GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2; // Start filling second buffer, so we are always ahead for filling.
 
+#define GBC_APU_SAMPLE_OUTPUT_LEVEL 3584
+
+uint32_t GBC_APU_LastSampleL = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+uint32_t GBC_APU_LastSampleR = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+
 uint32_t GBC_APU_Channel1Phase = 0;
 int32_t  GBC_APU_Channel1PhaseTicks = 0;
 uint32_t GBC_APU_Channel1PhaseFrequency = 0;
@@ -720,6 +725,9 @@ void GBC_APU_Initialize(void)
 
     GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2;
 
+    GBC_APU_LastSampleL = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+    GBC_APU_LastSampleR = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+
     GBC_APU_InitializeChannels();
 
     Audio_SetAudioBuffer(GBC_APU_Buffer_L, GBC_APU_Buffer_R, GBC_APU_BUFFER_SIZE);
@@ -738,6 +746,9 @@ void GBC_APU_Step(void)
 
     long l = 0; // Left speaker
     long r = 0; // Right speaker
+
+    long lastSampleDiffL = 0;
+    long lastSampleDiffR = 0;
 
     GBC_APU_FrameTicks += GBC_CPU_StepTicks;
 
@@ -1127,9 +1138,33 @@ void GBC_APU_Step(void)
         l <<= 3;
         r <<= 3;
 
-        l += 3584;
-        r += 3584;
+        l += GBC_APU_SAMPLE_OUTPUT_LEVEL;
+        r += GBC_APU_SAMPLE_OUTPUT_LEVEL;
 
+        // Calculate three additional samples between current and last sample
+
+        lastSampleDiffL = l - GBC_APU_LastSampleL;
+        lastSampleDiffR = r - GBC_APU_LastSampleR;
+
+        // 1. additional sample
+        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = GBC_APU_LastSampleL + (lastSampleDiffL / 4);
+        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = GBC_APU_LastSampleR + (lastSampleDiffR / 4);
+
+        GBC_APU_BufferPosition++;
+
+        // 2. additional sample
+        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = GBC_APU_LastSampleL + (lastSampleDiffL / 2);
+        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = GBC_APU_LastSampleR + (lastSampleDiffR / 2);
+
+        GBC_APU_BufferPosition++;
+
+        // 3. additional sample
+        GBC_APU_Buffer_L[GBC_APU_BufferPosition] = GBC_APU_Buffer_L[GBC_APU_BufferPosition-1] + (lastSampleDiffL / 4);
+        GBC_APU_Buffer_R[GBC_APU_BufferPosition] = GBC_APU_Buffer_R[GBC_APU_BufferPosition-1] + (lastSampleDiffR / 4);
+
+        GBC_APU_BufferPosition++;
+
+        // Actual sample
         GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l;
         GBC_APU_Buffer_R[GBC_APU_BufferPosition] = r;
 
@@ -1138,6 +1173,9 @@ void GBC_APU_Step(void)
         {
             GBC_APU_BufferPosition = 0;
         }
+
+        GBC_APU_LastSampleL = l;
+        GBC_APU_LastSampleR = r;
 
         GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE;
     }

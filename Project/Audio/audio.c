@@ -29,14 +29,14 @@ void Audio_InitializeTimer(void)
 
     /**************************************
     // Duration of one GB frame: 0,0167427062988281s
-    // Audio samples per frame: 532
-    // Duration of one audio sample: 0,0167427062988281s / 532 = 3,14712524414062e-5s
+    // Audio samples per frame: 532 * 4 = 2128
+    // Duration of one audio sample: 0,0167427062988281s / 2128 = 7,8678131103515507518796992481203e-6
     // Timer frequency: 100MHz
-    // Audio frequency: 1 / 3,14712524414062e-5s = 31775,030304Hz ~ 31,7KHz
-    // Timer period: 100MHz / 31775,030304Hz = 3147,1252441
+    // Audio frequency: 1 / 7,8678131103515507518796992481203e-6s = 127100,12121212Hz ~ 127,1KHz
+    // Timer period: 100MHz / 127100,12121212Hz = 786,781311
     **************************************/
 
-    Audio_TimerHandle.Init.Period        = 3148;
+    Audio_TimerHandle.Init.Period        = 786;
     Audio_TimerHandle.Init.Prescaler     = 0;
     Audio_TimerHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
     Audio_TimerHandle.Init.ClockDivision = 0;
