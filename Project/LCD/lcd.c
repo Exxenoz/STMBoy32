@@ -614,9 +614,9 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
     DMA_Stream_TypeDef* h3 = ((DMA_Stream_TypeDef *)LCD_DMA_Handle_WR_Rst.Instance);
 
     // Abort DMA transfer and reset DMA handles
-    //HAL_DMA_Abort(&LCD_DMA_Handle_Data);
-    //HAL_DMA_Abort(&LCD_DMA_Handle_WR_Set);
-    //HAL_DMA_Abort(&LCD_DMA_Handle_WR_Rst);
+    HAL_DMA_Abort(&LCD_DMA_Handle_Data);
+    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Set);
+    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Rst);
 
     // ToDo: Move to menu so it's only called on change
     LCD_SetDrawArea(x0, y0, width, height);
