@@ -15,7 +15,7 @@ DMA_HandleTypeDef LCD_DMA_Handle_WR_Rst;
 
 LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
 
-volatile uint16_t* LCD_DMA_TransferFrameBuffer;
+uint16_t* LCD_DMA_TransferFrameBuffer;
 uint32_t LCD_DMA_TransferFrameBufferSize;
 uint32_t LCD_DMA_TransferFrameBufferOffset;
 
@@ -665,8 +665,10 @@ void LCD_StartFrameBufferTransfer(uint16_t* frameBuffer, uint32_t frameBufferOff
 
 void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint16_t x0, uint16_t y0, uint16_t width, uint16_t height)
 {
-    // Wait until the current DMA transfer is complete
-    while (LCD_DMA_TransferFrameBuffer);
+    // Abort any running DMA transfers
+    HAL_DMA_Abort(&LCD_DMA_Handle_Data);
+    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Set);
+    HAL_DMA_Abort(&LCD_DMA_Handle_WR_Rst);
 
     // ToDo: Move to menu so it's only called on change
     LCD_SetDrawArea(x0, y0, width, height);
