@@ -90,7 +90,7 @@ void Audio_InitializeDMA(void)
 
     Audio_DMAHandleR.Instance                 = AUDIO_DMA_R_STREAM;
     Audio_DMAHandleR.State                    = HAL_DMA_STATE_RESET;
-    Audio_DMAHandleR.Init.Request             = DMA_REQUEST_DAC1;
+    Audio_DMAHandleR.Init.Request             = DMA_REQUEST_DAC2;
     Audio_DMAHandleR.Init.Direction           = DMA_MEMORY_TO_PERIPH;
     Audio_DMAHandleR.Init.PeriphInc           = DMA_PINC_DISABLE;
     Audio_DMAHandleR.Init.MemInc              = DMA_MINC_ENABLE;
