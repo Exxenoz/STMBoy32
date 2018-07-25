@@ -6,6 +6,7 @@
 #include "lcd.h"
 #include "os.h"
 
+
 // Total number of menupoints
 #define UI_NUMBER_OF_MAINPAGE_MPS 3
 #define UI_NUMBER_OF_SHOWALL_MPS  3
@@ -108,6 +109,7 @@
 #define UI_MP_FONT Fonts_STMFont_16x24
 #define UI_GE_FONT Fonts_STMFont_16x24
 
+
 typedef enum
 {
     UI_ALLGAMES,
@@ -142,9 +144,12 @@ typedef struct
 }
 UI_MenuPoint_t;
 
+
 extern const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS];
 
 
+
+void UI_Initialize(void);
 void UI_DrawMainPage(int firstValidMenuPoint);
 void UI_DrawShowAllPage(UI_ShowAllDesign_t design);
 void UI_DrawOptionsPage(void);

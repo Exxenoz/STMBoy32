@@ -4,6 +4,7 @@
 #include "common.h"
 #include "error.h"
 
+
 #define OS_LAST_PLAYED_GAMES_NUM      5                     // defines how many of the last played games are stored
 
 #define OS_LAST_PLAYED_FILE           "lastPlayed.txt"
@@ -17,6 +18,7 @@
 #define OS_MAX_PATH_LENGTH            ((sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1))
 
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
+
 
 typedef struct
 {
@@ -62,6 +64,7 @@ typedef struct
 }
 test_t;
 
+
 extern OS_Options_t OS_InitOptions;
 
 extern OS_GameEntry_t OS_CurrentGame;
@@ -74,6 +77,8 @@ extern int OS_LoadedGamesCounter;
 extern int OS_TotalGamesCounter;
 
 
+
+void OS_Initialize(void);
 void OS_LoadOptions(void);
 void OS_UpdateOptions(void);
 

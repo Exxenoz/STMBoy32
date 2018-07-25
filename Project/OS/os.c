@@ -4,6 +4,7 @@
 #include "ff.h"
 #include "sdc.h"
 
+
 OS_Options_t OS_InitOptions;                            // Inititial Options
 
 OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game      
@@ -15,6 +16,13 @@ OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all 
 int OS_LoadedGamesCounter = 0;                          // Number of successfully loaded Games
 int OS_TotalGamesCounter = 0;                           // Number of all games detected on SDC
 
+
+
+void OS_Initialize(void)
+{
+		// Load initial options
+    OS_LoadOptions();
+}
 
 // Compare Function used to sort all game entries
 int OS_CmpGameEntries(const void *a, const void *b)

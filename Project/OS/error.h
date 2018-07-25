@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+
 #define OS_ERROR_BASE_NUM                           (0x0000)
 #define SDC_ERROR_BASE_NUM                          (0x1000)
 
@@ -48,6 +49,7 @@ do                                                  \
     ERR_DEF.Argument = ARGUMENT;                    \
 } while (0)
 
+
 typedef struct
 {
     union
@@ -75,8 +77,10 @@ typedef struct
 Error_Info_t;
 
 
+
 void Error_BaseHandler(Error_Info_t err_info);
 void Error_SDCHandler(Error_Info_t err_info);
 void Error_OSHandler(Error_Info_t err_info);
+void Error_SystemHandler(void);
 
 #endif //ERROR_H

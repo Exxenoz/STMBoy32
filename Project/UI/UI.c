@@ -1,5 +1,6 @@
 #include "ui.h"
 
+
 const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
     {UI_MAINPAGE_MP_1_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_1_Y,
      UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_INGAME_FC},
@@ -22,6 +23,13 @@ const UI_MenuPoint_t UI_ShowAll_MenuPoints[UI_NUMBER_OF_SHOWALL_MPS] = {
      UI_SHOWALL_MP_HEIGHT, UI_SHOWALL_MP_LENGTH, OS_NO_ACTION},
 };
 
+
+
+void UI_Initialize(void)
+{
+		// Initialize Fonts 
+    Fonts_InitializeSTMFonts();
+}
 
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
