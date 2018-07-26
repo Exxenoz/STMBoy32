@@ -591,6 +591,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1503,6 +1538,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2414,6 +2484,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3322,6 +3427,41 @@
               <FileName>lcd_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4232,6 +4372,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5140,6 +5315,41 @@
               <FileName>lcd_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6052,6 +6262,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6960,6 +7205,41 @@
               <FileName>lcd_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7872,6 +8152,41 @@
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8783,6 +9098,41 @@
               <FileName>lcd_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\LCD\lcd_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_init.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_event_handlers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_event_handlers.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD\lcd_drawing.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_drawing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD\lcd_drawing.h</FilePath>
             </File>
           </Files>
         </Group>

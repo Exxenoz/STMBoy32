@@ -1,10 +1,10 @@
 #ifndef UI_H
 #define UI_H
 
+#include "os.h"
 #include "common.h"
 #include "ui_fonts.h"
-#include "lcd.h"
-#include "os.h"
+#include "lcd_drawing.h"
 
 
 // Total number of menupoints

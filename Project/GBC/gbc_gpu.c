@@ -1,7 +1,7 @@
 #include "gbc_gpu.h"
 #include "gbc_cpu.h"
 #include "gbc_mmu.h"
-#include "lcd.h"
+#include "lcd_drawing.h"
 #include "string.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;

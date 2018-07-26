@@ -15,12 +15,12 @@
 #include "gbc_mmu.h"
 
 #include "led.h"
-#include "lcd.h"
 #include "sdc.h"
 #include "audio.h"
 #include "input.h"
 #include "common.h"
 #include "system.h"
+#include "lcd_init.h"
 
 
 

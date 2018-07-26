@@ -1,6 +1,6 @@
 #include "input.h"
-#include "lcd.h"
 #include "gbc_mmu.h"
+
 
 TIM_HandleTypeDef Input_LockTimerHandle = { 
     .Instance = INPUT_LOCK_TIM
