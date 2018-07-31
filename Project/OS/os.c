@@ -3,17 +3,18 @@
 #include "os.h"
 
 
-OS_Options_t   OS_InitOptions;                          // Inititial Options
+OS_Options_t   OS_InitOptions;                          // Inititial Options.
 
-OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game      
+OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game.  
 
-OS_State_t     OS_CurrState          = OS_MAINPAGE;		// Current Operatingsystem state
-OS_State_t     OS_LastState          = OS_MAINPAGE;    // Last Operatingsystem state
+OS_State_t     OS_CurrState          = OS_MAINPAGE;		// Current Operatingsystem state.
+OS_State_t     OS_LastState          = OS_MAINPAGE;     // Last Operatingsystem state.
 
-int            OS_LoadedGamesCounter = 0;               // Number of successfully loaded Games
-int            OS_TotalGamesCounter  = 0;               // Number of all games detected on SDC
+int            OS_LoadedGamesCounter = 0;               // Number of successfully loaded Games.
+int            OS_TotalGamesCounter  = 0;               // Number of all games detected on SDC.
 
-OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all game titles & their favorite status
+OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all game titles & their favorite status.
+OS_GameEntry_t OS_LastPlayed[OS_LAST_PLAYED_GAMES_NUM]; // Array containing last played game titles & their favorite status.
 
 
 
@@ -54,7 +55,7 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
     Error_Def_t err_def;
 
     // Clear OS_GameEntries
-    memset(OS_GameEntries, 0, OS_MAX_NUMBER_OF_GAMES * sizeof(OS_GameEntry_t));
+    memset(OS_GameEntries, 0, sizeof(OS_GameEntries));
 
     // Reset gameCounters
     OS_LoadedGamesCounter = 0;
@@ -212,7 +213,7 @@ int ConvertCharArrayToGameEntries(const char *buffer, int bufferSize, OS_GameEnt
         {
             OS_GameEntries[currGameIndex].Name[j] = '\0';
 
-            ERROR_CHECK(OS_IsFavorite(&(OS_GameEntries[currGameIndex])));
+            ERROR_CHECK(OS_Set_IsFavorite(&(OS_GameEntries[currGameIndex])));
 
             currGameIndex++;
             j = -1;
@@ -224,22 +225,17 @@ int ConvertCharArrayToGameEntries(const char *buffer, int bufferSize, OS_GameEnt
 }
 
 Error_Def_t OS_LoadLastPlayed(void)
-{
-    //ToDo:
-    //Implement function to convert lastPlayedGames to a char[]
-    //Use this new approach for OS_-Load/Update-LastPlayed
-    
-    // The game titles are stored without null termination followed by '\r''\n', end of file is indicated by '-'
+{   
     FIL         file;  
-    int         bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1;
-    char        buffer[bufferSize];
     uint32_t    bytesRead;
+    uint32_t    bytesWritten;
     Error_Def_t err_def;
 
-    // Clear OS_GameEntries
-    memset(OS_GameEntries, 0, OS_MAX_NUMBER_OF_GAMES * sizeof(OS_GameEntry_t));
+    // Clear game entries.
+    memset(OS_GameEntries, 0, sizeof(OS_GameEntries));
+    memset(OS_LastPlayed,  0, sizeof(OS_LastPlayed));
 
-    // If no SDC can be mounted, file can't be opened/created or (fully) read set gameCounter to 0
+    // Mount SDC if possible.
     if (!SDC_Mount())
     {
         OS_LoadedGamesCounter = 0;
@@ -248,15 +244,30 @@ Error_Def_t OS_LoadLastPlayed(void)
         return err_def;
     }
 
+    // Open the file. If it can't be opened try to create a new one and initialize it.
     if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK)
     {
-        OS_LoadedGamesCounter = 0;
+        // Ty to create new one.
+        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
+        {
+            OS_LoadedGamesCounter = 0;
 
-        ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
-        return err_def;
+            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
+        }
+        else
+        {
+            // Try to initialize new one.
+            if (f_write(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_LastPlayed))
+            {
+                ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+                return err_def;
+            }
+        }
     }
 
-    if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize)
+    // Try to read the file.
+    if (f_read(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesRead) != FR_OK || bytesRead != sizeof(OS_LastPlayed))
     {
         OS_LoadedGamesCounter = 0;
 
@@ -264,11 +275,29 @@ Error_Def_t OS_LoadLastPlayed(void)
         return err_def;
     }
 
-    // If everything is ok close the file, load the games and set gameCounter accordingly
+    // If everything is ok close the file and reset OS_LoadedGamesCounter.
     f_close(&file);
+    OS_LoadedGamesCounter = 0;
 
-    OS_LoadedGamesCounter = ConvertCharArrayToGameEntries(buffer, bufferSize, OS_GameEntries, OS_MAX_NUMBER_OF_GAMES);
-    OS_TotalGamesCounter  = OS_LoadedGamesCounter;
+    // Get path of each game and try to open it in order to validate it.
+    // If a game is valid determine wheter it's currently marked as favorite, copy it to OS_GameEntries an increase the counter.
+    for (int i = 0; i < OS_LAST_PLAYED_GAMES_NUM; i++)
+    {
+        char path[OS_MAX_PATH_LENGTH];
+        OS_GetGamePath(&OS_LastPlayed[i], path, OS_MAX_PATH_LENGTH);
+        
+        if (f_open(&file, path, FA_OPEN_EXISTING | FA_READ) == FR_OK)
+        {
+            f_close(&file);
+
+            OS_GameEntries[OS_LoadedGamesCounter] = OS_LastPlayed[i];
+            OS_Set_IsFavorite(&OS_GameEntries[OS_LoadedGamesCounter]);
+
+            OS_LoadedGamesCounter++;
+        }
+    }
+    OS_TotalGamesCounter = OS_LoadedGamesCounter;
+
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;
@@ -281,6 +310,9 @@ Error_Def_t OS_UpdateLastPlayed(void)
     uint32_t    bytesRead;
     FIL         file;
 
+    // Clear game entries.
+    memset(OS_LastPlayed,  0, sizeof(OS_LastPlayed));
+
     // If no SDC can be mounted return false
     if (!SDC_Mount())
     {
@@ -288,89 +320,73 @@ Error_Def_t OS_UpdateLastPlayed(void)
         return err_def;
     }
 
-    // If the file doesn't exist try to create a new one, if it does update it
-    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ | FA_WRITE) == FR_NO_FILE)
+    // Open the file. If it can't be opened try to create a new one and initialize it with the current game.
+    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ | FA_WRITE) != FR_OK)
     {
-        // If creating a new file or writing to it fails return false
+        // Ty to create new one.
         if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
         {
+            OS_LoadedGamesCounter = 0;
+
             ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
             return err_def;
         }
-
-        // Initialize buffer with the first line (containing first game title) and 0s for the rest
-        int bufferSize = CountChars(OS_CurrentGame.Name) + 2;
-        char buffer[bufferSize];
-
-        CopyString(buffer, OS_CurrentGame.Name, bufferSize);
-        AppendChars(buffer, "\r\n", bufferSize, 2);
-
-        if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
+        else
         {
-            ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
-            return err_def;
-        }
-        
-        f_close(&file);
+            // Set the first OS_LastPlayed entry to the current game if OS_LastPlayed wasn't initialized yet (Name wouldn't start with 0).
+            if (OS_LastPlayed[0].Name[0] != 0)
+            {
+                OS_LastPlayed[0] = OS_CurrentGame;
+            }
 
-        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
-        return err_def;
+            // Try to initialize the new file.
+            if (f_write(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_LastPlayed))
+            {
+                ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+                return err_def;
+            }
+        }
     }
     else // Update the lastPlayed file
     {
-        int            bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1;
-        char           buffer[bufferSize];
-        OS_GameEntry_t lastPlayedGames[OS_LAST_PLAYED_GAMES_NUM];
-
-        // Read the lastPlayed entries to buffer
-        if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK)
+        // Try to read the lastPlayed entries.
+        if (f_read(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesRead) != FR_OK)
         {
             ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
             return err_def;
         }
 
-        // If current game is already stored as one of the lastPlayed get it's position otherwise the last one
-        // Then move all entries 1 position down (last gets deleted) and store current game on the first position
-        // If current game already was in the list start there (-> basically just moves it to the first position)
-        int lastPlayedNum = ConvertCharArrayToGameEntries(buffer, bufferSize, lastPlayedGames, OS_LAST_PLAYED_GAMES_NUM);
-
-        for (int i = 0; i <= lastPlayedNum; i++)
+        // If current game is already stored as one of the lastPlayed get it's position otherwise get the last position.
+        int removal_start_index = OS_LAST_PLAYED_GAMES_NUM - 1;
+        for (int i = 0; i < OS_LAST_PLAYED_GAMES_NUM; i++)
         {
-            if (strcmp(lastPlayedGames[i].Name, OS_CurrentGame.Name) == 0 || i == lastPlayedNum)
+            if (CmpStrings(OS_LastPlayed[i].Name, OS_CurrentGame.Name) == 0)
             {
-                for (; i > 0; i--)
-                {
-                    lastPlayedGames[i] = lastPlayedGames[i-1];
-                }
-                
-                lastPlayedGames[0] = OS_CurrentGame;
+                removal_start_index = i;
                 break;
             }
-        }    
-
-        // Calculate correct (exact) bufferSize, convert lastPlayedGames to char[] and write it back into the file
-        bufferSize = CountChars(lastPlayedGames[0].Name) + 3;
-        CopyString(buffer, lastPlayedGames[0].Name, bufferSize);
-        AppendString(buffer, "\r\n", bufferSize);
-
-        for (int i = 1; i < lastPlayedNum; i++)
-        {
-            bufferSize += CountChars(lastPlayedGames[i].Name) + 2;
-            AppendString(buffer, lastPlayedGames[i].Name, bufferSize);
-            AppendString(buffer, "\r\n", bufferSize);
         }
 
-        bufferSize += CountChars("--End of File--");
-        AppendChars(buffer, "--End of File--", bufferSize, 15);
+        // If the first last played game isn't the current game,
+        // move all previous game entries 1 position down starting at the determined position (last gets deleted) and store current game on the first position.
+        for (int i = removal_start_index; i > 0; i--)
+        {
+            OS_LastPlayed[i] = OS_LastPlayed[i - 1];
+        }
+        OS_LastPlayed[0] = OS_CurrentGame;
 
+        // Store the last played games.
         f_lseek(&file, 0);
-        if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
+        if (f_write(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_LastPlayed))
         {
             ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
             return err_def;
         }
     }
+    
+    // Close the file.
     f_close(&file);
+
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;
@@ -467,7 +483,7 @@ Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
     return err_def;
 }
 
-Error_Def_t OS_IsFavorite(OS_GameEntry_t *p_game)
+Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game)
 {
     Error_Def_t err_def;
     char        path[OS_MAX_PATH_LENGTH];

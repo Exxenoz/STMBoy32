@@ -184,11 +184,8 @@ void HandleShowAllGamesPage(void)
         if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID) && currGameEntryID != -1)
         {
             // Set the game which is to be started.
-            CopyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryIndex].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            CopyString(OS_CurrentGame.Name, OS_GameEntries[currGameEntryIndex].Name, sizeof(OS_CurrentGame.Name));
             OS_CurrentGame.IsFavorite = OS_GameEntries[currGameEntryIndex].IsFavorite;
-
-            // Update the last played games accordingly.
-            OS_UpdateLastPlayed();
 
             OS_DoAction(OS_SWITCH_TO_STATE_INGAME_FSD);
             Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
@@ -232,9 +229,11 @@ void HandleSDCIngame(void)
     // If the state switches directly from options to ingame the game was only paused and doesn't need to be loaded again.
     if (OS_LastState != OS_OPTIONS)
     {
+        // Update the last played games.
+        OS_UpdateLastPlayed();
+
         // Define path array with maximal needed size and get the game path.
         char path[OS_MAX_PATH_LENGTH];
-
         OS_GetGamePath(&OS_CurrentGame, path, OS_MAX_PATH_LENGTH);
 
         // Load the game.

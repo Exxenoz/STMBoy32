@@ -87,7 +87,7 @@ Error_Def_t OS_UpdateLastPlayed(void);
 
 Error_Def_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry);
 Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
-Error_Def_t OS_IsFavorite(OS_GameEntry_t *p_game);
+Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game);
 Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex);
 void OS_DoAction(OS_Action_t action);
 
