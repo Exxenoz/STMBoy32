@@ -244,7 +244,7 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
     LCD_DMA_TransferCompleteFlags = LCD_DMA_TRANSFER_NOT_COMPLETE;
 
     // Start DMA transfer; Check if frame buffer length is greater than max supported size for a single DMA transfer
-    LCD_StartFrameBufferTransfer(frameBuffer, LCD_DMA_TransferFrameBufferOffset = 0, (frameBufferLength > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : frameBufferLength);
+    LCD_StartFrameBufferTransfer(LCD_DMA_TransferFrameBuffer, LCD_DMA_TransferFrameBufferOffset = 0, (frameBufferLength > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : frameBufferLength);
 }
 
 void LCD_DrawGBCFrameBuffer(void)

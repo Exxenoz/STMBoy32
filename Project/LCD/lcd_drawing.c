@@ -122,7 +122,7 @@ void LCD_DrawWall(uint16_t x0, uint16_t y0, uint16_t length, uint16_t height, bo
 }
 
 // Draws a text in a colored box, using a certain font, starting at x0/y0 (upper left corner of the box) 
-void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, Fonts_FontDef_16_t *p_font)
+void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *text, const Fonts_FontDef_16_t *p_font)
 {
     // Calculate number of characters to draw and replace unknown chars with '?'
     int chars = 0;
@@ -193,7 +193,7 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
-void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, Fonts_SymbolDef_32_t *p_symbol)
+void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, const Fonts_SymbolDef_32_t *p_symbol)
 {
     for (int y = 0; y < p_symbol->SymbolHeight; y++)
     {

@@ -69,9 +69,6 @@ void HandleMainPage(void)
 
 void HandleShowAllGamesPage(void)
 {
-    // Initialize Fonts needed for this Page
-    Fonts_InitializeSTMFonts();
-
     // ?
     UI_ShowAllDesign_t designs[UI_NUMBER_OF_SHOWALL_MPS] = { UI_ALLGAMES, UI_FAVORITES, UI_LASTPLAYED };
     int currDesignID = 0;
@@ -206,9 +203,6 @@ void HandleShowAllGamesPage(void)
 
 void HandleOptionPage(void)
 {
-    // Initialize Fonts needed for this Page
-    Fonts_InitializeSTMFonts();
-
     // YTBI
     while (1)
     {

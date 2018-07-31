@@ -37,8 +37,8 @@ void LCD_OnTransferComplete(LCD_DMA_TransferCompleteFlags_t completeFlag)
         LCD_SET_CS;
 
         LCD_DMA_TransferFrameBufferOffset = 0;
-        LCD_DMA_TransferFrameBufferSize = 0;
-        LCD_DMA_TransferFrameBuffer = NULL;
+        LCD_DMA_TransferFrameBufferSize   = 0;
+        LCD_DMA_TransferFrameBuffer       = NULL;
     }
     else
     {
@@ -49,7 +49,7 @@ void LCD_OnTransferComplete(LCD_DMA_TransferCompleteFlags_t completeFlag)
         uint32_t remainingTransferSize = LCD_DMA_TransferFrameBufferSize - LCD_DMA_TransferFrameBufferOffset;
 
    			// Start the next DMA transfer; Check if remaining transfer size is greater than max supported size for a single DMA transfer
-        LCD_StartFrameBufferTransfer((uint16_t*)LCD_DMA_TransferFrameBuffer, LCD_DMA_TransferFrameBufferOffset, (remainingTransferSize > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : remainingTransferSize);
+        LCD_StartFrameBufferTransfer(LCD_DMA_TransferFrameBuffer, LCD_DMA_TransferFrameBufferOffset, (remainingTransferSize > LCD_DMA_MAX_SIZE_PER_TRANSFER) ? LCD_DMA_MAX_SIZE_PER_TRANSFER : remainingTransferSize);
     }
 }
 

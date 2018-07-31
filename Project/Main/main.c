@@ -26,26 +26,25 @@
 
 int main(void)
 {
-    // Initialize library.
-	  HAL_Init();
+		// Initialize library.
+		HAL_Init();
 
 		// Initialize system.
 		System_Initialize();
 
 		// Initialize drivers.
-	  UI_Initialize();
 		OS_Initialize();
-    SDC_Initialize();
-	  LED_Initialize();
-    LCD_Initialize();
+		SDC_Initialize();
+		LED_Initialize();
+		LCD_Initialize();
 //  CMOD_Initialize();
-    Audio_Initialize();
-    Input_Initialize();
-    
-    // Turn on display.
+		Audio_Initialize();
+		Input_Initialize();
+
+		// Turn on display.
     LCD_DimBacklight(0);
 
-	
+
     /* Main loop */
     while (1)
     {

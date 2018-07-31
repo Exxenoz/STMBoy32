@@ -149,7 +149,6 @@ extern const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS];
 
 
 
-void UI_Initialize(void);
 void UI_DrawMainPage(int firstValidMenuPoint);
 void UI_DrawShowAllPage(UI_ShowAllDesign_t design);
 void UI_DrawOptionsPage(void);
