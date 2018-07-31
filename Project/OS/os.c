@@ -122,7 +122,7 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
                 // If it is, replace the alphabetically 'highest' stored title with the currently read title
                 if (highestTitleIndex != -1)
                 {
-                    CopySt  ring(OS_GameEntries[highestTitleIndex].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
+                    CopyString(OS_GameEntries[highestTitleIndex].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
                 }
             }
 
