@@ -7,8 +7,8 @@ OS_Options_t   OS_InitOptions;                          // Inititial Options
 
 OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game      
 
-OS_State_t     OS_CurrState          = OS_MAIN_PAGE;		// Current Operatingsystem state
-OS_State_t     OS_LastState          = OS_MAIN_PAGE;    // Last Operatingsystem state
+OS_State_t     OS_CurrState          = OS_MAINPAGE;		// Current Operatingsystem state
+OS_State_t     OS_LastState          = OS_MAINPAGE;    // Last Operatingsystem state
 
 int            OS_LoadedGamesCounter = 0;               // Number of successfully loaded Games
 int            OS_TotalGamesCounter  = 0;               // Number of all games detected on SDC
@@ -500,10 +500,15 @@ void OS_DoAction(OS_Action_t action)
     {
         case OS_NO_ACTION:
             break;
-
+        
         case OS_SWITCH_TO_PREVIOUS_STATE:
             OS_CurrState = OS_LastState;
             OS_LastState = temp;
+            break;
+
+        case OS_SWITCH_TO_STATE_MAINPAGE:
+            OS_LastState = OS_CurrState;
+            OS_CurrState = OS_MAINPAGE;
             break;
 
         case OS_SWITCH_TO_STATE_SHOWALL:

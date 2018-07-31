@@ -40,8 +40,8 @@ void UI_DrawMainPage(int firstValidMenuPoint)
     }
     else
     {
-      // Print the Page background color
-      LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
+        // Print the Page background color
+        LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
     }
 
     // Draw BOOT CARTRIDGE (either en- or disabled)
@@ -57,7 +57,7 @@ void UI_DrawMainPage(int firstValidMenuPoint)
 }
 
 // Draws the initial Show all Page and returns whether lastPlayed game is valid (selectable)
-void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
+void UI_DrawShowAllPage(UI_ShowAllTabs_t design)
 {
     // Print the List background color (only noticable when there are less elements then would fit on the screen)
     LCD_ClearColor(UI_GE_BG_COLOR);
@@ -116,6 +116,7 @@ void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
 void UI_DrawOptionsPage(void)
 {
     // YTBI
+    LCD_ClearColor(UI_MAINPAGE_BG_COLOR); // TEST
 }
 
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_DrawOption_t option)

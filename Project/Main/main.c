@@ -48,6 +48,6 @@ int main(void)
     /* Main loop */
     while (1)
     {
-			os_state_handler();
+        os_state_handler();
     }
 }

@@ -68,12 +68,11 @@ uint16_t LCD_ReadData(void)
 {
     LCD_DATA_PORT->MODER = GPIO_INPUT_MODE;
     LCD_RST_RD;
-	  HAL_Delay(1);
-
+    HAL_Delay(1);
 
     uint16_t data = LCD_DATA_PORT->IDR;
     LCD_SET_RD;
-	  HAL_Delay(1);
+    HAL_Delay(1);
 
     LCD_DATA_PORT->MODER = GPIO_OUTPUT_MODE;
 
@@ -248,7 +247,7 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
 
 void LCD_DrawGBCFrameBuffer(void)
 {
-		// Set Draw Area to the middle 160x144px for non scaled display
+    // Set Draw Area to the middle 160x144px for non scaled display
     LCD_DrawFrameBuffer((uint16_t*)GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE, 80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
 }
 

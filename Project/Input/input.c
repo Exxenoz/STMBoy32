@@ -190,8 +190,6 @@ void Input_LockDynamically(Input_Button_ID_t id)
 
 void TIM2_IRQHandler(void)
 {
-    // What about the if?
-
     int i;
     for ( i = 0; i < 8; i++)
     {

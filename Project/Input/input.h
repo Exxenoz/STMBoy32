@@ -41,6 +41,7 @@ typedef enum
 }
 Input_ButtonState_t;
 
+#pragma pack(1)
 typedef struct
 {
     Input_Button_ID_t ID;                    // ID of the button the lock is associated with
