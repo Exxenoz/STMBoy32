@@ -7,6 +7,9 @@
 #include "lcd_drawing.h"
 
 
+// Switch brick design on/off
+#define SICK_BRICK_DESIGN         true
+  
 // Total number of menupoints
 #define UI_NUMBER_OF_MAINPAGE_MPS 3
 #define UI_NUMBER_OF_SHOWALL_MPS  3
@@ -26,7 +29,7 @@
 
 // Scrollbar specifications
 #define UI_SCROLLBAR_WIDTH        15
-#define UI_SCROLLBAR_BG_COLOR     0xF000
+#define UI_SCROLLBAR_BG_COLOR     0xBBEB
 #define UI_SCROLLBAR_FG_COLOR     0x0000
 
 // Brickwall specifications (measurements in pixel)
@@ -56,15 +59,16 @@
 #define UI_MAINPAGE_MP_3_STRING   "OPTIONS"
 
 // ShowAllpage menupoint texts
-#define UI_SHOWALL_MP_1_STRING   "<ALL GAMES>"
-#define UI_SHOWALL_MP_2_STRING   "<FAVORITES>"
-#define UI_SHOWALL_MP_3_STRING   "<LAST PLAYED>"
+#define UI_SHOWALL_MP_1_STRING   "|ALL GAMES|"
+#define UI_SHOWALL_MP_2_STRING   "|FAVORITES|"
+#define UI_SHOWALL_MP_3_STRING   "|LAST PLAYED|"
 
 // Mainpage menupoint coordinates (in pixel)
-#define UI_MAINPAGE_MPS_X   29
-#define UI_MAINPAGE_MP_1_Y  35
-#define UI_MAINPAGE_MP_2_Y  81
-#define UI_MAINPAGE_MP_3_Y  127
+#define UI_MAINPAGE_MP_SPACING 15
+#define UI_MAINPAGE_MPS_X      29
+#define UI_MAINPAGE_MP_1_Y     53
+#define UI_MAINPAGE_MP_2_Y     UI_MAINPAGE_MP_1_Y + UI_MAINPAGE_MP_HEIGHT + UI_MAINPAGE_MP_SPACING
+#define UI_MAINPAGE_MP_3_Y     UI_MAINPAGE_MP_2_Y + UI_MAINPAGE_MP_HEIGHT + UI_MAINPAGE_MP_SPACING
 
 // ShowAllPage menupoint coordinates (in pixel)
 #define UI_SHOWALL_MPS_X  UI_WALL_1_WIDTH

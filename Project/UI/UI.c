@@ -27,8 +27,22 @@ const UI_MenuPoint_t UI_ShowAll_MenuPoints[UI_NUMBER_OF_SHOWALL_MPS] = {
 
 void UI_DrawMainPage(int firstValidMenuPoint)
 {
-    // Print the Page background color
-    LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
+    if (SICK_BRICK_DESIGN)
+    {
+        LCD_Brick_t brick;
+        brick.Color        = UI_BRICK_COLOR;
+        brick.Height       = UI_BRICK_HEIGHT;
+        brick.Length       = UI_BRICK_LENGTH;
+        brick.Border.Color = UI_BRICK_BORDER_COLOR;
+        brick.Border.Width = UI_BRICK_BORDER_WIDTH;
+
+        LCD_DrawWall(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y, false, &brick);
+    }
+    else
+    {
+      // Print the Page background color
+      LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
+    }
 
     // Draw BOOT CARTRIDGE (either en- or disabled)
     if (firstValidMenuPoint == 0) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
@@ -45,7 +59,7 @@ void UI_DrawMainPage(int firstValidMenuPoint)
 // Draws the initial Show all Page and returns whether lastPlayed game is valid (selectable)
 void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
 {
-    // Print the List background color (only noticable when therre are less elements then would fit on the screen)
+    // Print the List background color (only noticable when there are less elements then would fit on the screen)
     LCD_ClearColor(UI_GE_BG_COLOR);
 
     // Draw the Background of ShowAllPage (brickwall)
