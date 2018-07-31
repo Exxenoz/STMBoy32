@@ -600,14 +600,13 @@ const Fonts_FontDef_16_t Fonts_STMFont_16x24 =
 
 
 // Returns the length of a given text represented by a certain font (in pixel)
-int Fonts_GetStringLength(const char s[], uint16_t textSpacing, const Fonts_FontDef_16_t *font)
+int Fonts_GetStringLength(const char s[], uint16_t textSpacing, const Fonts_FontDef_16_t *p_font)
 {
     int length = 0;
 
     for (int i = 0; s[i] != '\0'; i++)
     {
-			int test = font->FontWidth;
-        length += test + textSpacing;
+        length += p_font->FontWidth + textSpacing;
     }
 
     return length;

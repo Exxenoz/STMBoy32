@@ -4,6 +4,7 @@
 #include "common.h"
 
 
+#pragma pack(1)
 typedef struct
 {
     const bool     LettersMirrored;
@@ -13,6 +14,7 @@ typedef struct
 }
 Fonts_FontDef_16_t;
 
+#pragma pack(1)
 typedef struct
 {
     uint16_t SymbolHeight;            // Height of the symbol (in pixel)
