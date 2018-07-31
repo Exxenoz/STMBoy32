@@ -4,7 +4,10 @@
 #include "common.h"
 #include "audio_config.h"
 
+
 extern volatile bool Audio_IsPlayingOfBufferFinished;
+
+
 
 void Audio_Initialize(void);
 void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize);

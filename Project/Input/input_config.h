@@ -1,6 +1,7 @@
 #ifndef INPUT_CONFIG_H
 #define INPUT_CONFIG_H
 
+
 #define INPUT_LOCK_TIM                      TIM7
 
 #define INPUT_POLLING_TIM                   TIM2
@@ -32,5 +33,6 @@
 
 #define INPUT_FADE_BOTTOM_PORT              GPIOB
 #define INPUT_FADE_BOTTOM_PIN               GPIO_PIN_8
+
 
 #endif //INPUT_CONFIG_H

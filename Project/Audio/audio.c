@@ -1,13 +1,19 @@
 #include "audio.h"
 
-TIM_HandleTypeDef Audio_TimerHandle;
-DAC_HandleTypeDef Audio_DACHandle;
+
+TIM_HandleTypeDef      Audio_TimerHandle;
+
+DAC_HandleTypeDef      Audio_DACHandle;
 DAC_ChannelConfTypeDef Audio_ChannelConfigL;
 DAC_ChannelConfTypeDef Audio_ChannelConfigR;
-DMA_HandleTypeDef Audio_DMAHandleL;
-DMA_HandleTypeDef Audio_DMAHandleR;
+
+DMA_HandleTypeDef      Audio_DMAHandleL;
+DMA_HandleTypeDef      Audio_DMAHandleR;
+
 volatile bool Audio_IsPlayingOfBufferFinished = false;
-uint32_t Audio_BufferPlayedCounter = 0;
+uint32_t      Audio_BufferPlayedCounter       = 0;
+
+
 
 void Audio_InitializeGPIO(void)
 {

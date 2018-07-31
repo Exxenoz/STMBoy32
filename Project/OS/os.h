@@ -3,6 +3,8 @@
 
 #include "common.h"
 #include "error.h"
+#include "sdc.h"
+#include "ff.h"
 
 
 #define OS_LAST_PLAYED_GAMES_NUM      5                     // defines how many of the last played games are stored
@@ -20,6 +22,7 @@
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME 150
 
 
+#pragma pack(1)
 typedef struct
 {
     char Name[OS_MAX_GAME_TITLE_LENGTH + 1];
@@ -27,6 +30,7 @@ typedef struct
 }
 OS_GameEntry_t;
 
+#pragma pack(1)
 typedef struct
 {
     bool AutoBootCartridge;
@@ -57,12 +61,6 @@ typedef enum
     // More TBI
 }
 OS_Action_t;
-
-typedef struct
-{
-    char buffer[OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1];
-}
-test_t;
 
 
 extern OS_Options_t OS_InitOptions;

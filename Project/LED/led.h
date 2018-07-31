@@ -4,6 +4,7 @@
 #include "common.h"
 #include "led_config.h"
 
+
 #define LED_RED_SET     LED_RED_PORT->BSRRL |= LED_RED_PIN
 #define LED_RED_RESET   LED_RED_PORT->BSRRH |= LED_RED_PIN
 
@@ -12,6 +13,8 @@
 
 #define LED_BLUE_SET    LED_BLUE_PORT->BSRRL |= LED_BLUE_PIN
 #define LED_BLUE_RESET  LED_BLUE_PORT->BSRRH |= LED_BLUE_PIN
+
+
 
 void LED_Initialize(void);
 

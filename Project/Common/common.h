@@ -3,13 +3,9 @@
 
 #pragma anon_unions
 
-// Workaround for Keil syntax highlighting
-//#ifndef USE_STDPERIPH_DRIVER
-//    #define USE_STDPERIPH_DRIVER
-//#endif
 
 #include "stm32h7xx_hal.h"
-//////////////////////////////////////////
+
 
 #define NOP __ASM("nop")
 
@@ -23,6 +19,7 @@
 #define GPIO_INPUT_MODE  0x00000000
 #define GPIO_OUTPUT_MODE 0x55555555
 
+
 // Boolean define
 typedef enum bool_e
 {
@@ -30,6 +27,8 @@ typedef enum bool_e
     true
 }
 bool;
+
+
 
 // Custom string functions to ensure null termination
 int  CmpStrings(const void *a, const void *b);

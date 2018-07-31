@@ -32,6 +32,7 @@ const uint32_t Input_Pins[8] =
 };
 
 
+
 void Input_InitializePins(void)
 {
     GPIO_InitTypeDef GPIO_InitObject;
@@ -57,9 +58,9 @@ void Input_InitializePins(void)
 void Input_InitializeTimers(void)
 {
     // Initialize lock timer
-    Input_LockTimerHandle.Init.Prescaler         = 99999;               // Timer runs with 200MHz -> scale it to 2kHz
+    Input_LockTimerHandle.Init.Prescaler         = 99999;                   // Timer runs with 200MHz -> scale it to 2kHz
     Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    Input_LockTimerHandle.Init.Period            = INPUT_MAX_LOCK_TIME; // Count 'til max even value -> min overflows/s
+    Input_LockTimerHandle.Init.Period            = INPUT_MAX_LOCK_TIME;     // Count 'til max even value -> min overflows/s
     Input_LockTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     Input_LockTimerHandle.Init.RepetitionCounter = 0;
 
@@ -67,9 +68,9 @@ void Input_InitializeTimers(void)
     HAL_TIM_Base_Start(&Input_LockTimerHandle);
 
     // Initialise polling timer
-    Input_PollTimerHandle.Init.Prescaler         = 13334;               // Timer runs with 200MHz -> scale it to 15kHz
+    Input_PollTimerHandle.Init.Prescaler         = 13334;                   // Timer runs with 200MHz -> scale it to 15kHz
     Input_PollTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    Input_PollTimerHandle.Init.Period            = 14;                  // Count 'til 14 (+1) -> 1000 overflows/s
+    Input_PollTimerHandle.Init.Period            = 14;                      // Count 'til 14 (+1) -> 1000 overflows/s
     Input_PollTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     Input_PollTimerHandle.Init.RepetitionCounter = 0;
 
@@ -92,7 +93,7 @@ void Input_Initialize()
         Input_LastState[i] = INPUT_NOT_PRESSED;
         Input_Counter[i]   = 0;
 
-        Input_Locks[i].ID                   = i;
+        Input_Locks[i].ID                   = (Input_Button_ID_t)i;
         Input_Locks[i].LockedFor            = false;
         Input_Locks[i].LockedSince          = false;
         Input_Locks[i].IsLocked             = false;
@@ -169,7 +170,7 @@ void Input_LockAll(time_t lockTime)
 {
     for (int i = 0; i < 8; i++)
     {
-        Input_Lock(i, lockTime);
+        Input_Lock((Input_Button_ID_t)i, lockTime);
     }
 }
 

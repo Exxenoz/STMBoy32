@@ -1,7 +1,6 @@
 #include "ui.h"
 
 
-
 const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] = {
     {UI_MAINPAGE_MP_1_STRING, UI_MAINPAGE_MPS_X, UI_MAINPAGE_MP_1_Y,
      UI_MAINPAGE_MP_HEIGHT, UI_MAINPAGE_MP_LENGTH, OS_SWITCH_TO_STATE_INGAME_FC},
@@ -61,7 +60,6 @@ void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
     LCD_DrawWall(0, UI_WALL_1_HEIGHT + 1, UI_WALL_2_WIDTH, UI_WALL_2_HEIGHT, true, &brick);
     LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_1_WIDTH, 0, UI_WALL_1_WIDTH, UI_WALL_1_HEIGHT, false, &brick);
     LCD_DrawWall(LCD_DISPLAY_SIZE_X - UI_WALL_2_WIDTH, UI_WALL_1_HEIGHT + 1, UI_WALL_2_WIDTH, UI_WALL_2_HEIGHT, true, &brick);
-    //LCD_DrawWall(UI_WALL_2_WIDTH, UI_SHOWALL_GE_HEIGHT, LCD_DISPLAY_SIZE_X - 2 * UI_WALL_2_WIDTH, UI_UPPER_LIST_PADDING, &brick);
 
     // Draw the MP specified by design and load corresponding gameentries
     switch (design)
@@ -89,7 +87,9 @@ void UI_DrawShowAllPage(UI_ShowAllDesign_t design)
     int gameEntryY = UI_SHOWALL_GE_LIST_Y;
 
     UI_DrawScrollBar(0);
+
     LCD_DrawLine(UI_SHOWALL_MPS_X, UI_SHOWALL_MP_HEIGHT - 1, UI_SHOWALL_MP_LENGTH, UI_UPPER_LIST_PADDING, 0x0000, LCD_HORIZONTAL); 
+
     UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[0]), UI_HIGHLIGHTED);
 
     for (int i = 1; i < UI_LIST_LENGTH && i < OS_LoadedGamesCounter; i++)
@@ -293,8 +293,11 @@ void UI_ScrollGames(int *p_currGEIndex, int *p_currGEListID, UI_ScrollOption_t o
         // Selected gameentry is neither first nor first displayed
         // Reset highlighting of currGE, adapt currGEIndex and highlight prev gameentry
         UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[*p_currGEIndex]), UI_ENABLED);
+
         gameEntryY -= UI_SHOWALL_GE_HEIGHT;
+
         (*p_currGEIndex)--;
+
         UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[*p_currGEIndex]), UI_HIGHLIGHTED);
 
         // If the selected gameentry wasn't the first displayed the listID changes
@@ -332,25 +335,15 @@ void UI_ScrollGames(int *p_currGEIndex, int *p_currGEListID, UI_ScrollOption_t o
         // Selected gameentry isn't the last displayed
         // Reset highlighting of currGE, adapt currGEIndex and highlight next gameentry
         UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[*p_currGEIndex]), UI_ENABLED);
+
         gameEntryY += UI_SHOWALL_GE_HEIGHT;
+
         (*p_currGEIndex)++;
+
         UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[*p_currGEIndex]), UI_HIGHLIGHTED);
 
         // If the selected gameentry wasn't the last displayed the listID changes
         (*p_currGEListID)++;
         return;
     }
-}
-
-
-// Compiler workaround functions
-
-void UI_DrawMainPageMenuPoint(int id, UI_DrawOption_t option)
-{
-    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[id]), option);
-}
-
-void UI_PerformMainPageAction(int id)
-{
-    OS_DoAction(UI_MainPage_MenuPoints[id].Action);
 }

@@ -1,6 +1,7 @@
 #include "os_state_handlers.h"
 
 
+
 void HandleMainPage(void)
 {
     // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0)
@@ -21,12 +22,12 @@ void HandleMainPage(void)
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa
         if (!CMOD_Detect() && firstMenuPointID == 0)
         {
-            UI_DrawMainPageMenuPoint(0, UI_DISABLED);
+					  UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
             firstMenuPointID = 1;
         }
         else if (CMOD_Detect() && firstMenuPointID == 1)
         {
-            UI_DrawMainPageMenuPoint(0, UI_ENABLED);
+						UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
             firstMenuPointID = 0;
         }
 
@@ -34,9 +35,11 @@ void HandleMainPage(void)
         // reset highlighting of current menu point and highlight the menu point above
         if (Input_Interrupt_Flags.FadeTop && !Input_IsLocked(INPUT_FADE_TOP_ID) && currMenuPointID > firstMenuPointID)
         {
-            UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
+						UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currMenuPointID]), UI_ENABLED);
+
             currMenuPointID--;
-            UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
+
+						UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currMenuPointID]), UI_HIGHLIGHTED);
 
             Input_Lock(INPUT_FADE_TOP_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
         }
@@ -45,9 +48,11 @@ void HandleMainPage(void)
         // reset highlighting of current menu point and highlight the menu point below
         if (Input_Interrupt_Flags.FadeBot && !Input_IsLocked(INPUT_FADE_BOT_ID) && currMenuPointID < lastMenuPointID)
         {
-            UI_DrawMainPageMenuPoint(currMenuPointID, UI_ENABLED);
+						UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currMenuPointID]), UI_ENABLED);
+
             currMenuPointID++;
-            UI_DrawMainPageMenuPoint(currMenuPointID, UI_HIGHLIGHTED);
+
+						UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[currMenuPointID]), UI_HIGHLIGHTED);
 
             Input_Lock(INPUT_FADE_BOT_ID, OS_MAIN_PAGE_BUTTON_LOCK_TIME);
         }
@@ -56,7 +61,7 @@ void HandleMainPage(void)
         if (Input_Interrupt_Flags.ButtonA && !Input_IsLocked(INPUT_A_ID))
         {
             // Perform the action linked to the selected menupoint
-            UI_PerformMainPageAction(currMenuPointID);
+						OS_DoAction(UI_MainPage_MenuPoints[currMenuPointID].Action);
 
             // Lock all buttons until they are released so next page opens without anything pressed
             // If a button is not pressed at this thime UpdateLocks will immediately disable the lock again

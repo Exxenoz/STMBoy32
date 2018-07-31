@@ -856,16 +856,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1803,16 +1793,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2749,16 +2729,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3692,16 +3662,6 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4637,16 +4597,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -5580,16 +5530,6 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6527,16 +6467,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -7470,16 +7400,6 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8417,16 +8337,6 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -9363,16 +9273,6 @@
               <FileName>ui_fonts.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UI\fonts.c</FilePath>
-            </File>
-            <File>
-              <FileName>fonts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\UI\fonts.h</FilePath>
             </File>
           </Files>
         </Group>

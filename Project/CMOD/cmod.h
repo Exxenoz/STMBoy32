@@ -1,10 +1,12 @@
 #ifndef CMOD_H
 #define CMOD_H
 
+
 #include "cmod_config.h"
+#include "gbc_mmu.h"
 #include "common.h"
 #include "led.h"
-#include "gbc_mmu.h"
+
 
 #define CMOD_SET_RESET       CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
 #define CMOD_RST_RESET       CMOD_RESET_PORT->BSRRH |= CMOD_RESET_PIN
@@ -24,6 +26,7 @@
                              
 #define CMOD_DATA_MODE_IN    GPIOG->MODER = 0x00000000
 #define CMOD_DATA_MODE_OUT   GPIOG->MODER = 0x00005555
+
 
 typedef enum 
 {
@@ -48,8 +51,13 @@ typedef enum
     CMOD_FAILED
 } CMOD_SaveResult_t;
 
+
 CMOD_Status_t CMOD_GetStatus(void); 
 bool          CMOD_Detect(void);           
+
+
+
+void CMOD_Initialize(void); 
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data);                       
 void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data);   
@@ -58,8 +66,6 @@ void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data);
 
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting);        
 void              CMOD_ResetCartridge(void);
-
-void CMOD_Initialize(void); 
 
 void TIM5_IRQHandler(void);
 

@@ -3,6 +3,7 @@
 #include "ff.h"
 #include "string.h"
 
+
 TIM_OC_InitTypeDef CMOD_TIM_OCInitObject;
 TIM_HandleTypeDef CMOD_TimerHandle = { 
     .Instance = CMOD_TIM,
@@ -21,6 +22,9 @@ int            CMOD_BytesRead    = 0;
 int            CMOD_BytesToWrite = 0;
 int            CMOD_BytesWritten = 0;
 bool           CMOD_Initialized  = false;
+
+
+
 
 CMOD_Status_t CMOD_GetStatus(void)
 {

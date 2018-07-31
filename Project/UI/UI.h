@@ -75,11 +75,11 @@
 #define UI_SHOWALL_GE_LIST_Y  (LCD_DISPLAY_SIZE_Y - UI_LIST_LENGTH * UI_SHOWALL_GE_HEIGHT)
 
 // General menupoint specifications (measurements in pixel)
-#define UI_MP_SPACING       0
-#define UI_MP_BORDER_WIDTH  0
-#define UI_MP_BG_COLOR      0xFFFF
-#define UI_MP_TEXT_COLOR    0x0000
-#define UI_MP_BORDER_COLOR  0x0000
+#define UI_MP_SPACING       				    0
+#define UI_MP_BORDER_WIDTH  				    0
+#define UI_MP_BG_COLOR      				    0xFFFF
+#define UI_MP_TEXT_COLOR    				    0x0000
+#define UI_MP_BORDER_COLOR  				    0x0000
 
 #define UI_DISABLED_MP_BG_COLOR         0xC618
 #define UI_DISABLED_MP_TEXT_COLOR       0x7BD0
@@ -88,11 +88,11 @@
 #define UI_HIGHLIGHTED_MP_BORDER_COLOR  0xFFFF
 
 // Game-entry specifications (measurements in pixel)
-#define UI_GE_SPACING       0
-#define UI_GE_BORDER_WIDTH  0
-#define UI_GE_BG_COLOR      0xFFFF
-#define UI_GE_TEXT_COLOR    0x0000
-#define UI_GE_BORDER_COLOR  0x0000
+#define UI_GE_SPACING       					  0
+#define UI_GE_BORDER_WIDTH  					  0
+#define UI_GE_BG_COLOR      					  0xFFFF
+#define UI_GE_TEXT_COLOR    					  0x0000
+#define UI_GE_BORDER_COLOR  					  0x0000
 
 #define UI_GE_STAR_X        (LCD_DISPLAY_SIZE_X - UI_WALL_2_WIDTH - UI_SCROLLBAR_WIDTH - 35)
 #define UI_GE_STAR_OFFSET_Y 4
@@ -133,6 +133,7 @@ typedef enum
 }
 UI_ScrollOption_t;
 
+#pragma pack(1)
 typedef struct
 {
     char        Text[UI_MAX_MP_LENGTH + 1];  // MenuPoint Text
@@ -159,9 +160,5 @@ void UI_ReDrawCurrGE(int currGEIndex, int currGEListID);
 void UI_ReDrawGEList(int currGEIndex, int currGEListID);
 void UI_DrawScrollBar(int currGameEntry);
 void UI_ScrollGames(int *p_currGEIndex, int *p_currGEListID, UI_ScrollOption_t option);
-
-// Compiler workaround functions
-void UI_DrawMainPageMenuPoint(int id, UI_DrawOption_t option);
-void UI_PerformMainPageAction(int id);
 
 #endif // UI_H

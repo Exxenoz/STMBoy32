@@ -1,20 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include "os.h"
-#include "ff.h"
-#include "sdc.h"
 
 
-OS_Options_t OS_InitOptions;                            // Inititial Options
+OS_Options_t   OS_InitOptions;                          // Inititial Options
 
 OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game      
 
-OS_State_t OS_CurrState = OS_MAIN_PAGE;                 // Current Operatingsystem state
-OS_State_t OS_LastState = OS_MAIN_PAGE;                 // Last Operatingsystem state
+OS_State_t     OS_CurrState          = OS_MAIN_PAGE;		// Current Operatingsystem state
+OS_State_t     OS_LastState          = OS_MAIN_PAGE;    // Last Operatingsystem state
+
+int            OS_LoadedGamesCounter = 0;               // Number of successfully loaded Games
+int            OS_TotalGamesCounter  = 0;               // Number of all games detected on SDC
 
 OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all game titles & their favorite status
-int OS_LoadedGamesCounter = 0;                          // Number of successfully loaded Games
-int OS_TotalGamesCounter = 0;                           // Number of all games detected on SDC
 
 
 
@@ -229,12 +228,11 @@ Error_Def_t OS_LoadLastPlayed(void)
     //ToDo:
     //Implement function to convert lastPlayedGames to a char[]
     //Use this new approach for OS_-Load/Update-LastPlayed
-    test_t test;
     
     // The game titles are stored without null termination followed by '\r''\n', end of file is indicated by '-'
     FIL         file;  
     int         bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1;
-    //char        buffer[bufferSize];
+    char        buffer[bufferSize];
     uint32_t    bytesRead;
     Error_Def_t err_def;
 
@@ -258,7 +256,7 @@ Error_Def_t OS_LoadLastPlayed(void)
         return err_def;
     }
 
-    if (f_read(&file, test.buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize)
+    if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK || bytesRead != bufferSize)
     {
         OS_LoadedGamesCounter = 0;
 
@@ -269,7 +267,7 @@ Error_Def_t OS_LoadLastPlayed(void)
     // If everything is ok close the file, load the games and set gameCounter accordingly
     f_close(&file);
 
-    OS_LoadedGamesCounter = ConvertCharArrayToGameEntries(test.buffer, bufferSize, OS_GameEntries, OS_MAX_NUMBER_OF_GAMES);
+    OS_LoadedGamesCounter = ConvertCharArrayToGameEntries(buffer, bufferSize, OS_GameEntries, OS_MAX_NUMBER_OF_GAMES);
     OS_TotalGamesCounter  = OS_LoadedGamesCounter;
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
@@ -320,14 +318,12 @@ Error_Def_t OS_UpdateLastPlayed(void)
     }
     else // Update the lastPlayed file
     {
-        test_t test;
-
         int            bufferSize = OS_LAST_PLAYED_GAMES_NUM * (OS_MAX_GAME_TITLE_LENGTH + 2) + 1;
-        //char           buffer[bufferSize];
+        char           buffer[bufferSize];
         OS_GameEntry_t lastPlayedGames[OS_LAST_PLAYED_GAMES_NUM];
 
         // Read the lastPlayed entries to buffer
-        if (f_read(&file, test.buffer, bufferSize, &bytesRead) != FR_OK)
+        if (f_read(&file, buffer, bufferSize, &bytesRead) != FR_OK)
         {
             ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
             return err_def;
@@ -336,7 +332,7 @@ Error_Def_t OS_UpdateLastPlayed(void)
         // If current game is already stored as one of the lastPlayed get it's position otherwise the last one
         // Then move all entries 1 position down (last gets deleted) and store current game on the first position
         // If current game already was in the list start there (-> basically just moves it to the first position)
-        int lastPlayedNum = ConvertCharArrayToGameEntries(test.buffer, bufferSize, lastPlayedGames, OS_LAST_PLAYED_GAMES_NUM);
+        int lastPlayedNum = ConvertCharArrayToGameEntries(buffer, bufferSize, lastPlayedGames, OS_LAST_PLAYED_GAMES_NUM);
 
         for (int i = 0; i <= lastPlayedNum; i++)
         {
@@ -354,21 +350,21 @@ Error_Def_t OS_UpdateLastPlayed(void)
 
         // Calculate correct (exact) bufferSize, convert lastPlayedGames to char[] and write it back into the file
         bufferSize = CountChars(lastPlayedGames[0].Name) + 3;
-        CopyString(test.buffer, lastPlayedGames[0].Name, bufferSize);
-        AppendString(test.buffer, "\r\n", bufferSize);
+        CopyString(buffer, lastPlayedGames[0].Name, bufferSize);
+        AppendString(buffer, "\r\n", bufferSize);
 
         for (int i = 1; i < lastPlayedNum; i++)
         {
             bufferSize += CountChars(lastPlayedGames[i].Name) + 2;
-            AppendString(test.buffer, lastPlayedGames[i].Name, bufferSize);
-            AppendString(test.buffer, "\r\n", bufferSize);
+            AppendString(buffer, lastPlayedGames[i].Name, bufferSize);
+            AppendString(buffer, "\r\n", bufferSize);
         }
 
         bufferSize += CountChars("--End of File--");
-        AppendChars(test.buffer, "--End of File--", bufferSize, 15);
+        AppendChars(buffer, "--End of File--", bufferSize, 15);
 
         f_lseek(&file, 0);
-        if (f_write(&file, test.buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
+        if (f_write(&file, buffer, bufferSize, &bytesWritten) != FR_OK || bytesWritten != bufferSize)
         {
             ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
             return err_def;

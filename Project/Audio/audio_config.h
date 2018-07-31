@@ -1,6 +1,7 @@
 #ifndef AUDIO_CONFIG_H
 #define AUDIO_CONFIG_H
 
+
 #define AUDIO_L_PORT           GPIOA
 #define AUDIO_L_PIN            GPIO_PIN_4
 
@@ -31,5 +32,6 @@
 #define AUDIO_DMA_R_STREAM     DMA1_Stream6
 #define AUDIO_DMA_R_IRQn       DMA1_Stream6_IRQn
 #define AUDIO_DMA_R_IRQHandler DMA1_Stream6_IRQHandler
+
 
 #endif

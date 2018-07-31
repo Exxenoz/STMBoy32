@@ -68,13 +68,12 @@ uint16_t LCD_ReadData(void)
 {
     LCD_DATA_PORT->MODER = GPIO_INPUT_MODE;
     LCD_RST_RD;
+	  HAL_Delay(1);
 
-	for (uint16_t i = 0; i < 42; i++); // ToDo: use Hal_delay
 
     uint16_t data = LCD_DATA_PORT->IDR;
     LCD_SET_RD;
-
-    for (uint16_t i = 0; i < 10; i++); // ToDo: use Hal_delay
+	  HAL_Delay(1);
 
     LCD_DATA_PORT->MODER = GPIO_OUTPUT_MODE;
 
