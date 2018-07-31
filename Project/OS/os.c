@@ -19,7 +19,7 @@ OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all 
 
 void OS_Initialize(void)
 {
-		// Load initial options
+    // Load initial options
     OS_LoadOptions();
 }
 
@@ -122,7 +122,7 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
                 // If it is, replace the alphabetically 'highest' stored title with the currently read title
                 if (highestTitleIndex != -1)
                 {
-                    CopyString(OS_GameEntries[highestTitleIndex].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
+                    CopySt  ring(OS_GameEntries[highestTitleIndex].Name, fileInfo.fname, OS_MAX_GAME_TITLE_LENGTH + 1);
                 }
             }
 
