@@ -23,6 +23,7 @@ int            CMOD_BytesToWrite = 0;
 int            CMOD_BytesWritten = 0;
 bool           CMOD_Initialized  = false;
 
+bool CMOD_CartridgeInserted = false;
 
 
 
@@ -37,26 +38,31 @@ void CMOD_EnableInterrupt(void)
 }
 
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
-bool CMOD_Detect(void)
+bool CMOD_CheckForCartridge(void)
 {
     if (!CMOD_Initialized)
     {
-        return false;
-    }
-
-    uint8_t data = 0x00;
-
-    CMOD_ReadByte(0x0104, &data);
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    if (data == 0xCE)
-    {
-        return true;
+        CMOD_CartridgeInserted = false;
     }
     else
     {
-        return false;
+        uint8_t data = 0x00;
+
+        CMOD_ReadByte(0x0104, &data);
+        while (CMOD_Status == CMOD_PROCESSING);
+
+        if (data == 0xCE)
+        {
+            CMOD_CartridgeInserted = true;
+        }
+        else
+        {
+            CMOD_CartridgeInserted = false;
+        }
     }
+
+
+    return CMOD_CartridgeInserted;
 }
 
 void CMOD_ResetCartridge(void)
@@ -211,7 +217,7 @@ void CMOD_GetFileName(char* name)
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 {
     // If no SD Card is detected return nocard
-    if (!SDC_Mount() || !CMOD_Detect())
+    if (!SDC_Mount() || !CMOD_CheckForCartridge())
     {
         return CMOD_NOCARD;
     }

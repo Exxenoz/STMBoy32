@@ -23,10 +23,39 @@ const UI_MenuPoint_t UI_ShowAll_MenuPoints[UI_NUMBER_OF_SHOWALL_MPS] = {
      UI_SHOWALL_MP_HEIGHT, UI_SHOWALL_MP_LENGTH, OS_NO_ACTION},
 };
 
+UI_MenuPoint_t UI_Options_MenuPoints[UI_NUMBER_OF_OPTIONS_MPS] = {
+    {UI_OPTIONS_MP_1_STRING, UI_OPTIONS_MP_1_X, UI_OPTIONS_MP_1_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_SHORT, OS_EDIT_LANGUAGE},
+
+    {UI_OPTIONS_MP_2_STRING, UI_OPTIONS_MP_2_X, UI_OPTIONS_MP_2_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_SHORT, OS_NO_ACTION},
+
+    {UI_OPTIONS_MP_3_STRING, UI_OPTIONS_MP_3_X, UI_OPTIONS_MP_3_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_MEDIUM, OS_EDIT_BRIGHTNESS},
+
+    {UI_OPTIONS_MP_4_STRING, UI_OPTIONS_MP_4_X, UI_OPTIONS_MP_4_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_MEDIUM, OS_TOGGLE_OPTION_SCALING},
+
+    {UI_OPTIONS_MP_5_STRING, UI_OPTIONS_MP_5_X, UI_OPTIONS_MP_5_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_MEDIUM, OS_TOGGLE_OPTION_DIRECT_BOOT},
+
+    {UI_OPTIONS_MP_6_STRING, UI_OPTIONS_MP_6_X, UI_OPTIONS_MP_6_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_LONG, OS_SAVE_CARTRIDGE},
+};
+
+const UI_MenuPoint_t UI_Options_alternate_MP_6 =     
+    {UI_OPTIONS_ALTERNATE_MP_6_STRING, UI_OPTIONS_ALTERNATE_MP_6_X, UI_OPTIONS_MP_6_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_SHORT, OS_SWITCH_TO_STATE_MAINPAGE};
+
+const UI_MenuPoint_t UI_Options_regular_MP_6 =     
+    {UI_OPTIONS_MP_6_STRING, UI_OPTIONS_MP_6_X, UI_OPTIONS_MP_6_Y,
+     UI_OPTIONS_MP_HEIGHT, UI_OPTIONS_MP_LENGTH_LONG, OS_SAVE_CARTRIDGE};
+    
 
 
-void UI_DrawMainPage(int firstValidMenuPoint)
+void UI_DrawMainPage(int selectedMP)
 {
+    // Draw the Page background.
     if (SICK_BRICK_DESIGN)
     {
         LCD_Brick_t brick;
@@ -40,20 +69,19 @@ void UI_DrawMainPage(int firstValidMenuPoint)
     }
     else
     {
-        // Print the Page background color
         LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
     }
 
-    // Draw BOOT CARTRIDGE (either en- or disabled)
-    if (firstValidMenuPoint == 0) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
-    else                          UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
+    // Draw BOOT CARTRIDGE (either heighlighted or disabled) and the second menu point accordingly.
+    if   (CMOD_CartridgeInserted == true) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
+    else                                  UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
 
-    // Draw the other menu points (enabled)
+    // Draw the other menu points (enabled).
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]), UI_ENABLED);
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[2]), UI_ENABLED);
-
-    // Highlight the first valid menupoint
-    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[firstValidMenuPoint]), UI_HIGHLIGHTED);
+    
+    // Highlight the currently selected menu point.
+    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[selectedMP]), UI_HIGHLIGHTED);
 }
 
 // Draws the initial Show all Page and returns whether lastPlayed game is valid (selectable)
@@ -97,15 +125,16 @@ void UI_DrawShowAllPage(UI_ShowAllTabs_t design)
     // If no game was loaded return
     if (OS_LoadedGamesCounter == 0) return;
 
-    // Draw the initial Scrollbar, offset between menupoint and as many gameentries as possible (first highlighted)
-    int gameEntryY = UI_SHOWALL_GE_LIST_Y;
-
+    // Draw the initial Scrollbar.
     UI_DrawScrollBar(0);
 
+    // Draw an offset between the menupoint and the gameentry list.
     LCD_DrawLine(UI_SHOWALL_MPS_X, UI_SHOWALL_MP_HEIGHT - 1, UI_SHOWALL_MP_LENGTH, UI_UPPER_LIST_PADDING, 0x0000, LCD_HORIZONTAL); 
 
+    // Draw as many gameentries as possible (first one highlighted).
+    int gameEntryY = UI_SHOWALL_GE_LIST_Y;
+    
     UI_DrawGameEntry(UI_SHOWALL_GE_LIST_X, gameEntryY, &(OS_GameEntries[0]), UI_HIGHLIGHTED);
-
     for (int i = 1; i < UI_LIST_LENGTH && i < OS_LoadedGamesCounter; i++)
     {
         gameEntryY += UI_SHOWALL_GE_HEIGHT;
@@ -113,10 +142,101 @@ void UI_DrawShowAllPage(UI_ShowAllTabs_t design)
     }
 }
 
-void UI_DrawOptionsPage(void)
+void UI_DrawOptionsPage(int selectedMP)
 {
-    // YTBI
-    LCD_ClearColor(UI_MAINPAGE_BG_COLOR); // TEST
+    // Draw the Page background.
+    if (SICK_BRICK_DESIGN)
+    {
+        LCD_Brick_t brick;
+        brick.Color        = UI_BRICK_COLOR;
+        brick.Height       = UI_BRICK_HEIGHT;
+        brick.Length       = UI_BRICK_LENGTH;
+        brick.Border.Color = UI_BRICK_BORDER_COLOR;
+        brick.Border.Width = UI_BRICK_BORDER_WIDTH;
+
+        LCD_DrawWall(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y, false, &brick);
+    }
+    else
+    {
+        LCD_ClearColor(UI_OPTIONS_BG_COLOR);
+    }
+
+    // Draw menupoints.
+    if   (OS_EditLanguageMode)  UI_ShowLanguage();
+    else                        UI_DrawMenuPoint(&(UI_Options_MenuPoints[0]), UI_ENABLED);
+
+    UI_DrawMenuPoint(&(UI_Options_MenuPoints[1]), UI_DISABLED);
+
+    if   (OS_EditBrightnessMode)  UI_ShowBrightness();
+    else                          UI_DrawMenuPoint(&(UI_Options_MenuPoints[2]), UI_ENABLED);
+
+    UI_DrawMenuPoint(&(UI_Options_MenuPoints[3]), UI_ENABLED);
+    UI_DrawMenuPoint(&(UI_Options_MenuPoints[4]), UI_ENABLED);
+    UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_ENABLED);
+
+
+    // If the last menupoint is SAVE CARTRIDGE and no cartridge is present disable the menupoint.
+    if (OS_LastState != OS_INGAME_FROM_SDC && OS_LastState != OS_INGAME_FROM_CARTRIDGE && !CMOD_CartridgeInserted)
+    {
+        UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_DISABLED);
+    }
+
+    // Check enabled options.
+    if (OS_Options.DrawScaled)  LCD_DrawSymbol(UI_MP_4_CHECKMARK_X, UI_MP_4_CHECKMARK_Y, UI_MP_CHECKMARK_COLOR, &Fonts_Checkmark_28x20, false);
+    if (OS_Options.AutoBoot)    LCD_DrawSymbol(UI_MP_5_CHECKMARK_X, UI_MP_5_CHECKMARK_Y, UI_MP_CHECKMARK_COLOR, &Fonts_Checkmark_28x20, false);
+    
+    // Highlight the currently selected menupoint and its checkmark (if necessary).
+    if (!OS_EditLanguageMode && !OS_EditBrightnessMode)  UI_DrawMenuPoint(&(UI_Options_MenuPoints[selectedMP]), UI_HIGHLIGHTED);
+    if (selectedMP == 3 && OS_Options.DrawScaled)        LCD_DrawSymbol(UI_MP_4_CHECKMARK_X, UI_MP_4_CHECKMARK_Y, UI_HIGHLIGHTED_MP_CHECKMARK_COLOR, &Fonts_Checkmark_28x20, false);
+    if (selectedMP == 4 && OS_Options.AutoBoot)          LCD_DrawSymbol(UI_MP_5_CHECKMARK_X, UI_MP_5_CHECKMARK_Y, UI_HIGHLIGHTED_MP_CHECKMARK_COLOR, &Fonts_Checkmark_28x20, false);
+}
+
+void UI_ShowLanguage(void)
+{ 
+    UI_MenuPoint_t languageMP = 
+    {
+        .X      = UI_OPTIONS_MP_1_X,
+        .Y      = UI_OPTIONS_MP_1_Y,
+        .Height = UI_OPTIONS_MP_HEIGHT,
+        .Length = UI_OPTIONS_MP_LENGTH_SHORT,
+        .Action = OS_NO_ACTION,
+    };
+
+    switch (OS_Options.Language)
+    {
+        case OS_ENGLISH:
+            CopyString(languageMP.Text, "ENGLISH", UI_MAX_MP_LENGTH + 1);
+            break;
+    }
+
+
+    UI_DrawMenuPoint(&languageMP, UI_HIGHLIGHTED);
+    LCD_DrawSymbol(UI_MP_1_ARROW_LEFT_X, UI_MP_1_ARROW_LEFT_Y, UI_DISABLED_MP_ARROW_COLOR, &Fonts_ArrowLeftToRight_16x31, false);
+    LCD_DrawSymbol(UI_MP_1_ARROW_RIGHT_X, UI_MP_1_ARROW_RIGHT_Y, UI_DISABLED_MP_ARROW_COLOR, &Fonts_ArrowLeftToRight_16x31, true);
+}
+
+void UI_ShowBrightness(void)
+{
+    uint16_t arrowLeftColor  = UI_HIGHLIGHTED_MP_ARROW_COLOR;
+    uint16_t arrowRightColor = UI_HIGHLIGHTED_MP_ARROW_COLOR;
+    
+    UI_MenuPoint_t brightnessMP = 
+    {
+        .X      = UI_OPTIONS_MP_3_X,
+        .Y      = UI_OPTIONS_MP_3_Y,
+        .Height = UI_OPTIONS_MP_HEIGHT,
+        .Length = UI_OPTIONS_MP_LENGTH_MEDIUM,
+        .Action = OS_NO_ACTION,
+    };    
+    sprintf(brightnessMP.Text, "%3d%%", OS_Options.Brightness);
+
+
+    if (OS_Options.Brightness == 0)   arrowLeftColor  = UI_DISABLED_MP_ARROW_COLOR;
+    if (OS_Options.Brightness == 100) arrowRightColor = UI_DISABLED_MP_ARROW_COLOR;
+
+    UI_DrawMenuPoint(&brightnessMP, UI_HIGHLIGHTED);
+    LCD_DrawSymbol(UI_MP_3_ARROW_LEFT_X, UI_MP_3_ARROW_LEFT_Y, arrowLeftColor, &Fonts_ArrowLeftToRight_16x31, false);
+    LCD_DrawSymbol(UI_MP_3_ARROW_RIGHT_X, UI_MP_3_ARROW_RIGHT_Y, arrowRightColor, &Fonts_ArrowLeftToRight_16x31, true);
 }
 
 void UI_DrawMenuPoint(const UI_MenuPoint_t *menuPoint, UI_DrawOption_t option)
@@ -179,7 +299,7 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
             LCD_DrawText(x, y, UI_GE_BG_COLOR, &gameEntryDef, &UI_GE_FONT);
             if (gameEntry->IsFavorite)
             {
-                LCD_DrawSymbol(UI_GE_STAR_X, y + UI_GE_STAR_OFFSET_Y, UI_GE_STAR_COLOR, &Fonts_Star_32x22);
+                LCD_DrawSymbol(UI_GE_STAR_X, y + UI_GE_STAR_OFFSET_Y, UI_GE_STAR_COLOR, &Fonts_Star_32x22, false);
             }
             break;
 
@@ -195,7 +315,7 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
             LCD_DrawText(x, y, UI_HIGHLIGHTED_GE_BG_COLOR, &gameEntryDef, &UI_GE_FONT);
             if (gameEntry->IsFavorite)
             {
-                LCD_DrawSymbol(UI_GE_STAR_X, y + UI_GE_STAR_OFFSET_Y, UI_HIGHLIGHTED_GE_STAR_COLOR, &Fonts_Star_32x22);
+                LCD_DrawSymbol(UI_GE_STAR_X, y + UI_GE_STAR_OFFSET_Y, UI_HIGHLIGHTED_GE_STAR_COLOR, &Fonts_Star_32x22, false);
             }
             break;
     }

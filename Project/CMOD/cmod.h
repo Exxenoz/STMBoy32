@@ -52,11 +52,13 @@ typedef enum
 } CMOD_SaveResult_t;
 
 
-CMOD_Status_t CMOD_GetStatus(void); 
-bool          CMOD_Detect(void);           
+extern bool CMOD_CartridgeInserted;
 
 
 
+CMOD_Status_t CMOD_GetStatus(void);
+
+bool CMOD_CheckForCartridge(void);           
 void CMOD_Initialize(void); 
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data);                       

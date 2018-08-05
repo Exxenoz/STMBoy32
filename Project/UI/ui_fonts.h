@@ -26,6 +26,8 @@ Fonts_SymbolDef_32_t;
 
 extern const Fonts_FontDef_16_t   Fonts_STMFont_16x24;
 extern const Fonts_SymbolDef_32_t Fonts_Star_32x22;
+extern const Fonts_SymbolDef_32_t Fonts_Checkmark_28x20;
+extern const Fonts_SymbolDef_32_t Fonts_ArrowLeftToRight_16x31;
 
 
 

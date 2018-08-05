@@ -573,6 +573,24 @@ const uint16_t STM_FontData_16x24[] = {
          0x10F0, 0x1FF8, 0x0F08, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
          0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
 
+const uint32_t arrowLeftToRight_data_16x31[31] = {
+    0x0001, 0x0003, 0x0007, 0x000F, 0x001F,
+    0x003F, 0x007F, 0x00FF, 0x01FF, 0x03FF,
+    0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF,
+    0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF,
+    0x07FF, 0x03FF, 0x01FF, 0x00FF, 0x007F,
+    0x003F, 0x001F, 0x000F, 0x0007, 0x0003,
+    0x0001,
+};
+         
+const uint32_t checkmark_data_28x20[20] = {
+    0x0000003, 0x000000F, 0x000001F, 0x000007F,
+    0x00000FF, 0x00003FF, 0x00007FC, 0x0000FF0,
+    0x0001FC0, 0x0403F80, 0x0E07E00, 0x3E0FC00,
+    0x7F1F800, 0xFFBE000, 0x3FFC000, 0x0FF8000,
+    0x03F0000, 0x01E0000, 0x00E0000, 0x0040000,
+};
+
 const uint32_t star_data_32x22[22] = {
     0x00008000, 0x0001C000, 0x0001C000, 0x0003E000,
     0x0003E000, 0x0007F000, 0x0007F000, 0x000FF800,
@@ -580,6 +598,20 @@ const uint32_t star_data_32x22[22] = {
     0x00FFFF80, 0x007FFF00, 0x00FFFF80, 0x00FFFF80,
     0x01FFFFC0, 0x01FF7FC0, 0x03FC1FE0, 0x07E003F0,
     0x078000F0, 0x0E000038,
+};
+
+const Fonts_SymbolDef_32_t Fonts_ArrowLeftToRight_16x31 =
+{
+    .SymbolHeight = 31, 
+	.SymbolWidth  = 16, 
+	.SymbolData   = arrowLeftToRight_data_16x31,
+};
+
+const Fonts_SymbolDef_32_t Fonts_Checkmark_28x20 =
+{ 
+	.SymbolHeight = 20, 
+	.SymbolWidth  = 28, 
+	.SymbolData   = checkmark_data_28x20,
 };
 
 const Fonts_SymbolDef_32_t Fonts_Star_32x22 =
@@ -592,9 +624,9 @@ const Fonts_SymbolDef_32_t Fonts_Star_32x22 =
 const Fonts_FontDef_16_t Fonts_STMFont_16x24 =
 {
 	.LettersMirrored = true,
-	.FontHeight 		 = 24,
-	.FontWidth 			 = 16,
-	.FontData 			 = STM_FontData_16x24,
+	.FontHeight      = 24,
+	.FontWidth 	     = 16,
+	.FontData 	     = STM_FontData_16x24,
 };
 
 

@@ -143,7 +143,9 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
         GBC_GPU_FrameBuffer[i].Color = bgColor;
     }
 
-    // Draw first line of all chars, then second one, ...
+    // Calculate bitMask and then draw characters line by line.
+    uint32_t bitMask = (0x8 << ((p_font->FontWidth / 4 - 1) * 4));
+
     for (int yChar = 0; yChar < p_font->FontHeight; yChar++)
     {
         for (int c = 0; c < chars; c++)
@@ -157,11 +159,11 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
                 // Each byte of fontData represents a line of a char where a set bit means a pixel must be drawn
                 // All lines of a char are stored sequentially in fontData, same goes for all chars
                 // The first char is space (ASCII 32), afterwards all chars are stored in ASCII order
-                uint16_t currentCharLine = p_font->FontData[(text->Characters[c] - 32) * p_font->FontHeight + yChar];
+                uint32_t currentCharLine = p_font->FontData[(text->Characters[c] - 32) * p_font->FontHeight + yChar];
 
                 // If FontData is mirrored check lines from right to left
-                if ((p_font->LettersMirrored && ((currentCharLine >> xChar) & 0x0001)) ||
-                   (!p_font->LettersMirrored && ((currentCharLine << xChar) & 0x8000)))
+                if ((p_font->LettersMirrored && ((currentCharLine >> xChar) & 0x000001)) ||
+                   (!p_font->LettersMirrored && ((currentCharLine << xChar) & bitMask)))
                 {
                     // If a bit is set write textColor to the current Buffer position
                     // Padding Right and Bot is accomplished because buffer is actually
@@ -193,14 +195,19 @@ void LCD_DrawText(uint16_t x0, uint16_t y0, uint16_t bgColor, LCD_TextDef_t *tex
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);
 }
 
-void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, const Fonts_SymbolDef_32_t *p_symbol)
+void LCD_DrawSymbol(uint16_t x0, uint16_t y0, uint16_t color, const Fonts_SymbolDef_32_t *p_symbol, bool mirrorSymbol)
 {
+    uint32_t bitMask = (0x8 << ((p_symbol->SymbolWidth / 4 - 1) * 4));
+
+
     for (int y = 0; y < p_symbol->SymbolHeight; y++)
     {
+        uint32_t currentSymbolLine = p_symbol->SymbolData[y];
+        
         for (int x = 0; x < p_symbol->SymbolWidth; x++)
         {
-            uint32_t currentSymbolLine = p_symbol->SymbolData[y];
-            if ((currentSymbolLine << x) & 0x80000000)
+            if ((mirrorSymbol && ((currentSymbolLine >> x) & 0x000001)) ||
+               (!mirrorSymbol && ((currentSymbolLine << x) & bitMask)))
             {
                 LCD_DrawPixel(x0 + x, y0 + y, color);
             }

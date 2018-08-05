@@ -15,7 +15,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
 
     CMOD_ResetCartridge();
 
-    if (!CMOD_Detect())
+    if (!CMOD_CheckForCartridge())
     {
         return GBC_LOAD_RESULT_NO_CARTRIDGE;
     }

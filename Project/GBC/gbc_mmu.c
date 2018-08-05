@@ -125,7 +125,7 @@ bool GBC_MMU_IsValidROMHeader(void)
 
 bool GBC_MMU_LoadFromCartridge(void)
 {
-    if (!CMOD_Detect())
+    if (!CMOD_CheckForCartridge())
     {
         return false;
     }

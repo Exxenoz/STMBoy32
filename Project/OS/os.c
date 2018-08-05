@@ -3,9 +3,8 @@
 #include "os.h"
 
 
-OS_Options_t   OS_InitOptions;                          // Inititial Options.
 
-OS_GameEntry_t OS_CurrentGame;                          // Path of the currenty/last played game.  
+OS_GameEntry_t OS_CurrentGame;                      // Path of the currenty/last played game.  
 
 OS_State_t     OS_CurrState          = OS_MAINPAGE;		// Current Operatingsystem state.
 OS_State_t     OS_LastState          = OS_MAINPAGE;     // Last Operatingsystem state.
@@ -13,19 +12,28 @@ OS_State_t     OS_LastState          = OS_MAINPAGE;     // Last Operatingsystem 
 int            OS_LoadedGamesCounter = 0;               // Number of successfully loaded Games.
 int            OS_TotalGamesCounter  = 0;               // Number of all games detected on SDC.
 
+bool           OS_EditBrightnessMode = false;
+bool           OS_EditLanguageMode   = false;
+
 OS_GameEntry_t OS_GameEntries[OS_MAX_NUMBER_OF_GAMES];  // Array containing all game titles & their favorite status.
 OS_GameEntry_t OS_LastPlayed[OS_LAST_PLAYED_GAMES_NUM]; // Array containing last played game titles & their favorite status.
 
-
-
-void OS_Initialize(void)
+OS_Options_t   OS_Options =                             // Default Settings.
 {
-    // Load initial options
-    OS_LoadOptions();
-}
+    .Brightness = 100,
+    .AutoBoot   = false,
+    .DrawScaled = true,
+    .Language   = OS_ENGLISH,
+};
+
+
+
+/******************************************************************************/
+/*                            OS private Functions                            */
+/******************************************************************************/
 
 // Compare Function used to sort all game entries
-int OS_CmpGameEntries(const void *a, const void *b)
+int CmpGameEntries(const void *a, const void *b)
 {
     OS_GameEntry_t game1 = *((OS_GameEntry_t*)a);
     OS_GameEntry_t game2 = *((OS_GameEntry_t*)b);
@@ -33,16 +41,178 @@ int OS_CmpGameEntries(const void *a, const void *b)
     return CmpStrings(game1.Name, game2.Name);
 }
 
-void OS_LoadOptions(void)
+Error_Def_t LoadOptions(void)
 {
-    // Load the initial options from internal flash
-    // YTBI
+    FIL         file;  
+    uint32_t    bytesRead;
+    uint32_t    bytesWritten;
+    Error_Def_t err_def;
+
+
+    // Mount SDC if possible.
+    if (!SDC_Mount())
+    {
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
+        return err_def;
+    }
+
+    // Open the file. If it can't be opened try to create a new one and initialize it.
+    if (f_open(&file, OS_OPTIONS_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK)
+    {
+        // Ty to create new one.
+        if (f_open(&file, OS_OPTIONS_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
+        {
+            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_OPTIONS_FILE);
+            return err_def;
+        }
+        else
+        {
+            // Try to initialize new one.
+            if (f_write(&file, &OS_Options, sizeof(OS_Options), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_Options))
+            {
+                ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_OPTIONS_FILE);
+                return err_def;
+            }
+        }
+    }
+
+    // Try to read the file.
+    if (f_read(&file, &OS_Options, sizeof(OS_Options), &bytesRead) != FR_OK || bytesRead != sizeof(OS_Options))
+    {
+        ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_OPTIONS_FILE);
+        return err_def;
+    }
+
+    // If everything is ok close the file.
+    f_close(&file);
+ 
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
-void OS_UpdateOptions(void)
+
+/******************************************************************************/
+/*                            OS public Functions                             */
+/******************************************************************************/
+
+void OS_Initialize(void)
 {
-    // Store the current options to internal flash
-    // YTBI
+    // Load initial options
+    LoadOptions();
+    
+    // If auto boot is enabled and a cartridge is present start it immediately.
+    // If there is no cartridge present try to start the last played game.
+    // If there is no data about the last played game available try to load the first favorite game.
+    // If no favorite game could be loaded try to load the first normal game. If this fails aswell open the mainpage.
+    if (OS_Options.AutoBoot)
+    {
+        if (CMOD_CheckForCartridge())
+        {
+            OS_CurrState = OS_INGAME_FROM_CARTRIDGE;
+            OS_LastState = OS_CurrState;
+        }
+        else
+        {
+            OS_LoadLastPlayed();
+
+            if (OS_GameEntries[0].Name[0] == 0)
+            {
+                OS_LoadGameEntries("A", false, true);
+
+                if (OS_GameEntries[0].Name[0] == 0)
+                {
+                    OS_LoadGameEntries("A", false, false);
+                }
+            }
+            
+            if (OS_GameEntries[0].Name[0] != 0)
+            {
+                OS_CurrentGame = OS_GameEntries[0];
+                OS_CurrState   = OS_INGAME_FROM_SDC;
+                OS_LastState   = OS_CurrState;
+            }
+        }
+    }
+}
+
+Error_Def_t OS_LoadLastPlayed(void)
+{   
+    FIL         file;  
+    uint32_t    bytesRead;
+    uint32_t    bytesWritten;
+    Error_Def_t err_def;
+
+    // Clear game entries.
+    memset(OS_GameEntries, 0, sizeof(OS_GameEntries));
+    memset(OS_LastPlayed,  0, sizeof(OS_LastPlayed));
+
+    // Mount SDC if possible.
+    if (!SDC_Mount())
+    {
+        OS_LoadedGamesCounter = 0;
+
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
+        return err_def;
+    }
+
+    // Open the file. If it can't be opened try to create a new one and initialize it.
+    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK)
+    {
+        // Ty to create new one.
+        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
+        {
+            OS_LoadedGamesCounter = 0;
+
+            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
+            return err_def;
+        }
+        else
+        {
+            // Try to initialize new one.
+            if (f_write(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_LastPlayed))
+            {
+                ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+                return err_def;
+            }
+        }
+    }
+
+    // Try to read the file.
+    if (f_read(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesRead) != FR_OK || bytesRead != sizeof(OS_LastPlayed))
+    {
+        OS_LoadedGamesCounter = 0;
+
+        ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+        return err_def;
+    }
+
+    // If everything is ok close the file and reset OS_LoadedGamesCounter.
+    f_close(&file);
+    OS_LoadedGamesCounter = 0;
+
+    // Get path of each game and try to open it in order to validate it.
+    // If a game is valid determine wheter it's currently marked as favorite, copy it to OS_GameEntries an increase the counter.
+    for (int i = 0; i < OS_LAST_PLAYED_GAMES_NUM; i++)
+    {
+        char path[OS_MAX_PATH_LENGTH];
+        OS_GetGamePath(&OS_LastPlayed[i], path, OS_MAX_PATH_LENGTH);
+        
+        if (f_open(&file, path, FA_OPEN_EXISTING | FA_READ) == FR_OK)
+        {
+            f_close(&file);
+
+            OS_GameEntries[OS_LoadedGamesCounter] = OS_LastPlayed[i];
+            OS_Set_IsFavorite(&OS_GameEntries[OS_LoadedGamesCounter]);
+
+            OS_LoadedGamesCounter++;
+        }
+    }
+    OS_TotalGamesCounter = OS_LoadedGamesCounter;
+
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
 }
 
 // Loads maxLoad gameentries in alphabetical (starting with the one following startingName) order to OS_GameEntries
@@ -149,7 +319,7 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
                 // If opening the favorite directory fails sort what was already stored and exit
                 if (f_opendir(&directory, OS_FAVORITE_DIRECTORY) != FR_OK)
                 {
-                    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
+                    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), CmpGameEntries);
 
                     ERR_DEF_INIT(err_def, SDC_ERROR_DIR_ACCESS_FAILED, OS_FAVORITE_DIRECTORY);
                     return err_def;
@@ -161,143 +331,46 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
 
     // Close directory and sort the list alphabetically (case insensitive)
     f_closedir(&directory);
-    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), OS_CmpGameEntries);
+    qsort(OS_GameEntries, OS_LoadedGamesCounter, sizeof(OS_GameEntry_t), CmpGameEntries);
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;
 }
 
-Error_Def_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
+Error_Def_t OS_UpdateOptions(void)
 {
-    char        oldPath[OS_MAX_PATH_LENGTH];
-    char        newPath[OS_MAX_PATH_LENGTH];
-    Error_Def_t err_def;
-
-    // Get old path
-    err_def = OS_GetGamePath(p_game, oldPath, OS_MAX_PATH_LENGTH);
-    ERROR_CHECK(err_def);
-
-    // Invert the favorite attribute
-    p_game->IsFavorite = p_game->IsFavorite ? false : true;
-
-    // Get the new path
-    if (p_game->IsFavorite)
-    {
-        CopyString(newPath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
-        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
-    }
-    else
-    {
-        CopyString(newPath, OS_GAME_PATH, OS_MAX_PATH_LENGTH);
-        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
-    }
-
-    // Move the game into the new directory
-    f_rename(oldPath, newPath);
-
-    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
-    return err_def;
-}
-
-int ConvertCharArrayToGameEntries(const char *buffer, int bufferSize, OS_GameEntry_t *GameEntries, int entries)
-{
-    int currGameIndex = 0;
-
-    for (int i = 0, j = 0; i < bufferSize && buffer[i] != '-' && currGameIndex < entries; i++, j++)
-    {        
-        if (buffer[i] != '\r')
-        {
-            OS_GameEntries[currGameIndex].Name[j] = buffer[i];
-        }
-        else
-        {
-            OS_GameEntries[currGameIndex].Name[j] = '\0';
-
-            ERROR_CHECK(OS_Set_IsFavorite(&(OS_GameEntries[currGameIndex])));
-
-            currGameIndex++;
-            j = -1;
-            i++;             // Skip the '\n'
-        }
-    }
-
-    return currGameIndex;
-}
-
-Error_Def_t OS_LoadLastPlayed(void)
-{   
     FIL         file;  
-    uint32_t    bytesRead;
     uint32_t    bytesWritten;
     Error_Def_t err_def;
 
-    // Clear game entries.
-    memset(OS_GameEntries, 0, sizeof(OS_GameEntries));
-    memset(OS_LastPlayed,  0, sizeof(OS_LastPlayed));
 
     // Mount SDC if possible.
     if (!SDC_Mount())
     {
-        OS_LoadedGamesCounter = 0;
-
         ERR_DEF_INIT_NO_ARGUMENT(err_def, SDC_ERROR_NO_SDC);
         return err_def;
     }
 
-    // Open the file. If it can't be opened try to create a new one and initialize it.
-    if (f_open(&file, OS_LAST_PLAYED_FILE, FA_OPEN_EXISTING | FA_READ) != FR_OK)
+    // Open the file. If it can't be opened try to create a new one.
+    if (f_open(&file, OS_OPTIONS_FILE, FA_OPEN_EXISTING | FA_WRITE) != FR_OK)
     {
-        // Ty to create new one.
-        if (f_open(&file, OS_LAST_PLAYED_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
+        if (f_open(&file, OS_OPTIONS_FILE, FA_CREATE_NEW | FA_WRITE) != FR_OK)
         {
-            OS_LoadedGamesCounter = 0;
-
-            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_LAST_PLAYED_FILE);
+            ERR_DEF_INIT(err_def, SDC_ERROR_FILE_ACCESS_FAILED, OS_OPTIONS_FILE);
             return err_def;
-        }
-        else
-        {
-            // Try to initialize new one.
-            if (f_write(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_LastPlayed))
-            {
-                ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_LAST_PLAYED_FILE);
-                return err_def;
-            }
         }
     }
 
-    // Try to read the file.
-    if (f_read(&file, OS_LastPlayed, sizeof(OS_LastPlayed), &bytesRead) != FR_OK || bytesRead != sizeof(OS_LastPlayed))
+    // Write OS_Options to the options file.
+    if (f_write(&file, &OS_Options, sizeof(OS_Options), &bytesWritten) != FR_OK || bytesWritten != sizeof(OS_Options))
     {
-        OS_LoadedGamesCounter = 0;
-
-        ERR_DEF_INIT(err_def, SDC_ERROR_READING_FILE_FAILED, OS_LAST_PLAYED_FILE);
+        ERR_DEF_INIT(err_def, SDC_ERROR_WRITING_FILE_FAILED, OS_OPTIONS_FILE);
         return err_def;
     }
 
-    // If everything is ok close the file and reset OS_LoadedGamesCounter.
+    // If everything is ok close the file.
     f_close(&file);
-    OS_LoadedGamesCounter = 0;
-
-    // Get path of each game and try to open it in order to validate it.
-    // If a game is valid determine wheter it's currently marked as favorite, copy it to OS_GameEntries an increase the counter.
-    for (int i = 0; i < OS_LAST_PLAYED_GAMES_NUM; i++)
-    {
-        char path[OS_MAX_PATH_LENGTH];
-        OS_GetGamePath(&OS_LastPlayed[i], path, OS_MAX_PATH_LENGTH);
-        
-        if (f_open(&file, path, FA_OPEN_EXISTING | FA_READ) == FR_OK)
-        {
-            f_close(&file);
-
-            OS_GameEntries[OS_LoadedGamesCounter] = OS_LastPlayed[i];
-            OS_Set_IsFavorite(&OS_GameEntries[OS_LoadedGamesCounter]);
-
-            OS_LoadedGamesCounter++;
-        }
-    }
-    OS_TotalGamesCounter = OS_LoadedGamesCounter;
-
+ 
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;
@@ -392,54 +465,6 @@ Error_Def_t OS_UpdateLastPlayed(void)
     return err_def;
 }
 
-Error_Def_t OS_GetGameEntry(char *name, OS_GameEntry_t **gameEntry)
-{
-    Error_Def_t err_def;
-
-    for (int i = 0; i < OS_LoadedGamesCounter; i++)
-    {
-        if (CmpStrings(OS_GameEntries[i].Name, name) == 0)
-        {
-            *gameEntry = &(OS_GameEntries[i]);
-
-            ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
-            return err_def;
-        }
-    }
-
-    ERR_DEF_INIT(err_def, OS_ERROR_GAME_NOT_FOUND, name);
-    return err_def;
-}
-
-Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex)
-{
-    Error_Def_t err_def;
-
-    if (currGameEntryIndex >= OS_LoadedGamesCounter)
-    {
-        ERR_DEF_INIT(err_def, OS_ERROR_INVALID_INDEX, (char*)(&currGameEntryIndex)); // ?
-        return err_def;
-    }
-
-    for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
-    {
-        if (i == OS_LoadedGamesCounter - 1)
-        {
-            CopyString(OS_GameEntries[i].Name, "", OS_MAX_GAME_TITLE_LENGTH + 1);
-        }
-        else
-        {
-            CopyString(OS_GameEntries[i].Name, OS_GameEntries[i + 1].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
-            OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
-        }
-    }
-    OS_LoadedGamesCounter--;
-    OS_TotalGamesCounter--;
-
-    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
-    return err_def;
-}
-
 Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
 {
     FIL         file;
@@ -483,6 +508,35 @@ Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
     return err_def;
 }
 
+Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex)
+{
+    Error_Def_t err_def;
+
+    if (currGameEntryIndex >= OS_LoadedGamesCounter)
+    {
+        ERR_DEF_INIT(err_def, OS_ERROR_INVALID_INDEX, (char*)(&currGameEntryIndex));
+        return err_def;
+    }
+
+    for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
+    {
+        if (i == OS_LoadedGamesCounter - 1)
+        {
+            CopyString(OS_GameEntries[i].Name, "", OS_MAX_GAME_TITLE_LENGTH + 1);
+        }
+        else
+        {
+            CopyString(OS_GameEntries[i].Name, OS_GameEntries[i + 1].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
+        }
+    }
+    OS_LoadedGamesCounter--;
+    OS_TotalGamesCounter--;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
+}
+
 Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game)
 {
     Error_Def_t err_def;
@@ -503,6 +557,38 @@ Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game)
     {
         p_game->IsFavorite = false;
     }
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
+}
+
+Error_Def_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game)
+{
+    char        oldPath[OS_MAX_PATH_LENGTH];
+    char        newPath[OS_MAX_PATH_LENGTH];
+    Error_Def_t err_def;
+
+    // Get old path
+    err_def = OS_GetGamePath(p_game, oldPath, OS_MAX_PATH_LENGTH);
+    ERROR_CHECK(err_def);
+
+    // Invert the favorite attribute
+    p_game->IsFavorite = p_game->IsFavorite ? false : true;
+
+    // Get the new path
+    if (p_game->IsFavorite)
+    {
+        CopyString(newPath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
+        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
+    }
+    else
+    {
+        CopyString(newPath, OS_GAME_PATH, OS_MAX_PATH_LENGTH);
+        AppendString(newPath, p_game->Name, OS_MAX_PATH_LENGTH);
+    }
+
+    // Move the game into the new directory
+    f_rename(oldPath, newPath);
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;
@@ -545,6 +631,29 @@ void OS_DoAction(OS_Action_t action)
         case OS_SWITCH_TO_STATE_INGAME_FSD:
             OS_LastState = OS_CurrState;
             OS_CurrState = OS_INGAME_FROM_SDC;
+            OS_UpdateLastPlayed();
+            break;
+        
+        case OS_TOGGLE_OPTION_DIRECT_BOOT:
+            OS_Options.AutoBoot = (bool)!OS_Options.AutoBoot;
+            OS_UpdateOptions();
+            break;
+        
+        case OS_TOGGLE_OPTION_SCALING:
+            OS_Options.DrawScaled = (bool)!OS_Options.DrawScaled;
+            OS_UpdateOptions();
+            break;
+        
+        case OS_EDIT_BRIGHTNESS:
+            OS_EditBrightnessMode = (bool)!OS_EditBrightnessMode;
+            break;
+        
+        case OS_EDIT_LANGUAGE:
+            OS_EditLanguageMode = (bool)!OS_EditLanguageMode;
+            break;
+        
+        case OS_SAVE_CARTRIDGE:
+            CMOD_SaveCartridge(true);
             break;
     }
 }

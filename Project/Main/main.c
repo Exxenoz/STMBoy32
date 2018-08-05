@@ -16,6 +16,7 @@
 
 #include "led.h"
 #include "sdc.h"
+#include "cmod.h"
 #include "audio.h"
 #include "input.h"
 #include "common.h"
@@ -26,23 +27,23 @@
 
 int main(void)
 {
-		// Initialize library.
-		HAL_Init();
+    // Initialize library.
+    HAL_Init();
 
-		// Initialize system.
-		System_Initialize();
+    // Initialize system.
+    System_Initialize();
 
-		// Initialize drivers.
-		OS_Initialize();
-		SDC_Initialize();
-		LED_Initialize();
-		LCD_Initialize();
-//  CMOD_Initialize();
-		Audio_Initialize();
-		Input_Initialize();
+    // Initialize drivers.
+    OS_Initialize();
+    SDC_Initialize();
+    LED_Initialize();
+    LCD_Initialize();
+    //CMOD_Initialize();
+    Audio_Initialize();
+    Input_Initialize();
 
-		// Turn on display.
-    LCD_DimBacklight(0);
+    // Turn on display.
+    LCD_DimBacklight(100 - OS_Options.Brightness);
 
 
     /* Main loop */
