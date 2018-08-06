@@ -5,10 +5,10 @@
 #include "input_config.h"
 
 
-#define INPUT_FRAME_PORT      GPIOB
-#define INPUT_FRAME_PIN       GPIO_PIN_0
+#define INPUT_FRAME_PORT                   GPIOB
+#define INPUT_FRAME_PIN                    GPIO_PIN_0
 
-#define INPUT_MAX_LOCK_TIME   (MAX_16BIT_TIMER_PERIOD - 1) // Max even timer period (65534) => 32 767 ms (timer runs with 2kHz)
+#define INPUT_MAX_LOCK_TIME                (MAX_16BIT_TIMER_PERIOD - 1) // Max even timer period (65534) => 32 767 ms (timer runs with 2kHz)
 
 // Dynamic lock perimeters (used for scrolling a list)
 #define INPUT_MIN_DYNAMIC_LOCK_TIME        10

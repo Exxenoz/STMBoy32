@@ -108,7 +108,7 @@ void LCD_ReadBuffer(uint16_t addr, uint16_t buffer[], long length)
 /*                        LCD Configuration Functions                         */
 /******************************************************************************/
 
-void LCD_DimBacklight(long percent)
+void LCD_SetBrightness(long percent)
 {
     if (percent < 0)
     {
@@ -119,7 +119,7 @@ void LCD_DimBacklight(long percent)
         percent = 100;
     }
 
-    __HAL_TIM_SET_COMPARE(&LCD_TIM_Handle_Backlight, LCD_TIM_BACKLIGHT_CHANNEL, 2.81f * percent);
+    __HAL_TIM_SET_COMPARE(&LCD_TIM_Handle_Backlight, LCD_TIM_BACKLIGHT_CHANNEL, 0.8f * percent);
 }
 
 void LCD_SetDrawAreaHorizontal(uint16_t startColumn, uint16_t endColumn)

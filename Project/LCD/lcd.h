@@ -31,7 +31,7 @@ void LCD_WriteCommandWithParameters(uint16_t addr, uint16_t parameters[], long l
 /*                        LCD Configuration Functions                         */
 /******************************************************************************/
 
-void LCD_DimBacklight(long percent);
+void LCD_SetBrightness(long percent);
 void LCD_SetDrawArea(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
 void LCD_SetDrawBehaviour(bool writeBotToTop, bool writeRightToLeft, bool rowColExchange, bool refreshBotToTop, bool refreshRightToLeft, bool bgr);
 void LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO_t divRatio, LCD_FRAME_RATE_t frameRate);

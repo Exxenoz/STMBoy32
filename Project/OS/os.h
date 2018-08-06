@@ -25,6 +25,7 @@
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME     400
 #define OS_OPTIONS_PAGE_BUTTON_LOCK_TIME  400
 
+#define OS_MIN_BRIGHTNESS                 3                    // User can't go below 3%.
 
 typedef enum
 {

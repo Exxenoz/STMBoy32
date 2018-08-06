@@ -43,7 +43,7 @@ int main(void)
     Input_Initialize();
 
     // Turn on display.
-    LCD_DimBacklight(100 - OS_Options.Brightness);
+    LCD_SetBrightness(OS_Options.Brightness);
 
 
     /* Main loop */

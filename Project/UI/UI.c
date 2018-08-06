@@ -231,8 +231,8 @@ void UI_ShowBrightness(void)
     sprintf(brightnessMP.Text, "%3d%%", OS_Options.Brightness);
 
 
-    if (OS_Options.Brightness == 0)   arrowLeftColor  = UI_DISABLED_MP_ARROW_COLOR;
-    if (OS_Options.Brightness == 100) arrowRightColor = UI_DISABLED_MP_ARROW_COLOR;
+    if (OS_Options.Brightness == OS_MIN_BRIGHTNESS) arrowLeftColor  = UI_DISABLED_MP_ARROW_COLOR;
+    if (OS_Options.Brightness == 100)               arrowRightColor = UI_DISABLED_MP_ARROW_COLOR;
 
     UI_DrawMenuPoint(&brightnessMP, UI_HIGHLIGHTED);
     LCD_DrawSymbol(UI_MP_3_ARROW_LEFT_X, UI_MP_3_ARROW_LEFT_Y, arrowLeftColor, &Fonts_ArrowLeftToRight_16x31, false);

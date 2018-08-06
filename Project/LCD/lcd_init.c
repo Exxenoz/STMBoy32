@@ -103,18 +103,18 @@ void LCD_InitializeBacklight()
     HAL_GPIO_Init(LCD_PORT_BACKLIGHT, &GPIO_InitObject);
 
     LCD_TIM_Handle_Backlight.Instance               = LCD_TIM_BACKLIGHT;
-    LCD_TIM_Handle_Backlight.Init.Prescaler         = 37;
+    LCD_TIM_Handle_Backlight.Init.Prescaler         = 39;
     LCD_TIM_Handle_Backlight.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    LCD_TIM_Handle_Backlight.Init.Period            = 626;
+    LCD_TIM_Handle_Backlight.Init.Period            = 99;
     LCD_TIM_Handle_Backlight.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     LCD_TIM_Handle_Backlight.Init.RepetitionCounter = 0;
 
     static TIM_OC_InitTypeDef LCD_TIM_OC_Init_Backlight;
-    LCD_TIM_OC_Init_Backlight.Pulse        = 281; 
+    LCD_TIM_OC_Init_Backlight.Pulse        = 80; 
     LCD_TIM_OC_Init_Backlight.OCMode       = TIM_OCMODE_PWM1;
     LCD_TIM_OC_Init_Backlight.OCFastMode   = TIM_OCFAST_DISABLE;
-    LCD_TIM_OC_Init_Backlight.OCPolarity   = TIM_OCPOLARITY_LOW;
-    LCD_TIM_OC_Init_Backlight.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    LCD_TIM_OC_Init_Backlight.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    LCD_TIM_OC_Init_Backlight.OCNPolarity  = TIM_OCNPOLARITY_LOW;
     LCD_TIM_OC_Init_Backlight.OCIdleState  = TIM_OCIDLESTATE_RESET;
     LCD_TIM_OC_Init_Backlight.OCNIdleState = TIM_OCNIDLESTATE_RESET;
 

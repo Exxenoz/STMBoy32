@@ -268,7 +268,7 @@ void HandleOptionPage(void)
                 OS_Options.Brightness++;
                 OS_UpdateOptions();
 
-                LCD_DimBacklight(100 - OS_Options.Brightness);
+                LCD_DimBacklight(OS_Options.Brightness);
                 UI_ShowBrightness();
                 
                 Input_LockDynamically(INPUT_FADE_RIGHT_ID);
@@ -307,12 +307,12 @@ void HandleOptionPage(void)
                 Input_Lock(INPUT_FADE_LEFT_ID, INPUT_LOCK_UNTIL_RELEASED);*/
             }
             
-            if (OS_EditBrightnessMode && OS_Options.Brightness > 0)
+            if (OS_EditBrightnessMode && OS_Options.Brightness > OS_MIN_BRIGHTNESS)
             {
                 OS_Options.Brightness--;
                 OS_UpdateOptions();
 
-                LCD_DimBacklight(100 - OS_Options.Brightness);
+                LCD_DimBacklight(OS_Options.Brightness);
                 UI_ShowBrightness();
                 
                 Input_LockDynamically(INPUT_FADE_LEFT_ID);
