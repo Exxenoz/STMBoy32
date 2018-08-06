@@ -268,7 +268,7 @@ void HandleOptionPage(void)
                 OS_Options.Brightness++;
                 OS_UpdateOptions();
 
-                LCD_DimBacklight(OS_Options.Brightness);
+                LCD_SetBrightness(OS_Options.Brightness);
                 UI_ShowBrightness();
                 
                 Input_LockDynamically(INPUT_FADE_RIGHT_ID);
@@ -312,7 +312,7 @@ void HandleOptionPage(void)
                 OS_Options.Brightness--;
                 OS_UpdateOptions();
 
-                LCD_DimBacklight(OS_Options.Brightness);
+                LCD_SetBrightness(OS_Options.Brightness);
                 UI_ShowBrightness();
                 
                 Input_LockDynamically(INPUT_FADE_LEFT_ID);
@@ -396,6 +396,9 @@ void HandleOptionPage(void)
         // If B-Button is pressed switch to previous state and end the infinite loop.
         if (Input_Interrupt_Flags.ButtonB && !Input_IsLocked(INPUT_B_ID))
         {
+            OS_EditBrightnessMode = false;
+            OS_EditLanguageMode   = false;
+            
             Input_LockAll(INPUT_LOCK_UNTIL_RELEASED);
             OS_DoAction(OS_SWITCH_TO_PREVIOUS_STATE);
             break;
