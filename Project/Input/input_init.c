@@ -36,9 +36,9 @@ void Input_InitializePins(void)
 void Input_InitializeTimers(void)
 {
     // Initialize lock timer.
-    Input_LockTimerHandle.Init.Prescaler         = INPUT_LOCK_TIM_PRESCALER; // Timer runs with 200MHz -> scale it to 4kHz.
+    Input_LockTimerHandle.Init.Prescaler         = INPUT_LOCK_TIM_PRESCALER;
     Input_LockTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    Input_LockTimerHandle.Init.Period            = MAX_16BIT_TIMER_PERIOD;   // Count 'til max value -> 1 overflow / 16s.
+    Input_LockTimerHandle.Init.Period            = MAX_16BIT_TIMER_PERIOD;    // Count 'til max value -> 1 overflow / 16s (with 49999 as prescaler).
     Input_LockTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     Input_LockTimerHandle.Init.RepetitionCounter = 0;
 
@@ -46,9 +46,9 @@ void Input_InitializeTimers(void)
     HAL_TIM_Base_Start(&Input_LockTimerHandle);
 
     // Initialise polling timer.
-    Input_PollTimerHandle.Init.Prescaler         = 49999;                    // Timer runs with 200MHz -> scale it to 4kHz.
+    Input_PollTimerHandle.Init.Prescaler         = INPUT_POLLING_TIM_PRESCALER;
     Input_PollTimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    Input_PollTimerHandle.Init.Period            = 3;                        // Count 'til 3 (+1) -> 1000 overflows/s.
+    Input_PollTimerHandle.Init.Period            = ((INPUT_POLLING_TIM_FREQ / (INPUT_POLLING_TIM_PRESCALER + 1)) / 1000) - 1; // Generate 1000 overflows/s.
     Input_PollTimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     Input_PollTimerHandle.Init.RepetitionCounter = 0;
 

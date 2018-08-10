@@ -7,6 +7,8 @@
 #include "lcd_config.h"
 #include "lcd_drawing.h"
 
+#include "input_config.h"
+
 
 extern TIM_HandleTypeDef  LCD_TIM_Handle_PixelTransferTiming;
 extern TIM_HandleTypeDef  LCD_TIM_Handle_Backlight;

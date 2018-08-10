@@ -7,11 +7,11 @@
 #include "common.h"
 
 
-#define INPUT_LOCK_UNTIL_RELEASED          (INPUT_MAX_LOCK_TIME + 1)  // Locks button until it's released (second unlock condition) because value can never be reached.
+#define INPUT_LOCK_UNTIL_RELEASED          0   // Per convention locks button until it's released (second unlock condition).
 
-#define INPUT_MAX_DYNAMIC_LOCK_TIME        150
-#define INPUT_MIN_DYNAMIC_LOCK_TIME        10
-#define INPUT_DYNAMIC_LOCK_TIME_STEP       10
+#define INPUT_MAX_DYNAMIC_LOCK_TIME        300
+#define INPUT_MIN_DYNAMIC_LOCK_TIME        50
+#define INPUT_DYNAMIC_LOCK_TIME_STEP       25
 
 
 #pragma pack(1)

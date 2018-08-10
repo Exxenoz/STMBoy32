@@ -1,11 +1,11 @@
-#ifndef INPUT_H
+  #ifndef INPUT_H
 #define INPUT_H
 
 #include "common.h"
 #include "input_init.h"
 
 
-#define INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED   20
+#define INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED   10
 
 
 typedef enum

@@ -18,7 +18,7 @@
 #include "sdc.h"
 #include "cmod.h"
 #include "audio.h"
-#include "input.h"
+#include "input_init.h"
 #include "common.h"
 #include "system.h"
 #include "lcd_init.h"

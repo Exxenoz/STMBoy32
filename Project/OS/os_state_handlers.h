@@ -1,7 +1,7 @@
 #ifndef OS_STATE_HANDLERS_H
 #define OS_STATE_HANDLERS_H
 
-#include "input.h"
+#include "input_locks.h"
 #include "audio.h"
 #include "cmod.h"
 #include "gbc.h"

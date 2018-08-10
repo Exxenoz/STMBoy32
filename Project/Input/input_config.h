@@ -12,6 +12,8 @@
 
 #define INPUT_POLLING_TIM                   TIM2
 #define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM2_IRQn
+#define INPUT_POLLING_TIM_FREQ              200000000
+#define INPUT_POLLING_TIM_PRESCALER         49999
 
 #define INPUT_BUS_ALL                       RCC_AHB1Periph_GPIOB
 #define INPUT_PORT_ALL                      GPIOB
