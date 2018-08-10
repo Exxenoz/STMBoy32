@@ -38,7 +38,7 @@ int CmpGameEntries(const void *a, const void *b)
     OS_GameEntry_t game1 = *((OS_GameEntry_t*)a);
     OS_GameEntry_t game2 = *((OS_GameEntry_t*)b);
 
-    return CmpStrings(game1.Name, game2.Name);
+    return CompareStrings(game1.Name, game2.Name);
 }
 
 Error_Def_t LoadOptions(void)
@@ -263,8 +263,8 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
         if (f_readdir(&directory, &fileInfo) == FR_OK && fileInfo.fname[0] != NULL && fileInfo.fattrib != AM_DIR)
         {
             // If the read gametitle is not 'higher'/'lower' than startingName continue
-            if (previous && CmpStrings(startingName, fileInfo.fname) < 0) continue;
-            if (!previous && CmpStrings(startingName, fileInfo.fname) > 0) continue;
+            if (previous && CompareStrings(startingName, fileInfo.fname) < 0) continue;
+            if (!previous && CompareStrings(startingName, fileInfo.fname) > 0) continue;
 
             // If OS_GameEntries is not fully populated add the name of the game unconditionally
             if (OS_LoadedGamesCounter < OS_MAX_NUMBER_OF_GAMES)
@@ -282,7 +282,7 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
 
                 for (int i = 0; i < OS_MAX_NUMBER_OF_GAMES; i++)
                 {
-                    currentDifferenze = CmpStrings(OS_GameEntries[i].Name, fileInfo.fname);
+                    currentDifferenze = CompareStrings(OS_GameEntries[i].Name, fileInfo.fname);
                     if (currentDifferenze > biggestDifferenze)
                     {
                         biggestDifferenze = currentDifferenze;
@@ -433,7 +433,7 @@ Error_Def_t OS_UpdateLastPlayed(void)
         int removal_start_index = OS_LAST_PLAYED_GAMES_NUM - 1;
         for (int i = 0; i < OS_LAST_PLAYED_GAMES_NUM; i++)
         {
-            if (CmpStrings(OS_LastPlayed[i].Name, OS_CurrentGame.Name) == 0)
+            if (CompareStrings(OS_LastPlayed[i].Name, OS_CurrentGame.Name) == 0)
             {
                 removal_start_index = i;
                 break;
@@ -549,7 +549,7 @@ Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game)
     CopyString(favoritePath, OS_FAVORITE_PATH, OS_MAX_PATH_LENGTH);
     AppendString(favoritePath, p_game->Name, OS_MAX_PATH_LENGTH);
 
-    if (CmpStrings(path, favoritePath) == 0)
+    if (CompareStrings(path, favoritePath) == 0)
     {
         p_game->IsFavorite = true;
     }

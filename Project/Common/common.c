@@ -4,7 +4,7 @@
 
 
 // Compare two strings if string a is alphabetically 'higher' the return value is > 0 (0 for equal strings)
-int CmpStrings(const void *a, const void *b)
+int CompareStrings(const void *a, const void *b)
 {
     char *string1 = (char*)a;
     char *string2 = (char*)b;
@@ -43,18 +43,7 @@ void CopyString(char *dest, const char *src, int destSize)
     dest[i] = '\0';
 }
 
-void CopyChars(char *dest, const char *src, int destSize, int srcSize)
-{
-    // Clear destination
-    memset(dest, 0, destSize);
-
-    for (int i = 0; i < destSize && i < srcSize; i++)
-    {
-        dest[i] = src[i];
-    }
-}
-
-void CopyWithoutSuffix(char *dest, const char *src, int destSize)
+void CopyStringWithoutSuffix(char *dest, const char *src, int destSize)
 {
     // Clear destination
     memset(dest, 0, destSize);
@@ -81,6 +70,17 @@ void AppendString(char *dest, const char *src, int destSize)
     }
 
     dest[i] = '\0';
+}
+
+void CopyChars(char *dest, const char *src, int destSize, int srcSize)
+{
+    // Clear destination
+    memset(dest, 0, destSize);
+
+    for (int i = 0; i < destSize && i < srcSize; i++)
+    {
+        dest[i] = src[i];
+    }
 }
 
 void AppendChars(char *dest, const char *src, int destSize, int srcSize)

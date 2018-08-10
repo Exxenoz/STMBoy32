@@ -1,14 +1,14 @@
 #include "audio.h"
 
 
-TIM_HandleTypeDef      Audio_TimerHandle;
+TIM_HandleTypeDef       Audio_TimerHandle;
 
-DAC_HandleTypeDef      Audio_DACHandle;
-DAC_ChannelConfTypeDef Audio_ChannelConfigL;
-DAC_ChannelConfTypeDef Audio_ChannelConfigR;
+DMA_HandleTypeDef       Audio_DMAHandleL;
+DMA_HandleTypeDef       Audio_DMAHandleR;
 
-DMA_HandleTypeDef      Audio_DMAHandleL;
-DMA_HandleTypeDef      Audio_DMAHandleR;
+DAC_HandleTypeDef       Audio_DACHandle;
+DAC_ChannelConfTypeDef  Audio_ChannelConfigL;
+DAC_ChannelConfTypeDef  Audio_ChannelConfigR;
 
 volatile bool Audio_IsPlayingOfBufferFinished = false;
 uint32_t      Audio_BufferPlayedCounter       = 0;
@@ -34,24 +34,24 @@ void Audio_InitializeTimer(void)
     Audio_TimerHandle.State    = HAL_TIM_STATE_RESET;
 
     /**************************************
-    // Duration of one GB frame: 0,0167427062988281s
-    // Audio samples per frame: 532 * 4 = 2128
+    // Duration of one GB frame:     0,0167427062988281s
+    // Audio samples per frame:      532 * 4 = 2128
     // Duration of one audio sample: 0,0167427062988281s / 2128 = 7,8678131103515507518796992481203e-6
-    // Timer frequency: 100MHz
-    // Audio frequency: 1 / 7,8678131103515507518796992481203e-6s = 127100,12121212Hz ~ 127,1KHz
-    // Timer period: 100MHz / 127100,12121212Hz = 786,781311
+    // Timer frequency:              100MHz
+    // Audio frequency:              1 / 7,8678131103515507518796992481203e-6s = 127100,12121212Hz ~ 127,1KHz
+    // Timer period:                 100MHz / 127100,12121212Hz = 786,781311
     **************************************/
 
-    Audio_TimerHandle.Init.Period        = 786;
-    Audio_TimerHandle.Init.Prescaler     = 0;
-    Audio_TimerHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
-    Audio_TimerHandle.Init.ClockDivision = 0;
+    Audio_TimerHandle.Init.Period            = 786;
+    Audio_TimerHandle.Init.Prescaler         = 0;
+    Audio_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    Audio_TimerHandle.Init.ClockDivision     = 0;
     Audio_TimerHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     HAL_TIM_Base_Init(&Audio_TimerHandle);
 
     static TIM_MasterConfigTypeDef masterConfig;
     masterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    masterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    masterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &masterConfig);
 
     HAL_TIM_Base_Start(&Audio_TimerHandle);
@@ -128,6 +128,7 @@ void Audio_Initialize(void)
     Audio_InitializeDMA();
 }
 
+
 void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize)
 {
     Audio_BufferPlayedCounter = 0;
@@ -135,6 +136,7 @@ void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32
     HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t *)audioBufferL, audioBufferSize, DAC_ALIGN_12B_R);
     HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t *)audioBufferR, audioBufferSize, DAC_ALIGN_12B_R);
 }
+
 
 void DMA1_Stream5_IRQHandler(void)
 {

@@ -298,7 +298,7 @@ void UI_DrawGameEntry(uint16_t x, uint16_t y, OS_GameEntry_t *gameEntry, UI_Draw
     // Initialize gameentry specifications
     int stringLen = Fonts_GetStringLengthWithoutSuffix(gameEntry->Name, UI_GE_SPACING, &UI_GE_FONT);
 
-    CopyWithoutSuffix(gameEntryDef.Characters, gameEntry->Name, LCD_MAX_TEXT_LENGTH + 1);
+    CopyStringWithoutSuffix(gameEntryDef.Characters, gameEntry->Name, LCD_MAX_TEXT_LENGTH + 1);
     gameEntryDef.Spacing       = UI_GE_SPACING;
     gameEntryDef.Border.Width  = UI_GE_BORDER_WIDTH;
     gameEntryDef.Padding.Upper = ((UI_SHOWALL_GE_HEIGHT - 2 * UI_GE_BORDER_WIDTH - UI_MP_FONT.FontHeight) / 2);
