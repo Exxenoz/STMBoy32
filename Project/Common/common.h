@@ -10,15 +10,17 @@
 #define NOP __ASM("nop")
 
 // Null pointer define
-#define NULL 0
+#define NULL                         0
 
-#define INTERRUPT_PRIORITY_2    1                   // 0 is the highest priority, 16 the lowest
-#define MAX_16BIT_TIMER_PERIOD  65535
+#define INTERRUPT_PRIORITY_2         1                   // 0 is the highest priority, 16 the lowest
+#define MAX_16BIT_TIMER_PERIOD       0xFFFF
 
 // GPIO Modes
-#define GPIO_INPUT_MODE  0x00000000
-#define GPIO_OUTPUT_MODE 0x55555555
+#define GPIO_INPUT_MODE              0x00000000
+#define GPIO_OUTPUT_MODE             0x55555555
 
+
+typedef uint16_t time_t;
 
 // Boolean define
 typedef enum bool_e

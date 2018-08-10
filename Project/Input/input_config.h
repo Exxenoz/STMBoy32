@@ -2,13 +2,22 @@
 #define INPUT_CONFIG_H
 
 
+/******************************************************************************/
+/*                 Input Pin, Port, Bus and Timer definitions                 */
+/******************************************************************************/
+
 #define INPUT_LOCK_TIM                      TIM7
+#define INPUT_LOCK_TIM_FREQ                 200000000
+#define INPUT_LOCK_TIM_PRESCALER            49999
 
 #define INPUT_POLLING_TIM                   TIM2
 #define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM2_IRQn
 
 #define INPUT_BUS_ALL                       RCC_AHB1Periph_GPIOB
 #define INPUT_PORT_ALL                      GPIOB
+
+#define INPUT_FRAME_PORT                    GPIOB
+#define INPUT_FRAME_PIN                     GPIO_PIN_0
 
 #define INPUT_A_PORT                        GPIOB
 #define INPUT_A_PIN                         GPIO_PIN_1
