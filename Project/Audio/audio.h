@@ -10,6 +10,7 @@ extern volatile bool Audio_IsPlayingOfBufferFinished;
 
 
 void Audio_Initialize(void);
+void Audio_EnablePower(bool enable);
 void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize);
 
 void DMA1_Stream5_IRQHandler(void);

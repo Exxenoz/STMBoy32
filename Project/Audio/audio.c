@@ -13,7 +13,8 @@ DAC_ChannelConfTypeDef  Audio_ChannelConfigR;
 volatile bool Audio_IsPlayingOfBufferFinished = false;
 uint32_t      Audio_BufferPlayedCounter       = 0;
 
-
+#define AUDIO_SET_SD AUDIO_SD_PORT->BSRRL |= AUDIO_SD_PIN
+#define AUDIO_RST_SD AUDIO_SD_PORT->BSRRH |= AUDIO_SD_PIN
 
 void Audio_InitializeGPIO(void)
 {
@@ -26,6 +27,10 @@ void Audio_InitializeGPIO(void)
 
     GPIO_InitObject.Pin   = AUDIO_R_PIN;
     HAL_GPIO_Init(AUDIO_R_PORT, &GPIO_InitObject);
+
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitObject.Pin   = GPIO_PIN_12;
+    HAL_GPIO_Init(AUDIO_SD_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeTimer(void)
@@ -126,8 +131,20 @@ void Audio_Initialize(void)
     Audio_InitializeTimer();
     Audio_InitializeDAC();
     Audio_InitializeDMA();
+    Audio_EnablePower(true);
 }
 
+void Audio_EnablePower(bool enable)
+{
+    if (enable)
+    {
+        AUDIO_RST_SD;
+    }
+    else
+    {
+        AUDIO_SET_SD;
+    }
+}
 
 void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize)
 {
