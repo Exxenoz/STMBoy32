@@ -49,7 +49,7 @@ Input_Interrupt_Flags_t;
 
 
 extern Input_Interrupt_Flags_t Input_Interrupt_Flags;
-extern const uint32_t          Input_Pins[8];
+extern const Input_Pins_t      Input_Pins[8];
 
 
 void Input_UpdateGBCJoypad(void);

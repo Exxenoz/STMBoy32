@@ -46,25 +46,25 @@
 #define LCD_TIM_BACKLIGHT          TIM1
 #define LCD_TIM_BACKLIGHT_CHANNEL  TIM_CHANNEL_4
 
-#define LCD_RESET_PORT             GPIOD
-#define LCD_RESET_PIN              GPIO_PIN_6
+#define LCD_RESET_PORT             GPIOC
+#define LCD_RESET_PIN              GPIO_PIN_1
 
-#define LCD_RS_PORT                GPIOD
-#define LCD_RS_PIN                 GPIO_PIN_7
+#define LCD_RS_PORT                GPIOC
+#define LCD_RS_PIN                 GPIO_PIN_5
 
-#define LCD_CS_PORT                GPIOD
-#define LCD_CS_PIN                 GPIO_PIN_8
+#define LCD_CS_PORT                GPIOC
+#define LCD_CS_PIN                 GPIO_PIN_4
 
-#define LCD_RD_PORT                GPIOD
-#define LCD_RD_PIN                 GPIO_PIN_9
+#define LCD_RD_PORT                GPIOC
+#define LCD_RD_PIN                 GPIO_PIN_7
 
-#define LCD_WR_PORT                GPIOG
-#define LCD_WR_PORT_ODR_BYTE       0
-#define LCD_WR_PIN                 GPIO_PIN_0
+#define LCD_WR_PORT                GPIOI
+#define LCD_WR_PORT_ODR_BYTE       1
+#define LCD_WR_PIN                 GPIO_PIN_8
 #define LCD_WR_SET_TIM_CHANNEL     TIM_CHANNEL_1
 #define LCD_WR_RST_TIM_CHANNEL     TIM_CHANNEL_3
 
-#define LCD_DATA_PORT              GPIOF
+#define LCD_DATA_PORT              GPIOH
 #define LCD_DATA_WR_TIM            TIM8
 #define LCD_DATA_TIM_CHANNEL       TIM_CHANNEL_2
 
