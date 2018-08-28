@@ -1,6 +1,8 @@
 #ifndef AUDIO_CONFIG_H
 #define AUDIO_CONFIG_H
 
+#define AUDIO_SD_PORT          GPIOA
+#define AUDIO_SD_PIN           GPIO_PIN_12
 
 #define AUDIO_L_PORT           GPIOA
 #define AUDIO_L_PIN            GPIO_PIN_4
