@@ -22,7 +22,7 @@
 #include "common.h"
 #include "system.h"
 #include "lcd_init.h"
-
+#include "sdram.h"
 
 
 int main(void)
@@ -34,6 +34,7 @@ int main(void)
     System_Initialize();
 
     // Initialize drivers.
+    SDRAM_Initialize();
     OS_Initialize();
     SDC_Initialize();
     LED_Initialize();

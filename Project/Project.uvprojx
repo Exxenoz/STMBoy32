@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER, STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\;..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\Libraries\FatFs\src;..\Libraries\STM32H7xx_HAL_Driver\Inc;..\Libraries\STM32H7xx_HAL_Driver\Inc\Legacy;..\Libraries\STM32H743I_EVAL;.\Common;.\Core;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts;.\OS;.\System</IncludePath>
+              <IncludePath>..\;..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\Libraries\FatFs\src;..\Libraries\STM32H7xx_HAL_Driver\Inc;..\Libraries\STM32H7xx_HAL_Driver\Inc\Legacy;..\Libraries\STM32H743I_EVAL;.\Common;.\Core;.\Main;.\LCD;.\Input;.\LED;.\Audio;.\SDC;.\CMOD;.\GBC;.\UI;.\Fonts;.\OS;.\System;.\SDRAM</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -954,6 +954,21 @@
               <FileName>system.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\system.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1914,6 +1929,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2865,6 +2895,21 @@
               <FileName>system.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\system.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3822,6 +3867,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -4775,6 +4835,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -5724,6 +5799,21 @@
               <FileName>system.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\system.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6683,6 +6773,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -7632,6 +7737,21 @@
               <FileName>system.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\system.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8591,6 +8711,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -9543,6 +9678,21 @@
               <FileName>system.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\system.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDRAM\sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdram.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
         </Group>
