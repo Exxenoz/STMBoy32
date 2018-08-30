@@ -337,6 +337,35 @@ Error_Def_t OS_LoadGameEntries(char* startingName, bool previous, bool onlyFavor
     return err_def;
 }
 
+Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex)
+{
+    Error_Def_t err_def;
+
+    if (currGameEntryIndex >= OS_LoadedGamesCounter)
+    {
+        ERR_DEF_INIT(err_def, OS_ERROR_INVALID_INDEX, (char*)(&currGameEntryIndex));
+        return err_def;
+    }
+
+    for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
+    {
+        if (i == OS_LoadedGamesCounter - 1)
+        {
+            CopyString(OS_GameEntries[i].Name, "", OS_MAX_GAME_TITLE_LENGTH + 1);
+        }
+        else
+        {
+            CopyString(OS_GameEntries[i].Name, OS_GameEntries[i + 1].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
+            OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
+        }
+    }
+    OS_LoadedGamesCounter--;
+    OS_TotalGamesCounter--;
+
+    ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
+    return err_def;
+}
+
 Error_Def_t OS_UpdateOptions(void)
 {
     FIL         file;  
@@ -471,14 +500,14 @@ Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
     FRESULT     test;
     Error_Def_t err_def;
 
-    // Check if the array in which the path is to be stored is long enough
+    // Check if the array in which the path is to be stored is long enough.
     if (pathLength < OS_MAX_PATH_LENGTH)
     {
         ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_ERROR_INVALID_PATH_LENGTH);
         return err_def;
     }
 
-    // Check if the game is located inside the favorite folder
+    // Check if the game is located inside the favorite folder.
     CopyString(path, OS_FAVORITE_PATH, pathLength);
     AppendString(path, p_game->Name, pathLength);
     test = f_open(&file, path, FA_OPEN_EXISTING);
@@ -490,7 +519,7 @@ Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
         return err_def;
     }
 
-    // If the game isn't located inside the favorite folder check if its located in the game folder
+    // If the game isn't located inside the favorite folder check if its located in the game folder.
     CopyString(path, OS_GAME_PATH, pathLength);
     AppendString(path, p_game->Name, pathLength);
     test = f_open(&file, path, FA_OPEN_EXISTING);
@@ -502,36 +531,31 @@ Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
         return err_def;
     }
 
-    // If it's located in neither it doesn't exist
+    // If it's located in neither it doesn't exist.
     memset(path, 0, pathLength);
     ERR_DEF_INIT(err_def, OS_ERROR_GAME_NOT_FOUND, p_game->Name);
     return err_def;
 }
 
-Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex)
+Error_Def_t OS_GetSaveGamePath(OS_GameEntry_t *p_game, char *path, int pathLength)
 {
     Error_Def_t err_def;
 
-    if (currGameEntryIndex >= OS_LoadedGamesCounter)
+    // Check if the array in which the path is to be stored is long enough.
+    if (pathLength < OS_MAX_PATH_LENGTH)
     {
-        ERR_DEF_INIT(err_def, OS_ERROR_INVALID_INDEX, (char*)(&currGameEntryIndex));
+        ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_ERROR_INVALID_PATH_LENGTH);
         return err_def;
     }
 
-    for (int i = currGameEntryIndex; i < OS_LoadedGamesCounter; i++)
-    {
-        if (i == OS_LoadedGamesCounter - 1)
-        {
-            CopyString(OS_GameEntries[i].Name, "", OS_MAX_GAME_TITLE_LENGTH + 1);
-        }
-        else
-        {
-            CopyString(OS_GameEntries[i].Name, OS_GameEntries[i + 1].Name, OS_MAX_GAME_TITLE_LENGTH + 1);
-            OS_GameEntries[i].IsFavorite = OS_GameEntries[i + 1].IsFavorite;
-        }
-    }
-    OS_LoadedGamesCounter--;
-    OS_TotalGamesCounter--;
+    // Get path.
+    char name[OS_MAX_GAME_TITLE_LENGTH];
+    CopyStringWithoutSuffix(name, p_game->Name,OS_MAX_GAME_TITLE_LENGTH);
+    
+    CopyString(path, OS_SAVEGAME_PATH, pathLength);
+    AppendString(path, name, pathLength);
+    AppendString(path, OS_SAVEGAME_SUFFIX, pathLength);
+
 
     ERR_DEF_INIT_NO_ARGUMENT(err_def, OS_SUCCESS);
     return err_def;

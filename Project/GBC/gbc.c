@@ -67,6 +67,19 @@ void GBC_Unload(void)
     GBC_LoadState = GBC_LOAD_STATE_NONE;
 }
 
+void GBC_SDC_SaveERAM(void)
+{
+    FIL      file;
+    char     path[OS_MAX_PATH_LENGTH];
+    uint32_t bytesWritten;
+    
+    OS_GetSaveGamePath(&OS_CurrentGame, path, OS_MAX_PATH_LENGTH);
+    
+    f_open(&file, path, FA_OPEN_ALWAYS | FA_WRITE);
+    f_write(&file, GBC_MMU_Memory.ERAMBank0, 4 * 8192, &bytesWritten);
+    f_close(&file);
+}
+
 bool GBC_IsLoaded(void)
 {
     return GBC_LoadState != GBC_LOAD_STATE_NONE ? true : false;
@@ -92,4 +105,7 @@ void GBC_Update(void)
         GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
+    
+    // Save RAM after every frame.
+    //GBC_SDC_SaveERAM();
 }

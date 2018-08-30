@@ -982,7 +982,7 @@ typedef struct
   */
 #define FMC_SDRAM_CLOCK_DISABLE               ((uint32_t)0x00000000U)
 #define FMC_SDRAM_CLOCK_PERIOD_2              ((uint32_t)0x00000800U)
-#define FMC_SDRAM_CLOCK_PERIOD_3              ((uint32_t)0x00000C00)
+#define FMC_SDRAM_CLOCK_PERIOD_3              ((uint32_t)0x00000C00U)
 /**
   * @}
   */

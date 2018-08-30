@@ -47,6 +47,14 @@ typedef union
 }
 Input_Interrupt_Flags_t;
 
+#pragma pack(1)
+typedef struct
+{
+    GPIO_TypeDef* Port;
+    uint32_t Pin;
+}
+Input_Pins_t;
+
 
 extern Input_Interrupt_Flags_t Input_Interrupt_Flags;
 extern const Input_Pins_t      Input_Pins[8];

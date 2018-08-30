@@ -39,7 +39,7 @@ int main(void)
     SDC_Initialize();
     LED_Initialize();
     LCD_Initialize();
-    //CMOD_Initialize();
+    CMOD_Initialize();
     Audio_Initialize();
     Input_Initialize();
 
