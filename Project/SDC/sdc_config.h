@@ -9,13 +9,13 @@
 #define SDC_SPIx                                     SPI3
 #define SDC_SPIx_CLK_ENABLE()                        __HAL_RCC_SPI3_CLK_ENABLE()
 
-#define SDC_SPIx_SCK_AF                              GPIO_AF5_SPI3
+#define SDC_SPIx_SCK_AF                              GPIO_AF6_SPI3
 #define SDC_SPIx_SCK_GPIO_PORT                       GPIOC
 #define SDC_SPIx_SCK_PIN                             GPIO_PIN_10
 #define SDC_SPIx_SCK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
 #define SDC_SPIx_SCK_GPIO_CLK_DISABLE()              //__HAL_RCC_GPIOC_CLK_DISABLE()
 
-#define SDC_SPIx_MISO_MOSI_AF                        GPIO_AF5_SPI3
+#define SDC_SPIx_MISO_MOSI_AF                        GPIO_AF6_SPI3
 #define SDC_SPIx_MISO_MOSI_GPIO_PORT                 GPIOC
 #define SDC_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOC_CLK_ENABLE()
 #define SDC_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        //__HAL_RCC_GPIOC_CLK_DISABLE()
