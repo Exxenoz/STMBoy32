@@ -15,10 +15,8 @@ uint16_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
 uint32_t GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2; // Start filling second buffer, so we are always ahead for filling.
 
-#define GBC_APU_SAMPLE_OUTPUT_LEVEL 3584
-
-uint32_t GBC_APU_LastSampleL = GBC_APU_SAMPLE_OUTPUT_LEVEL;
-uint32_t GBC_APU_LastSampleR = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+uint32_t GBC_APU_LastSampleL = 0;
+uint32_t GBC_APU_LastSampleR = 0;
 
 uint32_t GBC_APU_Channel1Phase = 0;
 int32_t  GBC_APU_Channel1PhaseTicks = 0;
@@ -725,8 +723,8 @@ void GBC_APU_Initialize(void)
 
     GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2;
 
-    GBC_APU_LastSampleL = GBC_APU_SAMPLE_OUTPUT_LEVEL;
-    GBC_APU_LastSampleR = GBC_APU_SAMPLE_OUTPUT_LEVEL;
+    GBC_APU_LastSampleL = 0;
+    GBC_APU_LastSampleR = 0;
 
     GBC_APU_InitializeChannels();
 
@@ -1127,19 +1125,21 @@ void GBC_APU_Step(void)
 
         if (l > 63)
         {
-            l = 63;
+            l = 4095; // 2^12 - 1
+        }
+        else
+        {
+            l <<= 6;
         }
 
 		if (r > 63)
         {
-            r = 63;
+            r = 4095; // 2^12 - 1
         }
-
-        l <<= 3;
-        r <<= 3;
-
-        l += GBC_APU_SAMPLE_OUTPUT_LEVEL;
-        r += GBC_APU_SAMPLE_OUTPUT_LEVEL;
+        else
+        {
+            r <<= 6;
+        }
 
         // Calculate three additional samples between current and last sample
 
