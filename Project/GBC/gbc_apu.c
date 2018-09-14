@@ -1177,6 +1177,9 @@ void GBC_APU_Step(void)
         GBC_APU_LastSampleL = l;
         GBC_APU_LastSampleR = r;
 
+        l = 0;
+        r = 0;
+
         GBC_APU_Ticks -= GBC_APU_SAMPLE_RATE;
     }
 }
