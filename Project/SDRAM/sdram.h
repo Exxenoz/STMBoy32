@@ -21,12 +21,12 @@
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
 
 #define SDRAM_TIMEOUT                            ((uint32_t)0xFFFF)
-#define SDRAM_BANK_ADDR                          ((uint32_t)0xD0000000)
+#define SDRAM_BANK_ADDR                          ((uint32_t)0xC0000000)
 #define SDRAM_MEMORY_WIDTH                       FMC_SDRAM_MEM_BUS_WIDTH_16
 
 #define SDCLOCK_PERIOD                           FMC_SDRAM_CLOCK_PERIOD_2
 
-#define SDRAM_GPIOC_PINS                         GPIO_PIN_0 | GPIO_PIN_2 | GPIO_PIN_3
+#define SDRAM_GPIOC_PINS                         GPIO_PIN_0 | GPIO_PIN_3
 #define SDRAM_GPIOD_PINS                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_8| GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 | GPIO_PIN_15
 #define SDRAM_GPIOE_PINS                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_7| GPIO_PIN_8 | GPIO_PIN_9  | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15
 #define SDRAM_GPIOF_PINS                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 | GPIO_PIN_4  | GPIO_PIN_5  | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15

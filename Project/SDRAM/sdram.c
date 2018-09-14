@@ -19,6 +19,15 @@ void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram)
     GPIO_InitObject.Alternate = GPIO_AF12_FMC;              \
     HAL_GPIO_Init(PORT, &GPIO_InitObject);                   \
 
+    // Workaround: Configure PC2 (SDRAM CS) in output pp mode
+    // and set output voltage explicit to 0V, due to unknown PCB issues
+    GPIO_InitObject.Mode      = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitObject.Pin       = GPIO_PIN_2;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitObject);
+    GPIOC->ODR &= ~GPIO_PIN_2;
+
     INITIALIZE_SDRAM_PINS(GPIOC, SDRAM_GPIOC_PINS);
     INITIALIZE_SDRAM_PINS(GPIOD, SDRAM_GPIOD_PINS);
     INITIALIZE_SDRAM_PINS(GPIOE, SDRAM_GPIOE_PINS);
@@ -40,7 +49,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 
     // Configure a clock configuration enable SDRAM_Command and send it.
     Command->CommandMode            = FMC_SDRAM_CMD_CLK_ENABLE;
-    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK2;
+    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
     Command->AutoRefreshNumber      = 1;
     Command->ModeRegisterDefinition = 0;
     HAL_SDRAM_SendCommand(hsdram, Command, SDRAM_TIMEOUT);
@@ -48,14 +57,14 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 
     // Configure a PALL (precharge all) SDRAM_Command and send it.
     Command->CommandMode            = FMC_SDRAM_CMD_PALL;
-    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK2;
+    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
     Command->AutoRefreshNumber      = 1;
     Command->ModeRegisterDefinition = 0;
     HAL_SDRAM_SendCommand(hsdram, Command, SDRAM_TIMEOUT);
 
     // Configure a Auto-Refresh SDRAM_Command and send it.
     Command->CommandMode            = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
-    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK2;
+    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
     Command->AutoRefreshNumber      = 8;
     Command->ModeRegisterDefinition = 0;
     HAL_SDRAM_SendCommand(hsdram, Command, SDRAM_TIMEOUT);
@@ -68,7 +77,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
                        SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 
     Command->CommandMode            = FMC_SDRAM_CMD_LOAD_MODE;
-    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK2;
+    Command->CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
     Command->AutoRefreshNumber      = 1;
     Command->ModeRegisterDefinition = tmpmrd;
     HAL_SDRAM_SendCommand(hsdram, Command, SDRAM_TIMEOUT);
@@ -94,7 +103,7 @@ void SDRAM_Initialize(void)
 
     hsdram.Instance = FMC_SDRAM_DEVICE;
 
-    hsdram.Init.SDBank                = FMC_SDRAM_BANK2;
+    hsdram.Init.SDBank                = FMC_SDRAM_BANK1;
     hsdram.Init.ColumnBitsNumber      = FMC_SDRAM_COLUMN_BITS_NUM_9;
     hsdram.Init.RowBitsNumber         = FMC_SDRAM_ROW_BITS_NUM_13;
     hsdram.Init.MemoryDataWidth       = SDRAM_MEMORY_WIDTH;
