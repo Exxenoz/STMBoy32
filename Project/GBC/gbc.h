@@ -2,8 +2,6 @@
 #define GBC_H
 
 #include "common.h"
-#include "os.h"
-
 
 typedef enum GBC_LoadResult_e
 {

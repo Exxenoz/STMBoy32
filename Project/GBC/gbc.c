@@ -6,6 +6,7 @@
 #include "gbc_apu.h"
 #include "cmod.h"
 #include "sdc.h"
+#include "os.h"
 
 GBC_LoadState_t GBC_LoadState = GBC_LOAD_STATE_NONE; // Global GBC load state
 
