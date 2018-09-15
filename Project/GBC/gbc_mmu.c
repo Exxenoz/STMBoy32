@@ -7,12 +7,9 @@
 #include "cmod.h"
 #include "input.h"
 #include "string.h"
+#include "sdram.h"
 
 GBC_MMU_Memory_t GBC_MMU_Memory;                                                   // GBC Memory
-
-FIL GBC_MMU_SDC_ROMFile;                                                           // SDC ROM file object
-bool GBC_MMU_SDC_ROMFileStreamOpen = false;                                        // SDC ROM file open state
-
 GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN; // Current Memory Bank Controller
 GBC_MMU_MBC1Mode_t GBC_MMU_MBC1Mode = GBC_MMU_MBC1_MODE_ROM;                       // ROM/RAM Mode Select
 uint16_t GBC_MMU_CurrentROMBankID = 1;                                             // Current ROM Bank ID
@@ -136,15 +133,13 @@ bool GBC_MMU_LoadFromCartridge(void)
     CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    // Read ROM Bank 1
-    CMOD_ReadBytes(0x4000, 16384, GBC_MMU_Memory.CartridgeBankX);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
-
     // Check ROM Header
     if (!GBC_MMU_IsValidROMHeader())
     {
         return false;
     }
+
+    // ToDo: Read complete ROM and write it to SDRAM
 
     GBC_MMU_Initialize();
 
@@ -160,30 +155,20 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
 
     GBC_MMU_Unload();
 
-    if (f_open(&GBC_MMU_SDC_ROMFile, fileName, FA_OPEN_EXISTING | FA_READ) == FR_OK)
+    FIL ROMFile;
+    if (f_open(&ROMFile, fileName, FA_OPEN_EXISTING | FA_READ) == FR_OK)
     {
         uint32_t bytesRead = 0;
+        uint8_t readBuffer[512];
 
         // Read ROM Bank 0
         for (long i = 0; i < 16384; i += 512)
         {
-            f_lseek(&GBC_MMU_SDC_ROMFile, i);
+            f_lseek(&ROMFile, i);
 
-            if (f_read(&GBC_MMU_SDC_ROMFile, &GBC_MMU_Memory.CartridgeBank0[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
+            if (f_read(&ROMFile, &GBC_MMU_Memory.CartridgeBank0[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
             {
-                f_close(&GBC_MMU_SDC_ROMFile);
-                return false;
-            }
-        }
-
-        // Read ROM Bank 1
-        for (long i = 0, j = 16384; i < 16384; i += 512, j += 512)
-        {
-            f_lseek(&GBC_MMU_SDC_ROMFile, j);
-
-            if (f_read(&GBC_MMU_SDC_ROMFile, &GBC_MMU_Memory.CartridgeBankX[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
-            {
-                f_close(&GBC_MMU_SDC_ROMFile);
+                f_close(&ROMFile);
                 return false;
             }
         }
@@ -191,11 +176,28 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         // Check ROM Header
         if (!GBC_MMU_IsValidROMHeader())
         {
-            f_close(&GBC_MMU_SDC_ROMFile);
+            f_close(&ROMFile);
             return false;
         }
-        
-        GBC_MMU_SDC_ROMFileStreamOpen = true;
+
+        // Read complete ROM and write it to SDRAM
+        for (uint32_t position = 0, address = SDRAM_BANK_ADDR + WRITE_READ_ADDR; bytesRead; position += 512)
+        {
+            f_lseek(&ROMFile, position);
+
+            if (f_read(&ROMFile, &readBuffer, 512, &bytesRead) != FR_OK || (bytesRead != 0 && bytesRead != 512))
+            {
+                f_close(&ROMFile);
+                return false;
+            }
+
+            for (long i = 0; i < 512; i++, address++)
+            {
+                SDRAM_WRITE_BYTE(address, readBuffer[i]);
+            }
+        }
+
+        f_close(&ROMFile);
 
         GBC_MMU_Initialize();
 
@@ -207,13 +209,6 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
 
 void GBC_MMU_Unload(void)
 {
-    if (GBC_MMU_SDC_ROMFileStreamOpen)
-    {
-        GBC_MMU_SDC_ROMFileStreamOpen = false;
-
-        f_close(&GBC_MMU_SDC_ROMFile);
-    }
-
     memset(&GBC_MMU_Memory, 0, sizeof(GBC_MMU_Memory_t));
 
     GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN;
@@ -246,25 +241,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         case 0x7000:
         {
             // Cartridge ROM bank X
-            uint8_t result = 0;
-
-            if (GBC_MMU_CurrentROMBankID == 1)
-            {
-                return GBC_MMU_Memory.CartridgeBankX[address - 0x4000];
-            }
-            else if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
-            {
-                CMOD_ReadByte(address, &result);
-                while (CMOD_GetStatus() == CMOD_PROCESSING);
-            }
-            else
-            {
-                uint32_t bytesRead = 0;
-                f_lseek(&GBC_MMU_SDC_ROMFile, GBC_MMU_CurrentROMBankAddress + (address - 0x4000));
-                f_read(&GBC_MMU_SDC_ROMFile, &result, 1, &bytesRead);
-            }
-
-            return result;
+            return SDRAM_READ_BYTE(SDRAM_BANK_ADDR + WRITE_READ_ADDR + GBC_MMU_CurrentROMBankAddress + (address - 0x4000));
         }
         case 0x8000:
         case 0x9000:
