@@ -32,12 +32,12 @@
 #define SDRAM_GPIOF_PINS                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 | GPIO_PIN_4  | GPIO_PIN_5  | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15
 #define SDRAM_GPIOG_PINS                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_4 | GPIO_PIN_5  | GPIO_PIN_8  | GPIO_PIN_15
 
-#define SDRAM_READ_BYTE(INTERN_ADDR)             ((*(__IO uint8_t*)  (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)))
-#define SDRAM_READ_SHORT(INTERN_ADDR)            ((*(__IO uint16_t*) (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)))
-#define SDRAM_READ_LONG(INTERN_ADDR)             ((*(__IO uint32_t*) (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)))
-#define SDRAM_WRITE_BYTE(INTERN_ADDR, BYTE)      ((*(__IO uint8_t*)  (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)) = BYTE )
-#define SDRAM_WRITE_SHORT(INTERN_ADDR, BYTES)    ((*(__IO uint16_t*) (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)) = BYTES)
-#define SDRAM_WRITE_LONG(INTERN_ADDR, BYTES)     ((*(__IO uint32_t*) (SDRAM_BANK_ADDR + WRITE_READ_ADDR + INTERN_ADDR)) = BYTES)
+#define SDRAM_READ_BYTE(ADDR)             ((*(__IO uint8_t*)  (ADDR)))
+#define SDRAM_READ_SHORT(ADDR)            ((*(__IO uint16_t*) (ADDR)))
+#define SDRAM_READ_LONG(ADDR)             ((*(__IO uint32_t*) (ADDR)))
+#define SDRAM_WRITE_BYTE(ADDR, BYTE)      ((*(__IO uint8_t*)  (ADDR)) = BYTE )
+#define SDRAM_WRITE_SHORT(ADDR, BYTES)    ((*(__IO uint16_t*) (ADDR)) = BYTES)
+#define SDRAM_WRITE_LONG(ADDR, BYTES)     ((*(__IO uint32_t*) (ADDR)) = BYTES)
 
 
 

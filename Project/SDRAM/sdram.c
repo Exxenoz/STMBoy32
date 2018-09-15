@@ -139,13 +139,13 @@ void SDRAM_Initialize(void)
     // Write data to the SDRAM memory.
     for (uint32_t uwIndex = 0; uwIndex < BUFFER_SIZE; uwIndex++)
     {
-        SDRAM_WRITE_LONG(4 * uwIndex, aTxBuffer[uwIndex]);
+        SDRAM_WRITE_LONG(SDRAM_BANK_ADDR + WRITE_READ_ADDR + 4 * uwIndex, aTxBuffer[uwIndex]);
     }
 
     // Read back data from the SDRAM memory.
     for (uint32_t uwIndex = 0; uwIndex < BUFFER_SIZE; uwIndex++)
     {
-        aRxBuffer[uwIndex] = SDRAM_READ_LONG(4 * uwIndex);
+        aRxBuffer[uwIndex] = SDRAM_READ_LONG(SDRAM_BANK_ADDR + WRITE_READ_ADDR + 4 * uwIndex);
     }
 
     // Check data (Deadlock upon failure).
