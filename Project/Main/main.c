@@ -35,11 +35,11 @@ int main(void)
 
     // Initialize drivers.
     SDRAM_Initialize();
-    OS_Initialize();
     SDC_Initialize();
+    OS_Initialize();
     LED_Initialize();
     LCD_Initialize();
-    CMOD_Initialize();
+    //CMOD_Initialize();
     Audio_Initialize();
     Input_Initialize();
 
