@@ -564,7 +564,19 @@ typedef struct GBC_MMU_Memory_s
             uint8_t NewDMALengthModeStart;   // 0xFF55                                           - Only in GBC mode
             uint8_t InfraredPort;            // 0xFF56                                           - Only in GBC mode
             uint8_t IO_Unk9[17];
-            uint8_t BackgroundPaletteIndex;  // 0xFF68                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t BackgroundPaletteIndexData; // 0xFF68                                    - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int BackgroundPaletteIndex              : 6;
+                    unsigned int                                     : 1;
+                    unsigned int BackgroundPaletteIndexAutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
+                };
+            };
             uint8_t BackgroundPaletteData;   // 0xFF69                                           - Only in GBC mode
             uint8_t SpritePaletteIndex;      // 0xFF6A                                           - Only in GBC mode
             uint8_t SpritePaletteData;       // 0xFF6B                                           - Only in GBC mode
