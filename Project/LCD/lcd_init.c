@@ -154,7 +154,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_Init(&LCD_TIM_Handle_PixelTransferTiming);
 
     // Configure data pulse width modulation
-    OC_Config_Data.Pulse        = 5;
+    OC_Config_Data.Pulse        = 1;
     OC_Config_Data.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_Data.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_Data.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -164,7 +164,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_PixelTransferTiming, &OC_Config_Data, LCD_DATA_TIM_CHANNEL);
 
     // Configure WR reset pulse width modulation
-    OC_Config_WR_Rst.Pulse        = 5;
+    OC_Config_WR_Rst.Pulse        = 1;
     OC_Config_WR_Rst.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_WR_Rst.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_WR_Rst.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -174,7 +174,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_PixelTransferTiming, &OC_Config_WR_Rst, LCD_WR_RST_TIM_CHANNEL);
 
     // Configure WR set pulse width modulation
-    OC_Config_WR_Set.Pulse        = 30;
+    OC_Config_WR_Set.Pulse        = 1;
     OC_Config_WR_Set.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_WR_Set.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_WR_Set.OCPolarity   = TIM_OCPOLARITY_LOW;
