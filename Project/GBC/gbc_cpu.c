@@ -5053,5 +5053,5 @@ void GBC_CPU_Step()
     }
 #endif
 
-    //GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
+    GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
 }
