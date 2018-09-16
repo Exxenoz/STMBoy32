@@ -1,12 +1,35 @@
 #include "input.h"
+#include "input_init.h"
+#include "input_config.h"
 #include "gbc_mmu.h"
 
 
 Input_Interrupt_Flags_t  Input_Interrupt_Flags = { .allFlags = 0x00 };
-
-Input_ButtonState_t      Input_LastState[8]    = {0};
-Input_ButtonState_t      Input_CurrState[8]    = {0};
 uint8_t                  Input_Counter[8]      = {0};
+
+Input_ButtonState_t Input_LastState[8] =
+{
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+};
+
+Input_ButtonState_t Input_CurrState[8] =
+{
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+};
 
 const Input_Pins_t Input_Pins[8] =
 {

@@ -88,9 +88,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 
 static void SDRAM_FillBuffer(uint32_t *pBuffer, uint32_t uwBufferLenght, uint32_t uwOffset)
 {
-    uint32_t tmpIndex = 0;
-
-    for (tmpIndex = 0; tmpIndex < uwBufferLenght; tmpIndex++ )
+    for (uint32_t tmpIndex = 0; tmpIndex < uwBufferLenght; tmpIndex++ )
     {
         pBuffer[tmpIndex] = tmpIndex + uwOffset;
     }
@@ -101,8 +99,7 @@ void SDRAM_Initialize(void)
     enum { BUFFER_SIZE = 1024 };
 
 
-    hsdram.Instance = FMC_SDRAM_DEVICE;
-
+    hsdram.Instance                   = FMC_SDRAM_DEVICE;
     hsdram.Init.SDBank                = FMC_SDRAM_BANK1;
     hsdram.Init.ColumnBitsNumber      = FMC_SDRAM_COLUMN_BITS_NUM_9;
     hsdram.Init.RowBitsNumber         = FMC_SDRAM_ROW_BITS_NUM_13;
@@ -130,7 +127,9 @@ void SDRAM_Initialize(void)
     SDRAM_Initialization_Sequence(&hsdram, &SDRAM_Command);
 
 
-    // Check SDRAM memory read/write access.
+    /* Check SDRAM memory read/write access. */
+    ///////////////////////////////////////////
+
     uint32_t aTxBuffer[BUFFER_SIZE];
     uint32_t aRxBuffer[BUFFER_SIZE];
     SDRAM_FillBuffer(aTxBuffer, BUFFER_SIZE, 0xA244250F);

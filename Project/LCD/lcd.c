@@ -1,5 +1,10 @@
-#include "lcd.h"
 #include <string.h>
+
+#include "lcd.h"
+#include "lcd_config.h"
+#include "lcd_regdef.h"
+#include "gbc_gpu.h"
+
 
 LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
 LCD_Pixel_t LCD_GBCFrameBuffer[GBC_GPU_FRAME_SIZE];

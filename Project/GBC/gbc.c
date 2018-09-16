@@ -4,7 +4,7 @@
 #include "gbc_mmu.h"
 #include "gbc_tim.h"
 #include "gbc_apu.h"
-#include "cmod.h"
+#include "cmod_access.h"
 #include "sdc.h"
 #include "os.h"
 

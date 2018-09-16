@@ -1,10 +1,9 @@
-#ifndef CMOD_CONFIG_H
+ #ifndef CMOD_CONFIG_H
 #define CMOD_CONFIG_H
 
 
 #define CMOD_BUS(NAME)            RCC_AHB1Periph_##NAME
 
-// If necessary, Timer Channel can be changed inside the Initialize-Function
 #define CMOD_TIM                  TIM5
 #define CMOD_TIM_CHANNEL          TIM_CHANNEL_4
 #define CMOD_TIM_NVIC_CHANNEL     TIM5_IRQn

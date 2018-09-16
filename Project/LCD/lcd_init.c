@@ -1,5 +1,11 @@
 #include "lcd_init.h"
 
+#include "lcd.h"
+#include "lcd_config.h"
+#include "lcd_regdef.h"
+#include "lcd_drawing.h"
+#include "input_config.h"
+
 
 uint16_t LCD_REG_VCOM_CONTROL_DATA[2] =
 {

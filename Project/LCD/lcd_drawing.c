@@ -1,5 +1,9 @@
+#include "lcd.h"
+#include "lcd_config.h"
+#include "lcd_regdef.h"
 #include "lcd_drawing.h"
 
+#include "gbc_gpu.h"
 
 
 // Print whole Display in given color

@@ -1,4 +1,5 @@
 #include "input_locks.h"
+#include "input_config.h"
 
 
 Input_Lock_t Input_Locks[8] =

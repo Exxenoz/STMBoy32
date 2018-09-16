@@ -4,7 +4,7 @@
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
-#include "cmod.h"
+#include "cmod_access.h"
 #include "input.h"
 #include "string.h"
 #include "sdram.h"
