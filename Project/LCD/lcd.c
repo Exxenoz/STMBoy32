@@ -1,7 +1,8 @@
 #include "lcd.h"
-
+#include <string.h>
 
 LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
+LCD_Pixel_t LCD_GBCFrameBuffer[GBC_GPU_FRAME_SIZE];
 
 uint16_t*   LCD_DMA_TransferFrameBuffer;
 uint32_t    LCD_DMA_TransferFrameBufferSize;
@@ -247,8 +248,13 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
 
 void LCD_DrawGBCFrameBuffer(void)
 {
+    // Copy GBC frame buffer to same size output buffer to avoid modifications during DMA transfer
+    // ToDo: Replace the usage of this buffer with LCD_FrameBuffer and render the GBC_GPU_FrameBuffer
+    // into the center of LCD_FrameBuffer (without touching the - hopefully soon fancy - border)
+    memcpy(LCD_GBCFrameBuffer, GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE * 2);
+
     // Set Draw Area to the middle 160x144px for non scaled display
-    LCD_DrawFrameBuffer((uint16_t*)GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE, 80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
+    LCD_DrawFrameBuffer((uint16_t*)LCD_GBCFrameBuffer, GBC_GPU_FRAME_SIZE, 80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
 }
 
 void LCD_DrawGBCFrameBufferScaled(void)
