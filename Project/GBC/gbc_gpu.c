@@ -40,6 +40,9 @@ GBC_GPU_Color_t GBC_GPU_ObjectPalette1Classic[4] =
     0x0000, // 3 - Black
 };
 
+GBC_GPU_Color_t GBC_GPU_CGB_BackgroundPalette[8][4];
+GBC_GPU_Color_t GBC_GPU_CGB_SpritePalette[8][4];
+
 void GBC_GPU_Initialize(void)
 {
     GBC_GPU_ModeTicks = 0;
@@ -56,6 +59,40 @@ void GBC_GPU_Initialize(void)
     GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
     GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
     GBC_MMU_Memory.Scanline = 144;
+
+    for (uint32_t y = 0; y < 8; y++)
+    {
+        for (uint32_t x = 0; x < 4; x++)
+        {
+            // Initially all background colors are initialized as white
+            GBC_GPU_CGB_BackgroundPalette[y][x].Color = 0xFFFF;
+            // Initially all sprite colors are uninitialized
+            //GBC_GPU_CGB_SpritePalette -- Do nothing
+            // Since the variable is global it is initialized with zeros at the first startup.
+        }
+    }
+}
+
+uint8_t GBC_GPU_FetchBackgroundPaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex)
+{
+    // ToDo
+    return 0;
+}
+
+void GBC_GPU_SetBackgroundPaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex, uint8_t value)
+{
+    // ToDo
+}
+
+uint8_t GBC_GPU_FetchSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex)
+{
+    // ToDo
+    return 0;
+}
+
+void GBC_GPU_SetSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex, uint8_t value)
+{
+    // ToDo
 }
 
 void GBC_GPU_RenderScanline(void)
