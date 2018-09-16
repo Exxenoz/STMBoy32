@@ -933,7 +933,18 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF4A:
                 case 0xFF4B:
                 case 0xFF4C:
-                case 0xFF4D:
+                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    break;
+                case 0xFF4D: // SpeedSwitch
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_MMU_Memory.PrepareSpeedSwitch = (value & 0x01);
+                    }
+                    else
+                    {
+                        GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    }
+                    break;
                 case 0xFF4E:
                 case 0xFF4F:
                 case 0xFF50:
