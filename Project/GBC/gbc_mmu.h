@@ -580,7 +580,21 @@ typedef struct GBC_MMU_Memory_s
                 };
             };
             uint8_t BackgroundPaletteData;   // 0xFF69                                           - Only in GBC mode
-            uint8_t SpritePaletteIndex;      // 0xFF6A                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t SpritePaletteIndexData; // 0xFF6A                                    - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int SpritePaletteHL                 : 1; // (0 = Low, 1 = High)
+                    unsigned int SpritePaletteColorIndex         : 2;
+                    unsigned int SpritePaletteIndex              : 3;
+                    unsigned int                                 : 1;
+                    unsigned int SpritePaletteIndexAutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
+                };
+            };
             uint8_t SpritePaletteData;       // 0xFF6B                                           - Only in GBC mode
             uint8_t IO_Unk12[4];
             uint8_t WRAMBankID;              // 0xFF70                                           - Only in GBC mode
