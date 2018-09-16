@@ -75,24 +75,62 @@ void GBC_GPU_Initialize(void)
 
 uint8_t GBC_GPU_FetchBackgroundPaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex)
 {
-    // ToDo
-    return 0;
+    GBC_GPU_Color_t color = GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex];
+
+    if (hl)
+    {
+        return (color.Blue << 2) /* Blue */ || ((color.Green >> 3) & 0x3) /* Half Green High */;
+    }
+    else
+    {
+        return ((color.Green & 0x7) << 5) /* Half Green Low */ | color.Red /* Red */;
+    }
 }
 
 void GBC_GPU_SetBackgroundPaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex, uint8_t value)
 {
-    // ToDo
+    if (hl)
+    {
+        GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Blue = (value >> 2) & 0x1F /* Blue */;
+        GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Green = ((value & 0x3) << 3) /* Half Green High */
+            | (GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Green & 0x7) /* Half Green Low */;
+    }
+    else
+    {
+        GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Red = value & 0x1F /* Red */;
+        GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Green = (GBC_GPU_CGB_BackgroundPalette[paletteIndex][colorIndex].Green & 0x18) /* Half Green High */
+            | ((value >> 5) & 0x7) /* Half Green Low */;
+    }
 }
 
 uint8_t GBC_GPU_FetchSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex)
 {
-    // ToDo
-    return 0;
+    GBC_GPU_Color_t color = GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex];
+
+    if (hl)
+    {
+        return (color.Blue << 2) /* Blue */ || ((color.Green >> 3) & 0x3) /* Half Green High */;
+    }
+    else
+    {
+        return ((color.Green & 0x7) << 5) /* Half Green Low */ | color.Red /* Red */;
+    }
 }
 
 void GBC_GPU_SetSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t colorIndex, uint8_t value)
 {
-    // ToDo
+    if (hl)
+    {
+        GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Blue = (value >> 2) & 0x1F /* Blue */;
+        GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Green = ((value & 0x3) << 3) /* Half Green High */
+            | (GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Green & 0x7) /* Half Green Low */;
+    }
+    else
+    {
+        GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Red = value & 0x1F /* Red */;
+        GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Green = (GBC_GPU_CGB_SpritePalette[paletteIndex][colorIndex].Green & 0x18) /* Half Green High */
+            | ((value >> 5) & 0x7) /* Half Green Low */;
+    }
 }
 
 void GBC_GPU_RenderScanline(void)
