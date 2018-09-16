@@ -98,7 +98,7 @@ void GBC_GPU_RenderScanline(void)
     uint16_t tileID = 0;
 
     // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
-    if (GBC_MMU_Memory.BGDisplayEnable || (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
+    if (GBC_MMU_Memory.BGDisplayEnable || GBC_MMU_IS_CGB_MODE())
     {
         // Check if tile map #2 is selected
         if (GBC_MMU_Memory.BGTileMapDisplaySelect)
@@ -384,7 +384,7 @@ void GBC_GPU_RenderScanline(void)
 
                 GBC_GPU_PriorityPixel_t priorityPixel = GBC_GPU_PriorityPixelLine[lineX];
 
-                if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                if (GBC_MMU_IS_CGB_MODE())
                 {
                     // GBC mode only
 

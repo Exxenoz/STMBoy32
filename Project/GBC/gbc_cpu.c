@@ -2251,7 +2251,7 @@ void GBC_CPU_Initialize()
     memset(&GBC_CPU_Register, 0, sizeof(GBC_CPU_Register_t));
 
     // Initial value in register A is used for GBC detection
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         GBC_CPU_Register.AF = 0x11B0;
     }
@@ -2655,7 +2655,7 @@ void GBC_CPU_Step()
             {
                 // No instruction ticks
 
-                if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                if (GBC_MMU_IS_CGB_MODE())
                 {
                     if (GBC_MMU_Memory.PrepareSpeedSwitch)
                     {

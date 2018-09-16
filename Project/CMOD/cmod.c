@@ -200,7 +200,7 @@ void CMOD_GetFileName(char* name)
     }
     name[i++] = '.';
     
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         name[i++] = 'g';
         name[i++] = 'b';

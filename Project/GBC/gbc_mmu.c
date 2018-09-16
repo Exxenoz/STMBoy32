@@ -77,7 +77,7 @@ void GBC_MMU_Initialize(void)
     GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
 
     // Initialize memory
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         for (long i = 0; i < 128; i++)
         {
@@ -803,7 +803,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     if (!GBC_MMU_Memory.ChannelSoundsEnabled)
                     {
                         // Read-only in CGB mode
-                        if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                        if (GBC_MMU_IS_CGB_MODE())
                         {
                             break;
                         }
@@ -909,7 +909,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF46: // DMA Transfer and Start Address
                     GBC_MMU_Memory.OAMTransferStartAddress = value;
 
-                    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                    if (GBC_MMU_IS_CGB_MODE())
                     {
                         // ToDo
                     }
