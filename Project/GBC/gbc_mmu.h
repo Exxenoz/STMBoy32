@@ -572,7 +572,9 @@ typedef struct GBC_MMU_Memory_s
                 #pragma pack(1)
                 struct
                 {
-                    unsigned int BackgroundPaletteIndex              : 6;
+                    unsigned int BackgroundPaletteHL                 : 1; // (0 = Low, 1 = High)
+                    unsigned int BackgroundPaletteColorIndex         : 2;
+                    unsigned int BackgroundPaletteIndex              : 3;
                     unsigned int                                     : 1;
                     unsigned int BackgroundPaletteIndexAutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
                 };
