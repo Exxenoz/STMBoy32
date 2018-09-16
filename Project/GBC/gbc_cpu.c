@@ -22,9 +22,9 @@ uint32_t GBC_CPU_InstructionTicks = 0;                // Current instruction tic
 uint32_t GBC_CPU_StepTicks = 0;                       // Step ticks
 int32_t  GBC_CPU_UnhaltTicks = 0;                     // Unhalt ticks
 int32_t  GBC_CPU_InterruptMasterEnableDelayTicks = 0; // IME will be enabled after this delay (if != 0)
-
 uint32_t GBC_CPU_InterruptMasterEnable = true;        // Interrupt master
 uint32_t GBC_CPU_Halted = false;                      // Halted state
+uint32_t GBC_CPU_SpeedModifier = 0;                   // 0 ... normal Speed, 1 ... CGB Speed; needed, because CurrentSpeed flag is set per default in DMG mode
 
 //GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState =
 //    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE; // Memory access delay state for current instruction
@@ -580,6 +580,7 @@ void GBC_CPU_STOP()                     // 0x10 - Stop processor
         {
             GBC_MMU_Memory.PrepareSpeedSwitch = 0;
             GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
+            GBC_CPU_SpeedModifier = GBC_CPU_SpeedModifier ? 0 : 1;
         }
     }
 }
@@ -2276,6 +2277,7 @@ void GBC_CPU_Initialize()
     GBC_CPU_InterruptMasterEnableDelayTicks = 0;
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
+    GBC_CPU_SpeedModifier = 0;
     //GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE;
 }
 
@@ -2661,6 +2663,7 @@ void GBC_CPU_Step()
                     {
                         GBC_MMU_Memory.PrepareSpeedSwitch = 0;
                         GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
+                        GBC_CPU_SpeedModifier = GBC_CPU_SpeedModifier ? 0 : 1;
                     }
                 }
 
@@ -5053,5 +5056,5 @@ void GBC_CPU_Step()
     }
 #endif
 
-    GBC_CPU_StepTicks >>= GBC_MMU_Memory.CurrentSpeed;
+    GBC_CPU_StepTicks >>= GBC_CPU_SpeedModifier;
 }
