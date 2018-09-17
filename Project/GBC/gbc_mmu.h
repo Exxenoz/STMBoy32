@@ -122,7 +122,34 @@ typedef struct GBC_MMU_Memory_s
             uint8_t TileMapData[2048];    // 9800-9FFF: Tilemap Data
         };
     };
-    uint8_t VRAMBank1[8192];
+    #pragma pack(1)
+    union
+    {
+        uint8_t VRAMBank1[8192];          // Only in GBC mode
+
+        #pragma pack(1)
+        struct
+        {
+            uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
+
+            #pragma pack(1)
+            union
+            {
+                uint8_t Data;
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int BackgroundPaletteIndex : 3;
+                    unsigned int TileVRAMBankNumber     : 1; // (0 = VRAMBank0, 1 = VRAMBank1)
+                    unsigned int                        : 1;
+                    unsigned int HorizontalFlip         : 1; // (0 = Normal, 1 = Mirror horizontally)
+                    unsigned int VerticalFlip           : 1; // (0 = Normal, 1 = Mirror vertically)
+                    unsigned int BGOAMPriority          : 1; // (0 = OAM priority, 1 = BG priority)
+                };
+            } TileMapAttributes[2048];
+        } VRAMBank1Detail;
+    };
     uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
     uint8_t ERAMBank2[8192];
