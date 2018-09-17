@@ -112,7 +112,7 @@ bool GBC_MMU_IsValidROMHeader(void)
 {
     for (long i = 0; i < 48; i++)
     {
-        if (GBC_MMU_Memory.NintendoLogo[i] != GBC_MMU_NintendoLogo[i])
+        if (GBC_MMU_Memory.CartridgeBank0.NintendoLogo[i] != GBC_MMU_NintendoLogo[i])
         {
             return false;
         }
@@ -131,7 +131,7 @@ bool GBC_MMU_LoadFromCartridge(void)
     GBC_MMU_Unload();
 
     // Read ROM Bank 0
-    CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
+    CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0.Data);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
     // Check ROM Header
@@ -167,7 +167,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         {
             f_lseek(&ROMFile, i);
 
-            if (f_read(&ROMFile, &GBC_MMU_Memory.CartridgeBank0[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
+            if (f_read(&ROMFile, &GBC_MMU_Memory.CartridgeBank0.Data[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
             {
                 f_close(&ROMFile);
                 return false;
@@ -232,7 +232,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         case 0x2000:
         case 0x3000:
             // Cartridge ROM bank 0
-            return GBC_MMU_Memory.CartridgeBank0[address];
+            return GBC_MMU_Memory.CartridgeBank0.Data[address];
         case 0x4000:
         case 0x5000:
         case 0x6000:
@@ -1116,7 +1116,7 @@ void GBC_MMU_WriteShort(uint16_t address, uint16_t value)
 
 GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(void)
 {
-    switch (GBC_MMU_Memory.CartridgeType)
+    switch (GBC_MMU_Memory.CartridgeBank0.CartridgeType)
     {
         case GBC_MMU_CARTRIDGE_TYPE_ROM_ONLY:
         case GBC_MMU_CARTRIDGE_TYPE_ROM_RAM:

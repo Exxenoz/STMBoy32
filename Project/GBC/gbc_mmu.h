@@ -84,7 +84,7 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t CartridgeBank0[16384];    // 0000-3FFF: 16kB Cartridge ROM bank 0
+        uint8_t Data[16384];              // 0000-3FFF: 16kB Cartridge ROM bank 0
 
         #pragma pack(1)
         struct
@@ -105,10 +105,9 @@ typedef struct GBC_MMU_Memory_s
             uint8_t MaskROMVersionNumber; // 014C
             uint8_t HeaderChecksum;       // 014D
             uint8_t GlobalChecksum[2];    // 014E-014F
-            // Program Code               // 0150-3FFF
+            uint8_t ProgramCode[16048];   // 0150-3FFF
         };
-    };
-    uint8_t CartridgeBankX[16384];        // ToDo: Can not be removed currently, because it somehow breaks SDC reading
+    } CartridgeBank0;
     //------CartridgeBankX (SDRAM)        // 4000-7FFF: 16kB Cartridge ROM bank X
     #pragma pack(1)
     union
@@ -655,8 +654,8 @@ typedef void (*GBC_MMU_MBC)(uint16_t, uint8_t);
 
 extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory declaration for direct CPU access
 
-#define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
-#define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+#define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
+#define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);
