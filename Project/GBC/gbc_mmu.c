@@ -309,7 +309,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                     // Object Attribute Memory
                     if (address <= 0xFE9F)
                     {
-                        return GBC_MMU_Memory.OAM[address - 0xFE00];
+                        return GBC_MMU_Memory.OAM.Data[address - 0xFE00];
                     }
                     // else unused memory
                     break;
@@ -724,7 +724,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFE88: case 0xFE89: case 0xFE8A: case 0xFE8B: case 0xFE8C: case 0xFE8D: case 0xFE8E: case 0xFE8F:
                 case 0xFE90: case 0xFE91: case 0xFE92: case 0xFE93: case 0xFE94: case 0xFE95: case 0xFE96: case 0xFE97:
                 case 0xFE98: case 0xFE99: case 0xFE9A: case 0xFE9B: case 0xFE9C: case 0xFE9D: case 0xFE9E: case 0xFE9F:
-                    GBC_MMU_Memory.OAM[address - 0xFE00] = value;
+                    GBC_MMU_Memory.OAM.Data[address - 0xFE00] = value;
                     break;
                 // Unused Memory
                 case 0xFEA0: case 0xFEA1: case 0xFEA2: case 0xFEA3: case 0xFEA4: case 0xFEA5: case 0xFEA6: case 0xFEA7:
@@ -923,7 +923,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                         {
                             for (uint32_t i = 0; i < 160; i++, address++)
                             {
-                                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
+                                GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
                             }
                         }
                     }

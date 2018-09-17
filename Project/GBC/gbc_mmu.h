@@ -165,7 +165,7 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t OAM[160];                 // FE00-FE9F: 160B Object Attribute Memory
+        uint8_t Data[160];                // FE00-FE9F: 160B Object Attribute Memory
 
         #pragma pack(1)
         struct SpriteAttributes_s
@@ -190,7 +190,7 @@ typedef struct GBC_MMU_Memory_s
                 };
             };
         } SpriteAttributes[40];
-    };
+    } OAM;
     //------Unused                        // FEA0-FEFF:  96B Unused
     #pragma pack(1)
     union

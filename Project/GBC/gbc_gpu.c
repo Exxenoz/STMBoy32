@@ -339,7 +339,7 @@ void GBC_GPU_RenderScanline(void)
         // have the highest render priority in GBC mode
         for (int32_t i = 39; i >= 0; i--)
         {
-            struct SpriteAttributes_s sprite = GBC_MMU_Memory.SpriteAttributes[i];
+            struct SpriteAttributes_s sprite = GBC_MMU_Memory.OAM.SpriteAttributes[i];
 
             /* Sprite positioning:
              *
