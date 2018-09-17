@@ -975,12 +975,12 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF68: // BackgroundPaletteIndexData
-                    GBC_MMU_Memory.IO.BackgroundPaletteIndexData = value;
+                    GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data = value;
 
                     if (GBC_MMU_IS_CGB_MODE())
                     {
-                        GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteHL,
-                            GBC_MMU_Memory.IO.BackgroundPaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteColorIndex);
+                        GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex);
                     }
                     break;
                 case 0xFF69: // BackgroundPaletteData
@@ -988,25 +988,24 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                     if (GBC_MMU_IS_CGB_MODE())
                     {
-                        GBC_GPU_SetBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteHL,
-                            GBC_MMU_Memory.IO.BackgroundPaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteColorIndex, value);
+                        GBC_GPU_SetBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex, value);
 
-                        if (GBC_MMU_Memory.IO.BackgroundPaletteIndexAutoIncrement)
+                        if (GBC_MMU_Memory.IO.BackgroundPaletteIndex.AutoIncrement)
                         {
-                            uint8_t index = GBC_MMU_Memory.IO.BackgroundPaletteIndexData & 0x3F; ++index; index &= 0x3F;
-                            GBC_MMU_Memory.IO.BackgroundPaletteIndexData = (GBC_MMU_Memory.IO.BackgroundPaletteIndexData & 0x80) | index;
-                            GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteHL,
-                                GBC_MMU_Memory.IO.BackgroundPaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteColorIndex);
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Index++;
+                            GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                                GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex);
                         }
                     }
                     break;
                 case 0xFF6A: // SpritePaletteIndexData
-                    GBC_MMU_Memory.IO.SpritePaletteIndexData = value;
+                    GBC_MMU_Memory.IO.SpritePaletteIndex.Data = value;
 
                     if (GBC_MMU_IS_CGB_MODE())
                     {
-                        GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteHL,
-                            GBC_MMU_Memory.IO.SpritePaletteIndex, GBC_MMU_Memory.IO.SpritePaletteColorIndex);
+                        GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex);
                     }
                     break;
                 case 0xFF6B: // SpritePaletteData
@@ -1014,15 +1013,14 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                     if (GBC_MMU_IS_CGB_MODE())
                     {
-                        GBC_GPU_SetSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteHL,
-                            GBC_MMU_Memory.IO.SpritePaletteIndex, GBC_MMU_Memory.IO.SpritePaletteColorIndex, value);
+                        GBC_GPU_SetSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex, value);
 
-                        if (GBC_MMU_Memory.IO.SpritePaletteIndexAutoIncrement)
+                        if (GBC_MMU_Memory.IO.SpritePaletteIndex.AutoIncrement)
                         {
-                            uint8_t index = GBC_MMU_Memory.IO.SpritePaletteIndexData & 0x3F; ++index; index &= 0x3F;
-                            GBC_MMU_Memory.IO.SpritePaletteIndexData = (GBC_MMU_Memory.IO.SpritePaletteIndexData & 0x80) | index;
-                            GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteHL,
-                                GBC_MMU_Memory.IO.SpritePaletteIndex, GBC_MMU_Memory.IO.SpritePaletteColorIndex);
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Index++;
+                            GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                                GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex);
                         }
                     }
                     break;
