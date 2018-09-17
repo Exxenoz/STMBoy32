@@ -184,7 +184,7 @@ void GBC_GPU_RenderScanline(void)
         for (uint8_t lineX = 0; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
         {
             // Read tile id from tile map
-            tileID = GBC_MMU_Memory.VRAMBank0Detail.TileMapData[tileIndex];
+            tileID = GBC_MMU_Memory.VRAMBank0.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
             if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
@@ -193,7 +193,7 @@ void GBC_GPU_RenderScanline(void)
             }
 
             // Each tile is 8x8 pixel in size and uses 2 bytes per row or 2 bits per pixel
-            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0Detail.TileSetData[(tileID << 3) + pixelY];
+            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[(tileID << 3) + pixelY];
 
             // Move first pixel bits to bit 15 (low) and bit 7 (high)
             tilePixelLine <<= pixelX;
@@ -279,7 +279,7 @@ void GBC_GPU_RenderScanline(void)
         for (uint8_t lineX = 0; frameBufferIndex < GBC_GPU_CurrentFrameBufferEndIndex; tileIndex++)
         {
             // Read tile id from tile map
-            tileID = GBC_MMU_Memory.VRAMBank0Detail.TileMapData[tileIndex];
+            tileID = GBC_MMU_Memory.VRAMBank0.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
             if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
@@ -288,7 +288,7 @@ void GBC_GPU_RenderScanline(void)
             }
 
             // Each tile is 8x8 pixel in size and uses 2 bytes per row or 2 bits per pixel
-            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0Detail.TileSetData[(tileID << 3) + pixelY];
+            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[(tileID << 3) + pixelY];
 
             // Move first pixel bits to bit 15 (low) and bit 7 (high)
             tilePixelLine <<= pixelX;
@@ -419,7 +419,7 @@ void GBC_GPU_RenderScanline(void)
             }
 
             // Each tile uses 2 bytes per row or 2 bits per pixel
-            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0Detail.TileSetData[(tileID << 3) + pixelY];
+            uint16_t tilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[(tileID << 3) + pixelY];
 
             if (sprite.FlipX)
             {

@@ -113,19 +113,19 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t VRAMBank0[8192];          // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+        uint8_t Data[8192];               // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
 
         #pragma pack(1)
         struct
         {
             uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
             uint8_t TileMapData[2048];    // 9800-9FFF: Tilemap Data
-        } VRAMBank0Detail;
-    };
+        };
+    } VRAMBank0;
     #pragma pack(1)
     union
     {
-        uint8_t VRAMBank1[8192];          // Only in GBC mode
+        uint8_t Data[8192];               // Only in GBC mode
 
         #pragma pack(1)
         struct
@@ -148,8 +148,8 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int BGOAMPriority          : 1; // (0 = OAM priority, 1 = BG priority)
                 };
             } TileMapAttributes[2048];    // 9800-9FFF: Tilemap Attributes
-        } VRAMBank1Detail;
-    };
+        };
+    } VRAMBank1;
     uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
     uint8_t ERAMBank2[8192];
