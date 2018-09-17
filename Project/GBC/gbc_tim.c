@@ -22,14 +22,14 @@ void GBC_TIM_Step(void)
     {
         GBC_TIM_DividerTicks -= 256;
 
-        GBC_MMU_Memory.TimerDivider++;
+        GBC_MMU_Memory.IO.TimerDivider++;
     }
 
-    if (GBC_MMU_Memory.TimerRunning)
+    if (GBC_MMU_Memory.IO.TimerRunning)
     {
         GBC_TIM_CounterTicks += GBC_CPU_StepTicks;
 
-        switch (GBC_MMU_Memory.TimerSpeed)
+        switch (GBC_MMU_Memory.IO.TimerSpeed)
         {
             case 0:
                 GBC_TIM_CounterFrequency = 1024;    // 4096Hz
@@ -49,16 +49,16 @@ void GBC_TIM_Step(void)
         {
             GBC_TIM_CounterTicks -= GBC_TIM_CounterFrequency;
 
-            if (GBC_MMU_Memory.TimerCounter == 0xFF)
+            if (GBC_MMU_Memory.IO.TimerCounter == 0xFF)
             {
                 // When TimerCounter overflows the value of TimerModulo will be used as start value
-                GBC_MMU_Memory.TimerCounter = GBC_MMU_Memory.TimerModulo;
+                GBC_MMU_Memory.IO.TimerCounter = GBC_MMU_Memory.IO.TimerModulo;
 
-                GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_TIMER;
+                GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_TIMER;
             }
             else
             {
-                GBC_MMU_Memory.TimerCounter++;
+                GBC_MMU_Memory.IO.TimerCounter++;
             }
         }
     }
@@ -67,11 +67,11 @@ void GBC_TIM_Step(void)
 void GBC_TIM_ResetDivider(void)
 {
     GBC_TIM_DividerTicks = 0;
-    GBC_MMU_Memory.TimerDivider = 0;
+    GBC_MMU_Memory.IO.TimerDivider = 0;
 }
 
 void GBC_TIM_ResetCounter(void)
 {
     GBC_TIM_CounterTicks = 0;
-    GBC_MMU_Memory.TimerCounter = GBC_MMU_Memory.TimerModulo;
+    GBC_MMU_Memory.IO.TimerCounter = GBC_MMU_Memory.IO.TimerModulo;
 }

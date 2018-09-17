@@ -57,7 +57,7 @@ long GBC_CPU_InstructionsPerStep = 0;
             GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP + 1 - 0xC000] = ((VALUE) & 0xFF00) >> 8; /* High */                                       \
             break;                                                                                                                                 \
         case 0xD000: /* WRAM Bank X */                                                                                                             \
-            switch (GBC_MMU_Memory.WRAMBankID)                                                                                                     \
+            switch (GBC_MMU_Memory.IO.WRAMBankID)                                                                                                  \
             {                                                                                                                                      \
                 case 0:                                                                                                                            \
                 case 1:                                                                                                                            \
@@ -113,7 +113,7 @@ long GBC_CPU_InstructionsPerStep = 0;
                 GBC_MMU_Memory.WRAMBank0[GBC_CPU_Register.SP - 0xC000];                                                                            \
             break;                                                                                                                                 \
         case 0xD000: /* WRAM Bank X */                                                                                                             \
-            switch (GBC_MMU_Memory.WRAMBankID)                                                                                                     \
+            switch (GBC_MMU_Memory.IO.WRAMBankID)                                                                                                  \
             {                                                                                                                                      \
                 case 0:                                                                                                                            \
                 case 1:                                                                                                                            \
@@ -576,10 +576,10 @@ void GBC_CPU_STOP()                     // 0x10 - Stop processor
 {
     if (GBC_MMU_IS_CGB_MODE())
     {
-        if (GBC_MMU_Memory.PrepareSpeedSwitch)
+        if (GBC_MMU_Memory.IO.PrepareSpeedSwitch)
         {
-            GBC_MMU_Memory.PrepareSpeedSwitch = 0;
-            GBC_MMU_Memory.CurrentSpeed = !GBC_MMU_Memory.CurrentSpeed;
+            GBC_MMU_Memory.IO.PrepareSpeedSwitch = 0;
+            GBC_MMU_Memory.IO.CurrentSpeed = !GBC_MMU_Memory.IO.CurrentSpeed;
             GBC_CPU_SpeedModifier = GBC_CPU_SpeedModifier ? 0 : 1;
         }
     }
@@ -2333,7 +2333,7 @@ void GBC_CPU_RST_60H()      // Start Joypad Handler
 
 void GBC_CPU_Step()
 {
-    GBC_CPU_PendingInterrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.InterruptFlags;
+    GBC_CPU_PendingInterrupts = GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.IO.InterruptFlags;
     GBC_CPU_InstructionTicks = 0;
     GBC_CPU_StepTicks = 0;
 
@@ -2363,7 +2363,7 @@ void GBC_CPU_Step()
         {
             if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_VBLANK)
             {
-                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
+                GBC_MMU_Memory.IO.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_VBLANK;
 
                 GBC_CPU_InterruptMasterEnable = false;
                 GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
@@ -2372,7 +2372,7 @@ void GBC_CPU_Step()
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_LCD_STAT)
             {
-                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                GBC_MMU_Memory.IO.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
 
                 GBC_CPU_InterruptMasterEnable = false;
                 GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
@@ -2381,7 +2381,7 @@ void GBC_CPU_Step()
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_TIMER)
             {
-                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
+                GBC_MMU_Memory.IO.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_TIMER;
 
                 GBC_CPU_InterruptMasterEnable = false;
                 GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
@@ -2390,7 +2390,7 @@ void GBC_CPU_Step()
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_SERIAL)
             {
-                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
+                GBC_MMU_Memory.IO.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_SERIAL;
 
                 GBC_CPU_InterruptMasterEnable = false;
                 GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);
@@ -2399,7 +2399,7 @@ void GBC_CPU_Step()
             }
             else if (GBC_CPU_PendingInterrupts & GBC_MMU_INTERRUPT_FLAGS_JOYPAD)
             {
-                GBC_MMU_Memory.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
+                GBC_MMU_Memory.IO.InterruptFlags &= ~GBC_MMU_INTERRUPT_FLAGS_JOYPAD;
 
                 GBC_CPU_InterruptMasterEnable = false;
                 GBC_CPU_PUSH_TO_STACK(GBC_CPU_Register.PC);

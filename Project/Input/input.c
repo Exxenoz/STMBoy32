@@ -28,18 +28,18 @@ void Input_UpdateGBCJoypad(void)
     // If SelectFade is active (0) shift interrupt-flags by 4 to get fade flags first
     // Set the upper 4 bit of flags to 1 so the lower 4 bits in Joypad can be set without changing the upper 4
     // Set the lower 4 bit of Joypad to 1 (not pressed) so they can be set accordingly
-    if (GBC_MMU_Memory.JoypadInputSelectFade == 0)
+    if (GBC_MMU_Memory.IO.JoypadInputSelectFade == 0)
     {
         uint8_t flags = (((~Input_Interrupt_Flags.allFlags) >> 4) | 0xF0);
-        GBC_MMU_Memory.Joypad |= 0x0F;
-        GBC_MMU_Memory.Joypad &= flags;
+        GBC_MMU_Memory.IO.Joypad |= 0x0F;
+        GBC_MMU_Memory.IO.Joypad &= flags;
     }
 
     // If SelectButtons is active dont shift interrupt-flags, button flags are already first
-    if (GBC_MMU_Memory.JoypadInputSelectButtons == 0)
+    if (GBC_MMU_Memory.IO.JoypadInputSelectButtons == 0)
     {
-        GBC_MMU_Memory.Joypad |= 0x0F;
-        GBC_MMU_Memory.Joypad &= ((~Input_Interrupt_Flags.allFlags) | 0xF0);
+        GBC_MMU_Memory.IO.Joypad |= 0x0F;
+        GBC_MMU_Memory.IO.Joypad &= ((~Input_Interrupt_Flags.allFlags) | 0xF0);
     }
 }
 

@@ -195,7 +195,7 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t IO[128];                  // FF00-FF7F: 128B Memory-mapped I/O
+        uint8_t Data[128];                // FF00-FF7F: 128B Memory-mapped I/O
 
         #pragma pack(1)
         struct
@@ -626,7 +626,7 @@ typedef struct GBC_MMU_Memory_s
             uint8_t WRAMBankID;              // 0xFF70                                           - Only in GBC mode
             uint8_t IO_Unk10[15];
         };
-    };
+    } IO;
     uint8_t HRAM[127];                    // FF80-FFFE: 127B High RAM
     uint8_t InterruptEnable;              // FFFF:        1B Interrupt enable register
 }

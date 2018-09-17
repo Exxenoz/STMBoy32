@@ -57,8 +57,8 @@ void GBC_GPU_Initialize(void)
 
     // Start in VBlank mode
     GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
-    GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
-    GBC_MMU_Memory.Scanline = 144;
+    GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
+    GBC_MMU_Memory.IO.Scanline = 144;
 
     for (uint32_t y = 0; y < 8; y++)
     {
@@ -136,7 +136,7 @@ void GBC_GPU_SetSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_t col
 void GBC_GPU_RenderScanline(void)
 {
     // When the display is disabled the screen is blank (white)
-    if (!GBC_MMU_Memory.DisplayEnable)
+    if (!GBC_MMU_Memory.IO.DisplayEnable)
     {
         memset(&GBC_GPU_FrameBuffer[GBC_GPU_CurrentFrameBufferStartIndex],
             GBC_GPU_BackgroundPaletteClassic[0].Color, sizeof(GBC_GPU_Color_t) * GBC_GPU_FRAME_SIZE_X);
@@ -150,17 +150,17 @@ void GBC_GPU_RenderScanline(void)
     memset(GBC_GPU_PriorityPixelLine, 0, sizeof(GBC_GPU_PriorityPixelLine));
 
     // Which row in the tile map needs to be rendered
-    uint16_t screenOffsetY = GBC_MMU_Memory.Scanline + GBC_MMU_Memory.ScrollY;
+    uint16_t screenOffsetY = GBC_MMU_Memory.IO.Scanline + GBC_MMU_Memory.IO.ScrollY;
 
     // Which tile to start with in the map row
-    uint8_t tileX = GBC_MMU_Memory.ScrollX >> 3;
+    uint8_t tileX = GBC_MMU_Memory.IO.ScrollX >> 3;
 
     // Which tile to start with in the map column
     uint8_t tileY = (screenOffsetY & 0xFF) >> 3;
 
     // Which column of pixels in the tile to start with
     // Numbered from left to right (0-7)
-    uint8_t pixelX = GBC_MMU_Memory.ScrollX & 7;
+    uint8_t pixelX = GBC_MMU_Memory.IO.ScrollX & 7;
 
     // Which row of pixels to use in the tiles
     // Numbered from top to bottom (0-7)
@@ -173,10 +173,10 @@ void GBC_GPU_RenderScanline(void)
     uint16_t tileID = 0;
 
     // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
-    if (GBC_MMU_Memory.BGDisplayEnable || GBC_MMU_IS_CGB_MODE())
+    if (GBC_MMU_Memory.IO.BGDisplayEnable || GBC_MMU_IS_CGB_MODE())
     {
         // Check if tile map #2 is selected
-        if (GBC_MMU_Memory.BGTileMapDisplaySelect)
+        if (GBC_MMU_Memory.IO.BGTileMapDisplaySelect)
         {
             tileIndex += 1024; // Use tile map #2
         }
@@ -187,7 +187,7 @@ void GBC_GPU_RenderScanline(void)
             tileID = GBC_MMU_Memory.VRAMBank0.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
-            if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
+            if (!GBC_MMU_Memory.IO.BGAndWindowTileSetDisplaySelect && tileID < 128)
             {
                 tileID += 256;
             }
@@ -208,16 +208,16 @@ void GBC_GPU_RenderScanline(void)
                 switch (pixel)
                 {
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor3];
                         break;
                 }
 
@@ -235,15 +235,15 @@ void GBC_GPU_RenderScanline(void)
     }
 
     // The window becomes visible (if enabled) when positions are set in range WX = 0-166, WY = 0-143
-    if (GBC_MMU_Memory.WindowDisplayEnable &&
+    if (GBC_MMU_Memory.IO.WindowDisplayEnable &&
         //GBC_MMU_Memory.WindowPositionY <= 143 && -- Not needed, because Scanline should be in range 0-143 at this position
-        GBC_MMU_Memory.WindowPositionY <= GBC_MMU_Memory.Scanline &&
-        GBC_MMU_Memory.WindowPositionXMinus7 <= 166) // X = 7 and Y = 0 locates window at upper left
+        GBC_MMU_Memory.IO.WindowPositionY <= GBC_MMU_Memory.IO.Scanline &&
+        GBC_MMU_Memory.IO.WindowPositionXMinus7 <= 166) // X = 7 and Y = 0 locates window at upper left
     {
         // Where to render on the frame buffer
-        if (GBC_MMU_Memory.WindowPositionXMinus7 > 7)
+        if (GBC_MMU_Memory.IO.WindowPositionXMinus7 > 7)
         {
-            frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex + GBC_MMU_Memory.WindowPositionXMinus7 - 7;
+            frameBufferIndex = GBC_GPU_CurrentFrameBufferStartIndex + GBC_MMU_Memory.IO.WindowPositionXMinus7 - 7;
         }
         else
         {
@@ -251,7 +251,7 @@ void GBC_GPU_RenderScanline(void)
         }
 
         // Which row in the tile map needs to be rendered
-        screenOffsetY = GBC_MMU_Memory.Scanline - GBC_MMU_Memory.WindowPositionY;
+        screenOffsetY = GBC_MMU_Memory.IO.Scanline - GBC_MMU_Memory.IO.WindowPositionY;
 
         // Which tile to start with in the map row
         tileX = 0;
@@ -261,7 +261,7 @@ void GBC_GPU_RenderScanline(void)
 
         // Which column of pixels in the tile to start with
         // Numbered from left to right (0-7)
-        pixelX = (GBC_MMU_Memory.WindowPositionXMinus7 < 7) ? 7 - GBC_MMU_Memory.WindowPositionXMinus7 : 0;
+        pixelX = (GBC_MMU_Memory.IO.WindowPositionXMinus7 < 7) ? 7 - GBC_MMU_Memory.IO.WindowPositionXMinus7 : 0;
 
         // Which row of pixels to use in the tiles
         // Numbered from top to bottom (0-7)
@@ -271,7 +271,7 @@ void GBC_GPU_RenderScanline(void)
         tileIndex = (tileY << 5) + tileX;
 
         // Check if tile map #2 is selected
-        if (GBC_MMU_Memory.WindowTileMapDisplaySelect)
+        if (GBC_MMU_Memory.IO.WindowTileMapDisplaySelect)
         {
             tileIndex += 1024; // Use tile map #2
         }
@@ -282,7 +282,7 @@ void GBC_GPU_RenderScanline(void)
             tileID = GBC_MMU_Memory.VRAMBank0.TileMapData[tileIndex];
 
             // Calculate the real tile ID if tileID is signed due to tile set #0 selection
-            if (!GBC_MMU_Memory.BGAndWindowTileSetDisplaySelect && tileID < 128)
+            if (!GBC_MMU_Memory.IO.BGAndWindowTileSetDisplaySelect && tileID < 128)
             {
                 tileID += 256;
             }
@@ -303,16 +303,16 @@ void GBC_GPU_RenderScanline(void)
                 switch (pixel)
                 {
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.BackgroundPaletteColor3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex++] = GBC_GPU_BackgroundPaletteClassic[GBC_MMU_Memory.IO.BackgroundPaletteColor3];
                         break;
                 }
 
@@ -323,11 +323,11 @@ void GBC_GPU_RenderScanline(void)
         }
     }
 
-    if (GBC_MMU_Memory.SpriteDisplayEnable)
+    if (GBC_MMU_Memory.IO.SpriteDisplayEnable)
     {
         uint8_t spriteHeight = 8;
 
-        if (GBC_MMU_Memory.SpriteSize)
+        if (GBC_MMU_Memory.IO.SpriteSize)
         {
             spriteHeight = 16;
         }
@@ -360,8 +360,8 @@ void GBC_GPU_RenderScanline(void)
             spritePositionY = sprite.PositionY - 16;
 
             // Check if sprite falls on this scanline
-            if (spritePositionY > GBC_MMU_Memory.Scanline ||
-               (spritePositionY + spriteHeight) <= GBC_MMU_Memory.Scanline ||
+            if (spritePositionY > GBC_MMU_Memory.IO.Scanline ||
+               (spritePositionY + spriteHeight) <= GBC_MMU_Memory.IO.Scanline ||
                 spritePositionX <=  -8 ||
                 spritePositionX >= 160)
             {
@@ -382,7 +382,7 @@ void GBC_GPU_RenderScanline(void)
             {
                 if (spriteHeight == 16)
                 {
-                    pixelY = 15 - (GBC_MMU_Memory.Scanline - spritePositionY);
+                    pixelY = 15 - (GBC_MMU_Memory.IO.Scanline - spritePositionY);
 
                     // Check if pixel line is in the second tile
                     if (pixelY >= 8)
@@ -395,12 +395,12 @@ void GBC_GPU_RenderScanline(void)
                 }
                 else
                 {
-                    pixelY = 7 - (GBC_MMU_Memory.Scanline - spritePositionY);
+                    pixelY = 7 - (GBC_MMU_Memory.IO.Scanline - spritePositionY);
                 }
             }
             else
             {
-                pixelY = GBC_MMU_Memory.Scanline - spritePositionY;
+                pixelY = GBC_MMU_Memory.IO.Scanline - spritePositionY;
             }
 
             if (spritePositionX < 0)
@@ -512,16 +512,16 @@ void GBC_GPU_RenderScanline(void)
                     switch (pixel)
                     {
                         case 0:
-                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color0];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.IO.ObjectPalette1Color0];
                             break;
                         case 1:
-                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color1];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.IO.ObjectPalette1Color1];
                             break;
                         case 2:
-                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color2];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.IO.ObjectPalette1Color2];
                             break;
                         case 3:
-                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.ObjectPalette1Color3];
+                            GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette1Classic[GBC_MMU_Memory.IO.ObjectPalette1Color3];
                             break;
                     }
                 }
@@ -529,16 +529,16 @@ void GBC_GPU_RenderScanline(void)
                 {
                     // Select color from object palette 0
                     case 0:
-                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color0];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.IO.ObjectPalette0Color0];
                         break;
                     case 1:
-                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color1];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.IO.ObjectPalette0Color1];
                         break;
                     case 2:
-                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color2];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.IO.ObjectPalette0Color2];
                         break;
                     case 3:
-                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.ObjectPalette0Color3];
+                        GBC_GPU_FrameBuffer[frameBufferIndex] = GBC_GPU_ObjectPalette0Classic[GBC_MMU_Memory.IO.ObjectPalette0Color3];
                         break;
                 }
             }
@@ -548,15 +548,15 @@ void GBC_GPU_RenderScanline(void)
 
 #define GBC_GPU_COMPARE_SCANLINE()                                                                                                         \
 {                                                                                                                                          \
-    if (GBC_MMU_Memory.Scanline == GBC_MMU_Memory.ScanlineCompare)                                                                         \
+    if (GBC_MMU_Memory.IO.Scanline == GBC_MMU_Memory.IO.ScanlineCompare)                                                                   \
     {                                                                                                                                      \
-        GBC_MMU_Memory.Coincidence = 1;                                                                                                    \
+        GBC_MMU_Memory.IO.Coincidence = 1;                                                                                                 \
                                                                                                                                            \
-        if (GBC_MMU_Memory.CoincidenceInterrupt)                                                                                           \
+        if (GBC_MMU_Memory.IO.CoincidenceInterrupt)                                                                                        \
         {                                                                                                                                  \
             if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)                                                                     \
             {                                                                                                                              \
-                GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;                                                         \
+                GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;                                                      \
             }                                                                                                                              \
                                                                                                                                            \
             GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 1;                                                           \
@@ -564,7 +564,7 @@ void GBC_GPU_RenderScanline(void)
     }                                                                                                                                      \
     else                                                                                                                                   \
     {                                                                                                                                      \
-        GBC_MMU_Memory.Coincidence = 0;                                                                                                    \
+        GBC_MMU_Memory.IO.Coincidence = 0;                                                                                                 \
         GBC_GPU_StatusInterruptRequestState.CoincidenceInterruptRequest = 0;                                                               \
     }                                                                                                                                      \
 }                                                                                                                                          \
@@ -581,21 +581,21 @@ bool GBC_GPU_Step(void)
             {
                 GBC_GPU_ModeTicks -= 204;
 
-                GBC_MMU_Memory.Scanline++;
+                GBC_MMU_Memory.IO.Scanline++;
                 GBC_GPU_COMPARE_SCANLINE();
 
                 GBC_GPU_CurrentFrameBufferStartIndex += 160;
                 GBC_GPU_CurrentFrameBufferEndIndex += 160;
 
-                if (GBC_MMU_Memory.Scanline >= 144)
+                if (GBC_MMU_Memory.IO.Scanline >= 144)
                 {
-                    GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
+                    GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_VBLANK;
 
-                    if (GBC_MMU_Memory.VBlankInterrupt)
+                    if (GBC_MMU_Memory.IO.VBlankInterrupt)
                     {
                         if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
                         {
-                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                            GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
                         }
 
                         GBC_GPU_StatusInterruptRequestState.VBlankInterruptRequest = 1;
@@ -603,7 +603,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
-                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
+                    GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
 
 #ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
                     if (GBC_GPU_SkipCurrentFrame)
@@ -621,11 +621,11 @@ bool GBC_GPU_Step(void)
                 }
                 else
                 {
-                    if (GBC_MMU_Memory.OAMInterrupt)
+                    if (GBC_MMU_Memory.IO.OAMInterrupt)
                     {
                         if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
                         {
-                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                            GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
                         }
 
                         GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 1;
@@ -633,7 +633,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 0;
 
-                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
+                    GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
                 }
             }
             break;
@@ -644,19 +644,19 @@ bool GBC_GPU_Step(void)
             {
                 GBC_GPU_ModeTicks -= 456;
 
-                if (GBC_MMU_Memory.Scanline >= 153)
+                if (GBC_MMU_Memory.IO.Scanline >= 153)
                 {
-                    GBC_MMU_Memory.Scanline = 0;
+                    GBC_MMU_Memory.IO.Scanline = 0;
                     GBC_GPU_COMPARE_SCANLINE();
 
                     GBC_GPU_CurrentFrameBufferStartIndex = 0;
                     GBC_GPU_CurrentFrameBufferEndIndex = 160;
 
-                    if (GBC_MMU_Memory.OAMInterrupt)
+                    if (GBC_MMU_Memory.IO.OAMInterrupt)
                     {
                         if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
                         {
-                            GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                            GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
                         }
 
                         GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 1;
@@ -664,11 +664,11 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_StatusInterruptRequestState.VBlankInterruptRequest = 0;
 
-                    GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
+                    GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_2_DURING_OAM_READING;
                 }
                 else
                 {
-                    GBC_MMU_Memory.Scanline++;
+                    GBC_MMU_Memory.IO.Scanline++;
                     GBC_GPU_COMPARE_SCANLINE();
                 }
             }
@@ -682,7 +682,7 @@ bool GBC_GPU_Step(void)
 
                 GBC_GPU_StatusInterruptRequestState.OAMInterruptRequest = 0;
 
-                GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_3_DURING_DATA_TRANSFER;
+                GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_3_DURING_DATA_TRANSFER;
             }
             break;
         }
@@ -701,17 +701,17 @@ bool GBC_GPU_Step(void)
                 GBC_GPU_RenderScanline();
 #endif
 
-                if (GBC_MMU_Memory.HBlankInterrupt)
+                if (GBC_MMU_Memory.IO.HBlankInterrupt)
                 {
                     if (GBC_GPU_StatusInterruptRequestState.RequestFlags == 0)
                     {
-                        GBC_MMU_Memory.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
+                        GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_LCD_STAT;
                     }
 
                     GBC_GPU_StatusInterruptRequestState.HBlankInterruptRequest = 1;
                 }
 
-                GBC_GPU_Mode = GBC_MMU_Memory.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
+                GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
             }
             break;
         }
