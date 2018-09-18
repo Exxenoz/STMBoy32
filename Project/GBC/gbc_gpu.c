@@ -13,6 +13,42 @@ GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
 bool GBC_GPU_SkipCurrentFrame = true;
 #endif
 
+#pragma pack(1)
+typedef struct GBC_GPU_RenderCache_s
+{
+    uint16_t CurrFrameBufferStartIndex; // Start index of the current scanline
+    uint16_t CurrFrameBufferIndex;      // Current render position in the frame buffer
+    uint16_t CurrFrameBufferEndIndex;   // End index of the current scanline
+
+    uint16_t CurrScreenOffsetX;         // Which column in the tile map needs to be rendered (ScrollX)
+    uint16_t CurrScreenOffsetY;         // Which row in the tile map needs to be rendered (Scanline + ScrollY)
+
+    uint8_t CurrTilePositionX;          // Map column of the current tile
+    uint8_t CurrTilePositionY;          // Map row of the current tile
+
+    uint8_t CurrTilePixelPositionX;     // Tile column of the current pixel. Numbered from left to right (0-7)
+    uint8_t CurrTilePixelPositionY;     // Tile row of the current pixel.    Numbered from top to bottom (0-7)
+
+    uint16_t CurrTileMapTileIndex;      // Index of the current tile in the tile map data array
+    uint16_t CurrTileId;                // Id of the current tile in the tile set data array (of either VRAMBank0 or VRAMBank1)
+
+    uint16_t CurrTileSetTileIndex;      // Index of the current tile in the tile set data array (of either VRAMBank0 or VRAMBank1)
+    uint16_t CurrTilePixelLine;         // Each tile is 8x8 pixel in size and uses 2 bytes per row/line or 2 bits per pixel
+
+    uint16_t CurrPriorityPixelLineIndex;
+    GBC_GPU_PriorityPixel_t PriorityPixelLine[GBC_GPU_FRAME_SIZE_X];
+    GBC_GPU_PriorityPixel_t CurrPriorityPixel; // Cache for sprite rendering
+
+    uint8_t CurrPixel;
+
+    uint8_t CurrSpriteHeight;
+    int32_t CurrSpritePositionX;
+    int32_t CurrSpritePositionY;
+
+    struct SpriteAttributes_s CurrSpriteAttributes;
+}
+GBC_GPU_RenderCache_t;
+
 GBC_GPU_RenderCache_t GBC_GPU_RenderCache;
 #define RC GBC_GPU_RenderCache
 
