@@ -29,6 +29,7 @@ typedef struct GBC_GPU_RenderCache_s
     uint8_t CurrTilePixelPositionX;     // Tile column of the current pixel. Numbered from left to right (0-7)
     uint8_t CurrTilePixelPositionY;     // Tile row of the current pixel.    Numbered from top to bottom (0-7)
 
+    uint16_t CurrTileMapTileOffset;     // Offset to the first tile in the current tile map row (including index offset to TileMap0/1)
     uint16_t CurrTileMapTileIndex;      // Index of the current tile in the tile map data array
     uint16_t CurrTileId;                // Id of the current tile in the tile set data array (of either VRAMBank0 or VRAMBank1)
 
@@ -184,15 +185,10 @@ static inline void GBC_GPU_DMG_RenderBackgroundScanline(void)
     RC.CurrTilePositionY = (RC.CurrScreenOffsetY & 0xFF) >> 3;
     RC.CurrTilePixelPositionX = RC.CurrScreenOffsetX & 7;
     RC.CurrTilePixelPositionY = RC.CurrScreenOffsetY & 7;
-    RC.CurrTileMapTileIndex = (RC.CurrTilePositionY << 5) + RC.CurrTilePositionX;
+    RC.CurrTileMapTileOffset = (GBC_MMU_Memory.IO.BGTileMapDisplaySelect ? 1024 : 0) + (RC.CurrTilePositionY << 5);
+    RC.CurrTileMapTileIndex = RC.CurrTileMapTileOffset + RC.CurrTilePositionX;
 
-    // Check if tile map #2 is selected
-    if (GBC_MMU_Memory.IO.BGTileMapDisplaySelect)
-    {
-        RC.CurrTileMapTileIndex += 1024; // Use tile map #2
-    }
-
-    for (RC.CurrPriorityPixelLineIndex = 0; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex; RC.CurrTileMapTileIndex++)
+    for (RC.CurrPriorityPixelLineIndex = 0; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex;)
     {
         RC.CurrTileId = GBC_MMU_Memory.VRAMBank0.TileMapData[RC.CurrTileMapTileIndex];
 
@@ -236,6 +232,11 @@ static inline void GBC_GPU_DMG_RenderBackgroundScanline(void)
         }
 
         RC.CurrTilePixelPositionX = 0;
+
+        RC.CurrTilePositionX++;
+        RC.CurrTilePositionX &= 0x1F;
+
+        RC.CurrTileMapTileIndex = RC.CurrTileMapTileOffset + RC.CurrTilePositionX;
     }
 }
 
