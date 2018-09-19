@@ -1,7 +1,12 @@
 #include "os_state_handlers.h"
+
 #include "led.h"
+
+#include "ui_pages.h"
+
 #include "lcd.h"
 #include "lcd_config.h"
+#include "lcd_drawing.h"
 
 
 void HandleMainPage(void)
