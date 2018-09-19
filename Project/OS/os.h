@@ -15,6 +15,9 @@
 #define OS_OPTIONS_FILE                   "options.txt"
 #define OS_GAME_DIRECTORY                 "Games"
 #define OS_GAME_PATH                      "Games/"
+#define OS_SAVEGAME_DIRECTORY             "SaveGames"
+#define OS_SAVEGAME_PATH                  "SaveGames/"
+#define OS_SAVEGAME_SUFFIX                ".sav"
 #define OS_FAVORITE_DIRECTORY             "Games/Favorites"
 #define OS_FAVORITE_PATH                  "Games/Favorites/"
 
@@ -103,11 +106,12 @@ void OS_Initialize(void);
 
 Error_Def_t OS_LoadLastPlayed(void);
 Error_Def_t OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
+Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex);
 Error_Def_t OS_UpdateOptions(void);
 Error_Def_t OS_UpdateLastPlayed(void);
 
 Error_Def_t OS_GetGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
-Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex);
+Error_Def_t OS_GetSaveGamePath(OS_GameEntry_t *p_game, char *path, int pathLength);
 
 Error_Def_t OS_Set_IsFavorite(OS_GameEntry_t *p_game);
 Error_Def_t OS_InvertFavoriteStatus(OS_GameEntry_t *p_game);

@@ -1,7 +1,13 @@
+#include <string.h>
+
 #include "lcd.h"
+#include "lcd_config.h"
+#include "lcd_regdef.h"
+#include "gbc_gpu.h"
 
 
 LCD_Pixel_t LCD_FrameBuffer[LCD_DISPLAY_PIXELS];
+LCD_Pixel_t LCD_GBCFrameBuffer[GBC_GPU_FRAME_SIZE];
 
 uint16_t*   LCD_DMA_TransferFrameBuffer;
 uint32_t    LCD_DMA_TransferFrameBufferSize;
@@ -15,7 +21,7 @@ volatile LCD_DMA_TransferCompleteFlags_t LCD_DMA_TransferCompleteFlags = LCD_DMA
 /*                          LCD Low-Level Functions                           */
 /******************************************************************************/
 
-// Write register address
+// Write register address.
 void LCD_WriteAddr(uint16_t addr)
 {
     LCD_DATA_PORT->ODR = addr;
@@ -25,7 +31,7 @@ void LCD_WriteAddr(uint16_t addr)
     LCD_SET_RS;
 }
 
-// Write data
+// Write data.
 void LCD_WriteData(uint16_t data)
 {
     LCD_DATA_PORT->ODR = data;
@@ -33,7 +39,7 @@ void LCD_WriteData(uint16_t data)
     LCD_SET_WR;
 }
 
-// Write Command without data
+// Write Command without data.
 void LCD_WriteCommand(uint16_t addr)
 {
     LCD_RST_CS;
@@ -41,7 +47,7 @@ void LCD_WriteCommand(uint16_t addr)
     LCD_SET_CS;
 }
 
-// Write Command with single byte data
+// Write Command with single byte data.
 void LCD_WriteCommandWithData(uint16_t addr, uint16_t data)
 {
     LCD_RST_CS;
@@ -50,7 +56,7 @@ void LCD_WriteCommandWithData(uint16_t addr, uint16_t data)
     LCD_SET_CS;
 }
 
-// Write Command with data consisting of multiply parameters
+// Write Command with data consisting of multiply parameters.
 void LCD_WriteCommandWithParameters(uint16_t addr, uint16_t parameters[], long length)
 {
     LCD_RST_CS;
@@ -247,8 +253,13 @@ void LCD_DrawFrameBuffer(uint16_t* frameBuffer, uint32_t frameBufferLength, uint
 
 void LCD_DrawGBCFrameBuffer(void)
 {
+    // Copy GBC frame buffer to same size output buffer to avoid modifications during DMA transfer
+    // ToDo: Replace the usage of this buffer with LCD_FrameBuffer and render the GBC_GPU_FrameBuffer
+    // into the center of LCD_FrameBuffer (without touching the - hopefully soon fancy - border)
+    memcpy(LCD_GBCFrameBuffer, GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE * 2);
+
     // Set Draw Area to the middle 160x144px for non scaled display
-    LCD_DrawFrameBuffer((uint16_t*)GBC_GPU_FrameBuffer, GBC_GPU_FRAME_SIZE, 80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
+    LCD_DrawFrameBuffer((uint16_t*)LCD_GBCFrameBuffer, GBC_GPU_FRAME_SIZE, 80, 48, GBC_GPU_FRAME_SIZE_X, GBC_GPU_FRAME_SIZE_Y);
 }
 
 void LCD_DrawGBCFrameBufferScaled(void)

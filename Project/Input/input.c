@@ -1,23 +1,46 @@
 #include "input.h"
+#include "input_init.h"
+#include "input_config.h"
 #include "gbc_mmu.h"
 
 
 Input_Interrupt_Flags_t  Input_Interrupt_Flags = { .allFlags = 0x00 };
-
-Input_ButtonState_t      Input_LastState[8]    = {0};
-Input_ButtonState_t      Input_CurrState[8]    = {0};
 uint8_t                  Input_Counter[8]      = {0};
 
-const uint32_t Input_Pins[8] =
+Input_ButtonState_t Input_LastState[8] =
 {
-    INPUT_A_PIN,
-    INPUT_B_PIN,
-    INPUT_SELECT_PIN,
-    INPUT_START_PIN,
-    INPUT_FADE_RIGHT_PIN,
-    INPUT_FADE_LEFT_PIN,
-    INPUT_FADE_TOP_PIN,
-    INPUT_FADE_BOTTOM_PIN,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+};
+
+Input_ButtonState_t Input_CurrState[8] =
+{
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+    INPUT_NOT_PRESSED,
+};
+
+const Input_Pins_t Input_Pins[8] =
+{
+    { INPUT_A_PORT, INPUT_A_PIN },
+    { INPUT_B_PORT, INPUT_B_PIN },
+    { INPUT_SELECT_PORT, INPUT_SELECT_PIN },
+    { INPUT_START_PORT, INPUT_START_PIN },
+    { INPUT_FADE_RIGHT_PORT, INPUT_FADE_RIGHT_PIN },
+    { INPUT_FADE_LEFT_PORT, INPUT_FADE_LEFT_PIN },
+    { INPUT_FADE_TOP_PORT, INPUT_FADE_TOP_PIN },
+    { INPUT_FADE_BOTTOM_PORT, INPUT_FADE_BOTTOM_PIN },
 };
 
 
@@ -48,7 +71,7 @@ void TIM2_IRQHandler(void)
     for (int i = 0; i < 8; i++)
     {
         // If the Input pin is low button/fade is pressed.
-        Input_CurrState[i] = ((INPUT_PORT_ALL->IDR & Input_Pins[i]) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
+        Input_CurrState[i] = ((Input_Pins[i].Port->IDR & Input_Pins[i].Pin) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
 
         // If the input state didn't change since 1ms ago increase counter.
         // If the input state changed since 1ms ago reset counter.
@@ -65,8 +88,8 @@ void TIM2_IRQHandler(void)
         if (Input_Counter[i] >= INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED)
         {
             // Reset the corresponding Input Bit (not pressed) then set it according to the current state.
-            Input_Interrupt_Flags.allFlags &= ~(Input_Pins[i] >> 1);
-            Input_Interrupt_Flags.allFlags |= ((Input_Pins[i] >> 1) & Input_CurrState[i]);
+            Input_Interrupt_Flags.allFlags &= ~(Input_Pins[i].Pin >> 1);
+            Input_Interrupt_Flags.allFlags |= ((Input_Pins[i].Pin >> 1) & Input_CurrState[i]);
 
             Input_Counter[i] = 0;
         }

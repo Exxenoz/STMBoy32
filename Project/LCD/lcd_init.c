@@ -1,5 +1,11 @@
 #include "lcd_init.h"
 
+#include "lcd.h"
+#include "lcd_config.h"
+#include "lcd_regdef.h"
+#include "lcd_drawing.h"
+#include "input_config.h"
+
 
 uint16_t LCD_REG_VCOM_CONTROL_DATA[2] =
 {
@@ -154,7 +160,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_Init(&LCD_TIM_Handle_PixelTransferTiming);
 
     // Configure data pulse width modulation
-    OC_Config_Data.Pulse        = 5;
+    OC_Config_Data.Pulse        = 1;
     OC_Config_Data.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_Data.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_Data.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -164,7 +170,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_PixelTransferTiming, &OC_Config_Data, LCD_DATA_TIM_CHANNEL);
 
     // Configure WR reset pulse width modulation
-    OC_Config_WR_Rst.Pulse        = 5;
+    OC_Config_WR_Rst.Pulse        = 1;
     OC_Config_WR_Rst.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_WR_Rst.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_WR_Rst.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -174,7 +180,7 @@ void LCD_InitializeDMATimer(void)
     HAL_TIM_PWM_ConfigChannel(&LCD_TIM_Handle_PixelTransferTiming, &OC_Config_WR_Rst, LCD_WR_RST_TIM_CHANNEL);
 
     // Configure WR set pulse width modulation
-    OC_Config_WR_Set.Pulse        = 30;
+    OC_Config_WR_Set.Pulse        = 1;
     OC_Config_WR_Set.OCMode       = TIM_OCMODE_PWM1;
     OC_Config_WR_Set.OCFastMode   = TIM_OCFAST_DISABLE;
     OC_Config_WR_Set.OCPolarity   = TIM_OCPOLARITY_LOW;
@@ -295,7 +301,8 @@ void LCD_Initialize(void)
     LCD_WriteCommandWithParameters(LCD_REG_NEGATIVE_GAMMA_CORRECTION, LCD_REG_NEGATIVE_GAMMA_CORRECTION_DATA, 15);
 
     LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO1, LCD_FRAME_RATE_61HZ);
-    LCD_SetDrawBehaviour(true, true, true, true, false, true);
+
+    LCD_SetDrawBehaviour(false, false, true, false, false, true);
 
     LCD_WriteCommandWithData(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);

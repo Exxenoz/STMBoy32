@@ -8,20 +8,23 @@
   ******************************************************************************
   */
 
+#include "common.h"
+
+#include "lcd.h"
+#include "lcd_init.h"
+
 #include "os.h"
 #include "os_state_handlers.h"
 
-#include "gbc.h"
-#include "gbc_mmu.h"
+#include "cmod_init.h"
+#include "input_init.h"
 
+#include "gbc.h"
 #include "led.h"
 #include "sdc.h"
-#include "cmod.h"
 #include "audio.h"
-#include "input_init.h"
-#include "common.h"
+#include "sdram.h"
 #include "system.h"
-#include "lcd_init.h"
 
 
 
@@ -34,8 +37,9 @@ int main(void)
     System_Initialize();
 
     // Initialize drivers.
-    OS_Initialize();
+    SDRAM_Initialize();
     SDC_Initialize();
+    OS_Initialize();
     LED_Initialize();
     LCD_Initialize();
     //CMOD_Initialize();

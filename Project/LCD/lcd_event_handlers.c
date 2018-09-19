@@ -1,4 +1,11 @@
+#include "lcd.h"
+#include "lcd_init.h"
+#include "lcd_types.h"
+#include "lcd_config.h"
 #include "lcd_event_handlers.h"
+
+#include "input_config.h"
+
 
 bool LCD_READY_FLAG;
 

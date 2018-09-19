@@ -2,12 +2,8 @@
 #define LCD_DRAWING_H
 
 #include "common.h"
-#include "gbc_gpu.h"
 #include "ui_fonts.h"
-
-#include "lcd.h"
 #include "lcd_types.h"
-#include "lcd_config.h"
 
 
 

@@ -1,12 +1,9 @@
 #ifndef LCD_H
 #define LCD_H
 
-#include "gbc_gpu.h"
-
+#include "common.h"
 #include "lcd_init.h"
 #include "lcd_types.h"
-#include "lcd_config.h"
-#include "lcd_regdef.h"
 
 
 extern uint16_t*  LCD_DMA_TransferFrameBuffer;

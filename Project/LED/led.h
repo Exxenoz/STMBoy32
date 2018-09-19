@@ -2,7 +2,6 @@
 #define LED_H
 
 #include "common.h"
-#include "led_config.h"
 
 
 #define LED_RED_SET     LED_RED_PORT->BSRRL |= LED_RED_PIN

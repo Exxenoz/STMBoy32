@@ -2,7 +2,6 @@
 #define INPUT_INIT_H
 
 #include "common.h"
-#include "input_config.h"
 
 
 extern TIM_HandleTypeDef Input_PollTimerHandle;

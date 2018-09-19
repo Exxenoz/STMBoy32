@@ -1,187 +1,42 @@
+#include <string.h>
+
 #include "cmod.h"
-#include "sdc.h"
+#include "cmod_init.h"
+#include "cmod_access.h"
+
 #include "ff.h"
-#include "string.h"
+#include "led.h"
+#include "sdc.h"
+#include "gbc_mmu.h"
 
 
-TIM_OC_InitTypeDef CMOD_TIM_OCInitObject;
-TIM_HandleTypeDef CMOD_TimerHandle = { 
-    .Instance = CMOD_TIM,
-    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
-};
-
-uint8_t        CMOD_ROMBankX[16384];
-
-CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
-CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
-uint16_t       CMOD_Address      = 0x0000;
-uint8_t        *CMOD_DataOut     = NULL;
-uint8_t        *CMOD_DataIn      = NULL;
-int            CMOD_BytesToRead  = 0;
-int            CMOD_BytesRead    = 0;
-int            CMOD_BytesToWrite = 0;
-int            CMOD_BytesWritten = 0;
-bool           CMOD_Initialized  = false;
-
-bool CMOD_CartridgeInserted = false;
+uint8_t CMOD_ROMBankX[16384];
 
 
-
-CMOD_Status_t CMOD_GetStatus(void)
-{
-    return CMOD_Status; 
-}
-
-void CMOD_EnableInterrupt(void)
-{
-    CMOD_TIM->DIER |= (uint16_t)TIM_IT_UPDATE;
-}
 
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_CheckForCartridge(void)
 {
-    if (!CMOD_Initialized)
-    {
-        CMOD_CartridgeInserted = false;
-    }
-    else
+    if (CMOD_Initialized)
     {
         uint8_t data = 0x00;
 
         CMOD_ReadByte(0x0104, &data);
-        while (CMOD_Status == CMOD_PROCESSING);
+        while (CMOD_GetStatus() == CMOD_PROCESSING);
 
         if (data == 0xCE)
         {
-            CMOD_CartridgeInserted = true;
-        }
-        else
-        {
-            CMOD_CartridgeInserted = false;
+            return true;
         }
     }
 
-
-    return CMOD_CartridgeInserted;
+    return false;
 }
 
-void CMOD_ResetCartridge(void)
-{
-    CMOD_RST_RESET;                     // Reset Cartridge
-    for (int i = 0; i < 100; i++);      // Wait some ns
-    CMOD_SET_RESET;
-}
 
-void CMOD_ReadByte(uint16_t address, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
-
-    CMOD_Action      = CMOD_READ;
-    CMOD_Address     = address;
-    CMOD_DataIn      = data;
-    CMOD_BytesToRead = 1;
-    CMOD_BytesRead   = 0;
-    CMOD_Status      = CMOD_PROCESSING;
-
-    CMOD_DATA_MODE_IN;  
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
-
-    CMOD_Action      = CMOD_READ;
-    CMOD_Address     = startingAddress;
-    CMOD_DataIn      = data;
-    CMOD_BytesToRead = bytes;
-    CMOD_BytesRead   = 0;
-    CMOD_Status      = CMOD_PROCESSING;
-
-    CMOD_DATA_MODE_IN;  
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_WriteByte(uint16_t address, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
-
-    CMOD_Action       = CMOD_WRITE;
-    CMOD_Address      = address;
-    CMOD_DataOut      = data;
-    CMOD_BytesToWrite = 1;
-    CMOD_BytesWritten = 0;
-    CMOD_Status       = CMOD_PROCESSING;
-
-    CMOD_DATA_MODE_OUT;  
-    CMOD_EnableInterrupt();
-}
-
-void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
-{
-    while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
-
-    CMOD_Action       = CMOD_WRITE;
-    CMOD_Address      = startingAddress;
-    CMOD_DataOut      = data;
-    CMOD_BytesToWrite = bytes;
-    CMOD_BytesWritten = 0;
-    CMOD_Status       = CMOD_PROCESSING;
-
-    CMOD_DATA_MODE_OUT;
-    CMOD_EnableInterrupt();
-}
-
-// Manually switch the currently active Memory Bank of the Cartridge (to be able to save it)
-bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
-{
-    if (mbc == GBC_MMU_MBC_NONE)
-    {
-        // No switching Required
-        return true;
-    }
-    else if (mbc == GBC_MMU_MBC1)
-    {
-        uint8_t lower5Bit = bank & 0x1F;
-        uint8_t upper2Bit = (bank & 0x60) >> 5; 
-
-        CMOD_WriteByte(0x2100, &lower5Bit);      // Write lower 5 bit of rom bank number into 2000-3FFF
-        CMOD_WriteByte(0x6100, 0x00);            // Set 4000-5FFF to Rom mode
-        CMOD_WriteByte(0x4100, &upper2Bit);      // Write bit 6 & 7 of rom bank number into 4000-5FFF
-        while (CMOD_Status == CMOD_PROCESSING);
-    }
-    else if (mbc == GBC_MMU_MBC2 || mbc == GBC_MMU_MBC3)
-    {
-        // Convert bank to a 8bit number (16bit are needed as parameter for MBC5)
-        uint8_t bankNumber8Bit = bank;
-        // Switch Bank by writing into 2000-3FFF (for MBC2 lsb of upper byte must be 1)
-        CMOD_WriteByte(0x2100, &bankNumber8Bit);
-        while (CMOD_Status == CMOD_PROCESSING);
-    }
-    else if (mbc == GBC_MMU_MBC5)
-    {
-        uint8_t lower8Bit = bank;
-        uint8_t upperBit  = (bank & 0x100) >> 8; 
-
-        CMOD_WriteByte(0x2100, &lower8Bit);      // Write lower 8 bit of bank number into 2000-2FFF
-        CMOD_WriteByte(0x3100, &upperBit);       // Write upper 1 bit of bank number into 3000-3FFF
-        while (CMOD_Status == CMOD_PROCESSING);
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
-}
+/******************************************************************************/
+/*                            CMOD save Functions                             */
+/******************************************************************************/
 
 // Convert the 11 title bytes to a null terminated string
 void CMOD_GetFileName(char* name)
@@ -212,6 +67,47 @@ void CMOD_GetFileName(char* name)
         name[i++] = 'b';
     }
     name[i] = '\0';
+}
+
+// Manually switch the currently active Memory Bank of the Cartridge (to be able to save it).
+bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
+{
+    if (mbc != GBC_MMU_MBC_NONE) // Otherwise no switching required.
+    {
+        if (mbc == GBC_MMU_MBC1)
+        {
+            uint8_t lower5Bit = bank & 0x1F;
+            uint8_t upper2Bit = (bank & 0x60) >> 5; 
+
+            CMOD_WriteByte(0x2100, &lower5Bit);      // Write lower 5 bit of rom bank number into 2000-3FFF
+            CMOD_WriteByte(0x6100, 0x00);            // Set 4000-5FFF to Rom mode
+            CMOD_WriteByte(0x4100, &upper2Bit);      // Write bit 6 & 7 of rom bank number into 4000-5FFF
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+        }
+        else if (mbc == GBC_MMU_MBC2 || mbc == GBC_MMU_MBC3)
+        {
+            // Convert bank to a 8bit number (16bit are needed as parameter for MBC5) and switch Bank by writing into 2000-3FFF (for MBC2 lsb of upper byte must be 1).
+            uint8_t bankNumber8Bit = bank;
+
+            CMOD_WriteByte(0x2100, &bankNumber8Bit);
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+        }
+        else if (mbc == GBC_MMU_MBC5)
+        {
+            uint8_t lower8Bit = bank;
+            uint8_t upperBit  = (bank & 0x100) >> 8; 
+
+            CMOD_WriteByte(0x2100, &lower8Bit);      // Write lower 8 bit of bank number into 2000-2FFF
+            CMOD_WriteByte(0x3100, &upperBit);       // Write upper 1 bit of bank number into 3000-3FFF
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
@@ -283,7 +179,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
                 CMOD_SwitchMB(mbc, x);
 
                 CMOD_ReadBytes(0x4000, 16384, CMOD_ROMBankX);
-                while (CMOD_Status == CMOD_PROCESSING);
+                while (CMOD_GetStatus() == CMOD_PROCESSING);
             }
 
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
@@ -305,130 +201,4 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     }
 
     return CMOD_FAILED;
-}
-
-void CMOD_Initialize_CLK(void)
-{
-    GPIO_InitTypeDef GPIO_InitObject;
-
-    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitObject.Pin       = CMOD_CLK_PIN;
-    GPIO_InitObject.Pull      = GPIO_NOPULL;
-    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
-    HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
-
-    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 100Mhz(?) -> keep this rate
-    CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    CMOD_TimerHandle.Init.Period            = 95;                     // Count 'til 96(-1) -> 1,05Mhz PWM
-    CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-    CMOD_TimerHandle.Init.RepetitionCounter = 0;
-
-    CMOD_TIM_OCInitObject.Pulse        = 47; 
-    CMOD_TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
-    CMOD_TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
-    CMOD_TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
-    CMOD_TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
-    CMOD_TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
-    CMOD_TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &CMOD_TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
-    {
-        //Error_Handler();
-    }
-    
-    HAL_TIM_Base_Init(&CMOD_TimerHandle);
-    HAL_TIM_Base_Start(&CMOD_TimerHandle);
-
-    HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
-    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
-}
-
-void CMOD_Initialize(void)
-{
-    GPIO_InitTypeDef GPIO_InitObject;
-
-    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
-    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
-    GPIO_InitObject.Pin   = PIN;                     \
-    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
-    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
-    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
-
-    INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT,    CMOD_RD_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT,    CMOD_WR_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
-    INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
-
-    CMOD_Initialize_CLK();
-
-    CMOD_Initialized = true;
-}
-
-void CMOD_HandleRead(void)
-{
-    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank)
-
-    if (CMOD_BytesRead != 0)                                // If a Byte was read, store it
-    {                                                       // Gameboy stops driving Data Bus at 0ns -> Data ready
-        CMOD_DataIn[CMOD_BytesRead -1] = CMOD_GET_DATA();   // Store the nt byte at CMOD_DataIn[n-1]
-    }
-
-    if (CMOD_BytesRead == CMOD_BytesToRead)                 // Read all Data?
-    {
-        CMOD_SET_RD;                                        // RD rises after a read at 140ns (in GB)
-
-        CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
-        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
-        return;
-    }
-
-    CMOD_SET_ADDR(CMOD_Address + CMOD_BytesRead);           // Address changes at 140ns (in GB)
-    CMOD_RST_CS;                                            // CS goes low at 240ns (in GB)
-    CMOD_BytesRead++;                                       // Increase BytesRead in good faith
-}
-
-void CMOD_HandleWrite(void)
-{
-    CMOD_SET_CS;                                            // CS rises at 0ns (after CLK Flank)
-
-    if (CMOD_BytesWritten == CMOD_BytesToWrite)             // All Bytes written?
-    {
-        CMOD_SET_WR;                                        // WR rises after a write 20ns before the CLK rises (in GB)
-
-        CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
-        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
-        return;
-    }
-
-    CMOD_SET_ADDR(CMOD_Address + CMOD_BytesWritten);        // Address changes at 140ns (in GB)
-    CMOD_RST_CS;                                            // CS goes low at 240ns (in GB)
-    CMOD_BytesWritten++;                                    // Increase BytesWritten in good faith
-    CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);     // Data Bus is driven at 480ns (falling CLK) (in GB)
-}
-
-void CMOD_HandleNOP(void)
-{
-    return;
-}
-
-void (*CMOD_OperationTable[3])(void) =
-{
-    CMOD_HandleRead,
-    CMOD_HandleWrite,
-    CMOD_HandleNOP
-};
-
-void TIM5_IRQHandler(void)
-{
-  if (((CMOD_TIM->SR   & TIM_IT_UPDATE) != (uint16_t)RESET) && 
-      ((CMOD_TIM->DIER & TIM_IT_UPDATE) != (uint16_t)RESET))    // ITStatus == SET?
-  {
-      CMOD_OperationTable[CMOD_Action]();                       // Handle Read / Write / NOP
-
-      CMOD_TIM->SR = (uint16_t)~TIM_IT_UPDATE;                  // ClearITPendingBit
-  }
 }

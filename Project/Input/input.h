@@ -1,8 +1,7 @@
-  #ifndef INPUT_H
+#ifndef INPUT_H
 #define INPUT_H
 
 #include "common.h"
-#include "input_init.h"
 
 
 #define INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED   10
@@ -47,9 +46,17 @@ typedef union
 }
 Input_Interrupt_Flags_t;
 
+#pragma pack(1)
+typedef struct
+{
+    GPIO_TypeDef* Port;
+    uint32_t Pin;
+}
+Input_Pins_t;
+
 
 extern Input_Interrupt_Flags_t Input_Interrupt_Flags;
-extern const uint32_t          Input_Pins[8];
+extern const Input_Pins_t      Input_Pins[8];
 
 
 void Input_UpdateGBCJoypad(void);

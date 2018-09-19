@@ -1,4 +1,5 @@
 #include "audio.h"
+#include "audio_config.h"
 
 
 TIM_HandleTypeDef       Audio_TimerHandle;
@@ -10,6 +11,8 @@ DAC_HandleTypeDef       Audio_DACHandle;
 DAC_ChannelConfTypeDef  Audio_ChannelConfigL;
 DAC_ChannelConfTypeDef  Audio_ChannelConfigR;
 
+TIM_MasterConfigTypeDef Audio_MasterConfig;
+
 volatile bool Audio_IsPlayingOfBufferFinished = false;
 uint32_t      Audio_BufferPlayedCounter       = 0;
 
@@ -18,6 +21,8 @@ uint32_t      Audio_BufferPlayedCounter       = 0;
 void Audio_InitializeGPIO(void)
 {
     GPIO_InitTypeDef GPIO_InitObject = {0};
+
+
     GPIO_InitObject.Mode  = GPIO_MODE_ANALOG;
     GPIO_InitObject.Pin   = AUDIO_L_PIN;
     GPIO_InitObject.Pull  = GPIO_NOPULL;
@@ -26,6 +31,10 @@ void Audio_InitializeGPIO(void)
 
     GPIO_InitObject.Pin   = AUDIO_R_PIN;
     HAL_GPIO_Init(AUDIO_R_PORT, &GPIO_InitObject);
+
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitObject.Pin   = GPIO_PIN_12;
+    HAL_GPIO_Init(AUDIO_SD_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeTimer(void)
@@ -49,10 +58,9 @@ void Audio_InitializeTimer(void)
     Audio_TimerHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     HAL_TIM_Base_Init(&Audio_TimerHandle);
 
-    static TIM_MasterConfigTypeDef masterConfig;
-    masterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    masterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &masterConfig);
+    Audio_MasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    Audio_MasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &Audio_MasterConfig);
 
     HAL_TIM_Base_Start(&Audio_TimerHandle);
 }
@@ -65,12 +73,12 @@ void Audio_InitializeDAC(void)
 
     Audio_ChannelConfigL.DAC_Trigger      = AUDIO_DAC_L_TRIGGER;
     Audio_ChannelConfigL.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+    HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfigL, AUDIO_DAC_L_CHANNEL);
 
     Audio_ChannelConfigR.DAC_Trigger      = AUDIO_DAC_R_TRIGGER;
     Audio_ChannelConfigR.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-
-    HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfigL, AUDIO_DAC_L_CHANNEL);
     HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfigR, AUDIO_DAC_R_CHANNEL);
+
 
     HAL_DAC_Start(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL);
     HAL_DAC_Start(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL);
@@ -126,8 +134,20 @@ void Audio_Initialize(void)
     Audio_InitializeTimer();
     Audio_InitializeDAC();
     Audio_InitializeDMA();
+    Audio_EnablePower(true);
 }
 
+void Audio_EnablePower(bool enable)
+{
+    if (enable)
+    {
+        AUDIO_RST_SD;
+    }
+    else
+    {
+        AUDIO_SET_SD;
+    }
+}
 
 void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize)
 {
@@ -155,4 +175,5 @@ void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef* hdac)
 
 void HAL_DAC_ConvHalfCpltCallbackCh2(DAC_HandleTypeDef* hdac)
 {
+    // ToDo: Implement or remove.
 }

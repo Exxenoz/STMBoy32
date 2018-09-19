@@ -2,8 +2,6 @@
 #define INPUT_LOCKS_H
 
 #include "input.h"
-#include "input_config.h"
-
 #include "common.h"
 
 

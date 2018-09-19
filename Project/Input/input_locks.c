@@ -1,4 +1,5 @@
 #include "input_locks.h"
+#include "input_config.h"
 
 
 Input_Lock_t Input_Locks[8] =
@@ -40,7 +41,7 @@ void Input_UpdateLocks(void)
             if (timeLocked < 0) timeLocked += MAX_16BIT_TIMER_PERIOD;
 
             // Disable the lock if button was released.
-            if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID] >> 1)))
+            if (!(Input_Interrupt_Flags.allFlags & (Input_Pins[Input_Locks[i].ID].Pin >> 1)))
             {
                 Input_Locks[i].IsLocked             = false;
                 Input_Locks[i].WasUnlockedByTimeout = false;

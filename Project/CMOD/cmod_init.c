@@ -1,0 +1,76 @@
+#include "cmod_init.h"
+#include "cmod_config.h"
+
+
+TIM_OC_InitTypeDef CMOD_TIM_OCInitObject;
+TIM_HandleTypeDef  CMOD_TimerHandle =
+{ 
+    .Instance = CMOD_TIM,
+    .Channel  = HAL_TIM_ACTIVE_CHANNEL_1
+};
+
+bool CMOD_Initialized = false;
+
+
+
+void CMOD_Initialize_GPIOS(void)
+{
+    GPIO_InitTypeDef GPIO_InitObject;
+
+    #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
+    GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
+    GPIO_InitObject.Pin   = PIN;                     \
+    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
+
+    INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT,    CMOD_RD_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT,    CMOD_WR_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
+    INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
+}
+
+void CMOD_Initialize_CLK(void)
+{
+    GPIO_InitTypeDef GPIO_InitObject;
+
+    GPIO_InitObject.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitObject.Pin       = CMOD_CLK_PIN;
+    GPIO_InitObject.Pull      = GPIO_NOPULL;
+    GPIO_InitObject.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
+    HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
+
+    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 100Mhz(?) -> keep this rate
+    CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    CMOD_TimerHandle.Init.Period            = 95;                     // Count 'til 96(-1) -> 1,05Mhz PWM
+    CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    CMOD_TimerHandle.Init.RepetitionCounter = 0;
+
+    CMOD_TIM_OCInitObject.Pulse        = 47; 
+    CMOD_TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
+    CMOD_TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
+    CMOD_TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;
+    CMOD_TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+    CMOD_TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
+    CMOD_TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &CMOD_TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
+    {
+        //Error_Handler();
+    }
+    
+    HAL_TIM_Base_Init(&CMOD_TimerHandle);
+    HAL_TIM_Base_Start(&CMOD_TimerHandle);
+
+    HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
+    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
+}
+
+void CMOD_Initialize(void)
+{
+    CMOD_Initialize_GPIOS();
+    CMOD_Initialize_CLK();
+    CMOD_Initialized = true;
+}

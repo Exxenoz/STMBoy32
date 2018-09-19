@@ -1,4 +1,5 @@
 #include "input_init.h"
+#include "input_config.h"
 
 
 TIM_HandleTypeDef Input_LockTimerHandle = { 

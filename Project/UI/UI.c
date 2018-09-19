@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "lcd_config.h"
 
 
 const UI_MenuPoint_t UI_MainPage_MenuPoints[UI_NUMBER_OF_MAINPAGE_MPS] =
@@ -88,8 +89,8 @@ void UI_DrawMainPage(int selectedMP)
     }
 
     // Draw BOOT CARTRIDGE (either heighlighted or disabled) and the second menu point accordingly.
-    if   (CMOD_CartridgeInserted == true) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
-    else                                  UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
+    if   (CMOD_CheckForCartridge() == true) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
+    else                                    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
 
     // Draw the other menu points (enabled).
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]), UI_ENABLED);
@@ -191,7 +192,7 @@ void UI_DrawOptionsPage(int selectedMP)
 
 
     // If the last menupoint is SAVE CARTRIDGE and no cartridge is present disable the menupoint.
-    if (OS_LastState != OS_INGAME_FROM_SDC && OS_LastState != OS_INGAME_FROM_CARTRIDGE && !CMOD_CartridgeInserted)
+    if (OS_LastState != OS_INGAME_FROM_SDC && OS_LastState != OS_INGAME_FROM_CARTRIDGE && !CMOD_CheckForCartridge())
     {
         UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_DISABLED);
     }
