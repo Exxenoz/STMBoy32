@@ -908,26 +908,22 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF46: // DMA Transfer and Start Address
+                {
                     GBC_MMU_Memory.IO.OAMTransferStartAddress = value;
 
-                    if (GBC_MMU_IS_CGB_MODE())
-                    {
-                        // ToDo
-                    }
-                    else
-                    {
-                        // The written value specifies the transfer source address divided by 100h
-                        uint16_t address = value << 8;
+                    // The written value specifies the transfer source address divided by 100h
+                    uint16_t address = value << 8;
 
-                        if (address >= 0x8000 && address < 0xE000)
+                    if (address >= 0x8000 && address < 0xE000)
+                    {
+                        for (uint32_t i = 0; i < 160; i++, address++)
                         {
-                            for (uint32_t i = 0; i < 160; i++, address++)
-                            {
-                                GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
-                            }
+                            GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
                         }
                     }
+
                     break;
+                }
                 case 0xFF47:
                 case 0xFF48:
                 case 0xFF49:
