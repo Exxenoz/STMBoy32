@@ -129,17 +129,61 @@ bool GBC_MMU_LoadFromCartridge(void)
 
     GBC_MMU_Unload();
 
-    // Read ROM Bank 0
+    // Read ROM Bank 0.
     CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    // Check ROM Header
+    // Check ROM Header.
     if (!GBC_MMU_IsValidROMHeader())
     {
         return false;
     }
 
-    // ToDo: Read complete ROM and write it to SDRAM
+
+    /********** Load complete ROM to SDRAM. **********/
+    /*************************************************/
+
+    uint8_t  romBanks;
+    uint8_t  romSize = GBC_MMU_Memory.ROMSize;
+    uint32_t address = SDRAM_BANK_ADDR + WRITE_READ_ADDR;
+
+    // Load ROM Bank 0.
+    memcpy((void*)address, GBC_MMU_Memory.CartridgeBank0, 16384);
+
+    // Get MBC, if it's mbc1 make sure Rom Mode is selected.
+    GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
+    if (mbc == GBC_MMU_MBC1)
+    {
+        uint8_t romMode = 0x00;
+        CMOD_WriteByte(0x6001, &romMode);
+    }
+
+    // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0.
+    // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks.
+    romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));
+    if ((romSize & 0x50) == 0x50)
+    {
+       romBanks += 64;
+    }
+
+    for (int i = 1; i < romBanks; i++)
+    {
+        address += 16384;
+        
+        // If mbc 1 is used in the cartridge banks 0x20, 0x40 & 0x60 don't exist -> write 0s instead
+        if (mbc == GBC_MMU_MBC1 && (i == 0x20 || i == 0x40 || i == 0x60))
+        {
+            memset((void*)address, 0, 16384);
+        }
+        else // Otherwise switch the memory bank accordingly and read it
+        {
+            CMOD_SwitchMB(mbc, i);
+
+            CMOD_ReadBytes(0x4000, 16384, (uint8_t*)address);
+            while (CMOD_GetStatus() == CMOD_PROCESSING);
+        }
+    }
+
 
     GBC_MMU_Initialize();
 
@@ -598,15 +642,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         case 0x7000:
         {
             // Memory Bank Switch
-            if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
-            {
-                CMOD_WriteByte(address, &value);
-                while (CMOD_GetStatus() == CMOD_PROCESSING);
-            }
-            else // Loaded from SDC
-            {
-                GBC_MMU_MBC_Table[GBC_MMU_MemoryBankController](address, value);
-            }
+            GBC_MMU_MBC_Table[GBC_MMU_MemoryBankController](address, value);
             break;
         }
         case 0x8000:

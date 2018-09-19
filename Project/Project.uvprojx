@@ -774,6 +774,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -874,6 +894,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -970,6 +1005,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -1744,6 +1785,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1844,6 +1905,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1940,6 +2016,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -2713,6 +2795,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2813,6 +2915,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2909,6 +3026,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -3680,6 +3803,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3780,6 +3923,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3876,6 +4034,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -4647,6 +4811,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4747,6 +4931,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4843,6 +5042,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -5614,6 +5819,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5714,6 +5939,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5810,6 +6050,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -6583,6 +6829,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6683,6 +6949,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6779,6 +7060,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -7550,6 +7837,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7650,6 +7957,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7746,6 +8068,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -8519,6 +8847,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8619,6 +8967,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8715,6 +9078,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -9489,6 +9858,26 @@
               <FileType>5</FileType>
               <FilePath>.\CMOD\cmod_config.h</FilePath>
             </File>
+            <File>
+              <FileName>cmod_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_access.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_access.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_access.h</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CMOD\cmod_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmod_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CMOD\cmod_init.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9589,6 +9978,21 @@
               <FileType>5</FileType>
               <FilePath>.\UI\ui_fonts.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UI\ui_pages.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_pages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\UI\ui_pages.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9685,6 +10089,12 @@
               <FilePath>.\SDRAM\sdram.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LINK</GroupName>
+        </Group>
+        <Group>
+          <GroupName>IR</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>

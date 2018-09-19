@@ -1,3 +1,4 @@
+#include "cmod.h"
 #include "cmod_init.h"
 #include "cmod_config.h"
 
@@ -24,6 +25,8 @@ void CMOD_Initialize_GPIOS(void)
     GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
     HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
+    INITIALIZE_OUTPUT_PIN(CMOD_LLC_PORT,   CMOD_LLC_DD_PIN);
+    INITIALIZE_OUTPUT_PIN(CMOD_LLC_PORT,   CMOD_LLC_OE_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT,    CMOD_RD_PIN);
@@ -72,5 +75,8 @@ void CMOD_Initialize(void)
 {
     CMOD_Initialize_GPIOS();
     CMOD_Initialize_CLK();
+
+    CMOD_ENABLE_LLC();
+
     CMOD_Initialized = true;
 }

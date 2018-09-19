@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "cmod_config.h"
+#include "gbc_mmu.h"
 
 
 #define CMOD_SET_RESET            CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
@@ -55,7 +56,8 @@ typedef enum
 
 
 
-bool              CMOD_CheckForCartridge(void);           
+bool              CMOD_CheckForCartridge(void);
+bool              CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank);
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting);        
 
 #endif

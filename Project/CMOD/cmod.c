@@ -7,7 +7,6 @@
 #include "ff.h"
 #include "led.h"
 #include "sdc.h"
-#include "gbc_mmu.h"
 
 
 uint8_t CMOD_ROMBankX[16384];
@@ -133,8 +132,8 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     uint8_t  romSize      = GBC_MMU_Memory.ROMSize;
     uint32_t bytesWritten = 0;
 
-    // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0
-    // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks
+    // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0.
+    // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks.
     romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));
     if ((romSize & 0x50) == 0x50)
     {
@@ -183,8 +182,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             }
 
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
-            if (f_lseek(&file, x * 16384) != FR_OK ||
-                f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+            if (f_lseek(&file, x * 16384) != FR_OK || f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
             {
                 f_close(&file);
                 f_unlink(name);
