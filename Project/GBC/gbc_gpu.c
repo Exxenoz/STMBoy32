@@ -23,8 +23,8 @@ typedef struct GBC_GPU_RenderCache_s
     uint16_t CurrScreenOffsetX;         // Which column in the tile map needs to be rendered (ScrollX)
     uint16_t CurrScreenOffsetY;         // Which row in the tile map needs to be rendered (Scanline + ScrollY)
 
-    uint8_t CurrTilePositionX;          // Map column of the current tile
-    uint8_t CurrTilePositionY;          // Map row of the current tile
+    uint16_t CurrTilePositionX;         // Map column of the current tile
+    uint16_t CurrTilePositionY;         // Map row of the current tile
 
     uint8_t CurrTilePixelPositionX;     // Tile column of the current pixel. Numbered from left to right (0-7)
     uint8_t CurrTilePixelPositionY;     // Tile row of the current pixel.    Numbered from top to bottom (0-7)
