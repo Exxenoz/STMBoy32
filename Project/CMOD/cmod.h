@@ -16,13 +16,16 @@
                              
 #define CMOD_SET_WR               CMOD_WR_PORT->BSRRL |= CMOD_WR_PIN
 #define CMOD_RST_WR               CMOD_WR_PORT->BSRRH |= CMOD_WR_PIN
-                             
+
 #define CMOD_SET_ADDR(ADDR)       CMOD_ADDR_PORT->ODR = ADDR
 #define CMOD_SET_DATA(DATA)       CMOD_DATA_PORT->ODR = DATA
 #define CMOD_GET_DATA()           (CMOD_DATA_PORT->IDR & 0xFF)
-                             
-#define CMOD_DATA_MODE_IN()       GPIOG->MODER = 0x00000000
-#define CMOD_DATA_MODE_OUT()      GPIOG->MODER = 0x00005555
+
+#define CMOD_ENABLE_LLC()         CMOD_LLC_PORT->BSRRH |= CMOD_LLC_OE_PIN
+#define CMOD_DISABLE_LLC()        CMOD_LLC_PORT->BSRRL |= CMOD_LLC_OE_PIN
+
+#define CMOD_DATA_MODE_IN()       GPIOG->MODER = 0x00000000; CMOD_LLC_PORT->BSRRH |= CMOD_LLC_DD_PIN
+#define CMOD_DATA_MODE_OUT()      GPIOG->MODER = 0x00005555; CMOD_LLC_PORT->BSRRL |= CMOD_LLC_DD_PIN
 
 #define CMOD_ENABLE_INTERRUPT()   CMOD_TIM->DIER |= (uint16_t)TIM_IT_UPDATE
 

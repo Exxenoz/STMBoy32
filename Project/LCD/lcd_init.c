@@ -301,7 +301,8 @@ void LCD_Initialize(void)
     LCD_WriteCommandWithParameters(LCD_REG_NEGATIVE_GAMMA_CORRECTION, LCD_REG_NEGATIVE_GAMMA_CORRECTION_DATA, 15);
 
     LCD_SetFrameRate(LCD_FRAME_RATE_DIVISION_RATIO1, LCD_FRAME_RATE_61HZ);
-    LCD_SetDrawBehaviour(false, false, true, true, false, true);
+
+    LCD_SetDrawBehaviour(false, false, true, false, false, true);
 
     LCD_WriteCommandWithData(LCD_REG_TEARING_EFFECT_LINE_ON, 0);
     LCD_SetDrawArea(0, 0, LCD_DISPLAY_SIZE_X, LCD_DISPLAY_SIZE_Y);

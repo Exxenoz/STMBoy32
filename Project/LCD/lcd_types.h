@@ -43,6 +43,7 @@ typedef enum
 }
 LCD_Orientation_t;
 
+#pragma pack(1)
 typedef struct
 {
     uint16_t Width;
@@ -50,6 +51,7 @@ typedef struct
 }
 LCD_Border_t;
 
+#pragma pack(1)
 typedef struct
 {
     uint16_t     Length;
@@ -59,6 +61,7 @@ typedef struct
 }
 LCD_Brick_t;
 
+#pragma pack(1)
 typedef struct
 {
     int Upper;
@@ -68,6 +71,7 @@ typedef struct
 }
 LCD_Padding_t;
 
+#pragma pack(1)
 typedef struct
 {
     char          Characters[LCD_MAX_TEXT_LENGTH];

@@ -13,8 +13,8 @@
 
 void SDC_Initialize(void);
 bool SDC_Mount(void);
-bool SDC_IsMounted(void);
 void SDC_Unmount(void);
+bool SDC_IsMounted(void);
 
 void SPIx_Init(void);
 void SPIx_MspInit(SPI_HandleTypeDef *hspi);

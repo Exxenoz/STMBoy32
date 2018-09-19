@@ -24,7 +24,7 @@ bool SDC_Mount(void)
         SDC_Unmount();
     }
 
-    if(FATFS_LinkDriver(&SD_Driver, SDPath) != 0)
+    if(FATFS_LinkDriver(&SD_Driver, SDPath) != FR_OK)
     {
         return false;
     }
@@ -46,6 +46,7 @@ void SDC_Unmount(void)
 {
     f_mount(NULL, (TCHAR const*)SDPath, 1);
     FATFS_UnLinkDriver(SDPath);
+
     SDC_Mounted = false;
 }
 

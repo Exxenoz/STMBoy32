@@ -31,4 +31,8 @@
 #define CMOD_DATA_PORT            GPIOI
 #define CMOD_DATA_PINS            GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
 
+#define CMOD_LLC_PORT             GPIOC
+#define CMOD_LLC_DD_PIN           GPIO_PIN_6   // Data direction pin.
+#define CMOD_LLC_OE_PIN           GPIO_PIN_13  // Output enable pin.
+
 #endif

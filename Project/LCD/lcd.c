@@ -21,7 +21,7 @@ volatile LCD_DMA_TransferCompleteFlags_t LCD_DMA_TransferCompleteFlags = LCD_DMA
 /*                          LCD Low-Level Functions                           */
 /******************************************************************************/
 
-// Write register address
+// Write register address.
 void LCD_WriteAddr(uint16_t addr)
 {
     LCD_DATA_PORT->ODR = addr;
@@ -31,7 +31,7 @@ void LCD_WriteAddr(uint16_t addr)
     LCD_SET_RS;
 }
 
-// Write data
+// Write data.
 void LCD_WriteData(uint16_t data)
 {
     LCD_DATA_PORT->ODR = data;
@@ -39,7 +39,7 @@ void LCD_WriteData(uint16_t data)
     LCD_SET_WR;
 }
 
-// Write Command without data
+// Write Command without data.
 void LCD_WriteCommand(uint16_t addr)
 {
     LCD_RST_CS;
@@ -47,7 +47,7 @@ void LCD_WriteCommand(uint16_t addr)
     LCD_SET_CS;
 }
 
-// Write Command with single byte data
+// Write Command with single byte data.
 void LCD_WriteCommandWithData(uint16_t addr, uint16_t data)
 {
     LCD_RST_CS;
@@ -56,7 +56,7 @@ void LCD_WriteCommandWithData(uint16_t addr, uint16_t data)
     LCD_SET_CS;
 }
 
-// Write Command with data consisting of multiply parameters
+// Write Command with data consisting of multiply parameters.
 void LCD_WriteCommandWithParameters(uint16_t addr, uint16_t parameters[], long length)
 {
     LCD_RST_CS;
