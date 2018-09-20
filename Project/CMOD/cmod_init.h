@@ -4,7 +4,8 @@
 #include "common.h"
 
 
-extern bool CMOD_Initialized;
+extern bool               CMOD_Initialized;
+extern TIM_HandleTypeDef  CMOD_TimerHandle;
 
 
 

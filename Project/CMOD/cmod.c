@@ -10,26 +10,48 @@
 
 
 uint8_t CMOD_ROMBankX[16384];
+bool    CMOD_CartridgeInserted = false;
 
 
+void CMOD_TurnON(void)
+{
+    CMOD_ENABLE_LLC();
+
+    HAL_TIM_PWM_Start_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
+    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
+}
+
+void CMOD_TurnOFF(void)
+{
+    CMOD_DISABLE_LLC();
+
+    HAL_TIM_PWM_Stop_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
+    HAL_NVIC_DisableIRQ(CMOD_TIM_NVIC_CHANNEL);
+}
 
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_CheckForCartridge(void)
 {
-    if (CMOD_Initialized)
+    uint8_t data = 0x00;
+
+    if (!CMOD_Initialized)
     {
-        uint8_t data = 0x00;
-
-        CMOD_ReadByte(0x0104, &data);
-        while (CMOD_GetStatus() == CMOD_PROCESSING);
-
-        if (data == 0xCE)
-        {
-            return true;
-        }
+        CMOD_Initialize();
     }
 
-    return false;
+    //CMOD_TurnON();
+
+    CMOD_ReadByte(0x0104, &data);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+    //CMOD_TurnOFF();
+
+    if (data == 0xCE)
+    {
+        return CMOD_CartridgeInserted = true;
+    }
+
+    return CMOD_CartridgeInserted = false;
 }
 
 
@@ -117,6 +139,12 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         return CMOD_NOCARD;
     }
 
+    if (!CMOD_Initialized)
+    {
+        CMOD_Initialize();
+    }
+    //CMOD_TurnON();
+
     // Get MBC, if it's mbc1 make sure Rom Mode is selected
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
     if (mbc == GBC_MMU_MBC1)
@@ -161,6 +189,8 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         {
             f_close(&file);
             f_unlink(name);
+
+            CMOD_TurnOFF();
             return CMOD_FAILED;
         }
 
@@ -186,17 +216,22 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             {
                 f_close(&file);
                 f_unlink(name);
+
+                //CMOD_TurnOFF();
                 return CMOD_FAILED;
             }
         }
-
         f_close(&file);
+
+        //CMOD_TurnOFF();
         return CMOD_SUCCESS;
     }
     else if (openResult == FR_EXIST)
     {
+        //CMOD_TurnOFF();
         return CMOD_EXISTS;
     }
 
+    //CMOD_TurnOFF();
     return CMOD_FAILED;
 }

@@ -1,3 +1,4 @@
+#include "cmod_init.h"
 #include "cmod_access.h"
 
 
@@ -54,7 +55,7 @@ void CMOD_ReadByte(uint16_t address, uint8_t *data)
     CMOD_BytesRead   = 0;
     CMOD_Status      = CMOD_PROCESSING;
 
-    CMOD_DATA_MODE_IN();  
+    CMOD_DATA_MODE_IN();
     CMOD_ENABLE_INTERRUPT();
 }
 
@@ -71,7 +72,7 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
     CMOD_BytesRead   = 0;
     CMOD_Status      = CMOD_PROCESSING;
 
-    CMOD_DATA_MODE_IN();  
+    CMOD_DATA_MODE_IN();
     CMOD_ENABLE_INTERRUPT();
 }
 
@@ -129,7 +130,7 @@ void CMOD_HandleRead(void)
 
         CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
+        CMOD_DISABLE_INTERRUPT();                           // Disable Interrupt until needed again
         return;
     }
 
@@ -148,7 +149,7 @@ void CMOD_HandleWrite(void)
 
         CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
         CMOD_Action     = CMOD_NOACTION;                    // All actions finished
-        CMOD_TIM->DIER &= (uint16_t)~TIM_IT_UPDATE;         // Disable Interrupt until needed again
+        CMOD_DISABLE_INTERRUPT();                           // Disable Interrupt until needed again
         return;
     }
 
@@ -163,13 +164,9 @@ void CMOD_HandleNOP(void)
     return;
 }
 
-void TIM5_IRQHandler(void)
+void TIM4_IRQHandler(void)
 {
-  if (((CMOD_TIM->SR   & TIM_IT_UPDATE) != (uint16_t)RESET) && 
-      ((CMOD_TIM->DIER & TIM_IT_UPDATE) != (uint16_t)RESET))    // ITStatus == SET?
-  {
-      CMOD_OperationTable[CMOD_Action]();                       // Handle Read / Write / NOP
+    CMOD_OperationTable[CMOD_Action]();                       // Handle Read / Write / NOP
 
-      CMOD_TIM->SR = (uint16_t)~TIM_IT_UPDATE;                  // ClearITPendingBit
-  }
+    __HAL_TIM_CLEAR_IT(&CMOD_TimerHandle, TIM_IT_CC1);
 }

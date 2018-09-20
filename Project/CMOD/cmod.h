@@ -25,10 +25,11 @@
 #define CMOD_ENABLE_LLC()         CMOD_LLC_PORT->BSRRH |= CMOD_LLC_OE_PIN
 #define CMOD_DISABLE_LLC()        CMOD_LLC_PORT->BSRRL |= CMOD_LLC_OE_PIN
 
-#define CMOD_DATA_MODE_IN()       GPIOG->MODER = 0x00000000; CMOD_LLC_PORT->BSRRH |= CMOD_LLC_DD_PIN
-#define CMOD_DATA_MODE_OUT()      GPIOG->MODER = 0x00005555; CMOD_LLC_PORT->BSRRL |= CMOD_LLC_DD_PIN
+#define CMOD_DATA_MODE_IN()       CMOD_DATA_PORT->MODER = 0x00000000; CMOD_LLC_PORT->BSRRH |= CMOD_LLC_DD_PIN
+#define CMOD_DATA_MODE_OUT()      CMOD_DATA_PORT->MODER = 0x00005555; CMOD_LLC_PORT->BSRRL |= CMOD_LLC_DD_PIN
 
-#define CMOD_ENABLE_INTERRUPT()   CMOD_TIM->DIER |= (uint16_t)TIM_IT_UPDATE
+#define CMOD_ENABLE_INTERRUPT()   CMOD_TIM->DIER |= (uint16_t)TIM_IT_CC1
+#define CMOD_DISABLE_INTERRUPT()  CMOD_TIM->DIER &= (uint16_t)~TIM_IT_CC1;
 
 
 typedef enum 
@@ -55,9 +56,16 @@ typedef enum
 } CMOD_SaveResult_t;
 
 
+extern bool CMOD_CartridgeInserted;
 
-bool              CMOD_CheckForCartridge(void);
-bool              CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank);
+
+
+void CMOD_TurnON(void);
+void CMOD_TurnOFF(void);
+
+bool CMOD_CheckForCartridge(void);
+bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank);
+
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting);        
 
 #endif

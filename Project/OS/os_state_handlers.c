@@ -12,7 +12,7 @@
 void HandleMainPage(void)
 {
     // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0).
-    int firstMenuPointID = CMOD_CheckForCartridge() ? 0 : 1;
+    int firstMenuPointID = CMOD_CartridgeInserted ? 0 : 1;
     int lastMenuPointID  = 2;
     int currMenuPointID  = firstMenuPointID;
 
@@ -27,12 +27,12 @@ void HandleMainPage(void)
         Input_UpdateLocks();
 
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa.
-        if (!CMOD_CheckForCartridge() && firstMenuPointID == 0)
+        if (!CMOD_CartridgeInserted && firstMenuPointID == 0)
         {
             UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
             firstMenuPointID = 1;
         }
-        else if (CMOD_CheckForCartridge() && firstMenuPointID == 1)
+        else if (CMOD_CartridgeInserted && firstMenuPointID == 1)
         {
             UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
             firstMenuPointID = 0;
@@ -224,7 +224,7 @@ void HandleOptionPage(void)
     {
         UI_Options_MenuPoints[5] = UI_Options_regular_MP_6;
 
-        if (!CMOD_CheckForCartridge())
+        if (!CMOD_CartridgeInserted)
         {
             lastMenuPointID = 4;
         }
@@ -243,12 +243,12 @@ void HandleOptionPage(void)
         // If no cartridge is detected and SAVE CARTRIDGE is enabled disable it and vice versa.
         if (!accessedFromGame)
         {
-            if (!CMOD_CheckForCartridge() && lastMenuPointID == 5)
+            if (!CMOD_CartridgeInserted && lastMenuPointID == 5)
             {
                 UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_DISABLED);
                 lastMenuPointID = 4;
             }
-            else if (CMOD_CheckForCartridge() && lastMenuPointID == 4)
+            else if (CMOD_CartridgeInserted && lastMenuPointID == 4)
             {
                 UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_ENABLED);
                 lastMenuPointID = 5;

@@ -1,12 +1,12 @@
- #ifndef CMOD_CONFIG_H
+#ifndef CMOD_CONFIG_H
 #define CMOD_CONFIG_H
 
 
 #define CMOD_BUS(NAME)            RCC_AHB1Periph_##NAME
 
-#define CMOD_TIM                  TIM5
-#define CMOD_TIM_CHANNEL          TIM_CHANNEL_4
-#define CMOD_TIM_NVIC_CHANNEL     TIM5_IRQn
+#define CMOD_TIM                  TIM4
+#define CMOD_TIM_CHANNEL          TIM_CHANNEL_1
+#define CMOD_TIM_NVIC_CHANNEL     TIM4_IRQn
 
 #define CMOD_RESET_PORT           GPIOE
 #define CMOD_RESET_PIN            GPIO_PIN_5

@@ -46,9 +46,9 @@ void CMOD_Initialize_CLK(void)
     GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
 
-    CMOD_TimerHandle.Init.Prescaler         = 0;                      // Tim5 runs with 100Mhz(?) -> keep this rate
+    CMOD_TimerHandle.Init.Prescaler         = 1;                      // Tim4 runs with ~190Mhz(?) -> scale to ~95Mhz.
     CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    CMOD_TimerHandle.Init.Period            = 95;                     // Count 'til 96(-1) -> 1,05Mhz PWM
+    CMOD_TimerHandle.Init.Period            = 90;                     // Count 'til 91(-1) -> 1,05Mhz PWM
     CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     CMOD_TimerHandle.Init.RepetitionCounter = 0;
 
@@ -59,24 +59,26 @@ void CMOD_Initialize_CLK(void)
     CMOD_TIM_OCInitObject.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
     CMOD_TIM_OCInitObject.OCIdleState  = TIM_OCIDLESTATE_RESET;
     CMOD_TIM_OCInitObject.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    HAL_TIM_PWM_Init(&CMOD_TimerHandle);
+
     if (HAL_TIM_PWM_ConfigChannel(&CMOD_TimerHandle, &CMOD_TIM_OCInitObject, CMOD_TIM_CHANNEL) != HAL_OK)
     {
         //Error_Handler();
     }
-    
-    HAL_TIM_Base_Init(&CMOD_TimerHandle);
-    HAL_TIM_Base_Start(&CMOD_TimerHandle);
 
     HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
-    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
+    CMOD_TurnON();
 }
 
 void CMOD_Initialize(void)
 {
     CMOD_Initialize_GPIOS();
     CMOD_Initialize_CLK();
-
-    CMOD_ENABLE_LLC();
+    
+    CMOD_SET_RESET;
+    CMOD_RST_CS;
+    CMOD_SET_WR;
+    CMOD_SET_RD;
 
     CMOD_Initialized = true;
 }
