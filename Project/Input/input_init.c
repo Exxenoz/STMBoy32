@@ -2,11 +2,13 @@
 #include "input_config.h"
 
 
-TIM_HandleTypeDef Input_LockTimerHandle = { 
+TIM_HandleTypeDef Input_LockTimerHandle =
+{ 
     .Instance = INPUT_LOCK_TIM
 };
 
-TIM_HandleTypeDef Input_PollTimerHandle = { 
+TIM_HandleTypeDef Input_PollTimerHandle =
+{ 
     .Instance = INPUT_POLLING_TIM
 };
 

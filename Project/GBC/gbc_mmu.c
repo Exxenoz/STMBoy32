@@ -8,6 +8,7 @@
 #include "input.h"
 #include "string.h"
 #include "sdram.h"
+#include "cmod.h"
 
 GBC_MMU_Memory_t GBC_MMU_Memory;                                                   // GBC Memory
 GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN; // Current Memory Bank Controller
@@ -122,10 +123,12 @@ bool GBC_MMU_IsValidROMHeader(void)
 
 bool GBC_MMU_LoadFromCartridge(void)
 {
-    //CMOD_TurnON();
+    CMOD_TurnON();
+
 
     if (!CMOD_CheckForCartridge())
     {
+        CMOD_TurnOFF();
         return false;
     }
 
@@ -138,7 +141,7 @@ bool GBC_MMU_LoadFromCartridge(void)
     // Check ROM Header.
     if (!GBC_MMU_IsValidROMHeader())
     {
-        //CMOD_TurnOFF();
+        CMOD_TurnOFF();
         return false;
     }
 
@@ -189,8 +192,8 @@ bool GBC_MMU_LoadFromCartridge(void)
 
 
     GBC_MMU_Initialize();
+    CMOD_TurnOFF();
 
-    //CMOD_TurnOFF();
     return true;
 }
 
@@ -301,10 +304,10 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
             if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
             {
                 uint8_t result = 0;
-                //CMOD_TurnON();
+                CMOD_TurnON();
                 CMOD_ReadByte(address, &result);
                 while (CMOD_GetStatus() == CMOD_PROCESSING);
-                //CMOD_TurnOFF();
+                CMOD_TurnOFF();
                 return result;
             }
             else if (GBC_MMU_ERAMEnabled)
@@ -671,10 +674,10 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
             // External RAM bank X
             if (GBC_LoadState == GBC_LOAD_STATE_CARTRIDGE)
             {
-                //CMOD_TurnON();
+                CMOD_TurnON();
                 CMOD_WriteByte(address, &value);
                 while (CMOD_GetStatus() == CMOD_PROCESSING);
-                //CMOD_TurnOFF();
+                CMOD_TurnOFF();
             }
             else if (GBC_MMU_ERAMEnabled)
             {

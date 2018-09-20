@@ -14,6 +14,7 @@
 #include "lcd_init.h"
 
 #include "os.h"
+#include "os_init.h"
 #include "os_state_handlers.h"
 
 #include "cmod_init.h"

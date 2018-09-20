@@ -1,3 +1,4 @@
+#include "cmod.h"
 #include "cmod_init.h"
 #include "cmod_access.h"
 
@@ -25,6 +26,26 @@ int            CMOD_BytesWritten = 0;
 
 
 
+void CMOD_TurnON(void)
+{
+    CMOD_ENABLE_LLC();
+
+    HAL_TIM_PWM_Start_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
+    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
+
+    CMOD_Status = CMOD_WAITING;
+}
+
+void CMOD_TurnOFF(void)
+{
+    CMOD_DISABLE_LLC();
+
+    HAL_TIM_PWM_Stop_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
+    HAL_NVIC_DisableIRQ(CMOD_TIM_NVIC_CHANNEL);
+    
+    CMOD_Status = CMOD_TURNED_OFF;
+}
+
 CMOD_Status_t CMOD_GetStatus(void)
 {
     return CMOD_Status; 
@@ -37,6 +58,9 @@ CMOD_Status_t CMOD_GetStatus(void)
 
 void CMOD_ResetCartridge(void)
 {
+    if (CMOD_Status == CMOD_TURNED_OFF) return;
+
+
     CMOD_RST_RESET;
     HAL_Delay(1);                       // Wait 1ms (at least some ns).
     CMOD_SET_RESET;
@@ -44,6 +68,9 @@ void CMOD_ResetCartridge(void)
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data)
 {
+    if (CMOD_Status == CMOD_TURNED_OFF) return;
+
+
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
@@ -61,6 +88,9 @@ void CMOD_ReadByte(uint16_t address, uint8_t *data)
 
 void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
+    if (CMOD_Status == CMOD_TURNED_OFF) return;
+
+
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
@@ -78,6 +108,9 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 
 void CMOD_WriteByte(uint16_t address, uint8_t *data)
 {
+    if (CMOD_Status == CMOD_TURNED_OFF) return;
+
+
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
@@ -95,6 +128,9 @@ void CMOD_WriteByte(uint16_t address, uint8_t *data)
 
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
+    if (CMOD_Status == CMOD_TURNED_OFF) return;
+
+
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
@@ -128,8 +164,8 @@ void CMOD_HandleRead(void)
     {
         CMOD_SET_RD;                                        // RD rises after a read at 140ns (in GB)
 
-        CMOD_Status     = CMOD_DATA_READY;                  // -> Data Ready
-        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
+        CMOD_Status = CMOD_DATA_READY;                      // -> Data Ready
+        CMOD_Action = CMOD_NOACTION;                        // All actions finished
         CMOD_DISABLE_INTERRUPT();                           // Disable Interrupt until needed again
         return;
     }
@@ -147,8 +183,8 @@ void CMOD_HandleWrite(void)
     {
         CMOD_SET_WR;                                        // WR rises after a write 20ns before the CLK rises (in GB)
 
-        CMOD_Status     = CMOD_WRITE_COMPLETE;              // -> Write complete
-        CMOD_Action     = CMOD_NOACTION;                    // All actions finished
+        CMOD_Status = CMOD_WRITE_COMPLETE;                  // -> Write complete
+        CMOD_Action = CMOD_NOACTION;                        // All actions finished
         CMOD_DISABLE_INTERRUPT();                           // Disable Interrupt until needed again
         return;
     }

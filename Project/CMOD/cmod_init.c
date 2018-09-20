@@ -46,9 +46,9 @@ void CMOD_Initialize_CLK(void)
     GPIO_InitObject.Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(CMOD_CLK_PORT, &GPIO_InitObject);
 
-    CMOD_TimerHandle.Init.Prescaler         = 1;                      // Tim4 runs with ~190Mhz(?) -> scale to ~95Mhz.
+    CMOD_TimerHandle.Init.Prescaler         = 1;                      // Tim4 runs with ~190Mhz -> scale to ~95Mhz.
     CMOD_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    CMOD_TimerHandle.Init.Period            = 90;                     // Count 'til 91(-1) -> 1,05Mhz PWM
+    CMOD_TimerHandle.Init.Period            = 90;                     // Count 'til 91(-1) -> 1,05Mhz PWM.
     CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     CMOD_TimerHandle.Init.RepetitionCounter = 0;
 
@@ -67,7 +67,6 @@ void CMOD_Initialize_CLK(void)
     }
 
     HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
-    CMOD_TurnON();
 }
 
 void CMOD_Initialize(void)

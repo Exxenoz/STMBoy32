@@ -1,25 +1,63 @@
+#include "os_init.h"
+#include "os_config.h"
 #include "os_state_handlers.h"
-
-#include "led.h"
-
-#include "ui_pages.h"
 
 #include "lcd.h"
 #include "lcd_config.h"
 #include "lcd_drawing.h"
 
+#include "cmod.h"
+#include "cmod_access.h"
+
+#include "ui.h"
+#include "ui_pages.h"
+
+#include "input_locks.h"
+
+#include "led.h"
+#include "gbc.h"
+#include "audio.h"
+
+
+bool IsCartridgeInserted = false;
+
+
+
+void StartCheckingForCartridge(void)
+{
+    HAL_TIM_Base_Start_IT(&OS_TimerHandle);
+    HAL_NVIC_EnableIRQ(OS_TIM_NVIC_CHANNEL);    
+}
+
+void StopCheckingForCartridge(void)
+{
+    HAL_TIM_Base_Start_IT(&OS_TimerHandle);
+    HAL_NVIC_EnableIRQ(OS_TIM_NVIC_CHANNEL);    
+}
+
+
+/******************************************************************************/
+/*                              OS Page Handlers                              */
+/******************************************************************************/
 
 void HandleMainPage(void)
 {
+    // Turn on the CMOD.
+    CMOD_TurnON();
+
     // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0).
-    int firstMenuPointID = CMOD_CartridgeInserted ? 0 : 1;
+    int firstMenuPointID = CMOD_CheckForCartridge() ? 0 : 1;
     int lastMenuPointID  = 2;
     int currMenuPointID  = firstMenuPointID;
 
-    // Draw MainPage
+    // Draw MainPage.
     UI_DrawMainPage(currMenuPointID);
 
-    // MainPage loop
+    // Start periodically checking for Cartridge.
+    StartCheckingForCartridge();
+
+
+    // MainPage loop.
     while (1)
     {
         // Update the lockState of all buttons.
@@ -27,12 +65,12 @@ void HandleMainPage(void)
         Input_UpdateLocks();
 
         // If no cartridge is detected and BOOT CARTRIDGE is enabled disable it and vice versa.
-        if (!CMOD_CartridgeInserted && firstMenuPointID == 0)
+        if (!IsCartridgeInserted && firstMenuPointID == 0)
         {
             UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
             firstMenuPointID = 1;
         }
-        else if (CMOD_CartridgeInserted && firstMenuPointID == 1)
+        else if (IsCartridgeInserted && firstMenuPointID == 1)
         {
             UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
             firstMenuPointID = 0;
@@ -76,6 +114,11 @@ void HandleMainPage(void)
             break;
         }
     }
+
+
+    // Stop checking for cartridge and turn off the CMOD.
+    StopCheckingForCartridge();
+    CMOD_TurnOFF();
 }
 
 void HandleShowAllGamesPage(void)
@@ -215,6 +258,9 @@ void HandleOptionPage(void)
     int  currMenuPointID  = firstMenuPointID;
     bool accessedFromGame = (bool)(OS_LastState == OS_INGAME_FROM_SDC || OS_LastState == OS_INGAME_FROM_CARTRIDGE);
 
+    // Turn on the CMOD.
+    CMOD_TurnON();
+
     // Handle whether the page is accessed from the mainpage or from within a game.
     if (accessedFromGame)
     {
@@ -224,7 +270,7 @@ void HandleOptionPage(void)
     {
         UI_Options_MenuPoints[5] = UI_Options_regular_MP_6;
 
-        if (!CMOD_CartridgeInserted)
+        if (!CMOD_CheckForCartridge())
         {
             lastMenuPointID = 4;
         }
@@ -232,6 +278,10 @@ void HandleOptionPage(void)
 
     // Draw options page.
     UI_DrawOptionsPage(currMenuPointID);
+
+    // Start periodically checking for Cartridge.
+    StartCheckingForCartridge();
+
 
     // Options loop.
     while (1)
@@ -243,12 +293,12 @@ void HandleOptionPage(void)
         // If no cartridge is detected and SAVE CARTRIDGE is enabled disable it and vice versa.
         if (!accessedFromGame)
         {
-            if (!CMOD_CartridgeInserted && lastMenuPointID == 5)
+            if (!IsCartridgeInserted && lastMenuPointID == 5)
             {
                 UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_DISABLED);
                 lastMenuPointID = 4;
             }
-            else if (CMOD_CartridgeInserted && lastMenuPointID == 4)
+            else if (IsCartridgeInserted && lastMenuPointID == 4)
             {
                 UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_ENABLED);
                 lastMenuPointID = 5;
@@ -411,7 +461,17 @@ void HandleOptionPage(void)
             break;
         }
     }
+
+
+    // Stop checking for cartridge and turn off the CMOD.
+    StopCheckingForCartridge();
+    CMOD_TurnOFF();
 }
+
+
+/******************************************************************************/
+/*                              OS Game Handlers                              */
+/******************************************************************************/
 
 void HandleSDCIngame(void)
 {
@@ -531,6 +591,11 @@ void HandleCartridgeIngame(void)
     }
 }
 
+
+/******************************************************************************/
+/*                        OS State & Interrupt Handler                        */
+/******************************************************************************/
+
 void os_state_handler(void)
 {
 	// All Handle-Functions contain an infinite loop and will only exit when the page is left or an error occurs.
@@ -559,4 +624,12 @@ void os_state_handler(void)
         default:
             return;
 	}
+}
+
+// Periodically (1/s) check if a cartridge is inserted.
+void TIM15_IRQHandler(void)
+{
+    CMOD_CheckForCartridge();
+
+    __HAL_TIM_CLEAR_IT(&OS_TimerHandle, TIM_IT_UPDATE);
 }

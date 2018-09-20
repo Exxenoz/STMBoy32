@@ -118,6 +118,7 @@ void System_Initialize(void)
     __TIM6_CLK_ENABLE();
     __TIM7_CLK_ENABLE();
     __TIM8_CLK_ENABLE();
+    __TIM15_CLK_ENABLE();
 
     // Enable SYSCFG Clock.
     __HAL_RCC_SYSCFG_CLK_ENABLE();

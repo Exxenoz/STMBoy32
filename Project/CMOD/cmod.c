@@ -10,24 +10,8 @@
 
 
 uint8_t CMOD_ROMBankX[16384];
-bool    CMOD_CartridgeInserted = false;
 
 
-void CMOD_TurnON(void)
-{
-    CMOD_ENABLE_LLC();
-
-    HAL_TIM_PWM_Start_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
-    HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
-}
-
-void CMOD_TurnOFF(void)
-{
-    CMOD_DISABLE_LLC();
-
-    HAL_TIM_PWM_Stop_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
-    HAL_NVIC_DisableIRQ(CMOD_TIM_NVIC_CHANNEL);
-}
 
 // Check for a Cartridge by trying to read the first byte of the Nintendo Logo
 bool CMOD_CheckForCartridge(void)
@@ -39,19 +23,15 @@ bool CMOD_CheckForCartridge(void)
         CMOD_Initialize();
     }
 
-    //CMOD_TurnON();
-
     CMOD_ReadByte(0x0104, &data);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    //CMOD_TurnOFF();
-
     if (data == 0xCE)
     {
-        return CMOD_CartridgeInserted = true;
+        return true;
     }
 
-    return CMOD_CartridgeInserted = false;
+    return false;
 }
 
 
@@ -62,6 +42,8 @@ bool CMOD_CheckForCartridge(void)
 // Convert the 11 title bytes to a null terminated string
 void CMOD_GetFileName(char* name)
 {
+    // ToDo: Read directly from Cartridge. Dont forget checking if CMOD is ON.
+
     int i;
 
     for (i = 0; i < 11 && GBC_MMU_Memory.Title[i] != 0x00; i++)
@@ -93,6 +75,9 @@ void CMOD_GetFileName(char* name)
 // Manually switch the currently active Memory Bank of the Cartridge (to be able to save it).
 bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
 {
+    if (CMOD_GetStatus() == CMOD_TURNED_OFF) return false;
+
+
     if (mbc != GBC_MMU_MBC_NONE) // Otherwise no switching required.
     {
         if (mbc == GBC_MMU_MBC1)
@@ -133,6 +118,9 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
 
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 {
+    if (CMOD_GetStatus() == CMOD_TURNED_OFF) return CMOD_DISABLED;
+
+
     // If no SD Card is detected return nocard
     if (!SDC_Mount() || !CMOD_CheckForCartridge())
     {
@@ -143,7 +131,6 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     {
         CMOD_Initialize();
     }
-    //CMOD_TurnON();
 
     // Get MBC, if it's mbc1 make sure Rom Mode is selected
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
@@ -217,21 +204,17 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
                 f_close(&file);
                 f_unlink(name);
 
-                //CMOD_TurnOFF();
                 return CMOD_FAILED;
             }
         }
-        f_close(&file);
 
-        //CMOD_TurnOFF();
+        f_close(&file);
         return CMOD_SUCCESS;
     }
     else if (openResult == FR_EXIST)
     {
-        //CMOD_TurnOFF();
         return CMOD_EXISTS;
     }
 
-    //CMOD_TurnOFF();
     return CMOD_FAILED;
 }

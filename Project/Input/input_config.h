@@ -7,12 +7,12 @@
 /******************************************************************************/
 
 #define INPUT_LOCK_TIM                      TIM7
-#define INPUT_LOCK_TIM_FREQ                 200000000
+#define INPUT_LOCK_TIM_FREQ                 200000000   // Do not change!
 #define INPUT_LOCK_TIM_PRESCALER            49999
 
 #define INPUT_POLLING_TIM                   TIM2
 #define INPUT_POLLING_TIM_NVIC_CHANNEL      TIM2_IRQn
-#define INPUT_POLLING_TIM_FREQ              200000000
+#define INPUT_POLLING_TIM_FREQ              200000000   // Do not change!
 #define INPUT_POLLING_TIM_PRESCALER         49999
 
 #define INPUT_FRAME_PORT                    GPIOA

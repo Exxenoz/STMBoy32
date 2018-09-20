@@ -2,8 +2,8 @@
 #define CMOD_H
 
 #include "common.h"
-#include "cmod_config.h"
 #include "gbc_mmu.h"
+#include "cmod_config.h"
 
 
 #define CMOD_SET_RESET            CMOD_RESET_PORT->BSRRL |= CMOD_RESET_PIN
@@ -32,36 +32,16 @@
 #define CMOD_DISABLE_INTERRUPT()  CMOD_TIM->DIER &= (uint16_t)~TIM_IT_CC1;
 
 
-typedef enum 
-{
-    CMOD_WAITING,
-    CMOD_PROCESSING,
-    CMOD_DATA_READY,
-    CMOD_WRITE_COMPLETE
-} CMOD_Status_t;
-
-typedef enum
-{
-    CMOD_READ,
-    CMOD_WRITE,
-    CMOD_NOACTION
-} CMOD_Action_t;
-
 typedef enum
 {
     CMOD_SUCCESS,
     CMOD_EXISTS,
     CMOD_NOCARD,
-    CMOD_FAILED
+    CMOD_FAILED,
+    CMOD_DISABLED
 } CMOD_SaveResult_t;
 
 
-extern bool CMOD_CartridgeInserted;
-
-
-
-void CMOD_TurnON(void);
-void CMOD_TurnOFF(void);
 
 bool CMOD_CheckForCartridge(void);
 bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank);

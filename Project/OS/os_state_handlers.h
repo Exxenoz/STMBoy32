@@ -1,14 +1,8 @@
 #ifndef OS_STATE_HANDLERS_H
 #define OS_STATE_HANDLERS_H
 
-#include "input_locks.h"
-#include "audio.h"
-#include "cmod.h"
-#include "gbc.h"
-#include "ui.h"
-
-
 
 void os_state_handler(void);
+void TIM15_IRQHandler(void);
 
 #endif //OS_STATE_HANDLERS_H

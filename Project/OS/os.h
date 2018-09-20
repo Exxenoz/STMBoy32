@@ -102,8 +102,6 @@ extern OS_Options_t    OS_Options;
 
 
 
-void OS_Initialize(void);
-
 Error_Def_t OS_LoadLastPlayed(void);
 Error_Def_t OS_LoadGameEntries(char *startingName, bool previous, bool onlyFavorites);
 Error_Def_t OS_RemoveGameEntry(int currGameEntryIndex);
