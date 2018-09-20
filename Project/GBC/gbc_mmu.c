@@ -123,9 +123,6 @@ bool GBC_MMU_IsValidROMHeader(void)
 
 bool GBC_MMU_LoadFromCartridge(void)
 {
-    CMOD_TurnON();
-
-
     if (!CMOD_CheckForCartridge())
     {
         CMOD_TurnOFF();
@@ -190,10 +187,7 @@ bool GBC_MMU_LoadFromCartridge(void)
         }
     }
 
-
     GBC_MMU_Initialize();
-    CMOD_TurnOFF();
-
     return true;
 }
 

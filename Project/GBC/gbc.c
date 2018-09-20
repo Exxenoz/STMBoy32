@@ -14,6 +14,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
 {
     GBC_Unload();
 
+    CMOD_TurnON();
     CMOD_ResetCartridge();
 
     if (!CMOD_CheckForCartridge())
@@ -32,6 +33,7 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
     GBC_APU_Initialize();
 
     GBC_LoadState = GBC_LOAD_STATE_CARTRIDGE;
+    CMOD_TurnOFF();
 
     return GBC_LOAD_RESULT_OK;
 }

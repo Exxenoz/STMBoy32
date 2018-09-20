@@ -2,6 +2,8 @@
 #include "os_init.h"
 #include "os_config.h"
 
+#include "cmod_access.h"
+
 
 TIM_HandleTypeDef OS_TimerHandle =
 { 
@@ -83,6 +85,9 @@ void OS_Initialize(void)
     // If no favorite game could be loaded try to load the first normal game. If this fails aswell open the mainpage.
     if (OS_Options.AutoBoot)
     {
+        CMOD_TurnON();
+
+
         if (CMOD_CheckForCartridge())
         {
             OS_CurrState = OS_INGAME_FROM_CARTRIDGE;
@@ -109,6 +114,8 @@ void OS_Initialize(void)
                 OS_LastState   = OS_CurrState;
             }
         }
+        
+        CMOD_TurnOFF();
     }
 
     OS_Initialize_Timer();
