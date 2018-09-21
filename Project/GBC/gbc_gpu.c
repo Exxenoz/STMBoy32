@@ -298,7 +298,7 @@ static inline void GBC_GPU_CGB_RenderBackgroundScanline(void)
         }
 
         for (; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex && RC.CurrTilePixelPositionX < 8;
-            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++)
+            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++, RC.CurrFrameBufferIndex++)
         {
             if (RC.CurrTileMapTileAttributes.HorizontalFlip)
             {
@@ -319,7 +319,8 @@ static inline void GBC_GPU_CGB_RenderBackgroundScanline(void)
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPixel = RC.CurrPixel;
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPriority = RC.CurrTileMapTileAttributes.BGOAMPriority;
 
-            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex++] = GBC_GPU_CGB_BackgroundPalette[RC.CurrTileMapTileAttributes.BackgroundPaletteIndex][RC.CurrPixel];
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex] = GBC_GPU_CGB_BackgroundPalette[RC.CurrTileMapTileAttributes.BackgroundPaletteIndex][RC.CurrPixel];
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex].Green <<= 1;
         }
 
         RC.CurrTilePixelPositionX = 0;
@@ -472,7 +473,7 @@ static inline void GBC_GPU_CGB_RenderWindowScanline(void)
         }
 
         for (; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex && RC.CurrTilePixelPositionX < 8;
-            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++)
+            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++, RC.CurrFrameBufferIndex++)
         {
             if (RC.CurrTileMapTileAttributes.HorizontalFlip)
             {
@@ -493,7 +494,8 @@ static inline void GBC_GPU_CGB_RenderWindowScanline(void)
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPixel = RC.CurrPixel;
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPriority = RC.CurrTileMapTileAttributes.BGOAMPriority;
 
-            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex++] = GBC_GPU_CGB_BackgroundPalette[RC.CurrTileMapTileAttributes.BackgroundPaletteIndex][RC.CurrPixel];
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex] = GBC_GPU_CGB_BackgroundPalette[RC.CurrTileMapTileAttributes.BackgroundPaletteIndex][RC.CurrPixel];
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex].Green <<= 1;
         }
 
         RC.CurrTilePixelPositionX = 0;
@@ -849,6 +851,7 @@ static inline void GBC_GPU_CGB_RenderSpriteScanline(void)
             }
 
             GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex] = GBC_GPU_CGB_SpritePalette[RC.CurrSpriteAttributes.PaletteNumber][RC.CurrPixel];
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex].Green <<= 1;
         }
     }
 }
