@@ -2,6 +2,7 @@
 #include "gbc_tim.h"
 #include "gbc_apu.h"
 #include "gbc_gpu.h"
+#include "gbc_cpu.h"
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
@@ -18,6 +19,8 @@ uint32_t GBC_MMU_CurrentROMBankAddress = 16384;                                 
 
 bool GBC_MMU_ERAMEnabled = false;                                                  // External RAM Enabled State
 uint8_t GBC_MMU_CurrentERAMBankID = 0;                                             // Current ERAM Bank ID
+
+bool GBC_MMU_HDMAEnabled = false;
 
 bool GBC_MMU_RTC_Selected = false;                                                 // External RTC Selected State
 GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                       // External RTC Register
@@ -216,6 +219,8 @@ void GBC_MMU_Unload(void)
 
     GBC_MMU_ERAMEnabled = false;
     GBC_MMU_CurrentERAMBankID = 0;
+
+    GBC_MMU_HDMAEnabled = false;
 
     GBC_MMU_RTC_Selected = false;
     memset(&GBC_MMU_RTC_Register, 0, sizeof(GBC_MMU_RTC_Register_t));
@@ -581,6 +586,124 @@ GBC_MMU_MBC GBC_MMU_MBC_Table[6] =
     GBC_MMU_MBC3_Write,
     GBC_MMU_MBC5_Write,
 };
+
+static void GBC_MMU_StartGDMATransfer(void)
+{
+    // Source Start Address may be located at 0000-7FF0 or A000-DFF0
+    uint16_t srcAddress = GBC_MMU_Memory.IO.NewDMASourceHigh;
+
+    if (srcAddress > 0x7F && srcAddress < 0xA0)
+    {
+        srcAddress = 0;
+    }
+
+    srcAddress <<= 8;
+
+    // The lower four bits of the source address are ignored (treated as zero)
+    srcAddress |= (GBC_MMU_Memory.IO.NewDMASourceLow & 0xF0);
+
+    // The Destination Start Address may be located at 8000-9FF0
+    uint16_t dstAddress = GBC_MMU_Memory.IO.NewDMADestinationHigh;
+
+    // The upper 3 bits are ignored (destination is always in VRAM)
+    dstAddress &= 0x1F;
+
+    dstAddress <<= 8;
+
+    // The lower four bits of the destination address are ignored (treated as zero)
+    dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
+
+    dstAddress |= 0x8000;
+
+    uint16_t length = GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferLength;
+
+    // Transfer Length was divided by 10h, minus 1
+    length *= 16;
+    length += 16;
+
+    for (uint32_t i = 0; i < length; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+    }
+
+    // The execution of the program continues when the transfer has been completed, and FF55 then contains a value of FFh
+    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = 0xFF;
+
+    // Calculate CPU ticks - since they are going to be halved if we are in double speed mode
+    // and the GDMA is not faster in double speed mode, we have to add twice as much ticks
+    if (GBC_MMU_Memory.IO.CurrentSpeed)
+    {
+        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += length;
+    }
+    else
+    {
+        GBC_CPU_StepTicks += 4;
+        GBC_CPU_StepTicks += length >> 1;
+    }
+}
+
+uint32_t GBC_MMU_StartHDMATransfer(void)
+{
+    // Source Start Address may be located at 0000-7FF0 or A000-DFF0
+    uint16_t srcAddress = GBC_MMU_Memory.IO.NewDMASourceHigh;
+
+    if (srcAddress > 0x7F && srcAddress < 0xA0)
+    {
+        srcAddress = 0;
+    }
+
+    srcAddress <<= 8;
+
+    // The lower four bits of the source address are ignored (treated as zero)
+    srcAddress |= (GBC_MMU_Memory.IO.NewDMASourceLow & 0xF0);
+
+    // The Destination Start Address may be located at 8000-9FF0
+    uint16_t dstAddress = GBC_MMU_Memory.IO.NewDMADestinationHigh;
+
+    // The upper 3 bits are ignored (destination is always in VRAM)
+    dstAddress &= 0x1F;
+
+    dstAddress <<= 8;
+
+    // The lower four bits of the destination address are ignored (treated as zero)
+    dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
+
+    dstAddress |= 0x8000;
+
+    for (uint32_t i = 0; i < 16; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+    }
+
+    srcAddress += 16;
+    if (srcAddress == 0x8000)
+    {
+        srcAddress = 0xA000;
+    }
+
+    dstAddress += 16;
+    if (dstAddress == 0xA000)
+    {
+        dstAddress = 0x8000;
+    }
+
+    GBC_MMU_Memory.IO.NewDMASourceHigh = srcAddress >> 8;
+    GBC_MMU_Memory.IO.NewDMASourceLow = srcAddress & 0xFF;
+    GBC_MMU_Memory.IO.NewDMADestinationHigh = dstAddress >> 8;
+    GBC_MMU_Memory.IO.NewDMADestinationLow = dstAddress & 0xFF;
+
+    // Reading from NewDMALengthModeStart returns the remaining length (divided by 10h, minus 1)
+    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data--;
+    // A value of FFh indicates that the transfer has completed
+    if (GBC_MMU_Memory.IO.NewDMALengthModeStart.Data == 0xFF)
+    {
+        GBC_MMU_HDMAEnabled = false;
+    }
+
+    // Calculate CPU ticks and return them
+    return GBC_MMU_Memory.IO.CurrentSpeed ? 68 /* (16 + 1) * 4 */ : 36 /* (8 + 1) * 4 */;
+}
 
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 {
@@ -949,7 +1072,45 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF52:
                 case 0xFF53:
                 case 0xFF54:
-                case 0xFF55:
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
+                    break;
+                case 0xFF55: // NewDMALengthModeStart
+                    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = value;
+
+                    if (GBC_MMU_IS_DMG_MODE())
+                    {
+                        break;
+                    }
+
+                    if (GBC_MMU_HDMAEnabled)
+                    {
+                        // Reading of TransferMode can be used to confirm if the DMA transfer is active (1 = Not Active, 0 = Active)
+                        if (GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode)
+                        {
+                            GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode = 0; // Reset (0 = HDMA still active)
+                            // Only length was modified
+                        }
+                        else
+                        {
+                            // It is possible to terminate an active H-Blank transfer by writing zero to TransferMode
+                            GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = 0xFF;
+                            GBC_MMU_HDMAEnabled = false;
+                        }
+
+                        break;
+                    }
+
+                    if (GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode) // H-Blank DMA
+                    {
+                        GBC_MMU_HDMAEnabled = true;
+                        GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode = 0; // (0 = HDMA active)
+                    }
+                    else // General Purpose DMA
+                    {
+                        GBC_MMU_StartGDMATransfer();
+                    }
+
+                    break;
                 case 0xFF56:
                 case 0xFF57:
                 case 0xFF58:

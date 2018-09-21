@@ -587,7 +587,18 @@ typedef struct GBC_MMU_Memory_s
             uint8_t NewDMASourceLow;         // 0xFF52                                           - Only in GBC mode
             uint8_t NewDMADestinationHigh;   // 0xFF53                                           - Only in GBC mode
             uint8_t NewDMADestinationLow;    // 0xFF54                                           - Only in GBC mode
-            uint8_t NewDMALengthModeStart;   // 0xFF55                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t Data;                // 0xFF55                                           - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int TransferLength : 7;
+                    unsigned int TransferMode   : 1; // (0 = General Purpose DMA, 1 = H-Blank DMA)
+                };
+            } NewDMALengthModeStart;
             uint8_t InfraredPort;            // 0xFF56                                           - Only in GBC mode
             uint8_t IO_Unk9[17];
             #pragma pack(1)
@@ -667,6 +678,7 @@ GBC_MMU_RTC_Register_t;
 typedef void (*GBC_MMU_MBC)(uint16_t, uint8_t);
 
 extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory declaration for direct CPU access
+extern bool GBC_MMU_HDMAEnabled;
 
 #define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
 #define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
@@ -677,6 +689,8 @@ void GBC_MMU_Unload(void);
 
 uint8_t GBC_MMU_ReadByte(uint16_t address);
 uint16_t GBC_MMU_ReadShort(uint16_t address);
+
+uint32_t GBC_MMU_StartHDMATransfer(void);
 
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value);
 void GBC_MMU_WriteShort(uint16_t address, uint16_t value);

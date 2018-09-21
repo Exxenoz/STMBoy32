@@ -119,6 +119,7 @@ enum GBC_CPU_Flags_e
 
 extern GBC_CPU_Register_t GBC_CPU_Register; // External declaration for extended instructions file
 extern uint32_t GBC_CPU_StepTicks;          // External declaration for GPU file
+extern uint32_t GBC_CPU_Halted;             // External declaration for GPU file
 //extern GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState; // External declaration for CPU Ex file
 
 void GBC_CPU_Initialize(void);

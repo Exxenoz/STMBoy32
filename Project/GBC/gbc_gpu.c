@@ -604,6 +604,14 @@ bool GBC_GPU_Step(void)
                 GBC_MMU_Memory.IO.Scanline++;
                 GBC_GPU_COMPARE_SCANLINE();
 
+                if (GBC_MMU_HDMAEnabled)             // Can only be enabled in GBC mode
+                {
+                    if (!GBC_CPU_Halted || (GBC_MMU_Memory.InterruptEnable & GBC_MMU_Memory.IO.InterruptFlags) /* Pending Interrupts */)
+                    {
+                        GBC_GPU_ModeTicks += GBC_MMU_StartHDMATransfer();
+                    }
+                }
+
                 RC.CurrFrameBufferStartIndex += 160;
                 RC.CurrFrameBufferEndIndex += 160;
 
