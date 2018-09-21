@@ -615,13 +615,6 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int               : 1;
                     unsigned int AutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
                 };
-
-                #pragma pack(1)
-                struct
-                {
-                    unsigned int Index : 6; // Easy to increment
-                    unsigned int       : 2;
-                };
             } BackgroundPaletteIndex;
             uint8_t BackgroundPaletteData;   // 0xFF69                                           - Only in GBC mode
             #pragma pack(1)
@@ -637,13 +630,6 @@ typedef struct GBC_MMU_Memory_s
                     unsigned int PaletteIndex  : 3;
                     unsigned int               : 1;
                     unsigned int AutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
-                };
-
-                #pragma pack(1)
-                struct
-                {
-                    unsigned int Index : 6; // Easy to increment
-                    unsigned int       : 2;
                 };
             } SpritePaletteIndex;
             uint8_t SpritePaletteData;       // 0xFF6B                                           - Only in GBC mode

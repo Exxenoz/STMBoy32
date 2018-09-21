@@ -1150,7 +1150,12 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                         if (GBC_MMU_Memory.IO.BackgroundPaletteIndex.AutoIncrement)
                         {
-                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Index++;
+                            // Increment first six bits without touching the last two bits
+                            uint8_t helper = GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data & 0x40;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data++;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data |= helper;
                             GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
                                 GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex);
                         }
@@ -1175,7 +1180,12 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                         if (GBC_MMU_Memory.IO.SpritePaletteIndex.AutoIncrement)
                         {
-                            GBC_MMU_Memory.IO.SpritePaletteIndex.Index++;
+                            // Increment first six bits without touching the last two bits
+                            uint8_t helper = GBC_MMU_Memory.IO.SpritePaletteIndex.Data & 0x40;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data++;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data |= helper;
                             GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
                                 GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex);
                         }
