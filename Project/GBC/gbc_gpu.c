@@ -504,8 +504,6 @@ static inline void GBC_GPU_DMG_RenderSpriteScanline(void)
 {
     RC.CurrSpriteHeight = GBC_MMU_Memory.IO.SpriteSize ? 16 : 8;
 
-    // Start from behind, because the first sprites
-    // have the highest render priority in GBC mode
     for (int32_t i = 39; i >= 0; i--)
     {
         RC.CurrSpriteAttributes = GBC_MMU_Memory.OAM.SpriteAttributes[i];
@@ -628,25 +626,8 @@ static inline void GBC_GPU_DMG_RenderSpriteScanline(void)
 
             RC.CurrPriorityPixel = RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex];
 
-            if (GBC_MMU_IS_CGB_MODE())
+            if (RC.CurrPriorityPixel.SpritePositionSet)
             {
-                // GBC mode only
-
-                // When sprites with the same x coordinate values overlap,
-                // they have priority according to table ordering.
-                // (i.e. $FE00 - highest, $FE04 - next highest, etc.)
-
-                // When BGPriority is set, the corresponding BG tile will have priority
-                // above all OBJs (regardless of the priority bits in OAM memory).
-                //if (RC.CurrPriorityPixel.BGPriority) // ToDo
-                //{
-                //    continue;
-                //}
-            }
-            else if (RC.CurrPriorityPixel.SpritePositionSet)
-            {
-                // Non-GBC mode only
-
                 // When sprites with different x coordinate values overlap,
                 // the one with the smaller x coordinate (closer to the left)
                 // will have priority and appear above any others.
@@ -714,6 +695,164 @@ static inline void GBC_GPU_DMG_RenderSpriteScanline(void)
     }
 }
 
+static inline void GBC_GPU_CGB_RenderSpriteScanline(void)
+{
+    RC.CurrSpriteHeight = GBC_MMU_Memory.IO.SpriteSize ? 16 : 8;
+
+    // When sprites with the same x coordinate values overlap,
+    // they have priority according to table ordering.
+    // (i.e. $FE00 - highest, $FE04 - next highest, etc.)
+    // Start from behind, because the first sprites
+    // have the highest render priority in GBC mode
+    for (int32_t i = 39; i >= 0; i--)
+    {
+        RC.CurrSpriteAttributes = GBC_MMU_Memory.OAM.SpriteAttributes[i];
+
+        /* Sprite positioning:
+         *
+         *  <--  8px  -->
+         *  1 * * * * * * ^
+         *  * ~~~~~~~~~~* |
+         *  *  +++  +++ * | 8px
+         *  *  ===  === * |    /
+         *  *     ==    * |     16px
+         *  *  =      = * |
+         *  *   ======  * |
+         *  * * * * * * * v
+         *                0 ... Original  Pivot
+         *                1 ... Corrected Pivot
+         */
+
+        RC.CurrSpritePositionX = RC.CurrSpriteAttributes.PositionX -  8;
+        RC.CurrSpritePositionY = RC.CurrSpriteAttributes.PositionY - 16;
+
+        // Check if sprite falls on this scanline
+        if (RC.CurrSpritePositionY > GBC_MMU_Memory.IO.Scanline ||
+           (RC.CurrSpritePositionY + RC.CurrSpriteHeight) <= GBC_MMU_Memory.IO.Scanline ||
+            RC.CurrSpritePositionX <=  -8 ||
+            RC.CurrSpritePositionX >= 160)
+        {
+            continue;
+        }
+
+        if (RC.CurrSpriteHeight == 16)
+        {
+            // In 8x16 mode, the lower bit of the tile number is ignored.
+            RC.CurrTileId = RC.CurrSpriteAttributes.TileID & 0xFE;
+        }
+        else
+        {
+            RC.CurrTileId = RC.CurrSpriteAttributes.TileID;
+        }
+
+        if (RC.CurrSpriteAttributes.FlipY)
+        {
+            if (RC.CurrSpriteHeight == 16)
+            {
+                RC.CurrTilePixelPositionY = 15 - (GBC_MMU_Memory.IO.Scanline - RC.CurrSpritePositionY);
+
+                // Check if pixel line is in the second tile
+                if (RC.CurrTilePixelPositionY >= 8)
+                {
+                    RC.CurrTilePixelPositionY -= 8;
+
+                    // Use second tile
+                    RC.CurrTileId++;
+                }
+            }
+            else
+            {
+                RC.CurrTilePixelPositionY = 7 - (GBC_MMU_Memory.IO.Scanline - RC.CurrSpritePositionY);
+            }
+        }
+        else
+        {
+            RC.CurrTilePixelPositionY = GBC_MMU_Memory.IO.Scanline - RC.CurrSpritePositionY;
+        }
+
+        if (RC.CurrSpritePositionX < 0)
+        {
+            // Start with the first visible pixel
+            RC.CurrTilePixelPositionX = 0 - RC.CurrSpritePositionX;
+            // Start with the first pixel in the line
+            RC.CurrFrameBufferIndex = RC.CurrFrameBufferStartIndex;
+        }
+        else
+        {
+            // Start with the first pixel
+            RC.CurrTilePixelPositionX = 0;
+            // Start line drawing where the first sprite pixel is located
+            RC.CurrFrameBufferIndex = RC.CurrFrameBufferStartIndex + RC.CurrSpritePositionX;
+        }
+
+        RC.CurrTileSetTileIndex = (RC.CurrTileId << 3) + RC.CurrTilePixelPositionY;
+
+        if (RC.CurrSpriteAttributes.TileVRAMBank)
+        {
+            RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank1.TileSetData[RC.CurrTileSetTileIndex];
+        }
+        else
+        {
+            RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[RC.CurrTileSetTileIndex];
+        }
+
+        if (RC.CurrSpriteAttributes.FlipX)
+        {
+            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
+        }
+        else
+        {
+            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
+        }
+
+        for (RC.CurrPriorityPixelLineIndex = RC.CurrFrameBufferIndex - RC.CurrFrameBufferStartIndex;
+            RC.CurrTilePixelPositionX < 8 && RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex;
+            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++, RC.CurrFrameBufferIndex++)
+        {
+            if (RC.CurrSpriteAttributes.FlipX)
+            {
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+
+                // Move next two bits to bit 8 (low) and bit 0 (high)
+                RC.CurrTilePixelLine >>= 1;
+            }
+            else
+            {
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+
+                // Move next two bits to bit 15 (low) and bit 7 (high)
+                RC.CurrTilePixelLine <<= 1;
+            }
+
+            if (RC.CurrPixel == 0)
+            {
+                // Skip pixel, because 0 means transparent
+                continue;
+            }
+
+            RC.CurrPriorityPixel = RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex];
+
+            // When BGPriority is set, the corresponding BG tile will have priority
+            // above all OBJs (regardless of the priority bits in OAM memory).
+            if (RC.CurrPriorityPixel.BGPriority)
+            {
+                continue;
+            }
+
+            // When background priority is activated, then the sprite is
+            // behind BG color 1-3, BG color 0 is always behind object.
+            if (RC.CurrSpriteAttributes.BGRenderPriority && RC.CurrPriorityPixel.BGPixel)
+            {
+                continue;
+            }
+
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex] = GBC_GPU_CGB_SpritePalette[RC.CurrSpriteAttributes.PaletteNumber][RC.CurrPixel];
+        }
+    }
+}
+
 void GBC_GPU_RenderScanline(void)
 {
     // When the display is disabled the screen is blank (white)
@@ -761,7 +900,14 @@ void GBC_GPU_RenderScanline(void)
 
     if (GBC_MMU_Memory.IO.SpriteDisplayEnable)
     {
-        GBC_GPU_DMG_RenderSpriteScanline();
+        if (GBC_MMU_IS_CGB_MODE())
+        {
+            GBC_GPU_CGB_RenderSpriteScanline();
+        }
+        else
+        {
+            GBC_GPU_DMG_RenderSpriteScanline();
+        }
     }
 }
 
