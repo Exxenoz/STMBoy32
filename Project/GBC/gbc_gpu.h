@@ -53,10 +53,10 @@ typedef struct GBC_GPU_PriorityPixel_s
         #pragma pack(1)
         struct
         {
-            //unsigned int BGPriority      : 1; // BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory)
+            unsigned int BGPriority        : 1; // BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory)
             unsigned int BGPixel           : 2; // Background pixel color value for sprite priority detection
             unsigned int SpritePositionSet : 1; // True, when a valid sprite position for priority ordering is set
-            unsigned int                   : 5;
+            unsigned int                   : 4;
         };
     };
 

@@ -33,6 +33,8 @@ typedef struct GBC_GPU_RenderCache_s
     uint16_t CurrTileMapTileIndex;      // Index of the current tile in the tile map data array
     uint16_t CurrTileId;                // Id of the current tile in the tile set data array (of either VRAMBank0 or VRAMBank1)
 
+    union TileMapTileAttributes_u CurrTileMapTileAttributes; // Cache for background rendering in CGB mode
+
     uint16_t CurrTileSetTileIndex;      // Index of the current tile in the tile set data array (of either VRAMBank0 or VRAMBank1)
     uint16_t CurrTilePixelLine;         // Each tile is 8x8 pixel in size and uses 2 bytes per row/line or 2 bits per pixel
 
@@ -229,6 +231,95 @@ static inline void GBC_GPU_DMG_RenderBackgroundScanline(void)
             }
 
             RC.CurrTilePixelLine <<= 1;
+        }
+
+        RC.CurrTilePixelPositionX = 0;
+
+        RC.CurrTilePositionX++;
+        RC.CurrTilePositionX &= 0x1F;
+
+        RC.CurrTileMapTileIndex = RC.CurrTileMapTileOffset + RC.CurrTilePositionX;
+    }
+}
+
+static inline void GBC_GPU_CGB_RenderBackgroundScanline(void)
+{
+    RC.CurrFrameBufferIndex = RC.CurrFrameBufferStartIndex;
+    RC.CurrScreenOffsetX = GBC_MMU_Memory.IO.ScrollX;
+    RC.CurrScreenOffsetY = GBC_MMU_Memory.IO.Scanline + GBC_MMU_Memory.IO.ScrollY;
+    RC.CurrTilePositionX = RC.CurrScreenOffsetX >> 3;
+    RC.CurrTilePositionY = (RC.CurrScreenOffsetY & 0xFF) >> 3;
+    RC.CurrTilePixelPositionX = RC.CurrScreenOffsetX & 7;
+    RC.CurrTilePixelPositionY = RC.CurrScreenOffsetY & 7;
+    RC.CurrTileMapTileOffset = (GBC_MMU_Memory.IO.BGTileMapDisplaySelect ? 1024 : 0) + (RC.CurrTilePositionY << 5);
+    RC.CurrTileMapTileIndex = RC.CurrTileMapTileOffset + RC.CurrTilePositionX;
+
+    for (RC.CurrPriorityPixelLineIndex = 0; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex;)
+    {
+        RC.CurrTileId = GBC_MMU_Memory.VRAMBank0.TileMapData[RC.CurrTileMapTileIndex];
+
+        // Calculate the real tile id if current tile id is signed due to tile set #0 selection
+        if (!GBC_MMU_Memory.IO.BGAndWindowTileSetDisplaySelect && RC.CurrTileId < 128)
+        {
+            RC.CurrTileId += 256;
+        }
+
+        RC.CurrTileMapTileAttributes = GBC_MMU_Memory.VRAMBank1.TileMapTileAttributes[RC.CurrTileMapTileIndex];
+
+        if (RC.CurrTileMapTileAttributes.VerticalFlip)
+        {
+            RC.CurrTilePixelPositionY = 7 - (RC.CurrScreenOffsetY & 7);
+        }
+        else
+        {
+            RC.CurrTilePixelPositionY = RC.CurrScreenOffsetY & 7;
+        }
+
+        RC.CurrTileSetTileIndex = (RC.CurrTileId << 3) + RC.CurrTilePixelPositionY;
+
+        if (RC.CurrTileMapTileAttributes.TileVRAMBankNumber)
+        {
+            RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank1.TileSetData[RC.CurrTileSetTileIndex];
+        }
+        else
+        {
+            RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[RC.CurrTileSetTileIndex];
+        }
+
+        if (RC.CurrTileMapTileAttributes.HorizontalFlip)
+        {
+            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
+        }
+        else
+        {
+            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
+        }
+
+        for (; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex && RC.CurrTilePixelPositionX < 8;
+            RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++)
+        {
+            if (RC.CurrTileMapTileAttributes.HorizontalFlip)
+            {
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+
+                // Move next two bits to bit 8 (low) and bit 0 (high)
+                RC.CurrTilePixelLine >>= 1;
+            }
+            else
+            {
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+
+                // Move next two bits to bit 15 (low) and bit 7 (high)
+                RC.CurrTilePixelLine <<= 1;
+            }
+
+            // Save background pixel value for sprite priority system
+            RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPixel = RC.CurrPixel;
+            RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPriority = RC.CurrTileMapTileAttributes.BGOAMPriority;
+
+            GBC_GPU_FrameBuffer[RC.CurrFrameBufferIndex++] = GBC_GPU_CGB_BackgroundPalette[RC.CurrTileMapTileAttributes.BackgroundPaletteIndex][RC.CurrPixel];
         }
 
         RC.CurrTilePixelPositionX = 0;
@@ -540,7 +631,11 @@ void GBC_GPU_RenderScanline(void)
     memset(&RC.PriorityPixelLine, 0, sizeof(GBC_GPU_PriorityPixel_t) * GBC_GPU_FRAME_SIZE_X);
 
     // In GBC mode the BGDisplayEnable flag is ignored and sprites are always displayed on top
-    if (GBC_MMU_Memory.IO.BGDisplayEnable || GBC_MMU_IS_CGB_MODE())
+    if (GBC_MMU_IS_CGB_MODE())
+    {
+        GBC_GPU_CGB_RenderBackgroundScanline();
+    }
+    else if (GBC_MMU_Memory.IO.BGDisplayEnable)
     {
         GBC_GPU_DMG_RenderBackgroundScanline();
     }
