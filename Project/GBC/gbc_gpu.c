@@ -124,7 +124,7 @@ uint8_t GBC_GPU_FetchBackgroundPaletteColor(uint8_t hl, uint8_t paletteIndex, ui
 
     if (hl)
     {
-        return (color.Blue << 2) /* Blue */ || ((color.Green >> 3) & 0x3) /* Half Green High */;
+        return (color.Blue << 2) /* Blue */ | ((color.Green >> 3) & 0x3) /* Half Green High */;
     }
     else
     {
@@ -154,7 +154,7 @@ uint8_t GBC_GPU_FetchSpritePaletteColor(uint8_t hl, uint8_t paletteIndex, uint8_
 
     if (hl)
     {
-        return (color.Blue << 2) /* Blue */ || ((color.Green >> 3) & 0x3) /* Half Green High */;
+        return (color.Blue << 2) /* Blue */ | ((color.Green >> 3) & 0x3) /* Half Green High */;
     }
     else
     {
