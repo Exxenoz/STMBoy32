@@ -203,13 +203,13 @@ static inline void GBC_GPU_DMG_RenderBackgroundScanline(void)
         RC.CurrTileSetTileIndex = (RC.CurrTileId << 3) + RC.CurrTilePixelPositionY;
         RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[RC.CurrTileSetTileIndex];
 
-        // Move first pixel bits to bit 15 (low) and bit 7 (high)
+        // Move first pixel bits to bit 15 (high) and bit 7 (low)
         RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
 
         for (; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex && RC.CurrTilePixelPositionX < 8;
             RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++)
         {
-            RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+            RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
             // Save background pixel value for sprite priority system
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPixel = RC.CurrPixel;
@@ -288,12 +288,12 @@ static inline void GBC_GPU_CGB_RenderBackgroundScanline(void)
 
         if (RC.CurrTileMapTileAttributes.HorizontalFlip)
         {
-            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            // Move first pixel bits to bit 8 (high) and bit 0 (low)
             RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
         }
         else
         {
-            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            // Move first pixel bits to bit 15 (high) and bit 7 (low)
             RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
         }
 
@@ -302,16 +302,16 @@ static inline void GBC_GPU_CGB_RenderBackgroundScanline(void)
         {
             if (RC.CurrTileMapTileAttributes.HorizontalFlip)
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+                RC.CurrPixel = (RC.CurrTilePixelLine & 0x1) | ((RC.CurrTilePixelLine & 0x100) >> 7);
 
-                // Move next two bits to bit 8 (low) and bit 0 (high)
+                // Move next two bits to bit 8 (high) and bit 0 (low)
                 RC.CurrTilePixelLine >>= 1;
             }
             else
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
-                // Move next two bits to bit 15 (low) and bit 7 (high)
+                // Move next two bits to bit 15 (high) and bit 7 (low)
                 RC.CurrTilePixelLine <<= 1;
             }
 
@@ -370,13 +370,13 @@ static inline void GBC_GPU_DMG_RenderWindowScanline(void)
         RC.CurrTileSetTileIndex = (RC.CurrTileId << 3) + RC.CurrTilePixelPositionY;
         RC.CurrTilePixelLine = GBC_MMU_Memory.VRAMBank0.TileSetData[RC.CurrTileSetTileIndex];
 
-        // Move first pixel bits to bit 15 (low) and bit 7 (high)
+        // Move first pixel bits to bit 15 (high) and bit 7 (low)
         RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
 
         for (; RC.CurrFrameBufferIndex < RC.CurrFrameBufferEndIndex && RC.CurrTilePixelPositionX < 8;
             RC.CurrTilePixelPositionX++, RC.CurrPriorityPixelLineIndex++)
         {
-            RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+            RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
             // Save window pixel value for sprite priority system
             RC.PriorityPixelLine[RC.CurrPriorityPixelLineIndex].BGPixel = RC.CurrPixel;
@@ -463,12 +463,12 @@ static inline void GBC_GPU_CGB_RenderWindowScanline(void)
 
         if (RC.CurrTileMapTileAttributes.HorizontalFlip)
         {
-            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            // Move first pixel bits to bit 8 (high) and bit 0 (low)
             RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
         }
         else
         {
-            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            // Move first pixel bits to bit 15 (high) and bit 7 (low)
             RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
         }
 
@@ -477,16 +477,16 @@ static inline void GBC_GPU_CGB_RenderWindowScanline(void)
         {
             if (RC.CurrTileMapTileAttributes.HorizontalFlip)
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+                RC.CurrPixel = (RC.CurrTilePixelLine & 0x1) | ((RC.CurrTilePixelLine & 0x100) >> 7);
 
-                // Move next two bits to bit 8 (low) and bit 0 (high)
+                // Move next two bits to bit 8 (high) and bit 0 (low)
                 RC.CurrTilePixelLine >>= 1;
             }
             else
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
-                // Move next two bits to bit 15 (low) and bit 7 (high)
+                // Move next two bits to bit 15 (high) and bit 7 (low)
                 RC.CurrTilePixelLine <<= 1;
             }
 
@@ -592,12 +592,12 @@ static inline void GBC_GPU_DMG_RenderSpriteScanline(void)
 
         if (RC.CurrSpriteAttributes.FlipX)
         {
-            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            // Move first pixel bits to bit 8 (high) and bit 0 (low)
             RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
         }
         else
         {
-            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            // Move first pixel bits to bit 15 (high) and bit 7 (low)
             RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
         }
 
@@ -607,16 +607,16 @@ static inline void GBC_GPU_DMG_RenderSpriteScanline(void)
         {
             if (RC.CurrSpriteAttributes.FlipX)
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+                RC.CurrPixel = (RC.CurrTilePixelLine & 0x1) | ((RC.CurrTilePixelLine & 0x100) >> 7);
 
-                // Move next two bits to bit 8 (low) and bit 0 (high)
+                // Move next two bits to bit 8 (high) and bit 0 (low)
                 RC.CurrTilePixelLine >>= 1;
             }
             else
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
-                // Move next two bits to bit 15 (low) and bit 7 (high)
+                // Move next two bits to bit 15 (high) and bit 7 (low)
                 RC.CurrTilePixelLine <<= 1;
             }
 
@@ -800,12 +800,12 @@ static inline void GBC_GPU_CGB_RenderSpriteScanline(void)
 
         if (RC.CurrSpriteAttributes.FlipX)
         {
-            // Move first pixel bits to bit 8 (low) and bit 0 (high)
+            // Move first pixel bits to bit 8 (high) and bit 0 (low)
             RC.CurrTilePixelLine >>= RC.CurrTilePixelPositionX;
         }
         else
         {
-            // Move first pixel bits to bit 15 (low) and bit 7 (high)
+            // Move first pixel bits to bit 15 (high) and bit 7 (low)
             RC.CurrTilePixelLine <<= RC.CurrTilePixelPositionX;
         }
 
@@ -815,16 +815,16 @@ static inline void GBC_GPU_CGB_RenderSpriteScanline(void)
         {
             if (RC.CurrSpriteAttributes.FlipX)
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x1) << 1) | ((RC.CurrTilePixelLine & 0x100) >> 8);
+                RC.CurrPixel = (RC.CurrTilePixelLine & 0x1) | ((RC.CurrTilePixelLine & 0x100) >> 7);
 
-                // Move next two bits to bit 8 (low) and bit 0 (high)
+                // Move next two bits to bit 8 (high) and bit 0 (low)
                 RC.CurrTilePixelLine >>= 1;
             }
             else
             {
-                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 6) | ((RC.CurrTilePixelLine & 0x8000) >> 15);
+                RC.CurrPixel = ((RC.CurrTilePixelLine & 0x80) >> 7) | ((RC.CurrTilePixelLine & 0x8000) >> 14);
 
-                // Move next two bits to bit 15 (low) and bit 7 (high)
+                // Move next two bits to bit 15 (high) and bit 7 (low)
                 RC.CurrTilePixelLine <<= 1;
             }
 
