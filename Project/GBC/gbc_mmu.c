@@ -1022,7 +1022,18 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                     GBC_MMU_Memory.IO.Channel3WavePatternRAM[address] = value;
                     break;
-                case 0xFF40:
+                case 0xFF40: // GPUControlFlags
+                    GBC_MMU_Memory.IO.GPUControlFlags = value;
+
+                    if (GBC_MMU_Memory.IO.DisplayEnable)
+                    {
+                        GBC_GPU_EnableDisplay();
+                    }
+                    else
+                    {
+                        GBC_GPU_DisableDisplay();
+                    }
+                    break;
                 case 0xFF41:
                 case 0xFF42:
                 case 0xFF43:

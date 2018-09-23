@@ -5,8 +5,10 @@
 #include "string.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
-uint32_t GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK; // Needed, because some games overwrite mode
+uint32_t GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK; // Needed, because some games overwrite mode
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
+bool GBC_GPU_DisplayEnabled = true; // Necessary, because of display enable delay
+int32_t GBC_GPU_DisplayEnableDelay = 0;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
 
 #ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
@@ -86,14 +88,17 @@ void GBC_GPU_Initialize(void)
 {
     GBC_GPU_ModeTicks = 0;
 
-    // Start in VBlank mode
-    GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
-    GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
-    GBC_MMU_Memory.IO.Scanline = 144;
+    // Start in HBlank mode
+    GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK;
+    GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
+    GBC_MMU_Memory.IO.Scanline = 0;
 
     memset(&GBC_GPU_StatusInterruptRequestState, 0, sizeof(GBC_GPU_StatusInterruptRequestState_t));
 
     // Frame buffer must not be initialized
+
+    GBC_GPU_DisplayEnabled = true;
+    GBC_GPU_DisplayEnableDelay = 0;
 
 #ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
     GBC_GPU_SkipCurrentFrame = true;
@@ -858,14 +863,6 @@ static inline void GBC_GPU_CGB_RenderSpriteScanline(void)
 
 void GBC_GPU_RenderScanline(void)
 {
-    // When the display is disabled the screen is blank (white)
-    if (!GBC_MMU_Memory.IO.DisplayEnable)
-    {
-        memset(&GBC_GPU_FrameBuffer[RC.CurrFrameBufferStartIndex],
-            GBC_GPU_BackgroundPaletteClassic[0].Color, sizeof(GBC_GPU_Color_t) * GBC_GPU_FRAME_SIZE_X);
-        return;
-    }
-
     // Reset priority pixel line
     memset(&RC.PriorityPixelLine, 0, sizeof(GBC_GPU_PriorityPixel_t) * GBC_GPU_FRAME_SIZE_X);
 
@@ -914,6 +911,26 @@ void GBC_GPU_RenderScanline(void)
     }
 }
 
+void GBC_GPU_EnableDisplay(void)
+{
+    if (!GBC_GPU_DisplayEnabled)
+    {
+        GBC_GPU_DisplayEnableDelay = 244;
+    }
+}
+
+void GBC_GPU_DisableDisplay(void)
+{
+    if (GBC_GPU_DisplayEnabled)
+    {
+        // When the display is disabled the screen is blank (white)
+        memset(&GBC_GPU_FrameBuffer, GBC_GPU_BackgroundPaletteClassic[0].Color, sizeof(GBC_GPU_Color_t) * GBC_GPU_FRAME_SIZE);
+    }
+
+    GBC_GPU_DisplayEnabled = false;
+    GBC_GPU_DisplayEnableDelay = 0;
+}
+
 #define GBC_GPU_COMPARE_SCANLINE()                                                                                                         \
 {                                                                                                                                          \
     if (GBC_MMU_Memory.IO.Scanline == GBC_MMU_Memory.IO.ScanlineCompare)                                                                   \
@@ -940,6 +957,39 @@ void GBC_GPU_RenderScanline(void)
 bool GBC_GPU_Step(void)
 {
     GBC_GPU_ModeTicks += GBC_CPU_StepTicks;
+
+    if (!GBC_GPU_DisplayEnabled)
+    {
+        if (GBC_GPU_DisplayEnableDelay)
+        {
+            GBC_GPU_DisplayEnableDelay -= GBC_CPU_StepTicks;
+
+            if (GBC_GPU_DisplayEnableDelay <= 0)
+            {
+                GBC_GPU_DisplayEnableDelay = 0;
+                GBC_GPU_DisplayEnabled = true;
+
+                // Start in HBlank mode
+                GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK;
+                GBC_GPU_ModeTicks = 0;
+                GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
+                GBC_MMU_Memory.IO.Scanline = 0;
+
+                RC.CurrFrameBufferStartIndex = 0;
+                RC.CurrFrameBufferIndex = 0;
+                RC.CurrFrameBufferEndIndex = 160;
+
+                memset(&GBC_GPU_StatusInterruptRequestState, 0, sizeof(GBC_GPU_StatusInterruptRequestState_t));
+            }
+        }
+        else if (GBC_GPU_ModeTicks >= 70224)
+        {
+            GBC_GPU_ModeTicks -= 70224;
+            return true;
+        }
+
+        return false;
+    }
 
     switch (GBC_GPU_Mode)
     {
