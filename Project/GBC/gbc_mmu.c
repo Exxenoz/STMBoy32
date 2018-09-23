@@ -151,11 +151,11 @@ bool GBC_MMU_LoadFromCartridge(void)
     /*************************************************/
 
     uint8_t  romBanks;
-    uint8_t  romSize = GBC_MMU_Memory.ROMSize;
+    uint8_t  romSize = GBC_MMU_Memory.CartridgeBank0.ROMSize;
     uint32_t address = SDRAM_BANK_ADDR + WRITE_READ_ADDR;
 
     // Load ROM Bank 0.
-    memcpy((void*)address, GBC_MMU_Memory.CartridgeBank0, 16384);
+    memcpy((void*)address, GBC_MMU_Memory.CartridgeBank0.Data, 16384);
 
     // Get MBC, if it's mbc1 make sure Rom Mode is selected.
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
