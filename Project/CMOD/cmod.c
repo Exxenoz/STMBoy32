@@ -46,19 +46,19 @@ void CMOD_GetFileName(char* name)
 
     int i;
 
-    for (i = 0; i < 11 && GBC_MMU_Memory.Title[i] != 0x00; i++)
+    for (i = 0; i < 11 && GBC_MMU_Memory.CartridgeBank0.Title[i] != 0x00; i++)
     {
-        if (GBC_MMU_Memory.Title[i] == 0x5F)        // Convert underscores to spaces for the sake of consistency
+        if (GBC_MMU_Memory.CartridgeBank0.Title[i] == 0x5F)        // Convert underscores to spaces for the sake of consistency
         {
             name[i] = ' ';
             continue;
         }
 
-        name[i] = (char) GBC_MMU_Memory.Title[i];
+        name[i] = (char) GBC_MMU_Memory.CartridgeBank0.Title[i];
     }
     name[i++] = '.';
     
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         name[i++] = 'g';
         name[i++] = 'b';
@@ -144,7 +144,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     BYTE     mode = FA_WRITE;
     char     name[16];
     uint8_t  romBanks;
-    uint8_t  romSize      = GBC_MMU_Memory.ROMSize;
+    uint8_t  romSize      = GBC_MMU_Memory.CartridgeBank0.ROMSize;
     uint32_t bytesWritten = 0;
 
     // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0.
@@ -172,7 +172,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     if (openResult == FR_OK)
     {
         // Write Bank 0, if failed close and delete (if something has been written) the file
-        if (f_write(&file, GBC_MMU_Memory.CartridgeBank0, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+        if (f_write(&file, GBC_MMU_Memory.CartridgeBank0.Data, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
         {
             f_close(&file);
             f_unlink(name);

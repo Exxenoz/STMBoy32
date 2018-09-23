@@ -84,7 +84,7 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t CartridgeBank0[16384];    // 0000-3FFF: 16kB Cartridge ROM bank 0
+        uint8_t Data[16384];              // 0000-3FFF: 16kB Cartridge ROM bank 0
 
         #pragma pack(1)
         struct
@@ -105,15 +105,14 @@ typedef struct GBC_MMU_Memory_s
             uint8_t MaskROMVersionNumber; // 014C
             uint8_t HeaderChecksum;       // 014D
             uint8_t GlobalChecksum[2];    // 014E-014F
-            // Program Code               // 0150-3FFF
+            uint8_t ProgramCode[16048];   // 0150-3FFF
         };
-    };
-    uint8_t CartridgeBankX[16384];        // ToDo: Can not be removed currently, because it somehow breaks SDC reading
+    } CartridgeBank0;
     //------CartridgeBankX (SDRAM)        // 4000-7FFF: 16kB Cartridge ROM bank X
     #pragma pack(1)
     union
     {
-        uint8_t VRAMBank0[8192];          // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
+        uint8_t Data[8192];               // 8000-9FFF:  8kB Video RAM bank X                 - Switchable only in GBC mode (0-1)
 
         #pragma pack(1)
         struct
@@ -121,8 +120,35 @@ typedef struct GBC_MMU_Memory_s
             uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
             uint8_t TileMapData[2048];    // 9800-9FFF: Tilemap Data
         };
-    };
-    uint8_t VRAMBank1[8192];
+    } VRAMBank0;
+    #pragma pack(1)
+    union
+    {
+        uint8_t Data[8192];               // Only in GBC mode
+
+        #pragma pack(1)
+        struct
+        {
+            uint16_t TileSetData[3072];   // 8000-97FF: Tileset Data
+
+            #pragma pack(1)
+            union TileMapTileAttributes_u
+            {
+                uint8_t Data;
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int BackgroundPaletteIndex : 3;
+                    unsigned int TileVRAMBankNumber     : 1; // (0 = VRAMBank0, 1 = VRAMBank1)
+                    unsigned int                        : 1;
+                    unsigned int HorizontalFlip         : 1; // (0 = Normal, 1 = Mirror horizontally)
+                    unsigned int VerticalFlip           : 1; // (0 = Normal, 1 = Mirror vertically)
+                    unsigned int BGOAMPriority          : 1; // (0 = OAM priority, 1 = BG priority)
+                };
+            } TileMapTileAttributes[2048];// 9800-9FFF: Tilemap Tile Attributes
+        };
+    } VRAMBank1;
     uint8_t ERAMBank0[8192];              // A000-BFFF:  8kB External Cartridge RAM bank X, up to 128kB (but due to exhausted ressources for now only 32kB)
     uint8_t ERAMBank1[8192];
     uint8_t ERAMBank2[8192];
@@ -139,7 +165,7 @@ typedef struct GBC_MMU_Memory_s
     #pragma pack(1)
     union
     {
-        uint8_t OAM[160];                 // FE00-FE9F: 160B Object Attribute Memory
+        uint8_t Data[160];                // FE00-FE9F: 160B Object Attribute Memory
 
         #pragma pack(1)
         struct SpriteAttributes_s
@@ -164,12 +190,12 @@ typedef struct GBC_MMU_Memory_s
                 };
             };
         } SpriteAttributes[40];
-    };
+    } OAM;
     //------Unused                        // FEA0-FEFF:  96B Unused
     #pragma pack(1)
     union
     {
-        uint8_t IO[128];                  // FF00-FF7F: 128B Memory-mapped I/O
+        uint8_t Data[128];                // FF00-FF7F: 128B Memory-mapped I/O
 
         #pragma pack(1)
         struct
@@ -561,18 +587,57 @@ typedef struct GBC_MMU_Memory_s
             uint8_t NewDMASourceLow;         // 0xFF52                                           - Only in GBC mode
             uint8_t NewDMADestinationHigh;   // 0xFF53                                           - Only in GBC mode
             uint8_t NewDMADestinationLow;    // 0xFF54                                           - Only in GBC mode
-            uint8_t NewDMALengthModeStart;   // 0xFF55                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t Data;                // 0xFF55                                           - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int TransferLength : 7;
+                    unsigned int TransferMode   : 1; // (0 = General Purpose DMA, 1 = H-Blank DMA)
+                };
+            } NewDMALengthModeStart;
             uint8_t InfraredPort;            // 0xFF56                                           - Only in GBC mode
             uint8_t IO_Unk9[17];
-            uint8_t BackgroundPaletteIndex;  // 0xFF68                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t Data;                // 0xFF68                                           - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int HL            : 1; // (0 = Low, 1 = High)
+                    unsigned int ColorIndex    : 2;
+                    unsigned int PaletteIndex  : 3;
+                    unsigned int               : 1;
+                    unsigned int AutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
+                };
+            } BackgroundPaletteIndex;
             uint8_t BackgroundPaletteData;   // 0xFF69                                           - Only in GBC mode
-            uint8_t SpritePaletteIndex;      // 0xFF6A                                           - Only in GBC mode
+            #pragma pack(1)
+            union
+            {
+                uint8_t Data;                // 0xFF6A                                           - Only in GBC mode
+
+                #pragma pack(1)
+                struct
+                {
+                    unsigned int HL            : 1; // (0 = Low, 1 = High)
+                    unsigned int ColorIndex    : 2;
+                    unsigned int PaletteIndex  : 3;
+                    unsigned int               : 1;
+                    unsigned int AutoIncrement : 1; // (0 = Disabled, 1 = Increment after writing)
+                };
+            } SpritePaletteIndex;
             uint8_t SpritePaletteData;       // 0xFF6B                                           - Only in GBC mode
             uint8_t IO_Unk12[4];
             uint8_t WRAMBankID;              // 0xFF70                                           - Only in GBC mode
             uint8_t IO_Unk10[15];
         };
-    };
+    } IO;
     uint8_t HRAM[127];                    // FF80-FFFE: 127B High RAM
     uint8_t InterruptEnable;              // FFFF:        1B Interrupt enable register
 }
@@ -599,9 +664,10 @@ GBC_MMU_RTC_Register_t;
 typedef void (*GBC_MMU_MBC)(uint16_t, uint8_t);
 
 extern GBC_MMU_Memory_t GBC_MMU_Memory;                             // External GBC Memory declaration for direct CPU access
+extern bool GBC_MMU_HDMAEnabled;
 
-#define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
-#define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+#define GBC_MMU_IS_DMG_MODE() (!(GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY)))
+#define GBC_MMU_IS_CGB_MODE() (GBC_MMU_Memory.CartridgeBank0.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
 
 bool GBC_MMU_LoadFromCartridge(void);
 bool GBC_MMU_LoadFromSDC(char* fileName);
@@ -609,6 +675,8 @@ void GBC_MMU_Unload(void);
 
 uint8_t GBC_MMU_ReadByte(uint16_t address);
 uint16_t GBC_MMU_ReadShort(uint16_t address);
+
+uint32_t GBC_MMU_StartHDMATransfer(void);
 
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value);
 void GBC_MMU_WriteShort(uint16_t address, uint16_t value);

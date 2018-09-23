@@ -1,6 +1,8 @@
 #include "gbc_mmu.h"
 #include "gbc_tim.h"
 #include "gbc_apu.h"
+#include "gbc_gpu.h"
+#include "gbc_cpu.h"
 #include "gbc.h"
 #include "sdc.h"
 #include "ff.h"
@@ -18,6 +20,8 @@ uint32_t GBC_MMU_CurrentROMBankAddress = 16384;                                 
 
 bool GBC_MMU_ERAMEnabled = false;                                                  // External RAM Enabled State
 uint8_t GBC_MMU_CurrentERAMBankID = 0;                                             // Current ERAM Bank ID
+
+bool GBC_MMU_HDMAEnabled = false;
 
 bool GBC_MMU_RTC_Selected = false;                                                 // External RTC Selected State
 GBC_MMU_RTC_Register_t GBC_MMU_RTC_Register;                                       // External RTC Register
@@ -78,11 +82,11 @@ void GBC_MMU_Initialize(void)
     GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
 
     // Initialize memory
-    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+    if (GBC_MMU_IS_CGB_MODE())
     {
         for (long i = 0; i < 128; i++)
         {
-            GBC_MMU_Memory.IO[i] = GBC_MMU_InitialValuesForColorFFXX[i];
+            GBC_MMU_Memory.IO.Data[i] = GBC_MMU_InitialValuesForColorFFXX[i];
         }
 
         for (long i = 128, j = 0; i < 255; i++, j++)
@@ -96,7 +100,7 @@ void GBC_MMU_Initialize(void)
     {
         for (long i = 0; i < 128; i++)
         {
-            GBC_MMU_Memory.IO[i] = GBC_MMU_InitialValuesForFFXX[i];
+            GBC_MMU_Memory.IO.Data[i] = GBC_MMU_InitialValuesForFFXX[i];
         }
 
         for (long i = 128, j = 0; i < 255; i++, j++)
@@ -112,7 +116,7 @@ bool GBC_MMU_IsValidROMHeader(void)
 {
     for (long i = 0; i < 48; i++)
     {
-        if (GBC_MMU_Memory.NintendoLogo[i] != GBC_MMU_NintendoLogo[i])
+        if (GBC_MMU_Memory.CartridgeBank0.NintendoLogo[i] != GBC_MMU_NintendoLogo[i])
         {
             return false;
         }
@@ -131,8 +135,8 @@ bool GBC_MMU_LoadFromCartridge(void)
 
     GBC_MMU_Unload();
 
-    // Read ROM Bank 0.
-    CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0);
+    // Read ROM Bank 0
+    CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0.Data);
     while (CMOD_GetStatus() == CMOD_PROCESSING);
 
     // Check ROM Header.
@@ -211,7 +215,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         {
             f_lseek(&ROMFile, i);
 
-            if (f_read(&ROMFile, &GBC_MMU_Memory.CartridgeBank0[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
+            if (f_read(&ROMFile, &GBC_MMU_Memory.CartridgeBank0.Data[i], 512, &bytesRead) != FR_OK || bytesRead != 512)
             {
                 f_close(&ROMFile);
                 return false;
@@ -226,7 +230,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         }
 
         // Read complete ROM and write it to SDRAM
-        for (uint32_t position = 0, address = SDRAM_BANK_ADDR + WRITE_READ_ADDR; bytesRead; position += 512)
+        for (uint32_t position = 0, address = SDRAM_BANK_ADDR + WRITE_READ_ADDR; bytesRead; position += 512, address += 512)
         {
             f_lseek(&ROMFile, position);
 
@@ -236,10 +240,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
                 return false;
             }
 
-            for (long i = 0; i < 512; i++, address++)
-            {
-                SDRAM_WRITE_BYTE(address, readBuffer[i]);
-            }
+            memcpy((void*)address, readBuffer, 512);
         }
 
         f_close(&ROMFile);
@@ -264,6 +265,8 @@ void GBC_MMU_Unload(void)
     GBC_MMU_ERAMEnabled = false;
     GBC_MMU_CurrentERAMBankID = 0;
 
+    GBC_MMU_HDMAEnabled = false;
+
     GBC_MMU_RTC_Selected = false;
     memset(&GBC_MMU_RTC_Register, 0, sizeof(GBC_MMU_RTC_Register_t));
     GBC_MMU_RTC_RegisterID = 0;
@@ -279,7 +282,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         case 0x2000:
         case 0x3000:
             // Cartridge ROM bank 0
-            return GBC_MMU_Memory.CartridgeBank0[address];
+            return GBC_MMU_Memory.CartridgeBank0.Data[address];
         case 0x4000:
         case 0x5000:
         case 0x6000:
@@ -291,7 +294,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
         case 0x8000:
         case 0x9000:
             // Video RAM bank X
-            return (GBC_MMU_Memory.VRAMBankID == 1) ? GBC_MMU_Memory.VRAMBank1[address - 0x8000] : GBC_MMU_Memory.VRAMBank0[address - 0x8000];
+            return (GBC_MMU_Memory.IO.VRAMBankID == 1) ? GBC_MMU_Memory.VRAMBank1.Data[address - 0x8000] : GBC_MMU_Memory.VRAMBank0.Data[address - 0x8000];
         case 0xA000:
         case 0xB000:
             // External RAM bank X
@@ -328,7 +331,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
             return GBC_MMU_Memory.WRAMBank0[address - 0xC000];
         case 0xD000:
             // Work RAM Bank X
-            switch (GBC_MMU_Memory.WRAMBankID)
+            switch (GBC_MMU_Memory.IO.WRAMBankID)
             {
                 case 0:
                 case 1:
@@ -358,7 +361,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                     // Object Attribute Memory
                     if (address <= 0xFE9F)
                     {
-                        return GBC_MMU_Memory.OAM[address - 0xFE00];
+                        return GBC_MMU_Memory.OAM.Data[address - 0xFE00];
                     }
                     // else unused memory
                     break;
@@ -378,11 +381,11 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
 
                         if (address <= 0xFF2F)
                         {
-                            return GBC_MMU_Memory.IO[address - 0xFF00] | soundRegisterReadMask[address - 0xFF10];
+                            return GBC_MMU_Memory.IO.Data[address - 0xFF00] | soundRegisterReadMask[address - 0xFF10];
                         }
                         else // Wave RAM
                         {
-                            if (GBC_MMU_Memory.ChannelSound3Enabled)
+                            if (GBC_MMU_Memory.IO.ChannelSound3Enabled)
                             {
                                 address = GBC_APU_Channel3Phase;
 
@@ -401,12 +404,12 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
 
                             address &= 0x0F;
 
-                            return GBC_MMU_Memory.Channel3WavePatternRAM[address];
+                            return GBC_MMU_Memory.IO.Channel3WavePatternRAM[address];
                         }
                     }
                     else if (address <= 0xFF7F)
                     {
-                        return GBC_MMU_Memory.IO[address - 0xFF00];
+                        return GBC_MMU_Memory.IO.Data[address - 0xFF00];
                     }
                     else // High RAM and Interrupt Enable Register
                     {
@@ -414,7 +417,7 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                     }
                 default:
                     // Shadow RAM redirection to WRAM Bank X
-                    switch (GBC_MMU_Memory.WRAMBankID)
+                    switch (GBC_MMU_Memory.IO.WRAMBankID)
                     {
                         case 0:
                         case 1:
@@ -631,6 +634,124 @@ GBC_MMU_MBC GBC_MMU_MBC_Table[6] =
     GBC_MMU_MBC5_Write,
 };
 
+static void GBC_MMU_StartGDMATransfer(void)
+{
+    // Source Start Address may be located at 0000-7FF0 or A000-DFF0
+    uint16_t srcAddress = GBC_MMU_Memory.IO.NewDMASourceHigh;
+
+    if (srcAddress > 0x7F && srcAddress < 0xA0)
+    {
+        srcAddress = 0;
+    }
+
+    srcAddress <<= 8;
+
+    // The lower four bits of the source address are ignored (treated as zero)
+    srcAddress |= (GBC_MMU_Memory.IO.NewDMASourceLow & 0xF0);
+
+    // The Destination Start Address may be located at 8000-9FF0
+    uint16_t dstAddress = GBC_MMU_Memory.IO.NewDMADestinationHigh;
+
+    // The upper 3 bits are ignored (destination is always in VRAM)
+    dstAddress &= 0x1F;
+
+    dstAddress <<= 8;
+
+    // The lower four bits of the destination address are ignored (treated as zero)
+    dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
+
+    dstAddress |= 0x8000;
+
+    uint16_t length = GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferLength;
+
+    // Transfer Length was divided by 10h, minus 1
+    length *= 16;
+    length += 16;
+
+    for (uint32_t i = 0; i < length; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+    }
+
+    // The execution of the program continues when the transfer has been completed, and FF55 then contains a value of FFh
+    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = 0xFF;
+
+    // Calculate CPU ticks - since they are going to be halved if we are in double speed mode
+    // and the GDMA is not faster in double speed mode, we have to add twice as much ticks
+    if (GBC_MMU_Memory.IO.CurrentSpeed)
+    {
+        GBC_CPU_StepTicks += 8;
+        GBC_CPU_StepTicks += length;
+    }
+    else
+    {
+        GBC_CPU_StepTicks += 4;
+        GBC_CPU_StepTicks += length >> 1;
+    }
+}
+
+uint32_t GBC_MMU_StartHDMATransfer(void)
+{
+    // Source Start Address may be located at 0000-7FF0 or A000-DFF0
+    uint16_t srcAddress = GBC_MMU_Memory.IO.NewDMASourceHigh;
+
+    if (srcAddress > 0x7F && srcAddress < 0xA0)
+    {
+        srcAddress = 0;
+    }
+
+    srcAddress <<= 8;
+
+    // The lower four bits of the source address are ignored (treated as zero)
+    srcAddress |= (GBC_MMU_Memory.IO.NewDMASourceLow & 0xF0);
+
+    // The Destination Start Address may be located at 8000-9FF0
+    uint16_t dstAddress = GBC_MMU_Memory.IO.NewDMADestinationHigh;
+
+    // The upper 3 bits are ignored (destination is always in VRAM)
+    dstAddress &= 0x1F;
+
+    dstAddress <<= 8;
+
+    // The lower four bits of the destination address are ignored (treated as zero)
+    dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
+
+    dstAddress |= 0x8000;
+
+    for (uint32_t i = 0; i < 16; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+    }
+
+    srcAddress += 16;
+    if (srcAddress == 0x8000)
+    {
+        srcAddress = 0xA000;
+    }
+
+    dstAddress += 16;
+    if (dstAddress == 0xA000)
+    {
+        dstAddress = 0x8000;
+    }
+
+    GBC_MMU_Memory.IO.NewDMASourceHigh = srcAddress >> 8;
+    GBC_MMU_Memory.IO.NewDMASourceLow = srcAddress & 0xFF;
+    GBC_MMU_Memory.IO.NewDMADestinationHigh = dstAddress >> 8;
+    GBC_MMU_Memory.IO.NewDMADestinationLow = dstAddress & 0xFF;
+
+    // Reading from NewDMALengthModeStart returns the remaining length (divided by 10h, minus 1)
+    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data--;
+    // A value of FFh indicates that the transfer has completed
+    if (GBC_MMU_Memory.IO.NewDMALengthModeStart.Data == 0xFF)
+    {
+        GBC_MMU_HDMAEnabled = false;
+    }
+
+    // Calculate CPU ticks and return them
+    return GBC_MMU_Memory.IO.CurrentSpeed ? 68 /* (16 + 1) * 4 */ : 36 /* (8 + 1) * 4 */;
+}
+
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 {
     switch (address & 0xF000)
@@ -652,13 +773,13 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         case 0x9000:
         {
             // Video RAM bank X
-            if (GBC_MMU_Memory.VRAMBankID == 1)
+            if (GBC_MMU_Memory.IO.VRAMBankID == 1)
             {
-                GBC_MMU_Memory.VRAMBank1[address - 0x8000] = value;
+                GBC_MMU_Memory.VRAMBank1.Data[address - 0x8000] = value;
             }
             else
             {
-                GBC_MMU_Memory.VRAMBank0[address - 0x8000] = value;
+                GBC_MMU_Memory.VRAMBank0.Data[address - 0x8000] = value;
             }
             break;
         }
@@ -706,7 +827,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
         case 0xD000:
         {
             // Work RAM Bank X
-            switch (GBC_MMU_Memory.WRAMBankID)
+            switch (GBC_MMU_Memory.IO.WRAMBankID)
             {
                 case 0:
                 case 1:
@@ -767,7 +888,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFE88: case 0xFE89: case 0xFE8A: case 0xFE8B: case 0xFE8C: case 0xFE8D: case 0xFE8E: case 0xFE8F:
                 case 0xFE90: case 0xFE91: case 0xFE92: case 0xFE93: case 0xFE94: case 0xFE95: case 0xFE96: case 0xFE97:
                 case 0xFE98: case 0xFE99: case 0xFE9A: case 0xFE9B: case 0xFE9C: case 0xFE9D: case 0xFE9E: case 0xFE9F:
-                    GBC_MMU_Memory.OAM[address - 0xFE00] = value;
+                    GBC_MMU_Memory.OAM.Data[address - 0xFE00] = value;
                     break;
                 // Unused Memory
                 case 0xFEA0: case 0xFEA1: case 0xFEA2: case 0xFEA3: case 0xFEA4: case 0xFEA5: case 0xFEA6: case 0xFEA7:
@@ -786,30 +907,30 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     break;
                 // Memory-mapped I/O
                 case 0xFF00: // Joypad
-                    GBC_MMU_Memory.Joypad = value;
+                    GBC_MMU_Memory.IO.Joypad = value;
                     Input_UpdateGBCJoypad();
                     break;
                 case 0xFF01:
                 case 0xFF02:
                 case 0xFF03:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
                     GBC_TIM_ResetDivider();
                     break;
                 case 0xFF05:
                 case 0xFF06:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF07: // Timer Control
                     value &= 0x07;
 
-                    if (GBC_MMU_Memory.TimerRunning != (value & 0x03))
+                    if (GBC_MMU_Memory.IO.TimerRunning != (value & 0x03))
                     {
                         GBC_TIM_ResetCounter();
                     }
 
-                    GBC_MMU_Memory.TimerControl = value;
+                    GBC_MMU_Memory.IO.TimerControl = value;
                     break;
                 case 0xFF08:
                 case 0xFF09:
@@ -819,7 +940,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF0D:
                 case 0xFF0E:
                 case 0xFF0F:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF10:
                 case 0xFF11:
@@ -844,10 +965,10 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF24:
                 case 0xFF25:
                 {
-                    if (!GBC_MMU_Memory.ChannelSoundsEnabled)
+                    if (!GBC_MMU_Memory.IO.ChannelSoundsEnabled)
                     {
                         // Read-only in CGB mode
-                        if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
+                        if (GBC_MMU_IS_CGB_MODE())
                         {
                             break;
                         }
@@ -868,25 +989,25 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                         }
                     }
 
-                    uint8_t oldValue = GBC_MMU_Memory.IO[address - 0xFF00];
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    uint8_t oldValue = GBC_MMU_Memory.IO.Data[address - 0xFF00];
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     GBC_APU_OnWriteToSoundRegister(address, value, oldValue);
                     break;
                 }
                 case 0xFF26:
                     if (value & 0x80)
                     {
-                        GBC_MMU_Memory.ChannelSoundsEnabled = 1;
+                        GBC_MMU_Memory.IO.ChannelSoundsEnabled = 1;
                     }
-                    else if (GBC_MMU_Memory.ChannelSoundsEnabled)
+                    else if (GBC_MMU_Memory.IO.ChannelSoundsEnabled)
                     {
-                        GBC_MMU_Memory.ChannelSoundTerminal = 0;
+                        GBC_MMU_Memory.IO.ChannelSoundTerminal = 0;
 
                         // Disabeling the sound controller by clearing Bit 7 destroys the contents of all sound registers.
 
                         for (long i = 0x10; i < 0x30; i++)
                         {
-                            GBC_MMU_Memory.IO[i] = 0;
+                            GBC_MMU_Memory.IO.Data[i] = 0;
                         }
 
                         // Reinitialize sound module
@@ -903,7 +1024,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF2D:
                 case 0xFF2E:
                 case 0xFF2F:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF30: // Wave Pattern RAM Start
                 case 0xFF31:
@@ -921,7 +1042,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF3D:
                 case 0xFF3E:
                 case 0xFF3F: // Wave Pattern RAM End
-                    if (GBC_MMU_Memory.ChannelSound3Enabled)
+                    if (GBC_MMU_Memory.IO.ChannelSound3Enabled)
                     {
                         address = GBC_APU_Channel3Phase;
 
@@ -940,7 +1061,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                     address &= 0x0F;
 
-                    GBC_MMU_Memory.Channel3WavePatternRAM[address] = value;
+                    GBC_MMU_Memory.IO.Channel3WavePatternRAM[address] = value;
                     break;
                 case 0xFF40:
                 case 0xFF41:
@@ -948,36 +1069,43 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF43:
                 case 0xFF44:
                 case 0xFF45:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF46: // DMA Transfer and Start Address
-                    GBC_MMU_Memory.OAMTransferStartAddress = value;
+                {
+                    GBC_MMU_Memory.IO.OAMTransferStartAddress = value;
 
-                    if (GBC_MMU_Memory.CGBFlag & (GBC_MMU_CGB_FLAG_SUPPORTED | GBC_MMU_CGB_FLAG_ONLY))
-                    {
-                        // ToDo
-                    }
-                    else
-                    {
-                        // The written value specifies the transfer source address divided by 100h
-                        uint16_t address = value << 8;
+                    // The written value specifies the transfer source address divided by 100h
+                    uint16_t address = value << 8;
 
-                        if (address >= 0x8000 && address < 0xE000)
+                    if (address >= 0x8000 && address < 0xE000)
+                    {
+                        for (uint32_t i = 0; i < 160; i++, address++)
                         {
-                            for (uint32_t i = 0; i < 160; i++, address++)
-                            {
-                                GBC_MMU_Memory.OAM[i] = GBC_MMU_ReadByte(address);
-                            }
+                            GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
                         }
                     }
+
                     break;
+                }
                 case 0xFF47:
                 case 0xFF48:
                 case 0xFF49:
                 case 0xFF4A:
                 case 0xFF4B:
                 case 0xFF4C:
-                case 0xFF4D:
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
+                    break;
+                case 0xFF4D: // SpeedSwitch
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_MMU_Memory.IO.PrepareSpeedSwitch = (value & 0x01);
+                    }
+                    else
+                    {
+                        GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
+                    }
+                    break;
                 case 0xFF4E:
                 case 0xFF4F:
                 case 0xFF50:
@@ -985,7 +1113,45 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF52:
                 case 0xFF53:
                 case 0xFF54:
-                case 0xFF55:
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
+                    break;
+                case 0xFF55: // NewDMALengthModeStart
+                    GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = value;
+
+                    if (GBC_MMU_IS_DMG_MODE())
+                    {
+                        break;
+                    }
+
+                    if (GBC_MMU_HDMAEnabled)
+                    {
+                        // Reading of TransferMode can be used to confirm if the DMA transfer is active (1 = Not Active, 0 = Active)
+                        if (GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode)
+                        {
+                            GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode = 0; // Reset (0 = HDMA still active)
+                            // Only length was modified
+                        }
+                        else
+                        {
+                            // It is possible to terminate an active H-Blank transfer by writing zero to TransferMode
+                            GBC_MMU_Memory.IO.NewDMALengthModeStart.Data = 0xFF;
+                            GBC_MMU_HDMAEnabled = false;
+                        }
+
+                        break;
+                    }
+
+                    if (GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode) // H-Blank DMA
+                    {
+                        GBC_MMU_HDMAEnabled = true;
+                        GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferMode = 0; // (0 = HDMA active)
+                    }
+                    else // General Purpose DMA
+                    {
+                        GBC_MMU_StartGDMATransfer();
+                    }
+
+                    break;
                 case 0xFF56:
                 case 0xFF57:
                 case 0xFF58:
@@ -1004,10 +1170,68 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF65:
                 case 0xFF66:
                 case 0xFF67:
-                case 0xFF68:
-                case 0xFF69:
-                case 0xFF6A:
-                case 0xFF6B:
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
+                    break;
+                case 0xFF68: // BackgroundPaletteIndexData
+                    GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data = value;
+
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex);
+                    }
+                    break;
+                case 0xFF69: // BackgroundPaletteData
+                    GBC_MMU_Memory.IO.BackgroundPaletteData = value;
+
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_GPU_SetBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex, value);
+
+                        if (GBC_MMU_Memory.IO.BackgroundPaletteIndex.AutoIncrement)
+                        {
+                            // Increment first six bits without touching the last two bits
+                            uint8_t helper = GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data & 0x40;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data++;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.BackgroundPaletteIndex.Data |= helper;
+                            GBC_MMU_Memory.IO.BackgroundPaletteData = GBC_GPU_FetchBackgroundPaletteColor(GBC_MMU_Memory.IO.BackgroundPaletteIndex.HL,
+                                GBC_MMU_Memory.IO.BackgroundPaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.BackgroundPaletteIndex.ColorIndex);
+                        }
+                    }
+                    break;
+                case 0xFF6A: // SpritePaletteIndexData
+                    GBC_MMU_Memory.IO.SpritePaletteIndex.Data = value;
+
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex);
+                    }
+                    break;
+                case 0xFF6B: // SpritePaletteData
+                    GBC_MMU_Memory.IO.SpritePaletteData = value;
+
+                    if (GBC_MMU_IS_CGB_MODE())
+                    {
+                        GBC_GPU_SetSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex, value);
+
+                        if (GBC_MMU_Memory.IO.SpritePaletteIndex.AutoIncrement)
+                        {
+                            // Increment first six bits without touching the last two bits
+                            uint8_t helper = GBC_MMU_Memory.IO.SpritePaletteIndex.Data & 0x40;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data++;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data &= 0xBF;
+                            GBC_MMU_Memory.IO.SpritePaletteIndex.Data |= helper;
+                            GBC_MMU_Memory.IO.SpritePaletteData = GBC_GPU_FetchSpritePaletteColor(GBC_MMU_Memory.IO.SpritePaletteIndex.HL,
+                                GBC_MMU_Memory.IO.SpritePaletteIndex.PaletteIndex, GBC_MMU_Memory.IO.SpritePaletteIndex.ColorIndex);
+                        }
+                    }
+                    break;
                 case 0xFF6C:
                 case 0xFF6D:
                 case 0xFF6E:
@@ -1028,7 +1252,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                 case 0xFF7D:
                 case 0xFF7E:
                 case 0xFF7F:
-                    GBC_MMU_Memory.IO[address - 0xFF00] = value;
+                    GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 // High RAM
                 case 0xFF80: case 0xFF81: case 0xFF82: case 0xFF83: case 0xFF84: case 0xFF85: case 0xFF86: case 0xFF87:
@@ -1055,7 +1279,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     break;
                 default:
                     // Shadow RAM redirection to WRAM Bank X
-                    switch (GBC_MMU_Memory.WRAMBankID)
+                    switch (GBC_MMU_Memory.IO.WRAMBankID)
                     {
                         case 0:
                         case 1:
@@ -1098,7 +1322,7 @@ void GBC_MMU_WriteShort(uint16_t address, uint16_t value)
 
 GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(void)
 {
-    switch (GBC_MMU_Memory.CartridgeType)
+    switch (GBC_MMU_Memory.CartridgeBank0.CartridgeType)
     {
         case GBC_MMU_CARTRIDGE_TYPE_ROM_ONLY:
         case GBC_MMU_CARTRIDGE_TYPE_ROM_RAM:
