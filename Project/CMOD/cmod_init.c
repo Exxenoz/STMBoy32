@@ -73,7 +73,8 @@ void CMOD_Initialize(void)
 {
     CMOD_Initialize_GPIOS();
     CMOD_Initialize_CLK();
-    
+
+    CMOD_DISABLE_LLC();         // ToDo: Implement pullup so LLC is disabled per default.
     CMOD_SET_RESET;
     CMOD_RST_CS;
     CMOD_SET_WR;
