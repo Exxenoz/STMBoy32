@@ -61,17 +61,21 @@ void CMOD_GetFileName(char* name)
         }
     }
     name[i++] = '.';
-    
-    if (GBC_MMU_IS_CGB_MODE())
+
+    uint8_t gameType;
+    CMOD_ReadByte(0x0143, &gameType);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+    if (gameType != GBC_MMU_CGB_FLAG_SUPPORTED && gameType != GBC_MMU_CGB_FLAG_ONLY)
     {
         name[i++] = 'g';
         name[i++] = 'b';
-        name[i++] = 'c';  
     }
     else
     {
         name[i++] = 'g';
         name[i++] = 'b';
+        name[i++] = 'c';  
     }
     name[i] = '\0';
 }
