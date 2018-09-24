@@ -79,7 +79,7 @@ const uint8_t GBC_MMU_InitialValuesForColorFFXX[256] =
 
 void GBC_MMU_Initialize(void)
 {
-    GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController();
+    GBC_MMU_MemoryBankController = GBC_MMU_GetMemoryBankController(GBC_MMU_Memory.CartridgeBank0.CartridgeType);
 
     // Initialize memory
     if (GBC_MMU_IS_CGB_MODE())
@@ -158,7 +158,7 @@ bool GBC_MMU_LoadFromCartridge(void)
     memcpy((void*)address, GBC_MMU_Memory.CartridgeBank0.Data, 16384);
 
     // Get MBC, if it's mbc1 make sure Rom Mode is selected.
-    GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
+    GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController(GBC_MMU_Memory.CartridgeBank0.CartridgeType);
     if (mbc == GBC_MMU_MBC1)
     {
         uint8_t romMode = 0x00;
@@ -1320,9 +1320,9 @@ void GBC_MMU_WriteShort(uint16_t address, uint16_t value)
     GBC_MMU_WriteByte(address + 1, (value & 0xFF00) >> 8);
 }
 
-GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(void)
+GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(uint8_t cartridgeType)
 {
-    switch (GBC_MMU_Memory.CartridgeBank0.CartridgeType)
+    switch (cartridgeType)
     {
         case GBC_MMU_CARTRIDGE_TYPE_ROM_ONLY:
         case GBC_MMU_CARTRIDGE_TYPE_ROM_RAM:

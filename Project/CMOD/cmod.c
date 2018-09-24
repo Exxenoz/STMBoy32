@@ -4,6 +4,7 @@
 #include "cmod_init.h"
 #include "cmod_access.h"
 
+#include "os.h"
 #include "ff.h"
 #include "led.h"
 #include "sdc.h"
@@ -42,19 +43,22 @@ bool CMOD_CheckForCartridge(void)
 // Convert the 11 title bytes to a null terminated string
 void CMOD_GetFileName(char* name)
 {
-    // ToDo: Read directly from Cartridge. Dont forget checking if CMOD is ON.
+    if (CMOD_GetStatus() == CMOD_TURNED_OFF) return;
 
+
+    // Read the title.
+    CMOD_ReadBytes(0x0134, 11, (uint8_t*)name);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+    // Convert underscores to spaces for the sake of consistency.
     int i;
-
-    for (i = 0; i < 11 && GBC_MMU_Memory.CartridgeBank0.Title[i] != 0x00; i++)
+    for (i = 0; i < 11 && name[i] != 0x00; i++)
     {
-        if (GBC_MMU_Memory.CartridgeBank0.Title[i] == 0x5F)        // Convert underscores to spaces for the sake of consistency
+        if (name[i] == 0x5F)
         {
             name[i] = ' ';
             continue;
         }
-
-        name[i] = (char) GBC_MMU_Memory.CartridgeBank0.Title[i];
     }
     name[i++] = '.';
     
@@ -118,46 +122,51 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
 
 CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 {
-    if (CMOD_GetStatus() == CMOD_TURNED_OFF) return CMOD_DISABLED;
+    if (CMOD_GetStatus() == CMOD_TURNED_OFF)       return CMOD_DISABLED;
+    if (!SDC_Mount() || !CMOD_CheckForCartridge()) return CMOD_NOCARD;
 
-
-    // If no SD Card is detected return nocard
-    if (!SDC_Mount() || !CMOD_CheckForCartridge())
-    {
-        return CMOD_NOCARD;
-    }
 
     if (!CMOD_Initialized)
     {
         CMOD_Initialize();
     }
 
-    // Get MBC, if it's mbc1 make sure Rom Mode is selected
-    GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController();
+
+
+    FIL      file;
+    BYTE     mode = FA_WRITE;
+
+    char     name[16];
+    uint8_t  type;
+    uint8_t  romSize;
+    uint8_t  romBanks;
+    uint32_t bytesWritten = 0;
+
+
+    // Get Cartridge type and determine MBC type, if it's mbc1 make sure Rom Mode is selected.
+    CMOD_ReadByte(0x0147, &type);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+    GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController(type);
     if (mbc == GBC_MMU_MBC1)
     {
         uint8_t romMode = 0x00;
         CMOD_WriteByte(0x6001, &romMode);
     }
 
-    FIL      file;
-    BYTE     mode = FA_WRITE;
-    char     name[16];
-    uint8_t  romBanks;
-    uint8_t  romSize      = GBC_MMU_Memory.CartridgeBank0.ROMSize;
-    uint32_t bytesWritten = 0;
+    // Get Cartridges rom size and calculate number of banks from it.
+    CMOD_ReadByte(0x0148, &romSize);
+    while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    // Number of ROM banks equals 2^(ROMSize+1) or 0 for ROMSize = 0.
-    // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks.
-    romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));
-    if ((romSize & 0x50) == 0x50)
+    romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));    // Number of ROM banks equals 2^(ROMSize+1).
+    if (romSize == 0x52 || romSize == 0x53 || romSize == 0x54)   // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks.
     {
        romBanks += 64;
     }
 
     CMOD_GetFileName(name);
     
-    // Specify behaviour if file already exists
+    // Specify behaviour if file already exists.
     if (overrideExisting)
     {
         mode |= FA_CREATE_ALWAYS;
@@ -167,12 +176,19 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         mode |= FA_CREATE_NEW;
     }
 
-    // Create/open a file as specified by mode 
-    FRESULT openResult = f_open(&file, name, mode);
+    // Create/open a file as specified by mode.
+    char path[OS_MAX_PATH_LENGTH];
+    CopyString(path, OS_GAME_PATH, OS_MAX_PATH_LENGTH);
+    AppendString(path, name, OS_MAX_PATH_LENGTH);
+
+    volatile FRESULT openResult = f_open(&file, path, mode);
     if (openResult == FR_OK)
     {
-        // Write Bank 0, if failed close and delete (if something has been written) the file
-        if (f_write(&file, GBC_MMU_Memory.CartridgeBank0.Data, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+        // Write Bank 0, if it fails close and delete the file.
+        CMOD_ReadBytes(0x0000, 16384, CMOD_ROMBankX);
+        while (CMOD_GetStatus() == CMOD_PROCESSING);
+
+        if (f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
         {
             f_close(&file);
             f_unlink(name);

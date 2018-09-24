@@ -681,6 +681,6 @@ uint32_t GBC_MMU_StartHDMATransfer(void);
 void GBC_MMU_WriteByte(uint16_t address, uint8_t value);
 void GBC_MMU_WriteShort(uint16_t address, uint16_t value);
 
-GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(void);
+GBC_MMU_MemoryBankController_t GBC_MMU_GetMemoryBankController(uint8_t cartridgeType);
 
 #endif
