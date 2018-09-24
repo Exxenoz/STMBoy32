@@ -1111,8 +1111,7 @@ void GBC_APU_Step(void)
             }
         }*/
 
-        //l *= GBC_MMU_Memory.IO.ChannelControlOutputVinToSO1;
-		//r *= GBC_MMU_Memory.IO.ChannelControlOutputVinToSO2;
+        // ToDo: Implement ChannelControlOutputLevelSO1 and ChannelControlOutputLevelSO2
 
         if (l > 63)
         {
