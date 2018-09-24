@@ -14,14 +14,14 @@ TIM_HandleTypeDef OS_TimerHandle =
 
 void OS_Initialize_Timer(void)
 {
-    OS_TimerHandle.Init.Prescaler         = 49999;                   // Tim5 runs with 100Mhz(?) -> scale to 2khz.
+    OS_TimerHandle.Init.Prescaler         = 49999;                   // Tim5 runs with 200Mhz -> scale to 4khz.
     OS_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    OS_TimerHandle.Init.Period            = 1999;                    // Count 'til 2000(-1) -> 1 Interrupt / s.
+    OS_TimerHandle.Init.Period            = 3999;                    // Count 'til 4000(-1) -> 1 Interrupt / s.
     OS_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     OS_TimerHandle.Init.RepetitionCounter = 0;
     HAL_TIM_Base_Init(&OS_TimerHandle);
 
-    HAL_NVIC_SetPriority(OS_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
+    HAL_NVIC_SetPriority(OS_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_3, INTERRUPT_PRIORITY_3); // Must be a lower priority than the CMOD priority!
 }
 
 Error_Def_t LoadOptions(void)

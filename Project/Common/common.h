@@ -11,6 +11,8 @@
 #define NULL                         0                   // Null pointer define
 
 #define INTERRUPT_PRIORITY_2         1                   // 0 is the highest priority, 16 the lowest
+#define INTERRUPT_PRIORITY_3         2
+
 #define MAX_16BIT_TIMER_PERIOD       0xFFFF
 
 #define GPIO_INPUT_MODE              0x00000000
