@@ -67,7 +67,6 @@ GBC_GPU_PriorityPixel_t;
 #define GBC_GPU_FRAME_SIZE_X 160
 #define GBC_GPU_FRAME_SIZE_Y 144
 #define GBC_GPU_FRAME_SIZE 23040 // GBC_GPU_FRAME_SIZE_X * GBC_GPU_FRAME_SIZE_Y
-//#define GBC_GPU_FRAME_RATE_30HZ_MODE // Uncomment for 30Hz mode instead of 60Hz mode
 
 extern GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE]; // External declaration for LCD access
 

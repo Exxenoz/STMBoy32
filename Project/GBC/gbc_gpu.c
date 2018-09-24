@@ -9,11 +9,8 @@ uint32_t GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK; // Needed, because some ga
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 bool GBC_GPU_DisplayEnabled = true; // Necessary, because of display enable delay
 int32_t GBC_GPU_DisplayEnableDelay = 0;
+uint32_t GBC_GPU_DisplayEnableFrameSkipCount = 0;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
-
-#ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
-bool GBC_GPU_SkipCurrentFrame = true;
-#endif
 
 #pragma pack(1)
 typedef struct GBC_GPU_RenderCache_s
@@ -99,10 +96,7 @@ void GBC_GPU_Initialize(void)
 
     GBC_GPU_DisplayEnabled = true;
     GBC_GPU_DisplayEnableDelay = 0;
-
-#ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
-    GBC_GPU_SkipCurrentFrame = true;
-#endif
+    GBC_GPU_DisplayEnableFrameSkipCount = 0;
 
     // Initialize render cache
     memset(&GBC_GPU_RenderCache, 0, sizeof(GBC_GPU_RenderCache_t));
@@ -968,6 +962,7 @@ bool GBC_GPU_Step(void)
             {
                 GBC_GPU_DisplayEnableDelay = 0;
                 GBC_GPU_DisplayEnabled = true;
+                GBC_GPU_DisplayEnableFrameSkipCount = 3;
 
                 // Start in HBlank mode
                 GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK;
@@ -1031,19 +1026,14 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
 
-#ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
-                    if (GBC_GPU_SkipCurrentFrame)
+                    if (GBC_GPU_DisplayEnableFrameSkipCount)
                     {
-                        GBC_GPU_SkipCurrentFrame = false;
+                        --GBC_GPU_DisplayEnableFrameSkipCount;
                     }
                     else
                     {
-                        GBC_GPU_SkipCurrentFrame = true;
                         return true;
                     }
-#else
-                    return true;
-#endif
                 }
                 else
                 {
@@ -1118,14 +1108,7 @@ bool GBC_GPU_Step(void)
             {
                 GBC_GPU_ModeTicks -= 172;
 
-#ifdef GBC_GPU_FRAME_RATE_30HZ_MODE
-                if (!GBC_GPU_SkipCurrentFrame)
-                {
-                    GBC_GPU_RenderScanline();
-                }
-#else
                 GBC_GPU_RenderScanline();
-#endif
 
                 if (GBC_MMU_Memory.IO.HBlankInterrupt)
                 {
