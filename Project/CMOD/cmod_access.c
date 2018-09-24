@@ -14,15 +14,15 @@ void (*CMOD_OperationTable[3])(void) =
     CMOD_HandleNOP
 };
 
-CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
-CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
-uint16_t       CMOD_Address      = 0x0000;
-uint8_t        *CMOD_DataOut     = NULL;
-uint8_t        *CMOD_DataIn      = NULL;
-int            CMOD_BytesToRead  = 0;
-int            CMOD_BytesRead    = 0;
-int            CMOD_BytesToWrite = 0;
-int            CMOD_BytesWritten = 0;
+volatile CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
+volatile CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
+volatile uint16_t       CMOD_Address      = 0x0000;
+volatile uint8_t        *CMOD_DataOut     = NULL;
+volatile uint8_t        *CMOD_DataIn      = NULL;
+volatile int            CMOD_BytesToRead  = 0;
+volatile int            CMOD_BytesRead    = 0;
+volatile int            CMOD_BytesToWrite = 0;
+volatile int            CMOD_BytesWritten = 0;
 
 
 
@@ -34,6 +34,8 @@ void CMOD_TurnON(void)
     HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
 
     CMOD_Status = CMOD_WAITING;
+
+    HAL_Delay(100); // Wait until CMOD is up and running.
 }
 
 void CMOD_TurnOFF(void)
@@ -67,10 +69,8 @@ void CMOD_ResetCartridge(void)
 }
 
 void CMOD_ReadByte(uint16_t address, uint8_t *data)
-{
-    if (CMOD_Status == CMOD_TURNED_OFF) return;
-
-
+{        
+    if    (CMOD_Status == CMOD_TURNED_OFF) return;
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
@@ -88,9 +88,7 @@ void CMOD_ReadByte(uint16_t address, uint8_t *data)
 
 void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
-    if (CMOD_Status == CMOD_TURNED_OFF) return;
-
-
+    if    (CMOD_Status == CMOD_TURNED_OFF) return;
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_RD;                        // RD goes low for a read at 30ns (in GB)
@@ -108,9 +106,7 @@ void CMOD_ReadBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 
 void CMOD_WriteByte(uint16_t address, uint8_t *data)
 {
-    if (CMOD_Status == CMOD_TURNED_OFF) return;
-
-
+    if    (CMOD_Status == CMOD_TURNED_OFF) return;
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
@@ -128,9 +124,7 @@ void CMOD_WriteByte(uint16_t address, uint8_t *data)
 
 void CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data)
 {
-    if (CMOD_Status == CMOD_TURNED_OFF) return;
-
-
+    if    (CMOD_Status == CMOD_TURNED_OFF) return;
     while (CMOD_Status == CMOD_PROCESSING);
 
     CMOD_RST_WR;                        // WR goes low for a write at ? (in GB)
