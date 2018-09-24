@@ -11,8 +11,8 @@ extern const UI_MenuPoint_t UI_Options_regular_MP_6;
 
 
 
-void UI_DrawMainPage(int selectedMP);
-void UI_DrawOptionsPage(int selectedMP);
+void UI_DrawMainPage(int selectedMP, bool isCartridgeInserted);
+void UI_DrawOptionsPage(int selectedMP, bool isCartridgeInserted);
 void UI_DrawShowAllPage(UI_ShowAllTabs_t design);
 
 #endif //UI_PAGES_H

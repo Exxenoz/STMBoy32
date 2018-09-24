@@ -72,7 +72,7 @@ const UI_MenuPoint_t UI_Options_regular_MP_6 =
 
 
 
-void UI_DrawMainPage(int selectedMP)
+void UI_DrawMainPage(int selectedMP, bool isCartridgeInserted)
 {
     // Draw the Page background.
     if (SICK_BRICK_DESIGN)
@@ -91,9 +91,9 @@ void UI_DrawMainPage(int selectedMP)
         LCD_ClearColor(UI_MAINPAGE_BG_COLOR);
     }
 
-    // Draw BOOT CARTRIDGE (either heighlighted or disabled) and the second menu point accordingly.
-    if   (CMOD_CheckForCartridge() == true) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
-    else                                    UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
+    // Draw BOOT CARTRIDGE either heighlighted or disabled.
+    if   (isCartridgeInserted == true) UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_ENABLED);
+    else                               UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[0]), UI_DISABLED);
 
     // Draw the other menu points (enabled).
     UI_DrawMenuPoint(&(UI_MainPage_MenuPoints[1]), UI_ENABLED);
@@ -161,7 +161,7 @@ void UI_DrawShowAllPage(UI_ShowAllTabs_t design)
     }
 }
 
-void UI_DrawOptionsPage(int selectedMP)
+void UI_DrawOptionsPage(int selectedMP, bool isCartridgeInserted)
 {
     // Draw the Page background.
     if (SICK_BRICK_DESIGN)
@@ -195,7 +195,7 @@ void UI_DrawOptionsPage(int selectedMP)
 
 
     // If the last menupoint is SAVE CARTRIDGE and no cartridge is present disable the menupoint.
-    if (OS_LastState != OS_INGAME_FROM_SDC && OS_LastState != OS_INGAME_FROM_CARTRIDGE && !CMOD_CheckForCartridge())
+    if (OS_LastState != OS_INGAME_FROM_SDC && OS_LastState != OS_INGAME_FROM_CARTRIDGE && !isCartridgeInserted)
     {
         UI_DrawMenuPoint(&(UI_Options_MenuPoints[5]), UI_DISABLED);
     }

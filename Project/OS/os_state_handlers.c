@@ -26,7 +26,7 @@ bool IsCartridgeInserted = false;
 void StartCheckingForCartridge(void)
 {
     HAL_TIM_Base_Start_IT(&OS_TimerHandle);
-    HAL_NVIC_EnableIRQ(OS_TIM_NVIC_CHANNEL);    
+    HAL_NVIC_EnableIRQ(OS_TIM_NVIC_CHANNEL);
 }
 
 void StopCheckingForCartridge(void)
@@ -42,16 +42,17 @@ void StopCheckingForCartridge(void)
 
 void HandleMainPage(void)
 {
-    // Turn on the CMOD.
+    // Turn on the CMOD and check for a cartridge.
     CMOD_TurnON();
+    IsCartridgeInserted = CMOD_CheckForCartridge();
 
     // If no cartridge is detected first valid menupoint is SHOW ALL GAMES (ID 1) else BOOT CARTRIDGE (ID 0).
-    int firstMenuPointID = CMOD_CheckForCartridge() ? 0 : 1;
-    int lastMenuPointID  = 2;
+    int firstMenuPointID = IsCartridgeInserted ? 0 : 1;
     int currMenuPointID  = firstMenuPointID;
+    int lastMenuPointID  = 2;
 
     // Draw MainPage.
-    UI_DrawMainPage(currMenuPointID);
+    UI_DrawMainPage(currMenuPointID, IsCartridgeInserted);
 
     // Start periodically checking for Cartridge.
     StartCheckingForCartridge();
@@ -277,7 +278,7 @@ void HandleOptionPage(void)
     }
 
     // Draw options page.
-    UI_DrawOptionsPage(currMenuPointID);
+    UI_DrawOptionsPage(currMenuPointID, IsCartridgeInserted);
 
     // Start periodically checking for Cartridge.
     StartCheckingForCartridge();
@@ -447,7 +448,7 @@ void HandleOptionPage(void)
             
             // If END GAME or DESIGNS was pressed leave this page, if not re-draw it.
             if   (currMenuPointID == 1 || (accessedFromGame && currMenuPointID == 5))  break;
-            else                                                                       UI_DrawOptionsPage(currMenuPointID);
+            else                                                                       UI_DrawOptionsPage(currMenuPointID, IsCartridgeInserted);
         }
         
         // If B-Button is pressed switch to previous state and end the infinite loop.
@@ -629,7 +630,7 @@ void os_state_handler(void)
 // Periodically (1/s) check if a cartridge is inserted.
 void TIM15_IRQHandler(void)
 {
-    CMOD_CheckForCartridge();
+    IsCartridgeInserted = CMOD_CheckForCartridge();
 
     __HAL_TIM_CLEAR_IT(&OS_TimerHandle, TIM_IT_UPDATE);
 }
