@@ -29,7 +29,7 @@ void Audio_InitializeGPIO(void)
     HAL_GPIO_Init(AUDIO_R_PORT, &GPIO_InitObject);
 
     GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitObject.Pin   = GPIO_PIN_12;
+    GPIO_InitObject.Pin   = AUDIO_SD_PIN;
     HAL_GPIO_Init(AUDIO_SD_PORT, &GPIO_InitObject);
 }
 
@@ -40,14 +40,14 @@ void Audio_InitializeTimer(void)
 
     /**************************************
     // Duration of one GB frame:     0,0167427062988281s
-    // Audio samples per frame:      532 * 4 = 2128
-    // Duration of one audio sample: 0,0167427062988281s / 2128 = 7,8678131103515507518796992481203e-6
+    // Audio samples per frame:      532
+    // Duration of one audio sample: 0,0167427062988281s / 532 = 3,1471240601503759398496240601504e-5
     // Timer frequency:              100MHz
-    // Audio frequency:              1 / 7,8678131103515507518796992481203e-6s = 127100,12121212Hz ~ 127,1KHz
-    // Timer period:                 100MHz / 127100,12121212Hz = 786,781311
+    // Audio frequency:              1 / 3,1471240601503759398496240601504e-5 = 31775,04225Hz ~ 31,775kHz
+    // Timer period:                 100MHz / 31775,04225Hz = 3147,12
     **************************************/
 
-    Audio_TimerHandle.Init.Period            = 786;
+    Audio_TimerHandle.Init.Period            = 3146;
     Audio_TimerHandle.Init.Prescaler         = 0;
     Audio_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
     Audio_TimerHandle.Init.ClockDivision     = 0;
