@@ -5,11 +5,10 @@
 #include "string.h"
 
 uint32_t GBC_GPU_ModeTicks = 0;
-uint32_t GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK; // Needed, because some games overwrite mode
+uint32_t GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK; // Needed, because some games overwrite mode
 GBC_GPU_StatusInterruptRequestState_t GBC_GPU_StatusInterruptRequestState;
 bool GBC_GPU_DisplayEnabled = true; // Necessary, because of display enable delay
-int32_t GBC_GPU_DisplayEnableDelay = 0;
-uint32_t GBC_GPU_DisplayEnableFrameSkipCount = 0;
+int32_t GBC_GPU_DisplayEnableDelay = -1;
 GBC_GPU_Color_t GBC_GPU_FrameBuffer[GBC_GPU_FRAME_SIZE];
 
 #pragma pack(1)
@@ -85,10 +84,11 @@ void GBC_GPU_Initialize(void)
 {
     GBC_GPU_ModeTicks = 0;
 
-    // Start in HBlank mode
-    GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK;
-    GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
-    GBC_MMU_Memory.IO.Scanline = 0;
+    // Start in VBlank mode, because otherwise
+    // the first frame would take less than 70244 ticks
+    GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
+    GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
+    GBC_MMU_Memory.IO.Scanline = 145;
 
     memset(&GBC_GPU_StatusInterruptRequestState, 0, sizeof(GBC_GPU_StatusInterruptRequestState_t));
 
@@ -96,7 +96,6 @@ void GBC_GPU_Initialize(void)
 
     GBC_GPU_DisplayEnabled = true;
     GBC_GPU_DisplayEnableDelay = 0;
-    GBC_GPU_DisplayEnableFrameSkipCount = 0;
 
     // Initialize render cache
     memset(&GBC_GPU_RenderCache, 0, sizeof(GBC_GPU_RenderCache_t));
@@ -922,7 +921,7 @@ void GBC_GPU_DisableDisplay(void)
     }
 
     GBC_GPU_DisplayEnabled = false;
-    GBC_GPU_DisplayEnableDelay = 0;
+    GBC_GPU_DisplayEnableDelay = -1;
 }
 
 #define GBC_GPU_COMPARE_SCANLINE()                                                                                                         \
@@ -954,32 +953,33 @@ bool GBC_GPU_Step(void)
 
     if (!GBC_GPU_DisplayEnabled)
     {
-        if (GBC_GPU_DisplayEnableDelay)
+        if (GBC_GPU_DisplayEnableDelay > 0)
         {
             GBC_GPU_DisplayEnableDelay -= GBC_CPU_StepTicks;
 
             if (GBC_GPU_DisplayEnableDelay <= 0)
             {
                 GBC_GPU_DisplayEnableDelay = 0;
+            }
+        }
+
+        if (GBC_GPU_ModeTicks >= 70224)
+        {
+            GBC_GPU_ModeTicks -= 70224;
+
+            if (GBC_GPU_DisplayEnableDelay == 0)
+            {
+                GBC_GPU_DisplayEnableDelay = -1;
                 GBC_GPU_DisplayEnabled = true;
-                GBC_GPU_DisplayEnableFrameSkipCount = 3;
 
-                // Start in HBlank mode
-                GBC_GPU_Mode = GBC_GPU_MODE_0_DURING_HBLANK;
-                GBC_GPU_ModeTicks = 0;
-                GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_0_DURING_HBLANK;
-                GBC_MMU_Memory.IO.Scanline = 0;
-
-                RC.CurrFrameBufferStartIndex = 0;
-                RC.CurrFrameBufferIndex = 0;
-                RC.CurrFrameBufferEndIndex = 160;
+                // Start in VBlank mode
+                GBC_GPU_Mode = GBC_GPU_MODE_1_DURING_VBLANK;
+                GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
+                GBC_MMU_Memory.IO.Scanline = 145;
 
                 memset(&GBC_GPU_StatusInterruptRequestState, 0, sizeof(GBC_GPU_StatusInterruptRequestState_t));
             }
-        }
-        else if (GBC_GPU_ModeTicks >= 70224)
-        {
-            GBC_GPU_ModeTicks -= 70224;
+
             return true;
         }
 
@@ -1026,14 +1026,7 @@ bool GBC_GPU_Step(void)
 
                     GBC_GPU_Mode = GBC_MMU_Memory.IO.GPUMode = GBC_GPU_MODE_1_DURING_VBLANK;
 
-                    if (GBC_GPU_DisplayEnableFrameSkipCount)
-                    {
-                        --GBC_GPU_DisplayEnableFrameSkipCount;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return true;
                 }
                 else
                 {
