@@ -135,11 +135,9 @@ bool GBC_MMU_LoadFromCartridge(void)
 
     GBC_MMU_Unload();
 
-    // Read ROM Bank 0
+    // Read ROM Bank 0 and check ROM Header.
     CMOD_ReadBytes(0x0000, 16384, GBC_MMU_Memory.CartridgeBank0.Data);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    // Check ROM Header.
     if (!GBC_MMU_IsValidROMHeader())
     {
         CMOD_TurnOFF();
@@ -185,9 +183,7 @@ bool GBC_MMU_LoadFromCartridge(void)
         else // Otherwise switch the memory bank accordingly and read it
         {
             CMOD_SwitchMB(mbc, i);
-
             CMOD_ReadBytes(0x4000, 16384, (uint8_t*)address);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
         }
     }
 
@@ -303,7 +299,6 @@ uint8_t GBC_MMU_ReadByte(uint16_t address)
                 uint8_t result = 0;
                 CMOD_TurnON();
                 CMOD_ReadByte(address, &result);
-                while (CMOD_GetStatus() == CMOD_PROCESSING);
                 CMOD_TurnOFF();
                 return result;
             }
@@ -791,7 +786,6 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
             {
                 CMOD_TurnON();
                 CMOD_WriteByte(address, &value);
-                while (CMOD_GetStatus() == CMOD_PROCESSING);
                 CMOD_TurnOFF();
             }
             else if (GBC_MMU_ERAMEnabled)

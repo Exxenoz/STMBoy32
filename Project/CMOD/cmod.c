@@ -14,25 +14,17 @@ uint8_t CMOD_ROMBankX[16384];
 
 
 
-// Check for a Cartridge by trying to read the first byte of the Nintendo Logo
+// Check for a Cartridge by trying to read the first byte of the Nintendo Logo.
 bool CMOD_CheckForCartridge(void)
 {
-    uint8_t data = 0x00;
-
     if (!CMOD_Initialized)
     {
         CMOD_Initialize();
     }
 
-    CMOD_ReadByte(0x0104, &data);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    if (data == 0xCE)
-    {
-        return true;
-    }
-
-    return false;
+    uint8_t data = 0x00;
+    return (bool)(CMOD_ReadByte(0x0104, &data) == CMOD_OK && data == 0xCE);
 }
 
 
@@ -45,12 +37,12 @@ void CMOD_GetFileName(char* name)
 {
     if (CMOD_GetStatus() == CMOD_TURNED_OFF) return;
 
+    uint8_t gameType;
 
-    // Read the title.
+
+    // Read the title and convert underscores to spaces for the sake of consistency.
     CMOD_ReadBytes(0x0134, 11, (uint8_t*)name);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
 
-    // Convert underscores to spaces for the sake of consistency.
     int i;
     for (i = 0; i < 11 && name[i] != 0x00; i++)
     {
@@ -62,9 +54,9 @@ void CMOD_GetFileName(char* name)
     }
     name[i++] = '.';
 
-    uint8_t gameType;
+
+    // Read the game type and write file extension accordingly.
     CMOD_ReadByte(0x0143, &gameType);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
 
     if (gameType != GBC_MMU_CGB_FLAG_SUPPORTED && gameType != GBC_MMU_CGB_FLAG_ONLY)
     {
@@ -96,15 +88,12 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
             CMOD_WriteByte(0x2100, &lower5Bit);      // Write lower 5 bit of rom bank number into 2000-3FFF
             CMOD_WriteByte(0x6100, 0x00);            // Set 4000-5FFF to Rom mode
             CMOD_WriteByte(0x4100, &upper2Bit);      // Write bit 6 & 7 of rom bank number into 4000-5FFF
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
         }
         else if (mbc == GBC_MMU_MBC2 || mbc == GBC_MMU_MBC3)
         {
             // Convert bank to a 8bit number (16bit are needed as parameter for MBC5) and switch Bank by writing into 2000-3FFF (for MBC2 lsb of upper byte must be 1).
             uint8_t bankNumber8Bit = bank;
-
             CMOD_WriteByte(0x2100, &bankNumber8Bit);
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
         }
         else if (mbc == GBC_MMU_MBC5)
         {
@@ -113,7 +102,6 @@ bool CMOD_SwitchMB(GBC_MMU_MemoryBankController_t mbc, uint16_t bank)
 
             CMOD_WriteByte(0x2100, &lower8Bit);      // Write lower 8 bit of bank number into 2000-2FFF
             CMOD_WriteByte(0x3100, &upperBit);       // Write upper 1 bit of bank number into 3000-3FFF
-            while (CMOD_GetStatus() == CMOD_PROCESSING);
         }
         else
         {
@@ -129,12 +117,10 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     if (CMOD_GetStatus() == CMOD_TURNED_OFF)       return CMOD_DISABLED;
     if (!SDC_Mount() || !CMOD_CheckForCartridge()) return CMOD_NOCARD;
 
-
     if (!CMOD_Initialized)
     {
         CMOD_Initialize();
     }
-
 
 
     FIL      file;
@@ -149,9 +135,8 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
     // Get Cartridge type and determine MBC type, if it's mbc1 make sure Rom Mode is selected.
     CMOD_ReadByte(0x0147, &type);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
-
     GBC_MMU_MemoryBankController_t mbc = GBC_MMU_GetMemoryBankController(type);
+
     if (mbc == GBC_MMU_MBC1)
     {
         uint8_t romMode = 0x00;
@@ -160,17 +145,16 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
 
     // Get Cartridges rom size and calculate number of banks from it.
     CMOD_ReadByte(0x0148, &romSize);
-    while (CMOD_GetStatus() == CMOD_PROCESSING);
-
     romBanks = romSize == 0 ? 2 : (0x02 << (romSize & 0x0F));    // Number of ROM banks equals 2^(ROMSize+1).
+
     if (romSize == 0x52 || romSize == 0x53 || romSize == 0x54)   // ROMSize of 0x52, 0x53 or 0x54 equals 72,80 and 96 => 2^(2/3/4 + 1) +64 banks.
     {
        romBanks += 64;
     }
 
+    // Get the filename and specify behaviour if file already exists.
     CMOD_GetFileName(name);
-    
-    // Specify behaviour if file already exists.
+
     if (overrideExisting)
     {
         mode |= FA_CREATE_ALWAYS;
@@ -185,14 +169,13 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
     CopyString(path, OS_GAME_PATH, OS_MAX_PATH_LENGTH);
     AppendString(path, name, OS_MAX_PATH_LENGTH);
 
-    volatile FRESULT openResult = f_open(&file, path, mode);
+    FRESULT openResult = f_open(&file, path, mode);
     if (openResult == FR_OK)
     {
         // Write Bank 0, if it fails close and delete the file.
-        CMOD_ReadBytes(0x0000, 16384, CMOD_ROMBankX);
-        while (CMOD_GetStatus() == CMOD_PROCESSING);
+        ;
 
-        if (f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+        if (CMOD_ReadBytes(0x0000, 16384, CMOD_ROMBankX) != CMOD_OK || f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
         {
             f_close(&file);
             f_unlink(name);
@@ -213,9 +196,7 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
             else
             {
                 CMOD_SwitchMB(mbc, x);
-
                 CMOD_ReadBytes(0x4000, 16384, CMOD_ROMBankX);
-                while (CMOD_GetStatus() == CMOD_PROCESSING);
             }
 
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
@@ -236,5 +217,6 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         return CMOD_EXISTS;
     }
 
+    f_close(&file);
     return CMOD_FAILED;
 }
