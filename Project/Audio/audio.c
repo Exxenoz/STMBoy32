@@ -69,10 +69,10 @@ void Audio_InitializeDAC(void)
     HAL_DAC_Init(&Audio_DACHandle);
 
     Audio_ChannelConfigL.DAC_Trigger      = AUDIO_DAC_L_TRIGGER;
-    Audio_ChannelConfigL.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+    Audio_ChannelConfigL.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
 
     Audio_ChannelConfigR.DAC_Trigger      = AUDIO_DAC_R_TRIGGER;
-    Audio_ChannelConfigR.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+    Audio_ChannelConfigR.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
 
     HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfigL, AUDIO_DAC_L_CHANNEL);
     HAL_DAC_ConfigChannel(&Audio_DACHandle, &Audio_ChannelConfigR, AUDIO_DAC_R_CHANNEL);
@@ -89,13 +89,13 @@ void Audio_InitializeDMA(void)
     Audio_DMAHandleL.Init.Direction           = DMA_MEMORY_TO_PERIPH;
     Audio_DMAHandleL.Init.PeriphInc           = DMA_PINC_DISABLE;
     Audio_DMAHandleL.Init.MemInc              = DMA_MINC_ENABLE;
-    Audio_DMAHandleL.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    Audio_DMAHandleL.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+    Audio_DMAHandleL.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    Audio_DMAHandleL.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
     Audio_DMAHandleL.Init.Mode                = DMA_CIRCULAR;
     Audio_DMAHandleL.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     Audio_DMAHandleL.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL;
-    Audio_DMAHandleL.Init.MemBurst            = DMA_MBURST_SINGLE;
-    Audio_DMAHandleL.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+    Audio_DMAHandleL.Init.MemBurst            = DMA_MBURST_INC8;
+    Audio_DMAHandleL.Init.PeriphBurst         = DMA_PBURST_INC8;
     Audio_DMAHandleL.Init.Priority            = DMA_PRIORITY_HIGH;
     HAL_DMA_Init(&Audio_DMAHandleL);
 
@@ -105,13 +105,13 @@ void Audio_InitializeDMA(void)
     Audio_DMAHandleR.Init.Direction           = DMA_MEMORY_TO_PERIPH;
     Audio_DMAHandleR.Init.PeriphInc           = DMA_PINC_DISABLE;
     Audio_DMAHandleR.Init.MemInc              = DMA_MINC_ENABLE;
-    Audio_DMAHandleR.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    Audio_DMAHandleR.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+    Audio_DMAHandleR.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    Audio_DMAHandleR.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
     Audio_DMAHandleR.Init.Mode                = DMA_CIRCULAR;
     Audio_DMAHandleR.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     Audio_DMAHandleR.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_HALFFULL;
-    Audio_DMAHandleR.Init.MemBurst            = DMA_MBURST_SINGLE;
-    Audio_DMAHandleR.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+    Audio_DMAHandleR.Init.MemBurst            = DMA_MBURST_INC8;
+    Audio_DMAHandleR.Init.PeriphBurst         = DMA_PBURST_INC8;
     Audio_DMAHandleR.Init.Priority            = DMA_PRIORITY_HIGH;
     HAL_DMA_Init(&Audio_DMAHandleR);
 
@@ -146,12 +146,12 @@ void Audio_EnablePower(bool enable)
     }
 }
 
-void Audio_SetAudioBuffer(uint16_t* audioBufferL, uint16_t* audioBufferR, uint32_t audioBufferSize)
+void Audio_SetAudioBuffer(uint8_t* audioBufferL, uint8_t* audioBufferR, uint32_t audioBufferSize)
 {
     Audio_BufferPlayedCounter = 0;
 
-    HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t *)audioBufferL, audioBufferSize, DAC_ALIGN_12B_R);
-    HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t *)audioBufferR, audioBufferSize, DAC_ALIGN_12B_R);
+    HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t *)audioBufferL, audioBufferSize, DAC_ALIGN_8B_R);
+    HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t *)audioBufferR, audioBufferSize, DAC_ALIGN_8B_R);
 }
 
 

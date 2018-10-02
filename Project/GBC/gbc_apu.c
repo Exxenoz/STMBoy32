@@ -10,8 +10,8 @@ uint32_t GBC_APU_FrameIndex = 0;
 
 uint32_t GBC_APU_Ticks = 0;
 
-uint16_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
-uint16_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
+uint8_t GBC_APU_Buffer_L[GBC_APU_BUFFER_SIZE];
+uint8_t GBC_APU_Buffer_R[GBC_APU_BUFFER_SIZE];
 
 uint32_t GBC_APU_BufferPosition = GBC_APU_BUFFER_SIZE / 2; // Start filling second buffer, so we are always ahead for filling.
 
@@ -1115,20 +1115,12 @@ void GBC_APU_Step(void)
 
         if (l > 63)
         {
-            l = 4095; // 2^12 - 1
-        }
-        else
-        {
-            l <<= 6;
+            l = 64;
         }
 
 		if (r > 63)
         {
-            r = 4095; // 2^12 - 1
-        }
-        else
-        {
-            r <<= 6;
+            r = 64;
         }
 
         GBC_APU_Buffer_L[GBC_APU_BufferPosition] = l;
