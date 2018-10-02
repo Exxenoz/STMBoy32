@@ -722,7 +722,10 @@ void GBC_APU_Initialize(void)
 
     GBC_APU_InitializeChannels();
 
-    Audio_SetAudioBuffer(GBC_APU_Buffer_L, GBC_APU_Buffer_R, GBC_APU_BUFFER_SIZE);
+    Audio_StopOutput();
+    Audio_SetOutputBuffer(AUDIO_OUTPUTMODE_GBC, AUDIO_SAMPLE_ALIGNMENT_8B_R,
+        GBC_APU_Buffer_L, GBC_APU_Buffer_R, GBC_APU_BUFFER_SIZE);
+    Audio_StartOutput(AUDIO_PLAYBACK_HALF1, true);
 }
 
 void GBC_APU_Step(void)

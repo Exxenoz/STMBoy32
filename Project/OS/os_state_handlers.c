@@ -458,9 +458,7 @@ void HandleSDCIngame(void)
         }
 
         GBC_Update();
-
-        while (Audio_IsPlayingOfBufferFinished == false);
-        Audio_IsPlayingOfBufferFinished = false;
+        Audio_Update();
 
         if (OS_Options.DrawScaled)  LCD_DrawGBCFrameBufferScaled();
         else                        LCD_DrawGBCFrameBuffer();
@@ -515,9 +513,7 @@ void HandleCartridgeIngame(void)
         }
 
         GBC_Update();
-
-        while (Audio_IsPlayingOfBufferFinished == false);
-        Audio_IsPlayingOfBufferFinished = false;
+        Audio_Update();
 
         if (OS_Options.DrawScaled)  LCD_DrawGBCFrameBufferScaled();
         else                        LCD_DrawGBCFrameBuffer();
