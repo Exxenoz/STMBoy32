@@ -95,13 +95,27 @@ bool GBC_IsLoadedFromSDC(void)
 
 void GBC_Update(void)
 {
+    uint32_t cacheForStepTicks = 0;
+
     // Update until VBlank occurs
     do
     {
         GBC_CPU_Step();
 
-        // Scale CPU ticks based on speed modifier
-        GBC_CPU_StepTicks >>= GBC_CPU_SpeedModifier;
+        // Double Speed Mode
+        if (GBC_CPU_SpeedModifier)
+        {
+            // Divide CPU step ticks by 2
+            GBC_CPU_StepTicks >>= 1;
+            // Cache CPU step ticks from first CPU step
+            cacheForStepTicks = GBC_CPU_StepTicks;
+            // Process next CPU step; GBC_CPU_StepTicks will be overwritten
+            GBC_CPU_Step();
+            // Divide CPU step ticks by 2
+            GBC_CPU_StepTicks >>= 1;
+            // Add ticks from first CPU step
+            GBC_CPU_StepTicks += cacheForStepTicks;
+        }
 
         GBC_APU_Step();
     }
