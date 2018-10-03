@@ -26,6 +26,11 @@ uint32_t GBC_CPU_InterruptMasterEnable = true;        // Interrupt master
 uint32_t GBC_CPU_Halted = false;                      // Halted state
 uint32_t GBC_CPU_SpeedModifier = 0;                   // 0 ... normal Speed, 1 ... CGB Speed; needed, because CurrentSpeed flag is set per default in DMG mode
 
+// CPU timer
+uint32_t GBC_CPU_DividerTicks = 0;
+uint32_t GBC_CPU_CounterTicks = 0;
+uint32_t GBC_CPU_CounterFrequency = 0;
+
 //GBC_CPU_MemoryAccessDelayState_t GBC_CPU_MemoryAccessDelayState =
 //    GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE; // Memory access delay state for current instruction
 
@@ -2278,6 +2283,11 @@ void GBC_CPU_Initialize()
     GBC_CPU_InterruptMasterEnable = true;
     GBC_CPU_Halted = false;
     GBC_CPU_SpeedModifier = 0;
+
+    GBC_CPU_DividerTicks = 0;
+    GBC_CPU_CounterTicks = 0;
+    GBC_CPU_CounterFrequency = 0;
+
     //GBC_CPU_MemoryAccessDelayState = GBC_CPU_MEMORY_ACCESS_DELAY_STATE_NONE;
 }
 
@@ -5055,4 +5065,64 @@ void GBC_CPU_Step()
         GBC_CPU_DebugPrintEnabled = false;
     }
 #endif
+
+    GBC_CPU_DividerTicks += GBC_CPU_StepTicks;
+
+    // Timer divider register is incremented at rate of 16384Hz
+    while (GBC_CPU_DividerTicks >= 256)
+    {
+        GBC_CPU_DividerTicks -= 256;
+
+        GBC_MMU_Memory.IO.TimerDivider++;
+    }
+
+    if (GBC_MMU_Memory.IO.TimerRunning)
+    {
+        GBC_CPU_CounterTicks += GBC_CPU_StepTicks;
+
+        switch (GBC_MMU_Memory.IO.TimerSpeed)
+        {
+            case 0:
+                GBC_CPU_CounterFrequency = 1024;    // 4096Hz
+                break;
+            case 1:
+                GBC_CPU_CounterFrequency = 16;      // 262144Hz
+                break;
+            case 2:
+                GBC_CPU_CounterFrequency = 64;      // 65536Hz
+                break;
+            case 3:
+                GBC_CPU_CounterFrequency = 256;     // 16384Hz
+                break;
+        }
+
+        while (GBC_CPU_CounterTicks >= GBC_CPU_CounterFrequency)
+        {
+            GBC_CPU_CounterTicks -= GBC_CPU_CounterFrequency;
+
+            if (GBC_MMU_Memory.IO.TimerCounter == 0xFF)
+            {
+                // When TimerCounter overflows the value of TimerModulo will be used as start value
+                GBC_MMU_Memory.IO.TimerCounter = GBC_MMU_Memory.IO.TimerModulo;
+
+                GBC_MMU_Memory.IO.InterruptFlags |= GBC_MMU_INTERRUPT_FLAGS_TIMER;
+            }
+            else
+            {
+                GBC_MMU_Memory.IO.TimerCounter++;
+            }
+        }
+    }
+}
+
+void GBC_CPU_ResetDivider(void)
+{
+    GBC_CPU_DividerTicks = 0;
+    GBC_MMU_Memory.IO.TimerDivider = 0;
+}
+
+void GBC_CPU_ResetCounter(void)
+{
+    GBC_CPU_CounterTicks = 0;
+    GBC_MMU_Memory.IO.TimerCounter = GBC_MMU_Memory.IO.TimerModulo;
 }

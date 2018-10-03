@@ -2,7 +2,6 @@
 #include "gbc_cpu.h"
 #include "gbc_gpu.h"
 #include "gbc_mmu.h"
-#include "gbc_tim.h"
 #include "gbc_apu.h"
 #include "cmod.h"
 #include "sdc.h"
@@ -27,7 +26,6 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
     }
 
     GBC_CPU_Initialize();
-    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
     GBC_APU_Initialize();
 
@@ -52,7 +50,6 @@ GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
     }
 
     GBC_CPU_Initialize();
-    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
     GBC_APU_Initialize();
 
@@ -103,17 +100,13 @@ void GBC_Update(void)
     {
         GBC_CPU_Step();
 
-        // Timer and Divider Registers will operate twice
-        // as fast in GBC mode, so no tick scaling required
-        GBC_TIM_Step();
-
         // Scale CPU ticks based on speed modifier
         GBC_CPU_StepTicks >>= GBC_CPU_SpeedModifier;
 
         GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
-    
+
     // Save RAM after every frame.
     //GBC_SDC_SaveERAM();
 }

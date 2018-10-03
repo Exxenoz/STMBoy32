@@ -125,5 +125,7 @@ extern uint32_t GBC_CPU_SpeedModifier;      // External declaration for GBC file
 
 void GBC_CPU_Initialize(void);
 void GBC_CPU_Step(void);
+void GBC_CPU_ResetDivider(void);
+void GBC_CPU_ResetCounter(void);
 
 #endif

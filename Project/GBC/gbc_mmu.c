@@ -1,5 +1,4 @@
 #include "gbc_mmu.h"
-#include "gbc_tim.h"
 #include "gbc_apu.h"
 #include "gbc_gpu.h"
 #include "gbc_cpu.h"
@@ -875,7 +874,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     GBC_MMU_Memory.IO.Data[address - 0xFF00] = value;
                     break;
                 case 0xFF04: // Timer Divider: Writing any value to this register resets it to 0
-                    GBC_TIM_ResetDivider();
+                    GBC_CPU_ResetDivider();
                     break;
                 case 0xFF05:
                 case 0xFF06:
@@ -886,7 +885,7 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
 
                     if (GBC_MMU_Memory.IO.TimerRunning != (value & 0x03))
                     {
-                        GBC_TIM_ResetCounter();
+                        GBC_CPU_ResetCounter();
                     }
 
                     GBC_MMU_Memory.IO.TimerControl = value;
