@@ -5055,6 +5055,4 @@ void GBC_CPU_Step()
         GBC_CPU_DebugPrintEnabled = false;
     }
 #endif
-
-    GBC_CPU_StepTicks >>= GBC_CPU_SpeedModifier;
 }

@@ -102,7 +102,14 @@ void GBC_Update(void)
     do
     {
         GBC_CPU_Step();
+
+        // Timer and Divider Registers will operate twice
+        // as fast in GBC mode, so no tick scaling required
         GBC_TIM_Step();
+
+        // Scale CPU ticks based on speed modifier
+        GBC_CPU_StepTicks >>= GBC_CPU_SpeedModifier;
+
         GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
