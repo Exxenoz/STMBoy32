@@ -250,7 +250,6 @@ void Audio_Update(void)
 {
     Audio_Join();
 
-    GPIOG->ODR ^= GPIO_PIN_9;
     if (Audio_Playback == AUDIO_PLAYBACK_NONE)
     {
         return;
