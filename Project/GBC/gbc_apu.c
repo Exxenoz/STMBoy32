@@ -109,6 +109,25 @@ static const uint32_t GBC_APU_BaseNoiseFrequencies[8] =
     }                                                                                                                                                   \
 }                                                                                                                                                       \
 
+#define HANDLE_ZOMBIE_VOLUME(ENVELOPE_ENABLED, ENVELOPE_VOLUME, OLD_VALUE, NEW_VALUE)                                                                   \
+{                                                                                                                                                       \
+    if (!(OLD_VALUE & 7) && ENVELOPE_ENABLED)                                                                                                           \
+    {                                                                                                                                                   \
+        ENVELOPE_VOLUME++;                                                                                                                              \
+    }                                                                                                                                                   \
+    else if (!(OLD_VALUE & 8))                                                                                                                          \
+    {                                                                                                                                                   \
+        ENVELOPE_VOLUME += 2;                                                                                                                           \
+    }                                                                                                                                                   \
+                                                                                                                                                        \
+    if ((OLD_VALUE ^ NEW_VALUE) & 8)                                                                                                                    \
+    {                                                                                                                                                   \
+        ENVELOPE_VOLUME = 16 - ENVELOPE_VOLUME;                                                                                                         \
+    }                                                                                                                                                   \
+                                                                                                                                                        \
+    ENVELOPE_VOLUME &= 0xF;                                                                                                                             \
+}                                                                                                                                                       \
+
 void GBC_APU_InitializeChannel1(void)
 {
     GBC_APU_Channel1Phase = 0;
@@ -638,6 +657,8 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
 
             GBC_APU_Channel1EnvelopeLengthCounter = GBC_MMU_Memory.IO.Channel1EnvelopeSweepNumber;
             GBC_APU_Channel1EnvelopeVolume = GBC_MMU_Memory.IO.Channel1InitialEnvelopeVolume;
+
+            HANDLE_ZOMBIE_VOLUME(GBC_APU_Channel1EnvelopeEnabled, GBC_APU_Channel1EnvelopeVolume, oldValue, value);
             break;
         case 0xFF13:
             GBC_APU_Channel1PhaseFrequency = GET_CHANNEL1_FREQUENCY();
@@ -719,6 +740,8 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
 
             GBC_APU_Channel2EnvelopeLengthCounter = GBC_MMU_Memory.IO.Channel2EnvelopeSweepNumber;
             GBC_APU_Channel2EnvelopeVolume = GBC_MMU_Memory.IO.Channel2InitialEnvelopeVolume;
+
+            HANDLE_ZOMBIE_VOLUME(GBC_APU_Channel2EnvelopeEnabled, GBC_APU_Channel2EnvelopeVolume, oldValue, value);
             break;
         case 0xFF18:
             GBC_APU_Channel2PhaseFrequency = GET_CHANNEL2_FREQUENCY();
@@ -866,6 +889,8 @@ void GBC_APU_OnWriteToSoundRegister(uint16_t address, uint8_t value, uint8_t old
 
             GBC_APU_Channel4EnvelopeLengthCounter = GBC_MMU_Memory.IO.Channel4EnvelopeSweepNumber;
             GBC_APU_Channel4EnvelopeVolume = GBC_MMU_Memory.IO.Channel4InitialEnvelopeVolume;
+
+            HANDLE_ZOMBIE_VOLUME(GBC_APU_Channel4EnvelopeEnabled, GBC_APU_Channel4EnvelopeVolume, oldValue, value);
             break;
         case 0xFF22:
             GBC_APU_Channel4Frequency = GBC_APU_BaseNoiseFrequencies[GBC_MMU_Memory.IO.Channel4PolynomialCounterFreqDivRatio] >> (GBC_MMU_Memory.IO.Channel4PolynomialCounterShiftClockFreq + 1);
