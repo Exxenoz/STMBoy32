@@ -612,17 +612,22 @@ static void GBC_MMU_StartGDMATransfer(void)
     // The lower four bits of the destination address are ignored (treated as zero)
     dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
 
-    dstAddress |= 0x8000;
-
     uint16_t length = GBC_MMU_Memory.IO.NewDMALengthModeStart.TransferLength;
 
     // Transfer Length was divided by 10h, minus 1
     length *= 16;
     length += 16;
 
-    for (uint32_t i = 0; i < length; i++, srcAddress++, dstAddress++)
+    if (GBC_MMU_Memory.IO.VRAMBankID)
     {
-        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+        for (uint32_t i = 0; i < length; i++, srcAddress++, dstAddress++)
+        {
+            GBC_MMU_Memory.VRAMBank1.Data[dstAddress] = GBC_MMU_ReadByte(srcAddress);
+        }
+    }
+    else for (uint32_t i = 0; i < length; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_Memory.VRAMBank0.Data[dstAddress] = GBC_MMU_ReadByte(srcAddress);
     }
 
     // The execution of the program continues when the transfer has been completed, and FF55 then contains a value of FFh
@@ -668,20 +673,23 @@ uint32_t GBC_MMU_StartHDMATransfer(void)
     // The lower four bits of the destination address are ignored (treated as zero)
     dstAddress |= (GBC_MMU_Memory.IO.NewDMADestinationLow & 0xF0);
 
-    dstAddress |= 0x8000;
-
-    for (uint32_t i = 0; i < 16; i++, srcAddress++, dstAddress++)
+    if (GBC_MMU_Memory.IO.VRAMBankID)
     {
-        GBC_MMU_WriteByte(dstAddress, GBC_MMU_ReadByte(srcAddress));
+        for (uint32_t i = 0; i < 16; i++, srcAddress++, dstAddress++)
+        {
+            GBC_MMU_Memory.VRAMBank1.Data[dstAddress] = GBC_MMU_ReadByte(srcAddress);
+        }
+    }
+    else for (uint32_t i = 0; i < 16; i++, srcAddress++, dstAddress++)
+    {
+        GBC_MMU_Memory.VRAMBank0.Data[dstAddress] = GBC_MMU_ReadByte(srcAddress);
     }
 
-    srcAddress += 16;
     if (srcAddress == 0x8000)
     {
         srcAddress = 0xA000;
     }
 
-    dstAddress += 16;
     if (dstAddress == 0xA000)
     {
         dstAddress = 0x8000;
@@ -1047,12 +1055,9 @@ void GBC_MMU_WriteByte(uint16_t address, uint8_t value)
                     // The written value specifies the transfer source address divided by 100h
                     uint16_t address = value << 8;
 
-                    if (address >= 0x8000 && address < 0xE000)
+                    for (uint32_t i = 0; i < 160; i++, address++)
                     {
-                        for (uint32_t i = 0; i < 160; i++, address++)
-                        {
-                            GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
-                        }
+                        GBC_MMU_Memory.OAM.Data[i] = GBC_MMU_ReadByte(address);
                     }
 
                     break;
