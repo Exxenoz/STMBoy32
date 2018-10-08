@@ -184,17 +184,22 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         }
 
         // Read complete ROM and write it to SDRAM
-        for (uint32_t position = 0, address = SDRAM_BANK_ADDR + WRITE_READ_ADDR; bytesRead; position += 512, address += 512)
+        for (uint32_t position = 0, address = SDRAM_BANK_ADDR + WRITE_READ_ADDR; bytesRead; position += bytesRead, address += bytesRead)
         {
             f_lseek(&ROMFile, position);
 
-            if (f_read(&ROMFile, &readBuffer, 512, &bytesRead) != FR_OK || (bytesRead != 0 && bytesRead != 512))
+            if (f_read(&ROMFile, &readBuffer, 512, &bytesRead) != FR_OK)
             {
                 f_close(&ROMFile);
                 return false;
             }
 
-            memcpy((void*)address, readBuffer, 512);
+            if (bytesRead == 0)
+            {
+                break;
+            }
+
+            memcpy((void*)address, readBuffer, bytesRead);
         }
 
         f_close(&ROMFile);
