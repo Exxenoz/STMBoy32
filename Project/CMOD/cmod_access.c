@@ -14,7 +14,7 @@ void (*CMOD_OperationTable[3])(void) =
     CMOD_HandleNOP
 };
 
-volatile CMOD_Status_t  CMOD_Status       = CMOD_WAITING;
+volatile CMOD_Status_t  CMOD_Status       = CMOD_TURNED_OFF;
 volatile CMOD_Action_t  CMOD_Action       = CMOD_NOACTION;
 volatile uint16_t       CMOD_Address      = 0x0000;
 volatile uint8_t        *CMOD_DataIn      = NULL;
@@ -36,7 +36,6 @@ void CMOD_TurnON(void)
         HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
 
         CMOD_Status = CMOD_WAITING;
-
         HAL_Delay(100);                          // Wait until CMOD is up and running.
     }
 }
@@ -122,8 +121,6 @@ CMOD_Result_t CMOD_WriteByte(uint16_t address, uint8_t *data)
     if    (CMOD_Status == CMOD_TURNED_OFF) return CMOD_TURNEDOFF;
     while (CMOD_Status == CMOD_PROCESSING);
 
-    CMOD_RST_WR;                                 // WR goes low for a write at ? (in GB)
-
     CMOD_Status       = CMOD_PROCESSING;
     CMOD_Action       = CMOD_WRITE;
     CMOD_Address      = address;
@@ -143,8 +140,6 @@ CMOD_Result_t CMOD_WriteBytes(uint16_t startingAddress, int bytes, uint8_t *data
 {
     if    (CMOD_Status == CMOD_TURNED_OFF) return CMOD_TURNEDOFF;
     while (CMOD_Status == CMOD_PROCESSING);
-
-    CMOD_RST_WR;                                 // WR goes low for a write at ? (in GB)
 
     CMOD_Status       = CMOD_PROCESSING;
     CMOD_Action       = CMOD_WRITE;
@@ -198,18 +193,23 @@ void CMOD_HandleWrite(void)
     if (CMOD_BytesWritten == CMOD_BytesToWrite)             // All Bytes written?
     {
         CMOD_SET_WR;                                        // WR rises after a write 20ns before the CLK rises (in GB).
+        CMOD_RST_RD;                                        // RD goes low after a write some ns after the next CLK rises (in GB).
 
         CMOD_DISABLE_INTERRUPT();                           // Disable Interrupt until needed again.
         CMOD_Action = CMOD_NOACTION;                        // All actions finished.
-        CMOD_Status = CMOD_DATA_READY;                      // -> Write complete.
+        CMOD_Status = CMOD_WRITE_COMPLETE;                  // -> Write complete.
 
         return;
     }
 
+    CMOD_SET_RD;                                            // RD goes high at 140ns (in GB).
     CMOD_SET_ADDR(CMOD_Address + CMOD_BytesWritten);        // Address changes at 140ns (in GB).
+
     CMOD_RST_CS;                                            // CS goes low at 240ns (in GB).
-    CMOD_BytesWritten++;                                    // Increase BytesWritten in good faith.
+    CMOD_RST_WR;                                            // WR goes low for a write at ? (in GB)
     CMOD_SET_DATA(CMOD_DataOut[CMOD_BytesWritten - 1]);     // Data Bus is driven at 480ns (falling CLK) (in GB).
+
+    CMOD_BytesWritten++;                                    // Increase BytesWritten in good faith.
 }
 
 void CMOD_HandleNOP(void)

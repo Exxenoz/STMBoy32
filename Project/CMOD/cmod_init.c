@@ -21,18 +21,27 @@ void CMOD_Initialize_GPIOS(void)
     #define INITIALIZE_OUTPUT_PIN(PORT, PIN)       \
     GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;    \
     GPIO_InitObject.Pin   = PIN;                     \
-    GPIO_InitObject.Pull  = GPIO_NOPULL;              \
+    GPIO_InitObject.Pull  = GPIO_PULLDOWN;            \
     GPIO_InitObject.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
     HAL_GPIO_Init(PORT, &GPIO_InitObject);              \
 
     INITIALIZE_OUTPUT_PIN(CMOD_LLC_PORT,   CMOD_LLC_DD_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_LLC_PORT,   CMOD_LLC_OE_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_RESET_PORT, CMOD_RESET_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_CS_PORT,    CMOD_CS_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_RD_PORT,    CMOD_RD_PIN);
-    INITIALIZE_OUTPUT_PIN(CMOD_WR_PORT,    CMOD_WR_PIN);
     INITIALIZE_OUTPUT_PIN(CMOD_ADDR_PORT,  CMOD_ADDR_PINS);
     INITIALIZE_OUTPUT_PIN(CMOD_DATA_PORT,  CMOD_DATA_PINS);
+
+    GPIO_InitObject.Pull = GPIO_PULLUP;
+    GPIO_InitObject.Pin  = CMOD_LLC_OE_PIN;
+    HAL_GPIO_Init(CMOD_LLC_PORT, &GPIO_InitObject);
+    
+    GPIO_InitObject.Pin  = CMOD_RESET_PIN;
+    HAL_GPIO_Init(CMOD_RESET_PORT, &GPIO_InitObject);
+    
+    GPIO_InitObject.Pin  = CMOD_CS_PIN;
+    HAL_GPIO_Init(CMOD_CS_PORT, &GPIO_InitObject);
+    
+    GPIO_InitObject.Pin  = CMOD_WR_PIN;
+    HAL_GPIO_Init(CMOD_WR_PORT, &GPIO_InitObject);
 }
 
 void CMOD_Initialize_CLK(void)
@@ -74,11 +83,10 @@ void CMOD_Initialize(void)
     CMOD_Initialize_GPIOS();
     CMOD_Initialize_CLK();
 
-    CMOD_DISABLE_LLC();         // ToDo: Implement pullup so LLC is disabled per default.
     CMOD_SET_RESET;
-    CMOD_RST_CS;
+    CMOD_SET_CS;
     CMOD_SET_WR;
-    CMOD_SET_RD;
+    CMOD_RST_RD;
 
     CMOD_Initialized = true;
 }
