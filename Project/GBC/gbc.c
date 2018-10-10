@@ -2,7 +2,6 @@
 #include "gbc_cpu.h"
 #include "gbc_gpu.h"
 #include "gbc_mmu.h"
-#include "gbc_tim.h"
 #include "gbc_apu.h"
 #include "cmod_access.h"
 #include "sdc.h"
@@ -28,7 +27,6 @@ GBC_LoadResult_t GBC_LoadFromCartridge(void)
     }
 
     GBC_CPU_Initialize();
-    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
     GBC_APU_Initialize();
 
@@ -54,7 +52,6 @@ GBC_LoadResult_t GBC_LoadFromSDC(char* fileName)
     }
 
     GBC_CPU_Initialize();
-    GBC_TIM_Initialize();
     GBC_GPU_Initialize();
     GBC_APU_Initialize();
 
@@ -100,15 +97,32 @@ bool GBC_IsLoadedFromSDC(void)
 
 void GBC_Update(void)
 {
+    uint32_t cacheForStepTicks = 0;
+
     // Update until VBlank occurs
     do
     {
         GBC_CPU_Step();
-        GBC_TIM_Step();
+
+        // Double Speed Mode
+        if (GBC_CPU_SpeedModifier)
+        {
+            // Divide CPU step ticks by 2
+            GBC_CPU_StepTicks >>= 1;
+            // Cache CPU step ticks from first CPU step
+            cacheForStepTicks = GBC_CPU_StepTicks;
+            // Process next CPU step; GBC_CPU_StepTicks will be overwritten
+            GBC_CPU_Step();
+            // Divide CPU step ticks by 2
+            GBC_CPU_StepTicks >>= 1;
+            // Add ticks from first CPU step
+            GBC_CPU_StepTicks += cacheForStepTicks;
+        }
+
         GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
-    
+
     // Save RAM after every frame.
     //GBC_SDC_SaveERAM();
 }
