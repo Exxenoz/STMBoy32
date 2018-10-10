@@ -33,6 +33,7 @@ void CMOD_TurnON(void)
         CMOD_ENABLE_LLC();
 
         HAL_TIM_PWM_Start_IT(&CMOD_TimerHandle, CMOD_TIM_CHANNEL);
+
         HAL_NVIC_EnableIRQ(CMOD_TIM_NVIC_CHANNEL);
 
         CMOD_Status = CMOD_WAITING;

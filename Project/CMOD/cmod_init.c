@@ -61,7 +61,7 @@ void CMOD_Initialize_CLK(void)
     CMOD_TimerHandle.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     CMOD_TimerHandle.Init.RepetitionCounter = 0;
 
-    CMOD_TIM_OCInitObject.Pulse        = 47; 
+    CMOD_TIM_OCInitObject.Pulse        = 47;
     CMOD_TIM_OCInitObject.OCMode       = TIM_OCMODE_PWM1;
     CMOD_TIM_OCInitObject.OCFastMode   = TIM_OCFAST_DISABLE;
     CMOD_TIM_OCInitObject.OCPolarity   = TIM_OCPOLARITY_LOW;

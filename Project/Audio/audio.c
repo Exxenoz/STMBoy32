@@ -41,8 +41,6 @@ void Audio_InitializeBuffer(void)
 void Audio_InitializeGPIO(void)
 {
     GPIO_InitTypeDef GPIO_InitObject = {0};
-
-
     GPIO_InitObject.Mode  = GPIO_MODE_ANALOG;
     GPIO_InitObject.Pin   = AUDIO_L_PIN;
     GPIO_InitObject.Pull  = GPIO_NOPULL;
@@ -101,9 +99,10 @@ void Audio_InitializeTimer(Audio_OutputMode_t outputMode)
 
     HAL_TIM_Base_Init(&Audio_TimerHandle);
 
-    Audio_MasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    Audio_MasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &Audio_MasterConfig);
+    static TIM_MasterConfigTypeDef masterConfig;
+    masterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    masterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&Audio_TimerHandle, &masterConfig);
 
     HAL_TIM_Base_Start(&Audio_TimerHandle);
 }

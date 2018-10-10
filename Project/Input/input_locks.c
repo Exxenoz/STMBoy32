@@ -37,7 +37,7 @@ void Input_UpdateLocks(void)
             // If lock is enabled calculate for how long it has been locked.
             long timeLocked = INPUT_LOCK_TIM->CNT - Input_Locks[i].LockedSince;
 
-            // If timeLocked is negative timer has overflowed -> add max timer value to correct it. ToDo: FIX
+            // If timeLocked is negative timer has overflowed -> add max timer value to correct it. ToDo: FIX naming
             if (timeLocked < 0) timeLocked += MAX_16BIT_TIMER_PERIOD;
 
             // Disable the lock if button was released.
