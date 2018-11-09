@@ -21,8 +21,7 @@ DAC_HandleTypeDef       Audio_DACHandle;
 DAC_ChannelConfTypeDef  Audio_ChannelConfigL;
 DAC_ChannelConfTypeDef  Audio_ChannelConfigR;
 
-#define AUDIO_SET_SD AUDIO_SD_PORT->BSRRL |= AUDIO_SD_PIN
-#define AUDIO_RST_SD AUDIO_SD_PORT->BSRRH |= AUDIO_SD_PIN
+
 
 void Audio_InitializeBuffer(void)
 {
@@ -51,8 +50,12 @@ void Audio_InitializeGPIO(void)
     HAL_GPIO_Init(AUDIO_R_PORT, &GPIO_InitObject);
 
     GPIO_InitObject.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitObject.Pin   = AUDIO_SD_PIN;
-    HAL_GPIO_Init(AUDIO_SD_PORT, &GPIO_InitObject);
+    GPIO_InitObject.Pin   = AUDIO_NSD_PIN;
+    HAL_GPIO_Init(AUDIO_NSD_PORT, &GPIO_InitObject);
+    GPIO_InitObject.Pin   = AUDIO_NMUTE_PIN;
+    HAL_GPIO_Init(AUDIO_NMUTE_PORT, &GPIO_InitObject);
+    GPIO_InitObject.Pin   = AUDIO_MODE_PIN;
+    HAL_GPIO_Init(AUDIO_MODE_PORT, &GPIO_InitObject);
 }
 
 void Audio_InitializeDAC(void)
@@ -83,14 +86,14 @@ void Audio_InitializeTimer(Audio_OutputMode_t outputMode)
     {
         /**************************************
         // Duration of one GB frame:     0,0167427062988281s
-        // Audio samples per frame:      532
-        // Duration of one audio sample: 0,0167427062988281s / 532 = 3,1471240601503759398496240601504e-5
+        // Audio samples per frame:      1064
+        // Duration of one audio sample: 0,0167427062988281s / 1064 = 1,5735626220703101503759398496241e-5
         // Timer frequency:              200MHz
-        // Audio frequency:              1 / 3,1471240601503759398496240601504e-5 = 31775,04225Hz ~ 31,775kHz
-        // Timer period:                 200MHz / 31775,04225Hz = 6294,2481
+        // Audio frequency:              1 / 1,5735626220703101503759398496241e-5 = 63550,06Hz ~ 63,550kHz
+        // Timer period:                 200MHz / 63550,06Hz = 3147,1252
         **************************************/
 
-        Audio_TimerHandle.Init.Period            = 6294;
+        Audio_TimerHandle.Init.Period            = 3147;
         Audio_TimerHandle.Init.Prescaler         = 0;
         Audio_TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
         Audio_TimerHandle.Init.ClockDivision     = 0;
@@ -160,18 +163,34 @@ void Audio_Initialize(void)
     Audio_InitializeBuffer();
     Audio_InitializeGPIO();
     Audio_InitializeDAC();
+
+    AUDIO_SET_MODE_D;
+    
     Audio_EnablePower(true);
+    Audio_Mute(false);
 }
 
 void Audio_EnablePower(bool enable)
 {
     if (enable)
     {
-        AUDIO_RST_SD;
+        AUDIO_SET_NSD;
     }
     else
     {
-        AUDIO_SET_SD;
+        AUDIO_RST_NSD;
+    }
+}
+
+void Audio_Mute(bool mute)
+{
+    if (mute)
+    {
+        AUDIO_RST_NMUTE;
+    }
+    else
+    {
+        AUDIO_SET_NMUTE;
     }
 }
 
@@ -201,7 +220,7 @@ void Audio_StartOutput(Audio_Playback_t playback, bool loop)
         Audio_StopOutput();
     }
 
-    Audio_IsPlayingOfBufferLeftFinished = false;
+    Audio_IsPlayingOfBufferLeftFinished  = false;
     Audio_IsPlayingOfBufferRightFinished = false;
 
     switch (playback)
@@ -209,15 +228,15 @@ void Audio_StartOutput(Audio_Playback_t playback, bool loop)
         case AUDIO_PLAYBACK_NONE:
             break;
         case AUDIO_PLAYBACK_FULL:
-            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)Audio_BufferLeft, Audio_BufferSize, Audio_SampleAlignment);
+            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)Audio_BufferLeft,  Audio_BufferSize, Audio_SampleAlignment);
             HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t*)Audio_BufferRight, Audio_BufferSize, Audio_SampleAlignment);
             break;
         case AUDIO_PLAYBACK_HALF1:
-            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)Audio_BufferLeft, Audio_BufferSizeHalf, Audio_SampleAlignment);
+            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)Audio_BufferLeft,  Audio_BufferSizeHalf, Audio_SampleAlignment);
             HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t*)Audio_BufferRight, Audio_BufferSizeHalf, Audio_SampleAlignment);
             break;
         case AUDIO_PLAYBACK_HALF2:
-            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)(&Audio_BufferLeft[Audio_BufferSizeHalf]), Audio_BufferSizeHalf, Audio_SampleAlignment);
+            HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_L_CHANNEL, (uint32_t*)(&Audio_BufferLeft[Audio_BufferSizeHalf]),  Audio_BufferSizeHalf, Audio_SampleAlignment);
             HAL_DAC_Start_DMA(&Audio_DACHandle, AUDIO_DAC_R_CHANNEL, (uint32_t*)(&Audio_BufferRight[Audio_BufferSizeHalf]), Audio_BufferSizeHalf, Audio_SampleAlignment);
             break;
         default:

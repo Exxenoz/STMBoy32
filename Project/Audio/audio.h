@@ -7,6 +7,17 @@
 #define AUDIO_SET_SD        AUDIO_SD_PORT->BSRRL |= AUDIO_SD_PIN
 #define AUDIO_RST_SD        AUDIO_SD_PORT->BSRRH |= AUDIO_SD_PIN
 
+
+#define AUDIO_SET_NSD        AUDIO_NSD_PORT->BSRRL |= AUDIO_NSD_PIN
+#define AUDIO_RST_NSD        AUDIO_NSD_PORT->BSRRH |= AUDIO_NSD_PIN
+
+#define AUDIO_SET_MODE_D     AUDIO_MODE_PORT->BSRRL |= AUDIO_MODE_PIN
+#define AUDIO_SET_MODE_AB    AUDIO_MODE_PORT->BSRRH |= AUDIO_MODE_PIN
+
+#define AUDIO_SET_NMUTE      AUDIO_NMUTE_PORT->BSRRL |= AUDIO_NMUTE_PIN
+#define AUDIO_RST_NMUTE      AUDIO_NMUTE_PORT->BSRRH |= AUDIO_NMUTE_PIN
+
+
 typedef enum Audio_OutputMode_e
 {
     AUDIO_OUTPUTMODE_NONE = 0,
@@ -33,11 +44,12 @@ typedef enum Audio_Playback_e
 Audio_Playback_t;
 
 
+
 void Audio_Initialize(void);
 void Audio_EnablePower(bool enable);
+void Audio_Mute(bool mute);
 
-void Audio_SetOutputBuffer(Audio_OutputMode_t outputMode, Audio_SampleAlignment_t sampleAlignment,
-    uint8_t* bufferLeft, uint8_t* bufferRight, uint32_t bufferSize);
+void Audio_SetOutputBuffer(Audio_OutputMode_t outputMode, Audio_SampleAlignment_t sampleAlignment, uint8_t* bufferLeft, uint8_t* bufferRight, uint32_t bufferSize);
 void Audio_StartOutput(Audio_Playback_t playback, bool loop);
 void Audio_StopOutput(void);
 void Audio_Update(void);
