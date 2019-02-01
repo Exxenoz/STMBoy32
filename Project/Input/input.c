@@ -33,13 +33,13 @@ Input_ButtonState_t Input_CurrState[8] =
 
 const Input_Pins_t Input_Pins[8] =
 {
-    { INPUT_A_PORT, INPUT_A_PIN },
-    { INPUT_B_PORT, INPUT_B_PIN },
-    { INPUT_SELECT_PORT, INPUT_SELECT_PIN },
-    { INPUT_START_PORT, INPUT_START_PIN },
-    { INPUT_FADE_RIGHT_PORT, INPUT_FADE_RIGHT_PIN },
-    { INPUT_FADE_LEFT_PORT, INPUT_FADE_LEFT_PIN },
-    { INPUT_FADE_TOP_PORT, INPUT_FADE_TOP_PIN },
+    { INPUT_A_PORT,           INPUT_A_PIN },
+    { INPUT_B_PORT,           INPUT_B_PIN },
+    { INPUT_SELECT_PORT,      INPUT_SELECT_PIN },
+    { INPUT_START_PORT,       INPUT_START_PIN },
+    { INPUT_FADE_RIGHT_PORT,  INPUT_FADE_RIGHT_PIN },
+    { INPUT_FADE_LEFT_PORT,   INPUT_FADE_LEFT_PIN },
+    { INPUT_FADE_TOP_PORT,    INPUT_FADE_TOP_PIN },
     { INPUT_FADE_BOTTOM_PORT, INPUT_FADE_BOTTOM_PIN },
 };
 
@@ -68,13 +68,13 @@ void Input_UpdateGBCJoypad(void)
 
 void TIM2_IRQHandler(void)
 {
-    for (int i = 0; i < 8; i++)
+    // Check state of every Input
+    for (int i = 0; i < NUMBER_OF_INPUTS; i++)
     {
         // If the Input pin is low button/fade is pressed.
         Input_CurrState[i] = ((Input_Pins[i].Port->IDR & Input_Pins[i].Pin) == 0x00) ? INPUT_PRESSED : INPUT_NOT_PRESSED;
 
-        // If the input state didn't change since 1ms ago increase counter.
-        // If the input state changed since 1ms ago reset counter.
+        // If the state didn't change, increase the counter. Otherwise reset it.
         if (Input_CurrState[i] == Input_LastState[i])
         {
             Input_Counter[i]++;
@@ -87,7 +87,7 @@ void TIM2_IRQHandler(void)
         // If the input state didn't change for x cycles (x ms) consider state as permanent.
         if (Input_Counter[i] >= INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED)
         {
-            // Reset the corresponding Input Bit (not pressed) then set it according to the current state.
+            // Reset the corresponding Input Bit (not pressed), then set it according to the current state.
             Input_Interrupt_Flags.allFlags &= ~(Input_Pins[i].Pin >> 1);
             Input_Interrupt_Flags.allFlags |= ((Input_Pins[i].Pin >> 1) & Input_CurrState[i]);
 

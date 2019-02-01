@@ -4,6 +4,7 @@
 #include "common.h"
 
 
+#define NUMBER_OF_INPUTS                                8
 #define INPUT_POLLING_CYCLES_UNTIL_CONSIDERED_PRESSED   10
 
 
