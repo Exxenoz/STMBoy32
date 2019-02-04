@@ -37,6 +37,7 @@ int main(void)
     // Initialize system.
     System_Initialize();
 
+
     // Initialize drivers.
     SDRAM_Initialize();
     SDC_Initialize();
@@ -49,6 +50,7 @@ int main(void)
 
     // Turn on display.
     LCD_SetBrightness(OS_Options.Brightness);
+
 
 
     /* Main loop */

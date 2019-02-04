@@ -508,6 +508,8 @@ void HandleSDCIngame(void)
     }
 
 
+    uint32_t frameCounter = 1; 
+
     while (1)
     {
         // If select and start are pressed simultaneously in game pause it and go to options page.
@@ -530,6 +532,16 @@ void HandleSDCIngame(void)
 
         if (OS_Options.DrawScaled)  LCD_DrawGBCFrameBufferScaled();
         else                        LCD_DrawGBCFrameBuffer();
+        
+        /*
+        // Save RAM after every 120sth frame.
+        if (frameCounter == 120)
+        {
+            GBC_SDC_SaveCurrentERAM();
+            frameCounter = 0;
+        }
+        
+        frameCounter++;*/
     }
 }
 

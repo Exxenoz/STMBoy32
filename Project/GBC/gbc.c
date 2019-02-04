@@ -67,7 +67,7 @@ void GBC_Unload(void)
     GBC_LoadState = GBC_LOAD_STATE_NONE;
 }
 
-void GBC_SDC_SaveERAM(void)
+void GBC_SDC_SaveCurrentERAM(void)
 {
     FIL      file;
     char     path[OS_MAX_PATH_LENGTH];
@@ -78,6 +78,22 @@ void GBC_SDC_SaveERAM(void)
     f_open(&file, path, FA_OPEN_ALWAYS | FA_WRITE);
     f_write(&file, GBC_MMU_Memory.ERAMBank0, 4 * 8192, &bytesWritten);
     f_close(&file);
+}
+
+GBC_LoadResult_t GBC_SDC_LoadERAM(char *path)
+{
+    FIL      file;
+    uint32_t bytesRead;
+
+    f_open(&file, path, FA_OPEN_EXISTING | FA_READ);
+    if (f_read(&file, GBC_MMU_Memory.ERAMBank0, 4 * 8192, &bytesRead) != FR_OK)
+    {
+        f_close(&file);
+        return GBC_LOAD_RESULT_NO_VALID_SAV_FILE;
+    }
+
+    f_close(&file);
+    return GBC_LOAD_RESULT_OK;
 }
 
 bool GBC_IsLoaded(void)
@@ -122,7 +138,4 @@ void GBC_Update(void)
         GBC_APU_Step();
     }
     while (!GBC_GPU_Step());
-
-    // Save RAM after every frame.
-    //GBC_SDC_SaveERAM();
 }

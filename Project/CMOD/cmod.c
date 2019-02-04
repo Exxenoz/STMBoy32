@@ -175,7 +175,10 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
         // Write Bank 0, if it fails close and delete the file.
         ;
 
-        if (CMOD_ReadBytes(0x0000, 16384, CMOD_ROMBankX) != CMOD_OK || f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+        CMOD_Result_t cmodResult = CMOD_ReadBytes(0x0000, 16384, CMOD_ROMBankX);
+        FRESULT sdResult = f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten); // Works only with debugger & if breakpoint is set here and...
+        
+        if (cmodResult != CMOD_OK || sdResult != FR_OK || bytesWritten != 16384)
         {
             f_close(&file);
             f_unlink(name);
@@ -199,8 +202,11 @@ CMOD_SaveResult_t CMOD_SaveCartridge(bool overrideExisting)
                 CMOD_ReadBytes(0x4000, 16384, CMOD_ROMBankX);
             }
 
+            FRESULT seekResult  = f_lseek(&file, x * 16384);
+            FRESULT writeResult = f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten); // ...here.
+
             // Write Bank x to the end of the file, if failed close and delete (if something has been written) the file
-            if (f_lseek(&file, x * 16384) != FR_OK || f_write(&file, CMOD_ROMBankX, 16384, &bytesWritten) != FR_OK || bytesWritten != 16384)
+            if (seekResult != FR_OK || writeResult != FR_OK || bytesWritten != 16384)
             {
                 f_close(&file);
                 f_unlink(name);

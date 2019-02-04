@@ -10,6 +10,7 @@
 #include "string.h"
 #include "sdram.h"
 #include "cmod.h"
+#include "os.h"
 
 GBC_MMU_Memory_t GBC_MMU_Memory;                                                   // GBC Memory
 GBC_MMU_MemoryBankController_t GBC_MMU_MemoryBankController = GBC_MMU_MBC_UNKNOWN; // Current Memory Bank Controller
@@ -203,7 +204,7 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
     if (f_open(&ROMFile, fileName, FA_OPEN_EXISTING | FA_READ) == FR_OK)
     {
         uint32_t bytesRead = 0;
-        uint8_t readBuffer[512];
+        uint8_t  readBuffer[512];
 
         // Read ROM Bank 0
         for (long i = 0; i < 16384; i += 512)
@@ -244,6 +245,13 @@ bool GBC_MMU_LoadFromSDC(char* fileName)
         }
 
         f_close(&ROMFile);
+
+        // Load savegame (if there is any)
+        char path[OS_MAX_PATH_LENGTH];
+
+        OS_GetSaveGamePath(&OS_CurrentGame, path, OS_MAX_PATH_LENGTH);
+        GBC_SDC_LoadERAM(path);
+
 
         GBC_MMU_Initialize();
 

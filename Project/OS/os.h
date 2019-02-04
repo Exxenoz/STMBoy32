@@ -15,20 +15,20 @@
 #define OS_OPTIONS_FILE                   "options.txt"
 #define OS_GAME_DIRECTORY                 "Games"
 #define OS_GAME_PATH                      "Games/"
-#define OS_SAVEGAME_DIRECTORY             "SaveGames"
-#define OS_SAVEGAME_PATH                  "SaveGames/"
+#define OS_SAVEGAME_DIRECTORY             "Games"           // ToDo: Create SaveGames folder on SDC
+#define OS_SAVEGAME_PATH                  "Games/"
 #define OS_SAVEGAME_SUFFIX                ".sav"
 #define OS_FAVORITE_DIRECTORY             "Games/Favorites"
 #define OS_FAVORITE_PATH                  "Games/Favorites/"
 
 #define OS_MAX_GAME_TITLE_LENGTH          18
-#define OS_MAX_NUMBER_OF_GAMES            100                  // defines how many games can be loaded to buffer
+#define OS_MAX_NUMBER_OF_GAMES            100                    // defines how many games can be loaded to buffer
 #define OS_MAX_PATH_LENGTH                ((sizeof(OS_FAVORITE_PATH) + OS_MAX_GAME_TITLE_LENGTH + 1))
 
 #define OS_MAIN_PAGE_BUTTON_LOCK_TIME     400
 #define OS_OPTIONS_PAGE_BUTTON_LOCK_TIME  400
 
-#define OS_MIN_BRIGHTNESS                 3                     // User can't go below 3%.
+#define OS_MIN_BRIGHTNESS                 3                      // User can't go below 3%.
 
 typedef enum
 {

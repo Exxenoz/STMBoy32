@@ -77,7 +77,7 @@ void CMOD_Initialize_CLK(void)
 
     HAL_NVIC_SetPriority(CMOD_TIM_NVIC_CHANNEL, INTERRUPT_PRIORITY_2, INTERRUPT_PRIORITY_2);
 }
-
+#include "cmod_access.h"
 void CMOD_Initialize(void)
 {
     CMOD_Initialize_GPIOS();
