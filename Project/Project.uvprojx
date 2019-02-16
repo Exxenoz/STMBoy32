@@ -904,7 +904,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -1922,7 +1922,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -2939,7 +2939,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -3954,7 +3954,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -4969,7 +4969,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -5984,7 +5984,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -7001,7 +7001,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -8016,7 +8016,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -9033,7 +9033,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
@@ -10051,7 +10051,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OS</GroupName>
+          <GroupName>OS_Core</GroupName>
           <Files>
             <File>
               <FileName>os.c</FileName>
