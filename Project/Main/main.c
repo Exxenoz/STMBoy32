@@ -31,12 +31,11 @@
 
 int main(void)
 {
-    // Initialize library.
+    // Initialize HAL.
     HAL_Init();
 
     // Initialize system.
     System_Initialize();
-
 
     // Initialize drivers.
     SDRAM_Initialize();
@@ -48,9 +47,8 @@ int main(void)
     Audio_Initialize();
     Input_Initialize();
 
-    // Turn on display.
+    // Set brightness according to settings.
     LCD_SetBrightness(OS_Options.Brightness);
-
 
 
     /* Main loop */
